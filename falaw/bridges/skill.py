@@ -1,6 +1,6 @@
-"""Render a Claude SKILL.md (and references) from the pyfal tool registry.
+"""Render a Claude SKILL.md (and references) from the falaw tool registry.
 
-The skill is the entry point that teaches Claude Code how to use pyfal. It
+The skill is the entry point that teaches Claude Code how to use falaw. It
 is generated --- never hand-edited at the install location --- so adding a
 new tool automatically updates the skill the next time we run
 `write_skill_files()`.
@@ -15,7 +15,7 @@ from ..base import ToolSpec
 from ..registry import list_models, list_tools
 
 _HEADER = """---
-name: pyfal
+name: falaw
 description: >-
   Generate and manage AI media (images, video, audio) via fal.ai. Use this
   skill whenever the user wants to generate, edit, upscale, or compose media,
@@ -24,9 +24,9 @@ description: >-
   for self-improvement across sessions.
 ---
 
-# pyfal
+# falaw
 
-Use the `pyfal` Python package as your primary interface to fal.ai.
+Use the `falaw` Python package as your primary interface to fal.ai.
 
 ## Read the journal first
 
@@ -34,7 +34,7 @@ Before doing anything novel, glance at recent journal entries --- past
 sessions may have left notes, gotchas, or suggestions that save you time:
 
 ```python
-from pyfal import journal
+from falaw import journal
 for e in journal.recent(20):
     print(e.kind, '-', e.text[:120])
 ```
@@ -45,7 +45,7 @@ Whenever a model behaved oddly, an error was confusing, or you had to work
 around something, leave a note. This is how the next session learns:
 
 ```python
-from pyfal import journal
+from falaw import journal
 journal.issue("FLUX dev returned NSFW=True for a benign prompt",
               suggestion="Document an example that triggers it",
               tags=("flux", "safety"))
@@ -57,7 +57,7 @@ journal.note("schnell quality=fast returns 1024x1024 by default")
 ## Pick a model without memorizing IDs
 
 ```python
-from pyfal import list_models, pick_model
+from falaw import list_models, pick_model
 [m.id for m in list_models(category='video')]
 pick_model(category='image', quality_tier='ultra').id
 ```
@@ -69,9 +69,9 @@ service, UI) derive their surfaces from the same registry.
 """
 
 _FOOTER_TEMPLATE = """
-## Models known to pyfal
+## Models known to falaw
 
-The model registry lives at `pyfal/data/models.json`. Refresh it from
+The model registry lives at `falaw/data/models.json`. Refresh it from
 `misc/docs/fal_ai_docs_full.md` when fal ships new models. Quick view:
 
 ```
@@ -80,9 +80,9 @@ The model registry lives at `pyfal/data/models.json`. Refresh it from
 
 ## When you can't find what you need
 
-* Check `pyfal/misc/docs/llms-full.txt` for a structured fal.ai overview.
-* Check `pyfal/misc/docs/fal_ai_docs_full.md` for the full corpus (~3MB).
-* Drop into `pyfal.call_fal(application, arguments)` for any model not
+* Check `falaw/misc/docs/llms-full.txt` for a structured fal.ai overview.
+* Check `falaw/misc/docs/fal_ai_docs_full.md` for the full corpus (~3MB).
+* Drop into `falaw.call_fal(application, arguments)` for any model not
   yet wrapped --- this is the escape hatch. Then leave a `journal.improvement`
   asking for a proper tool wrapper.
 """
@@ -93,13 +93,13 @@ def build_skill_md(tools: Optional[Iterable[ToolSpec]] = None) -> str:
     tools = list(tools if tools is not None else list_tools())
     parts = [_HEADER]
     for t in tools:
-        parts.append(f"\n### `pyfal.{t.name}`\n")
+        parts.append(f"\n### `falaw.{t.name}`\n")
         parts.append(t.description.strip())
         parts.append("")
         if t.examples:
             parts.append("Examples:")
             for ex in t.examples:
-                parts.append(f"  - `pyfal.{t.name}(**{dict(ex)!r})`")
+                parts.append(f"  - `falaw.{t.name}(**{dict(ex)!r})`")
             parts.append("")
     model_lines = "\n".join(
         f"  {m.category:20s} {m.quality_tier:10s} {m.id}"

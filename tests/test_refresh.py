@@ -1,7 +1,7 @@
-"""Offline tests for pyfal.refresh.
+"""Offline tests for falaw.refresh.
 
 We don't hit the network here. Network behavior is verified via the CLI
-(`python -m pyfal refresh-llms`) and by the conditional GET we already
+(`python -m falaw refresh-llms`) and by the conditional GET we already
 confirmed against fal.ai (HTTP 304 with the saved ETag).
 """
 
@@ -14,8 +14,8 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def _isolated_data_dir(tmp_path, monkeypatch):
-    monkeypatch.setenv("PYFAL_DATA_DIR", str(tmp_path))
-    from pyfal.journal import _default_journal
+    monkeypatch.setenv("FALAW_DATA_DIR", str(tmp_path))
+    from falaw.journal import _default_journal
 
     _default_journal.cache_clear()
     yield
@@ -23,7 +23,7 @@ def _isolated_data_dir(tmp_path, monkeypatch):
 
 
 def test_parse_index_dedups_and_filters(tmp_path):
-    from pyfal.refresh import _parse_index
+    from falaw.refresh import _parse_index
 
     idx = tmp_path / "idx.md"
     idx.write_text(
@@ -44,7 +44,7 @@ def test_parse_index_dedups_and_filters(tmp_path):
 
 
 def test_conditional_headers_uses_saved_state():
-    from pyfal.refresh import DocSource, _conditional_headers
+    from falaw.refresh import DocSource, _conditional_headers
 
     src = DocSource(name="x", url="http://x", local_path="/tmp/x")
     state = {"x": {"etag": '"abc"', "last_modified": "Sat, 02 May 2026 08:00:00 GMT"}}
@@ -54,14 +54,14 @@ def test_conditional_headers_uses_saved_state():
 
 
 def test_conditional_headers_empty_when_no_state():
-    from pyfal.refresh import DocSource, _conditional_headers
+    from falaw.refresh import DocSource, _conditional_headers
 
     src = DocSource(name="x", url="http://x", local_path="/tmp/x")
     assert _conditional_headers(src, {}) == {}
 
 
 def test_diff_against_previous_returns_unified_diff(tmp_path):
-    from pyfal.refresh import DocSource, _snapshot_path, diff_against_previous
+    from falaw.refresh import DocSource, _snapshot_path, diff_against_previous
 
     src = DocSource(
         name="d", url="http://x", local_path=str(tmp_path / "d.txt")
@@ -77,7 +77,7 @@ def test_diff_against_previous_returns_unified_diff(tmp_path):
 
 
 def test_state_roundtrip():
-    from pyfal.refresh import _load_state, _save_state
+    from falaw.refresh import _load_state, _save_state
 
     assert _load_state() == {}
     _save_state({"llms": {"etag": '"x"', "fetched_at": 1.0}})
@@ -85,7 +85,7 @@ def test_state_roundtrip():
 
 
 def test_refresh_tools_registered():
-    from pyfal.registry import list_tools
+    from falaw.registry import list_tools
 
     names = {t.name for t in list_tools(tag="refresh")}
     assert "refresh_llms" in names
@@ -93,7 +93,7 @@ def test_refresh_tools_registered():
 
 
 def test_fetch_if_changed_handles_304(monkeypatch, tmp_path):
-    from pyfal import refresh as r
+    from falaw import refresh as r
 
     src = r.DocSource(
         name="t",
@@ -112,7 +112,7 @@ def test_fetch_if_changed_handles_304(monkeypatch, tmp_path):
 
 
 def test_fetch_if_changed_writes_on_200(monkeypatch, tmp_path):
-    from pyfal import refresh as r
+    from falaw import refresh as r
 
     src = r.DocSource(
         name="u",

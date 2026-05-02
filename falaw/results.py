@@ -30,7 +30,7 @@ class Asset:
         if to is None:
             to = os.path.join(
                 os.getcwd(),
-                f"pyfal_asset_{abs(hash(self.url)) % 10**8}{self._infer_extension()}",
+                f"falaw_asset_{abs(hash(self.url)) % 10**8}{self._infer_extension()}",
             )
         parent = os.path.dirname(os.path.abspath(to))
         if parent:

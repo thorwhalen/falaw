@@ -1,4 +1,4 @@
-"""CLI entry: ``python -m pyfal <command>``.
+"""CLI entry: ``python -m falaw <command>``.
 
 Commands:
   refresh-llms          Conditional GET of llms.txt and llms-full.txt.
@@ -41,8 +41,8 @@ def main(argv: list[str] | None = None) -> int:
 
         repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         for d in (
-            os.path.join(repo_root, "pyfal", "data", "skills", "pyfal"),
-            os.path.join(repo_root, ".claude", "skills", "pyfal"),
+            os.path.join(repo_root, "falaw", "data", "skills", "falaw"),
+            os.path.join(repo_root, ".claude", "skills", "falaw"),
         ):
             print("wrote", write_skill_files(d))
         return 0

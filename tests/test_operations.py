@@ -9,9 +9,9 @@ import pytest
 def _isolated_journal(tmp_path, monkeypatch):
     # Re-route the journal so failures during operation tests don't pollute
     # the user's real journal.
-    monkeypatch.setenv("PYFAL_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("FALAW_DATA_DIR", str(tmp_path))
     # Reset the lru_cache that holds the default journal.
-    from pyfal.journal import _default_journal
+    from falaw.journal import _default_journal
 
     _default_journal.cache_clear()
     yield
@@ -38,7 +38,7 @@ def test_generate_image_calls_fal(monkeypatch):
         }
 
     monkeypatch.setattr(fal_client, "subscribe", fake_subscribe)
-    from pyfal import generate_image
+    from falaw import generate_image
 
     r = generate_image("a fox", quality="balanced")
     assert captured["application"] == "fal-ai/flux/dev"
@@ -53,7 +53,7 @@ def test_generate_image_journals_on_error(monkeypatch, tmp_path):
         raise RuntimeError("simulated fal failure")
 
     monkeypatch.setattr(fal_client, "subscribe", boom)
-    from pyfal import generate_image, journal
+    from falaw import generate_image, journal
 
     with pytest.raises(RuntimeError):
         generate_image("anything", quality="fast")

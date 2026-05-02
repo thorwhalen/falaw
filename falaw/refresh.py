@@ -8,12 +8,12 @@ Three layers, cheapest first:
   the doc set, save previous-version snapshots for diffing, journal results.
 
 State (per-source ETag and Last-Modified) is kept under
-``$PYFAL_DATA_DIR/refresh/state.json`` (default ``~/.config/pyfal/refresh/``);
+``$FALAW_DATA_DIR/refresh/state.json`` (default ``~/.config/falaw/refresh/``);
 previous-version snapshots live alongside as ``<source>.prev`` so a successful
 refresh can be diffed against the prior content.
 
-For scheduled / remote runs, set ``PYFAL_DATA_DIR`` to a path *inside* the
-repo (e.g. ``misc/pyfal_state``) so journal entries and refresh state are
+For scheduled / remote runs, set ``FALAW_DATA_DIR`` to a path *inside* the
+repo (e.g. ``misc/falaw_state``) so journal entries and refresh state are
 committed back to the repo on each run.
 """
 
@@ -38,7 +38,7 @@ from .registry import register_tool
 
 
 def _state_dir() -> str:
-    base = os.environ.get("PYFAL_DATA_DIR") or os.path.expanduser("~/.config/pyfal")
+    base = os.environ.get("FALAW_DATA_DIR") or os.path.expanduser("~/.config/falaw")
     d = os.path.join(base, "refresh")
     os.makedirs(d, exist_ok=True)
     return d
@@ -111,7 +111,7 @@ def _request(
     req = urllib.request.Request(
         url,
         method=method,
-        headers={"User-Agent": "pyfal-refresh/0.1", **(extra_headers or {})},
+        headers={"User-Agent": "falaw-refresh/0.1", **(extra_headers or {})},
     )
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
