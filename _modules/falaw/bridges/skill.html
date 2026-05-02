@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.skill &mdash; falaw 0.0.3 documentation</title>
+  <title>falaw.bridges.skill &mdash; falaw 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -53,17 +53,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
 </ul>
 
@@ -113,19 +119,113 @@
 <span class="s2">description: &gt;-</span>
 <span class="s2">  Generate and manage AI media (images, video, audio) via fal.ai. Use this</span>
 <span class="s2">  skill whenever the user wants to generate, edit, upscale, or compose media,</span>
-<span class="s2">  or asks about fal.ai or fal-client. The skill exposes Python tools that</span>
-<span class="s2">  wrap fal-client with smart model selection, result handling, and a journal</span>
-<span class="s2">  for self-improvement across sessions.</span>
+<span class="s2">  or asks about fal.ai or fal-client. Also use it for *directorial* workflows:</span>
+<span class="s2">  the user defines a Scene as data (characters, beats, shots) and falaw renders</span>
+<span class="s2">  it with caching, so a single edit re-renders only what changed.</span>
 <span class="s2">---</span>
 
 <span class="s2"># falaw</span>
 
-<span class="s2">Use the `falaw` Python package as your primary interface to fal.ai.</span>
+<span class="s2">Two ways to use `falaw`:</span>
+
+<span class="s2">1. **Single-shot operations** --- `generate_image`, `text_to_speech`, etc. for</span>
+<span class="s2">   one-off media generation.</span>
+<span class="s2">2. **Directorial workflow** --- author a Scene as data, render it, give notes</span>
+<span class="s2">   that re-edit the Scene, re-render only the affected beats. This is the path</span>
+<span class="s2">   to *direct* a film instead of just *generate* clips.</span>
+
+<span class="s2">## Directorial workflow (when the user wants to &quot;plan, parametrize, render&quot;)</span>
+
+<span class="s2">The thesis: keep the film in *editable structure* all the way down to the</span>
+<span class="s2">pixels. The creator authors a Scene as data; a directorial note becomes a</span>
+<span class="s2">single IR edit; the renderer caches everything content-addressed so unchanged</span>
+<span class="s2">beats don&#39;t re-render.</span>
+
+<span class="s2">### Phase 1: Plan (LLM-assisted or hand-built)</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import parse_screenplay, Scene, Character, Environment, make_beat, make_shot</span>
+
+<span class="s2"># Option A: feed prose / treatment text and let any-llm draft the structure.</span>
+<span class="s2">scene = parse_screenplay(prose_text, title=&quot;Diner Encounter&quot;,</span>
+<span class="s2">                         style=&quot;Wes-Anderson pastel&quot;)</span>
+
+<span class="s2"># Option B: build the Scene directly.</span>
+<span class="s2">scene = Scene(</span>
+<span class="s2">    title=&quot;Diner Encounter&quot;,</span>
+<span class="s2">    style=&quot;Wes-Anderson symmetrical pastel&quot;,</span>
+<span class="s2">    characters=(Character(name=&quot;Sarah&quot;, description=&quot;mid-30s, dark curly hair&quot;),),</span>
+<span class="s2">    environments=(Environment(name=&quot;diner&quot;, description=&quot;1950s chrome diner&quot;,</span>
+<span class="s2">                              time_of_day=&quot;midnight&quot;),),</span>
+<span class="s2">    shots=(make_shot(&quot;two-shot at the booth&quot;, framing=&quot;medium&quot;,</span>
+<span class="s2">                     environment=&quot;diner&quot;, characters=(&quot;Sarah&quot;, &quot;Tom&quot;), index=0),),</span>
+<span class="s2">    beats=(</span>
+<span class="s2">        make_beat(&quot;Sarah&quot;, &quot;Why are you here?&quot;,</span>
+<span class="s2">                  shot_id=&quot;...&quot;, emotion=&quot;wary&quot;, index=0),</span>
+<span class="s2">        make_beat(&quot;Tom&quot;, &quot;I came to apologize.&quot;, index=1),</span>
+<span class="s2">    ),</span>
+<span class="s2">)</span>
+<span class="s2">```</span>
+
+<span class="s2">### Phase 2: Parametrize (set identity anchors)</span>
+
+<span class="s2">Cast each character with a *canonical* face and voice. These anchors get</span>
+<span class="s2">reused for every shot/beat that character appears in --- this is what gives</span>
+<span class="s2">identity continuity.</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import cast_character, establish_environment</span>
+
+<span class="s2">sarah = cast_character(&quot;Sarah&quot;, &quot;mid-30s, dark curly hair, wary eyes&quot;,</span>
+<span class="s2">                       reference_audio_url=&quot;https://.../sarah_sample.wav&quot;)</span>
+<span class="s2">diner = establish_environment(&quot;diner&quot;,</span>
+<span class="s2">                              &quot;1950s chrome diner, neon outside, half-empty booths&quot;,</span>
+<span class="s2">                              time_of_day=&quot;midnight&quot;, lighting=&quot;cool fluorescents&quot;)</span>
+<span class="s2">scene = scene.with_character(sarah).with_environment(diner)</span>
+<span class="s2">```</span>
+
+<span class="s2">### Phase 3: Render (caches; re-edits are cheap)</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import render_scene, save_scene</span>
+
+<span class="s2">manifest = render_scene(scene)             # all beats + shots</span>
+<span class="s2">save_scene(scene, &quot;out/diner_v1.json&quot;)     # snapshot the IR alongside</span>
+<span class="s2">```</span>
+
+<span class="s2">### Phase 4: Direct (notes -&gt; IR edits -&gt; re-render)</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import apply_note_to_beat</span>
+
+<span class="s2"># Pick the beat to direct.</span>
+<span class="s2">beat = scene.beat(&quot;002-tom-...&quot;)</span>
+<span class="s2">edited = apply_note_to_beat(beat, &quot;He cracks on this line; tries to hide it.&quot;)</span>
+<span class="s2">scene2 = scene.with_beat(edited)</span>
+<span class="s2">manifest2 = render_scene(scene2)   # only the edited beat re-renders;</span>
+<span class="s2">                                   # the rest are cache hits.</span>
+<span class="s2">```</span>
+
+<span class="s2">For cross-cutting notes like &quot;tighten the pacing&quot;, use</span>
+<span class="s2">`apply_note_to_scene(scene, note)`. For non-LLM edits, just construct the</span>
+<span class="s2">new dataclass yourself --- everything is frozen so `dataclasses.replace`</span>
+<span class="s2">works.</span>
+
+<span class="s2">### Local stitching</span>
+
+<span class="s2">`falaw.local` (requires ffmpeg) stitches the per-beat lipsynced clips into</span>
+<span class="s2">a watchable scene:</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw.local import concatenate_clips</span>
+<span class="s2">concatenate_clips([m[&quot;url&quot;] for m in manifest[&quot;beats&quot;]],</span>
+<span class="s2">                  output_path=&quot;out/scene.mp4&quot;, transition_s=0.2)</span>
+<span class="s2">```</span>
 
 <span class="s2">## Read the journal first</span>
 
-<span class="s2">Before doing anything novel, glance at recent journal entries --- past</span>
-<span class="s2">sessions may have left notes, gotchas, or suggestions that save you time:</span>
+<span class="s2">Before novel work, glance at recent entries --- past sessions may have</span>
+<span class="s2">left notes that save you time:</span>
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
@@ -135,30 +235,26 @@
 
 <span class="s2">## Leave a journal entry when something surprises you</span>
 
-<span class="s2">Whenever a model behaved oddly, an error was confusing, or you had to work</span>
-<span class="s2">around something, leave a note. This is how the next session learns:</span>
-
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
 <span class="s2">journal.issue(&quot;FLUX dev returned NSFW=True for a benign prompt&quot;,</span>
-<span class="s2">              suggestion=&quot;Document an example that triggers it&quot;,</span>
-<span class="s2">              tags=(&quot;flux&quot;, &quot;safety&quot;))</span>
-<span class="s2">journal.improvement(&quot;Add an `upscale_image` tool that wraps clarity-upscaler&quot;,</span>
-<span class="s2">                    tags=(&quot;backlog&quot;,))</span>
-<span class="s2">journal.note(&quot;schnell quality=fast returns 1024x1024 by default&quot;)</span>
+<span class="s2">              suggestion=&quot;Try guidance_scale=2.0&quot;, tags=(&quot;flux&quot;, &quot;safety&quot;))</span>
+<span class="s2">journal.improvement(&quot;Pass beat.emotion as a TTS prompt arg for emotion-aware models&quot;,</span>
+<span class="s2">                    tags=(&quot;backlog&quot;, &quot;directorial&quot;))</span>
+<span class="s2">journal.note(&quot;schnell at quality=&#39;fast&#39; returns 1024x1024 by default&quot;)</span>
 <span class="s2">```</span>
 
 <span class="s2">## Pick a model without memorizing IDs</span>
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import list_models, pick_model</span>
-<span class="s2">[m.id for m in list_models(category=&#39;video&#39;)]</span>
-<span class="s2">pick_model(category=&#39;image&#39;, quality_tier=&#39;ultra&#39;).id</span>
+<span class="s2">[m.id for m in list_models(category=&#39;image_to_video&#39;)]</span>
+<span class="s2">pick_model(category=&#39;image_edit&#39;, quality_tier=&#39;ultra&#39;).id</span>
 <span class="s2">```</span>
 
 <span class="s2">## Tools</span>
 
-<span class="s2">The functions below are also registered tools; bridges (MCP server, HTTP</span>
+<span class="s2">Every function below is a registered tool; bridges (MCP server, HTTP</span>
 <span class="s2">service, UI) derive their surfaces from the same registry.</span>
 <span class="s2">&quot;&quot;&quot;</span>
 

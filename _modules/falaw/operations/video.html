@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.video &mdash; falaw 0.0.3 documentation</title>
+  <title>falaw.operations.video &mdash; falaw 0.0.4 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=47de8214"></script>
+      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -53,17 +53,23 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
 </ul>
 
@@ -142,9 +148,7 @@
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a video from a text prompt.&quot;&quot;&quot;</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;text_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-    <span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;text_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
     <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span></div>
@@ -191,9 +195,7 @@
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Animate a still image into a video.&quot;&quot;&quot;</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-    <span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
     <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
     <span class="k">if</span> <span class="n">prompt</span><span class="p">:</span>
         <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>

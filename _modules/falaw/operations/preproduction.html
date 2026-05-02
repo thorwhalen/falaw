@@ -1,0 +1,405 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.operations.preproduction &mdash; falaw 0.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.operations.preproduction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.operations.preproduction</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Pre-production: produce reusable identity anchors for a Scene.</span>
+
+<span class="sd">The downstream renderer reuses Character.reference_image_url for every</span>
+<span class="sd">shot featuring that character, and Character.voice for every line they</span>
+<span class="sd">speak. So the quality of the *anchors* set here propagates everywhere.</span>
+
+<span class="sd">Each function returns an updated entity (Character / Environment) you</span>
+<span class="sd">can feed back into the Scene via `scene.with_character(...)` etc.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_call_fal</span><span class="p">,</span> <span class="n">materialize_asset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_model</span><span class="p">,</span> <span class="n">register_tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..results</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span><span class="p">,</span> <span class="n">parse_response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Character</span><span class="p">,</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">Shot</span><span class="p">,</span> <span class="n">Voice</span>
+
+
+<div class="viewcode-block" id="cast_character">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/preproduction.html#falaw.cast_character">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cast_character&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Generate or attach a canonical face image for a character, plus &quot;</span>
+        <span class="s2">&quot;an optional voice. Returns an updated Character with &quot;</span>
+        <span class="s2">&quot;`reference_image_url` set --- the anchor used by every later &quot;</span>
+        <span class="s2">&quot;lipsync render. Pass an existing image_url to skip generation.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;preproduction&quot;</span><span class="p">,</span> <span class="s2">&quot;character&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual description used to generate the face.&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Skip generation and use this image as the face.&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual style applied to the face image (joined to description).&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;voice_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;reference_audio_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;voice_style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sarah&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;mid-30s, sharp features, dark curly hair, wary eyes&quot;</span><span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cast_character</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+    <span class="n">voice_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">reference_audio_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">voice_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a Character with a canonical face (and optional voice).</span>
+
+<span class="sd">    If ``image_url`` is given, we skip face generation and use that</span>
+<span class="sd">    image directly. Otherwise we run text-to-image with the description</span>
+<span class="sd">    (+ optional ``style`` suffix), cache the result, and use the URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">image_url</span><span class="p">:</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
+            <span class="n">prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2"> | style: </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;portrait_4_3&quot;</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;cast_character: face generation produced no asset for </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">image_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+
+    <span class="n">voice</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Voice</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">voice_id</span> <span class="ow">or</span> <span class="n">reference_audio_url</span><span class="p">:</span>
+        <span class="n">voice</span> <span class="o">=</span> <span class="n">Voice</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">voice_id</span><span class="o">=</span><span class="n">voice_id</span><span class="p">,</span>
+            <span class="n">reference_audio_url</span><span class="o">=</span><span class="n">reference_audio_url</span><span class="p">,</span>
+            <span class="n">style_notes</span><span class="o">=</span><span class="n">voice_style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Character</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+        <span class="n">reference_image_url</span><span class="o">=</span><span class="n">image_url</span><span class="p">,</span>
+        <span class="n">voice</span><span class="o">=</span><span class="n">voice</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cast_voice">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/preproduction.html#falaw.cast_voice">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cast_voice&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Attach or refine a Voice for an existing Character. Provide a &quot;</span>
+        <span class="s2">&quot;`reference_audio_url` (for cloning) or a `voice_id` (model-side &quot;</span>
+        <span class="s2">&quot;preset). Returns the updated Character.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;preproduction&quot;</span><span class="p">,</span> <span class="s2">&quot;voice&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;character&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;character&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;voice_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;reference_audio_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;style_notes&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;model_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cast_voice</span><span class="p">(</span>
+    <span class="n">character</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">voice_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">reference_audio_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">style_notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Attach or update the Voice on a Character.&quot;&quot;&quot;</span>
+    <span class="n">voice</span> <span class="o">=</span> <span class="n">Voice</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">character</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">voice_id</span><span class="o">=</span><span class="n">voice_id</span><span class="p">,</span>
+        <span class="n">reference_audio_url</span><span class="o">=</span><span class="n">reference_audio_url</span><span class="p">,</span>
+        <span class="n">style_notes</span><span class="o">=</span><span class="n">style_notes</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">replace</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="n">voice</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="establish_environment">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/preproduction.html#falaw.establish_environment">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;establish_environment&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Generate or attach a canonical establishing image for a &quot;</span>
+        <span class="s2">&quot;location. Used as visual anchor and lighting reference for &quot;</span>
+        <span class="s2">&quot;every shot in that environment. Returns an Environment.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;preproduction&quot;</span><span class="p">,</span> <span class="s2">&quot;environment&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;time_of_day&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;lighting&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;diner&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;1950s American chrome diner, &quot;</span>
+         <span class="s2">&quot;neon outside, half-empty booths&quot;</span><span class="p">,</span> <span class="s2">&quot;time_of_day&quot;</span><span class="p">:</span> <span class="s2">&quot;midnight&quot;</span><span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">establish_environment</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">time_of_day</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">lighting</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Environment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create an Environment with a canonical establishing image.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">image_url</span><span class="p">:</span>
+        <span class="n">prompt_parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">description</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">time_of_day</span><span class="p">:</span>
+            <span class="n">prompt_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;time of day: </span><span class="si">{</span><span class="n">time_of_day</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lighting</span><span class="p">:</span>
+            <span class="n">prompt_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lighting: </span><span class="si">{</span><span class="n">lighting</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prompt_parts</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_16_9&quot;</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">})</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;establish_environment: generation produced no asset for </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">image_url</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+
+    <span class="k">return</span> <span class="n">Environment</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+        <span class="n">time_of_day</span><span class="o">=</span><span class="n">time_of_day</span><span class="p">,</span>
+        <span class="n">lighting</span><span class="o">=</span><span class="n">lighting</span><span class="p">,</span>
+        <span class="n">reference_image_url</span><span class="o">=</span><span class="n">image_url</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="storyboard_shot">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/preproduction.html#falaw.storyboard_shot">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;storyboard_shot&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Render a still preview (storyboard frame) for a single Shot, &quot;</span>
+        <span class="s2">&quot;composited with its Environment and the Characters in view. &quot;</span>
+        <span class="s2">&quot;Returns the URL of the still --- use it as a reference image &quot;</span>
+        <span class="s2">&quot;for downstream image-to-video.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;preproduction&quot;</span><span class="p">,</span> <span class="s2">&quot;storyboard&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;shot&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;shot&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Shot&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;list of falaw.Character&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Result (the still)&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">storyboard_shot</span><span class="p">(</span>
+    <span class="n">shot</span><span class="p">:</span> <span class="n">Shot</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Environment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">characters</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a storyboard still for a Shot.&quot;&quot;&quot;</span>
+    <span class="n">parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">shot</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">&quot;shot&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">shot</span><span class="o">.</span><span class="n">framing</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;framing: </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">framing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;location: </span><span class="si">{</span><span class="n">environment</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">environment</span><span class="o">.</span><span class="n">time_of_day</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;time: </span><span class="si">{</span><span class="n">environment</span><span class="o">.</span><span class="n">time_of_day</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">environment</span><span class="o">.</span><span class="n">lighting</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lighting: </span><span class="si">{</span><span class="n">environment</span><span class="o">.</span><span class="n">lighting</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">characters</span><span class="p">:</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;characters: </span><span class="si">{</span><span class="n">names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;camera: </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;style: </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_16_9&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">})</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

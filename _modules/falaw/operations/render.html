@@ -1,0 +1,495 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.operations.render &mdash; falaw 0.0.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.operations.render</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.operations.render</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Beat / shot / scene rendering with caching.</span>
+
+<span class="sd">The directorial workflow only works if a single IR edit causes only the</span>
+<span class="sd">*affected* parts to re-render. Each renderer here:</span>
+
+<span class="sd">1. Computes a content hash from the IR (``beat_content_hash`` /</span>
+<span class="sd">   ``shot_content_hash``) plus the relevant identity anchors.</span>
+<span class="sd">2. Stores the result in `falaw.cache` keyed by that hash.</span>
+<span class="sd">3. Returns a small dict with ``url``, ``cache_hit``, and ``hash`` so the</span>
+<span class="sd">   scene renderer can build a manifest.</span>
+
+<span class="sd">Outputs:</span>
+
+<span class="sd">* ``render_beat`` --- TTS (using the speaker&#39;s voice) → lipsync to the</span>
+<span class="sd">  speaker&#39;s reference image. Returns a video URL.</span>
+<span class="sd">* ``render_shot`` --- a still or short clip of the visual frame</span>
+<span class="sd">  (storyboard or i2v depending on quality).</span>
+<span class="sd">* ``render_scene`` --- orchestrates beats and shots, returns a manifest</span>
+<span class="sd">  dict that can be persisted next to the Scene file.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">_cache_dir</span><span class="p">,</span> <span class="n">cache_get</span><span class="p">,</span> <span class="n">cache_put</span><span class="p">,</span> <span class="n">cached_call_fal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_model</span><span class="p">,</span> <span class="n">register_tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..results</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Beat</span><span class="p">,</span>
+    <span class="n">Character</span><span class="p">,</span>
+    <span class="n">Environment</span><span class="p">,</span>
+    <span class="n">Scene</span><span class="p">,</span>
+    <span class="n">Shot</span><span class="p">,</span>
+    <span class="n">beat_content_hash</span><span class="p">,</span>
+    <span class="n">shot_content_hash</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1"># --- helpers --------------------------------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_picked_tts_model</span><span class="p">(</span><span class="n">character</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick the right TTS model. Voice cloning if reference audio present;</span>
+<span class="sd">    voice id when set; otherwise the default TTS tier.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span> <span class="ow">and</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span><span class="o">.</span><span class="n">model_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span><span class="o">.</span><span class="n">model_id</span>
+    <span class="k">if</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span> <span class="ow">and</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span><span class="o">.</span><span class="n">reference_audio_url</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;voice_clone&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="s2">&quot;high&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">return</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;tts&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_tts_arguments</span><span class="p">(</span><span class="n">character</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">line</span><span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">args</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">character</span><span class="o">.</span><span class="n">voice</span>
+    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">reference_audio_url</span><span class="p">:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;reference_audio_url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">reference_audio_url</span>
+    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">voice_id</span><span class="p">:</span>
+        <span class="n">args</span><span class="p">[</span><span class="s2">&quot;voice&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">voice_id</span>
+    <span class="k">return</span> <span class="n">args</span>
+
+
+<span class="c1"># --- per-beat -------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="render_beat">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/render.html#falaw.render_beat">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;render_beat&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Render one Beat: TTS (using the speaker&#39;s Voice) → lipsync to &quot;</span>
+        <span class="s2">&quot;the speaker&#39;s reference image. Cached by content hash --- &quot;</span>
+        <span class="s2">&quot;re-rendering an unchanged Beat is a no-op. Returns &quot;</span>
+        <span class="s2">&quot;{url, cache_hit, hash, audio_url}.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;render&quot;</span><span class="p">,</span> <span class="s2">&quot;beat&quot;</span><span class="p">,</span> <span class="s2">&quot;video&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;beat&quot;</span><span class="p">,</span> <span class="s2">&quot;character&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;beat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Beat&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;character&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;tts_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;lipsync_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Bypass cache and re-render.&quot;</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">render_beat</span><span class="p">(</span>
+    <span class="n">beat</span><span class="p">:</span> <span class="n">Beat</span><span class="p">,</span>
+    <span class="n">character</span><span class="p">:</span> <span class="n">Character</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tts_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">lipsync_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render one Beat to a lipsynced video. Returns a small manifest dict.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">beat</span><span class="o">.</span><span class="n">action</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;empty beat (no line, no action)&quot;</span><span class="p">}</span>
+
+    <span class="n">h</span> <span class="o">=</span> <span class="n">beat_content_hash</span><span class="p">(</span><span class="n">beat</span><span class="p">,</span> <span class="n">character</span><span class="o">=</span><span class="n">character</span><span class="p">)</span>
+    <span class="n">cache_app</span> <span class="o">=</span> <span class="s2">&quot;falaw.render_beat&quot;</span>
+    <span class="n">cache_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">hit</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="n">audio_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">video_url</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span><span class="p">:</span>
+        <span class="n">tts_model</span> <span class="o">=</span> <span class="n">_picked_tts_model</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">)</span>
+        <span class="n">tts_args</span> <span class="o">=</span> <span class="n">_tts_arguments</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">tts_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">tts_model</span><span class="p">,</span> <span class="n">tts_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="n">tts_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
+            <span class="n">tts_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">tts_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">tts_args</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tts_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;render_beat: TTS produced no asset for beat </span><span class="si">{</span><span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">audio_url</span> <span class="o">=</span> <span class="n">tts_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+
+    <span class="k">if</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span> <span class="ow">and</span> <span class="n">character</span><span class="o">.</span><span class="n">reference_image_url</span><span class="p">:</span>
+        <span class="n">ls_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;lipsync&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">ls_args</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">reference_image_url</span><span class="p">,</span>
+            <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">ls_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">ls_model</span><span class="p">,</span> <span class="n">ls_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="n">ls_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">ls_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">ls_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">ls_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ls_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="n">video_url</span> <span class="o">=</span> <span class="n">ls_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+
+    <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">video_url</span> <span class="ow">or</span> <span class="n">audio_url</span><span class="p">,</span>
+        <span class="s2">&quot;video_url&quot;</span><span class="p">:</span> <span class="n">video_url</span><span class="p">,</span>
+        <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span>
+        <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+        <span class="s2">&quot;beat_id&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span>
+        <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">cache_put</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">,</span> <span class="n">manifest</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;beat:</span><span class="si">{</span><span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">manifest</span></div>
+
+
+
+<span class="c1"># --- per-shot -------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="render_shot">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/render.html#falaw.render_shot">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;render_shot&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Render a Shot: a still (storyboard) or short clip if &quot;</span>
+        <span class="s2">&quot;`as_video=True` (image-to-video). Cached by content hash. &quot;</span>
+        <span class="s2">&quot;Returns {url, cache_hit, hash, kind}.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;render&quot;</span><span class="p">,</span> <span class="s2">&quot;shot&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;shot&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;shot&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Shot&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;list of falaw.Character&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;as_video&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">render_shot</span><span class="p">(</span>
+    <span class="n">shot</span><span class="p">:</span> <span class="n">Shot</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Environment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">characters</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(),</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">as_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a Shot as a still (default) or a short clip.&quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">shot_content_hash</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;-v&quot;</span> <span class="k">if</span> <span class="n">as_video</span> <span class="k">else</span> <span class="s2">&quot;-i&quot;</span><span class="p">)</span>
+    <span class="n">cache_app</span> <span class="o">=</span> <span class="s2">&quot;falaw.render_shot&quot;</span>
+    <span class="n">cache_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span> <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="n">quality</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">hit</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">shot</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">&quot;shot&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;framing: </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">framing</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;location: </span><span class="si">{</span><span class="n">environment</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">environment</span><span class="o">.</span><span class="n">time_of_day</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;time: </span><span class="si">{</span><span class="n">environment</span><span class="o">.</span><span class="n">time_of_day</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;camera: </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">style</span><span class="p">:</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;style: </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; | &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
+    <span class="n">img_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">img_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span>
+        <span class="n">img_model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_16_9&quot;</span><span class="p">},</span>
+        <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">img_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
+        <span class="n">img_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">img_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">img_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;render_shot: image generation produced no asset for </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">still_url</span> <span class="o">=</span> <span class="n">img_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_video</span><span class="p">:</span>
+        <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">still_url</span><span class="p">,</span> <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+                    <span class="s2">&quot;shot_id&quot;</span><span class="p">:</span> <span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="n">cache_put</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">,</span> <span class="n">manifest</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;shot:</span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">manifest</span>
+
+    <span class="c1"># image -&gt; video</span>
+    <span class="n">i2v_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">i2v_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">still_url</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="p">:</span>
+        <span class="n">i2v_args</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span>
+    <span class="n">i2v_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">i2v_model</span><span class="p">,</span> <span class="n">i2v_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+    <span class="n">i2v_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
+        <span class="n">i2v_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">i2v_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">i2v_args</span>
+    <span class="p">)</span>
+    <span class="n">video_url</span> <span class="o">=</span> <span class="n">i2v_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span> <span class="k">if</span> <span class="n">i2v_result</span><span class="o">.</span><span class="n">first</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">video_url</span> <span class="ow">or</span> <span class="n">still_url</span><span class="p">,</span>
+        <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;still_url&quot;</span><span class="p">:</span> <span class="n">still_url</span><span class="p">,</span>
+        <span class="s2">&quot;video_url&quot;</span><span class="p">:</span> <span class="n">video_url</span><span class="p">,</span>
+        <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+        <span class="s2">&quot;shot_id&quot;</span><span class="p">:</span> <span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">cache_put</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">,</span> <span class="n">manifest</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;shot:</span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">manifest</span></div>
+
+
+
+<span class="c1"># --- whole-scene orchestration --------------------------------------------</span>
+
+
+<div class="viewcode-block" id="render_scene">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/render.html#falaw.render_scene">[docs]</a>
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;render_scene&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Render an entire Scene: every Shot + every Beat, with caching &quot;</span>
+        <span class="s2">&quot;so unchanged units are no-ops. Returns a manifest dict with &quot;</span>
+        <span class="s2">&quot;per-beat and per-shot results, plus aggregate counts. Pass &quot;</span>
+        <span class="s2">&quot;`force=True` to bypass the cache.&quot;</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;render&quot;</span><span class="p">,</span> <span class="s2">&quot;scene&quot;</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;scene&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;scene&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Scene&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;tts_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;lipsync_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;shot_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;shots_as_video&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+            <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">render_scene</span><span class="p">(</span>
+    <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tts_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">lipsync_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+    <span class="n">shot_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">shots_as_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render every shot and beat. Returns a manifest dict.&quot;&quot;&quot;</span>
+    <span class="n">chars_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">characters</span><span class="p">}</span>
+    <span class="n">envs_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">environments</span><span class="p">}</span>
+
+    <span class="n">shot_results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">shot</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">shots</span><span class="p">:</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">envs_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">chars_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">shot</span><span class="o">.</span><span class="n">characters</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">chars_by_name</span>
+        <span class="p">)</span>
+        <span class="n">shot_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">render_shot</span><span class="p">(</span>
+                <span class="n">shot</span><span class="p">,</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+                <span class="n">characters</span><span class="o">=</span><span class="n">chars</span><span class="p">,</span>
+                <span class="n">style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
+                <span class="n">as_video</span><span class="o">=</span><span class="n">shots_as_video</span><span class="p">,</span>
+                <span class="n">quality</span><span class="o">=</span><span class="n">shot_quality</span><span class="p">,</span>
+                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">beat_results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">beats</span><span class="p">:</span>
+        <span class="n">speaker</span> <span class="o">=</span> <span class="n">chars_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">speaker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">beat_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;beat_id&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;no character&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">beat_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">render_beat</span><span class="p">(</span>
+                <span class="n">beat</span><span class="p">,</span> <span class="n">speaker</span><span class="p">,</span>
+                <span class="n">tts_quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">,</span>
+                <span class="n">lipsync_quality</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">,</span>
+                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">cache_hits</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache_hit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">shot_results</span> <span class="o">+</span> <span class="n">beat_results</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
+        <span class="s2">&quot;shot_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">shot_results</span><span class="p">),</span>
+        <span class="s2">&quot;beat_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">beat_results</span><span class="p">),</span>
+        <span class="s2">&quot;cache_hits&quot;</span><span class="p">:</span> <span class="n">cache_hits</span><span class="p">,</span>
+        <span class="s2">&quot;shots&quot;</span><span class="p">:</span> <span class="n">shot_results</span><span class="p">,</span>
+        <span class="s2">&quot;beats&quot;</span><span class="p">:</span> <span class="n">beat_results</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="manifest_path_for">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/render.html#falaw.manifest_path_for">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">manifest_path_for</span><span class="p">(</span><span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return where `render_scene`&#39;s manifest would be saved by default.&quot;&quot;&quot;</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="nb">dir</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="s2">&quot;scenes&quot;</span><span class="p">)</span>
+    <span class="n">safe</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;scene&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">safe</span><span class="si">}</span><span class="s2">.manifest.json&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
