@@ -43,8 +43,10 @@ from .core import call_fal
 def _cache_dir() -> str:
     base = (
         os.environ.get("FALAW_CACHE_DIR")
-        or (os.environ.get("FALAW_DATA_DIR") and
-            os.path.join(os.environ["FALAW_DATA_DIR"], "cache"))
+        or (
+            os.environ.get("FALAW_DATA_DIR")
+            and os.path.join(os.environ["FALAW_DATA_DIR"], "cache")
+        )
         or os.path.expanduser("~/.config/falaw/cache")
     )
     os.makedirs(base, exist_ok=True)
@@ -151,8 +153,18 @@ def materialize_asset(url: str, *, key_hint: str = "") -> str:
 
 def _infer_ext_from_url(url: str) -> str:
     base = url.split("?", 1)[0]
-    for ext in (".mp4", ".mov", ".webm", ".mp3", ".wav", ".m4a",
-                ".png", ".jpg", ".jpeg", ".webp"):
+    for ext in (
+        ".mp4",
+        ".mov",
+        ".webm",
+        ".mp3",
+        ".wav",
+        ".m4a",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+    ):
         if base.lower().endswith(ext):
             return ext
     return ".bin"

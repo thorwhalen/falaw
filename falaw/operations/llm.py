@@ -37,15 +37,21 @@ _DEFAULT_MODEL = "anthropic/claude-3-5-sonnet"
         "properties": {
             "prompt": {"type": "string"},
             "system": {"type": "string"},
-            "model": {"type": "string", "default": _DEFAULT_MODEL,
-                      "description": "OpenRouter model id, e.g. 'anthropic/claude-3-5-sonnet'."},
+            "model": {
+                "type": "string",
+                "default": _DEFAULT_MODEL,
+                "description": "OpenRouter model id, e.g. 'anthropic/claude-3-5-sonnet'.",
+            },
             "temperature": {"type": "number", "default": 0.7},
             "extra": {"type": "object"},
         },
     },
     output_schema={"type": "string"},
     examples=(
-        {"prompt": "summarize this scene in one line", "system": "you are a script consultant"},
+        {
+            "prompt": "summarize this scene in one line",
+            "system": "you are a script consultant",
+        },
     ),
 )
 def llm_complete(
@@ -163,8 +169,11 @@ def parse_screenplay(
         temperature=0.2,
     )
     parsed = _parse_json_loose(response)
-    return _scene_from_llm_dict(parsed, default_title=title or parsed.get("title", "Untitled"),
-                                 default_style=style or parsed.get("style", ""))
+    return _scene_from_llm_dict(
+        parsed,
+        default_title=title or parsed.get("title", "Untitled"),
+        default_style=style or parsed.get("style", ""),
+    )
 
 
 def _parse_json_loose(s: str) -> dict:
@@ -174,7 +183,9 @@ def _parse_json_loose(s: str) -> dict:
     # Extract the largest balanced {...} substring.
     match = re.search(r"\{.*\}", s, flags=re.DOTALL)
     if not match:
-        raise ValueError(f"parse_screenplay: no JSON object in LLM response: {s[:200]!r}")
+        raise ValueError(
+            f"parse_screenplay: no JSON object in LLM response: {s[:200]!r}"
+        )
     try:
         return json.loads(match.group(0))
     except json.JSONDecodeError as exc:
@@ -213,8 +224,7 @@ def _scene_from_llm_dict(d: dict, *, default_title: str, default_style: str) -> 
         for i, s in enumerate(d.get("shots") or [])
     )
     beats = tuple(
-        _beat_with_explicit_id(b, i)
-        for i, b in enumerate(d.get("beats") or [])
+        _beat_with_explicit_id(b, i) for i, b in enumerate(d.get("beats") or [])
     )
     return Scene(
         title=d.get("title", default_title),
@@ -229,6 +239,7 @@ def _scene_from_llm_dict(d: dict, *, default_title: str, default_style: str) -> 
 
 def _shot_with_explicit_id(s: dict, idx: int):
     from ..scene import Shot
+
     sid = s.get("id") or shot_id(
         description=s.get("description", ""),
         framing=s.get("framing", ""),
@@ -288,16 +299,24 @@ Output ONLY the JSON object.
         "required": ["beat", "note"],
         "properties": {
             "beat": {"type": "object", "description": "falaw.Beat"},
-            "note": {"type": "string",
-                     "description": "Plain-English directorial instruction."},
+            "note": {
+                "type": "string",
+                "description": "Plain-English directorial instruction.",
+            },
             "model": {"type": "string", "default": _DEFAULT_MODEL},
         },
     },
     output_schema={"type": "object", "description": "falaw.Beat"},
     examples=(
-        {"beat": {"id": "001-john-abcd", "speaker": "John",
-                  "line": "It's fine.", "emotion": ""},
-         "note": "He cracks on this line --- voice goes up."},
+        {
+            "beat": {
+                "id": "001-john-abcd",
+                "speaker": "John",
+                "line": "It's fine.",
+                "emotion": "",
+            },
+            "note": "He cracks on this line --- voice goes up.",
+        },
     ),
 )
 def apply_note_to_beat(
@@ -369,6 +388,7 @@ def apply_note_to_scene(
 ) -> Scene:
     """Apply a cross-cutting note: LLM proposes per-beat edits, we apply them."""
     from ..scene import scene_to_dict
+
     user_prompt = (
         f"SCENE (JSON):\n{json.dumps(scene_to_dict(scene), indent=2, default=str)}\n\n"
         f"NOTE: {note}\n\n"
@@ -382,4 +402,6 @@ def apply_note_to_scene(
         temperature=0.2,
     )
     parsed = _parse_json_loose(response)
-    return _scene_from_llm_dict(parsed, default_title=scene.title, default_style=scene.style)
+    return _scene_from_llm_dict(
+        parsed, default_title=scene.title, default_style=scene.style
+    )

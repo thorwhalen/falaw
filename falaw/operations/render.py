@@ -83,8 +83,11 @@ def _tts_arguments(character: Character, line: str) -> dict:
             "character": {"type": "object", "description": "falaw.Character"},
             "tts_quality": {"type": "string", "default": "balanced"},
             "lipsync_quality": {"type": "string", "default": "high"},
-            "force": {"type": "boolean", "default": False,
-                      "description": "Bypass cache and re-render."},
+            "force": {
+                "type": "boolean",
+                "default": False,
+                "description": "Bypass cache and re-render.",
+            },
         },
     },
     output_schema={"type": "object"},
@@ -100,8 +103,12 @@ def render_beat(
 ) -> dict:
     """Render one Beat to a lipsynced video. Returns a small manifest dict."""
     if not beat.line and not beat.action:
-        return {"url": "", "cache_hit": False, "hash": "",
-                "skipped": "empty beat (no line, no action)"}
+        return {
+            "url": "",
+            "cache_hit": False,
+            "hash": "",
+            "skipped": "empty beat (no line, no action)",
+        }
 
     h = beat_content_hash(beat, character=character)
     cache_app = "falaw.render_beat"
@@ -119,9 +126,7 @@ def render_beat(
         tts_model = _picked_tts_model(character, quality=tts_quality)
         tts_args = _tts_arguments(character, beat.line)
         tts_raw = cached_call_fal(tts_model, tts_args, refresh=force)
-        tts_result = parse_response(
-            tts_raw, application=tts_model, arguments=tts_args
-        )
+        tts_result = parse_response(tts_raw, application=tts_model, arguments=tts_args)
         if not tts_result.first:
             raise RuntimeError(
                 f"render_beat: TTS produced no asset for beat {beat.id!r}"
@@ -169,8 +174,7 @@ def render_beat(
         "properties": {
             "shot": {"type": "object", "description": "falaw.Shot"},
             "environment": {"type": "object", "description": "falaw.Environment"},
-            "characters": {"type": "array",
-                           "description": "list of falaw.Character"},
+            "characters": {"type": "array", "description": "list of falaw.Character"},
             "style": {"type": "string"},
             "as_video": {"type": "boolean", "default": False},
             "quality": {"type": "string", "default": "balanced"},
@@ -216,19 +220,27 @@ def render_shot(
 
     img_model = pick_model(category="image", quality_tier=quality).id
     img_raw = cached_call_fal(
-        img_model, {"prompt": prompt, "image_size": "landscape_16_9"},
+        img_model,
+        {"prompt": prompt, "image_size": "landscape_16_9"},
         refresh=force,
     )
     img_result = parse_response(
         img_raw, application=img_model, arguments={"prompt": prompt}
     )
     if not img_result.first:
-        raise RuntimeError(f"render_shot: image generation produced no asset for {shot.id!r}")
+        raise RuntimeError(
+            f"render_shot: image generation produced no asset for {shot.id!r}"
+        )
     still_url = img_result.first.url
 
     if not as_video:
-        manifest = {"url": still_url, "kind": "image", "hash": h,
-                    "shot_id": shot.id, "cache_hit": False}
+        manifest = {
+            "url": still_url,
+            "kind": "image",
+            "hash": h,
+            "shot_id": shot.id,
+            "cache_hit": False,
+        }
         cache_put(cache_app, cache_args, manifest, note=f"shot:{shot.id}")
         return manifest
 
@@ -238,9 +250,7 @@ def render_shot(
     if shot.camera:
         i2v_args["prompt"] = shot.camera
     i2v_raw = cached_call_fal(i2v_model, i2v_args, refresh=force)
-    i2v_result = parse_response(
-        i2v_raw, application=i2v_model, arguments=i2v_args
-    )
+    i2v_result = parse_response(i2v_raw, application=i2v_model, arguments=i2v_args)
     video_url = i2v_result.first.url if i2v_result.first else ""
     manifest = {
         "url": video_url or still_url,
@@ -299,9 +309,7 @@ def render_scene(
     for shot in scene.shots:
         env = envs_by_name.get(shot.environment)
         chars = tuple(
-            chars_by_name[name]
-            for name in shot.characters
-            if name in chars_by_name
+            chars_by_name[name] for name in shot.characters if name in chars_by_name
         )
         shot_results.append(
             render_shot(
@@ -320,21 +328,27 @@ def render_scene(
         speaker = chars_by_name.get(beat.speaker)
         if speaker is None:
             beat_results.append(
-                {"beat_id": beat.id, "skipped": "no character",
-                 "speaker": beat.speaker, "cache_hit": False}
+                {
+                    "beat_id": beat.id,
+                    "skipped": "no character",
+                    "speaker": beat.speaker,
+                    "cache_hit": False,
+                }
             )
             continue
         beat_results.append(
             render_beat(
-                beat, speaker,
+                beat,
+                speaker,
                 tts_quality=tts_quality,
                 lipsync_quality=lipsync_quality,
                 force=force,
             )
         )
 
-    cache_hits = sum(int(r.get("cache_hit", False))
-                     for r in shot_results + beat_results)
+    cache_hits = sum(
+        int(r.get("cache_hit", False)) for r in shot_results + beat_results
+    )
     return {
         "title": scene.title,
         "style": scene.style,

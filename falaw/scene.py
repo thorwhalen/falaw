@@ -218,7 +218,9 @@ class Scene:
 # --- id generation --------------------------------------------------------
 
 
-def beat_id(*, speaker: str, line: str, action: str = "", index: Optional[int] = None) -> str:
+def beat_id(
+    *, speaker: str, line: str, action: str = "", index: Optional[int] = None
+) -> str:
     """Deterministic, human-readable-ish beat id.
 
     Pattern: ``{index?}-{speaker_slug}-{content_hash}``. Index makes

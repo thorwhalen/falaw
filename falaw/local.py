@@ -73,11 +73,21 @@ def concatenate_clips(
                 listfile.write(f"file '{os.path.abspath(p)}'\n")
             listpath = listfile.name
         try:
-            os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".",
-                        exist_ok=True)
+            os.makedirs(
+                os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True
+            )
             cmd = [
-                ffmpeg, "-y", "-f", "concat", "-safe", "0",
-                "-i", listpath, "-c", "copy", output_path,
+                ffmpeg,
+                "-y",
+                "-f",
+                "concat",
+                "-safe",
+                "0",
+                "-i",
+                listpath,
+                "-c",
+                "copy",
+                output_path,
             ]
             if not audio:
                 cmd[-1:-1] = ["-an"]
@@ -110,22 +120,23 @@ def concatenate_clips(
         for i in range(1, n):
             a_offset += durations[i - 1] - transition_s
             a_out = f"[a{i}]"
-            filter_lines.append(
-                f"{a_last}[{i}:a]acrossfade=d={transition_s}{a_out}"
-            )
+            filter_lines.append(f"{a_last}[{i}:a]acrossfade=d={transition_s}{a_out}")
             a_last = a_out
         afilter = f";{a_last}"
     filtergraph = ";".join(filter_lines)
     cmd = [
-        ffmpeg, "-y", *inputs, "-filter_complex",
+        ffmpeg,
+        "-y",
+        *inputs,
+        "-filter_complex",
         filtergraph,
-        "-map", last,
+        "-map",
+        last,
     ]
     if audio:
         cmd += ["-map", a_last]
     cmd += [output_path]
-    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".",
-                exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True)
     _run(cmd)
     return output_path
 
@@ -139,12 +150,22 @@ def extract_thumbnail(
     """Save a single frame from a clip as a PNG."""
     ffmpeg = _require("ffmpeg")
     src = _to_local(clip_url)
-    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".",
-                exist_ok=True)
-    _run([
-        ffmpeg, "-y", "-ss", f"{at_seconds:.3f}", "-i", src,
-        "-frames:v", "1", "-q:v", "2", output_path,
-    ])
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True)
+    _run(
+        [
+            ffmpeg,
+            "-y",
+            "-ss",
+            f"{at_seconds:.3f}",
+            "-i",
+            src,
+            "-frames:v",
+            "1",
+            "-q:v",
+            "2",
+            output_path,
+        ]
+    )
     return output_path
 
 
@@ -162,14 +183,14 @@ def overlay_audio(
     ffmpeg = _require("ffmpeg")
     v = _to_local(video_url)
     a = _to_local(audio_url)
-    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".",
-                exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True)
     cmd = [ffmpeg, "-y", "-i", v, "-i", a]
     if replace_audio:
         cmd += ["-map", "0:v:0", "-map", "1:a:0"]
     else:
         cmd += [
-            "-filter_complex", "[0:a][1:a]amix=inputs=2:duration=longest",
+            "-filter_complex",
+            "[0:a][1:a]amix=inputs=2:duration=longest",
         ]
     cmd += ["-c:v", "copy", "-shortest", output_path]
     _run(cmd)
@@ -180,8 +201,16 @@ def _probe_duration(path: str) -> float:
     """Return the duration of a media file in seconds, via ffprobe."""
     ffprobe = _require("ffprobe")
     out = _run(
-        [ffprobe, "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=nokey=1:noprint_wrappers=1", path],
+        [
+            ffprobe,
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=nokey=1:noprint_wrappers=1",
+            path,
+        ],
         capture=True,
     )
     return float(out.strip())

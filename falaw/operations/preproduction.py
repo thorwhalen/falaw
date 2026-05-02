@@ -33,15 +33,23 @@ from ..scene import Character, Environment, Shot, Voice
         "required": ["name", "description"],
         "properties": {
             "name": {"type": "string"},
-            "description": {"type": "string",
-                            "description": "Visual description used to generate the face."},
-            "image_url": {"type": "string",
-                          "description": "Skip generation and use this image as the face."},
-            "style": {"type": "string",
-                      "description": "Visual style applied to the face image (joined to description)."},
-            "quality": {"type": "string",
-                        "enum": ["fast", "balanced", "high", "ultra"],
-                        "default": "high"},
+            "description": {
+                "type": "string",
+                "description": "Visual description used to generate the face.",
+            },
+            "image_url": {
+                "type": "string",
+                "description": "Skip generation and use this image as the face.",
+            },
+            "style": {
+                "type": "string",
+                "description": "Visual style applied to the face image (joined to description).",
+            },
+            "quality": {
+                "type": "string",
+                "enum": ["fast", "balanced", "high", "ultra"],
+                "default": "high",
+            },
             "voice_id": {"type": "string"},
             "reference_audio_url": {"type": "string"},
             "voice_style": {"type": "string"},
@@ -49,7 +57,10 @@ from ..scene import Character, Environment, Shot, Voice
     },
     output_schema={"type": "object", "description": "falaw.Character"},
     examples=(
-        {"name": "Sarah", "description": "mid-30s, sharp features, dark curly hair, wary eyes"},
+        {
+            "name": "Sarah",
+            "description": "mid-30s, sharp features, dark curly hair, wary eyes",
+        },
     ),
 )
 def cast_character(
@@ -157,15 +168,21 @@ def cast_voice(
             "time_of_day": {"type": "string"},
             "lighting": {"type": "string"},
             "image_url": {"type": "string"},
-            "quality": {"type": "string",
-                        "enum": ["fast", "balanced", "high", "ultra"],
-                        "default": "high"},
+            "quality": {
+                "type": "string",
+                "enum": ["fast", "balanced", "high", "ultra"],
+                "default": "high",
+            },
         },
     },
     output_schema={"type": "object", "description": "falaw.Environment"},
     examples=(
-        {"name": "diner", "description": "1950s American chrome diner, "
-         "neon outside, half-empty booths", "time_of_day": "midnight"},
+        {
+            "name": "diner",
+            "description": "1950s American chrome diner, "
+            "neon outside, half-empty booths",
+            "time_of_day": "midnight",
+        },
     ),
 )
 def establish_environment(
@@ -220,9 +237,11 @@ def establish_environment(
             "environment": {"type": "object", "description": "falaw.Environment"},
             "characters": {"type": "array", "description": "list of falaw.Character"},
             "style": {"type": "string"},
-            "quality": {"type": "string",
-                        "enum": ["fast", "balanced", "high", "ultra"],
-                        "default": "balanced"},
+            "quality": {
+                "type": "string",
+                "enum": ["fast", "balanced", "high", "ultra"],
+                "default": "balanced",
+            },
         },
     },
     output_schema={"type": "object", "description": "falaw.Result (the still)"},
