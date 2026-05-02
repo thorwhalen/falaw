@@ -1,0 +1,124 @@
+"""Tool and model registries.
+
+Two registries, both queryable by tags/categories:
+
+* `ToolRegistry` --- decorator-populated, holds the agent-facing surface.
+* `ModelRegistry` --- JSON-backed, catalog of fal models with quality tiers.
+
+Bridges (skill / MCP / HTTP) read the tool registry. Operations call
+`pick_model` to map a (category, quality) pair to a concrete fal model id.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from functools import lru_cache
+from typing import Callable, Optional
+
+from .base import ModelRecord, ToolSpec
+
+_TOOLS: dict[str, ToolSpec] = {}
+
+
+def register_tool(**spec_kwargs) -> Callable:
+    """Decorator: register the wrapped function as a falai tool.
+
+    >>> @register_tool(name='echo', description='echo back', tags=('demo',))
+    ... def _echo(x): return x
+    >>> get_tool('echo').name
+    'echo'
+    """
+
+    def decorate(func: Callable) -> Callable:
+        spec = ToolSpec(func=func, **spec_kwargs)
+        _TOOLS[spec.name] = spec
+        return func
+
+    return decorate
+
+
+def get_tool(name: str) -> ToolSpec:
+    if name not in _TOOLS:
+        raise KeyError(
+            f"No falai tool registered as {name!r}; known: {sorted(_TOOLS)}"
+        )
+    return _TOOLS[name]
+
+
+def list_tools(*, tag: Optional[str] = None) -> list[ToolSpec]:
+    return [t for t in _TOOLS.values() if tag is None or tag in t.tags]
+
+
+# --- model registry --------------------------------------------------------
+
+
+def _models_path() -> str:
+    return os.path.join(os.path.dirname(__file__), "data", "models.json")
+
+
+@lru_cache(maxsize=1)
+def _load_models() -> dict[str, ModelRecord]:
+    with open(_models_path()) as f:
+        records = json.load(f)
+    out: dict[str, ModelRecord] = {}
+    for r in records:
+        r = dict(r)
+        r["aliases"] = tuple(r.get("aliases") or ())
+        out[r["id"]] = ModelRecord(**r)
+    return out
+
+
+def list_models(
+    *,
+    category: Optional[str] = None,
+    quality_tier: Optional[str] = None,
+) -> list[ModelRecord]:
+    return [
+        m
+        for m in _load_models().values()
+        if (category is None or m.category == category)
+        and (quality_tier is None or m.quality_tier == quality_tier)
+    ]
+
+
+def get_model(id: str) -> ModelRecord:
+    models = _load_models()
+    if id in models:
+        return models[id]
+    for m in models.values():
+        if id in m.aliases:
+            return m
+    raise KeyError(f"No model {id!r} known to falai. Try list_models() to browse.")
+
+
+# Tier ordering used to fall back to nearby tiers when an exact match is missing.
+_TIER_ORDER = ("fast", "balanced", "high", "ultra")
+
+
+def pick_model(
+    *,
+    category: str,
+    quality_tier: str = "balanced",
+) -> ModelRecord:
+    """Pick a sensible fal model for a (category, quality) request.
+
+    Tries the exact tier; if absent, walks neighboring tiers; if still
+    absent, falls back to any model in the category. Raises KeyError
+    only when the category has no models at all.
+    """
+    by_tier = {m.quality_tier: m for m in list_models(category=category)}
+    if quality_tier in by_tier:
+        return by_tier[quality_tier]
+    if quality_tier in _TIER_ORDER:
+        i = _TIER_ORDER.index(quality_tier)
+        for offset in range(1, len(_TIER_ORDER)):
+            for j in (i - offset, i + offset):
+                if 0 <= j < len(_TIER_ORDER) and _TIER_ORDER[j] in by_tier:
+                    return by_tier[_TIER_ORDER[j]]
+    fallback = list_models(category=category)
+    if not fallback:
+        raise KeyError(
+            f"No models known for category={category!r}. Try list_models()."
+        )
+    return fallback[0]

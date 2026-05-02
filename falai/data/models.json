@@ -1,0 +1,173 @@
+[
+  {
+    "id": "fal-ai/flux/schnell",
+    "category": "image",
+    "description": "Ultra-fast 1-4 step image generation. Commercial use allowed.",
+    "aliases": ["flux-schnell"],
+    "quality_tier": "fast",
+    "cost_hint": "very low",
+    "docs_url": "https://fal.ai/models/fal-ai/flux/schnell"
+  },
+  {
+    "id": "fal-ai/flux/dev",
+    "category": "image",
+    "description": "Fast high-quality image generation, 12B parameter model.",
+    "aliases": ["flux-dev"],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/flux/dev"
+  },
+  {
+    "id": "fal-ai/flux-pro/v1.1",
+    "category": "image",
+    "description": "Professional FLUX Pro v1.1: superior composition and detail.",
+    "aliases": ["flux-pro"],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-pro/v1.1"
+  },
+  {
+    "id": "fal-ai/flux-pro/v1.1-ultra",
+    "category": "image",
+    "description": "FLUX1.1 [pro] Ultra: 2K resolution, photo-realistic.",
+    "aliases": ["flux-ultra"],
+    "quality_tier": "ultra",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-pro/v1.1-ultra"
+  },
+  {
+    "id": "fal-ai/flux-pro/kontext/max",
+    "category": "image_edit",
+    "description": "FLUX.1 Kontext [max]: premium image editing with strong prompt adherence.",
+    "aliases": ["flux-kontext-max"],
+    "quality_tier": "ultra",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-pro/kontext/max"
+  },
+  {
+    "id": "fal-ai/veo3",
+    "category": "video",
+    "description": "Google's most advanced AI video generation, with sound.",
+    "aliases": ["veo3"],
+    "quality_tier": "ultra",
+    "cost_hint": "very high",
+    "docs_url": "https://fal.ai/models/fal-ai/veo3"
+  },
+  {
+    "id": "fal-ai/kling-video/v2.1/master/image-to-video",
+    "category": "video",
+    "description": "Premium image-to-video with cinematic visuals.",
+    "aliases": ["kling-master"],
+    "quality_tier": "high",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/kling-video/v2.1/master/image-to-video"
+  },
+  {
+    "id": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+    "category": "video",
+    "description": "MiniMax Hailuo-02 Pro: 1080p image-to-video.",
+    "aliases": ["hailuo-pro"],
+    "quality_tier": "balanced",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/minimax/hailuo-02/pro/image-to-video"
+  },
+  {
+    "id": "fal-ai/minimax/speech-02-hd",
+    "category": "tts",
+    "description": "High-quality multilingual text-to-speech.",
+    "aliases": ["minimax-tts"],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/minimax/speech-02-hd"
+  },
+  {
+    "id": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "category": "tts",
+    "description": "ElevenLabs multilingual TTS.",
+    "aliases": ["elevenlabs-tts"],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/tts/multilingual-v2"
+  },
+  {
+    "id": "fal-ai/playai/tts/v3",
+    "category": "tts",
+    "description": "PlayAI TTS v3: blazing-fast TTS with emotional tones.",
+    "aliases": ["playai-tts"],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/v3"
+  },
+  {
+    "id": "fal-ai/minimax/voice-clone",
+    "category": "voice_clone",
+    "description": "Clone any voice with a few seconds of audio sample.",
+    "aliases": ["voice-clone"],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/minimax/voice-clone"
+  },
+  {
+    "id": "fal-ai/ai-avatar",
+    "category": "avatar",
+    "description": "Single-person talking avatar with lip-sync.",
+    "aliases": ["ai-avatar"],
+    "quality_tier": "balanced",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/ai-avatar"
+  },
+  {
+    "id": "fal-ai/sync-lipsync/v2",
+    "category": "lipsync",
+    "description": "Advanced lip-sync animation generation.",
+    "aliases": ["sync-lipsync"],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/sync-lipsync/v2"
+  },
+  {
+    "id": "fal-ai/clarity-upscaler",
+    "category": "upscale",
+    "description": "High-fidelity image upscaling.",
+    "aliases": ["clarity-upscaler"],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/clarity-upscaler"
+  },
+  {
+    "id": "fal-ai/birefnet/v2",
+    "category": "background_removal",
+    "description": "High-resolution background removal.",
+    "aliases": ["birefnet"],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/birefnet/v2"
+  },
+  {
+    "id": "fal-ai/diffrhythm",
+    "category": "music",
+    "description": "Fast song generation from lyrics (under 30s).",
+    "aliases": ["diffrhythm"],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/diffrhythm"
+  },
+  {
+    "id": "fal-ai/lyria2",
+    "category": "music",
+    "description": "Google's universal music generation model.",
+    "aliases": ["lyria2"],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/lyria2"
+  },
+  {
+    "id": "fal-ai/any-llm",
+    "category": "llm",
+    "description": "Universal LLM access (Claude, GPT-4o, Gemini, Llama).",
+    "aliases": ["any-llm"],
+    "quality_tier": "balanced",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/any-llm"
+  }
+]
