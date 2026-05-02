@@ -57,3 +57,45 @@ def text_to_speech(
     arguments.update(extra or {})
     raw = call_fal(model, arguments)
     return parse_response(raw, application=model, arguments=arguments)
+
+
+@register_tool(
+    name="voice_clone",
+    description=(
+        "Synthesize speech in a cloned voice. Provide a `reference_audio_url` "
+        "(a few seconds of the target voice) and the text to speak. Returns "
+        "a falaw.Result whose .first asset is the cloned-voice audio URL."
+    ),
+    tags=("audio", "voice_clone", "generate"),
+    input_schema={
+        "type": "object",
+        "required": ["reference_audio_url", "text"],
+        "properties": {
+            "reference_audio_url": {"type": "string"},
+            "text": {"type": "string"},
+            "model_id": {"type": "string"},
+            "extra": {"type": "object"},
+        },
+    },
+    output_schema={"type": "object", "description": "falaw.Result"},
+    examples=(
+        {"reference_audio_url": "https://example.com/me.wav",
+         "text": "Hello, this is in my voice."},
+    ),
+)
+def voice_clone(
+    reference_audio_url: str,
+    text: str,
+    *,
+    model_id: Optional[str] = None,
+    extra: Optional[dict] = None,
+) -> Result:
+    """Generate speech in a cloned voice."""
+    model = model_id or pick_model(category="voice_clone", quality_tier="high").id
+    arguments = {
+        "reference_audio_url": reference_audio_url,
+        "text": text,
+        **(extra or {}),
+    }
+    raw = call_fal(model, arguments)
+    return parse_response(raw, application=model, arguments=arguments)

@@ -1,27 +1,129 @@
 [
   {
-    "id": "fal-ai/flux/schnell",
-    "category": "image",
-    "description": "Ultra-fast 1-4 step image generation. Commercial use allowed.",
-    "aliases": ["flux-schnell"],
-    "quality_tier": "fast",
-    "cost_hint": "very low",
-    "docs_url": "https://fal.ai/models/fal-ai/flux/schnell"
+    "id": "fal-ai/elevenlabs/audio-isolation",
+    "category": "audio",
+    "description": "Audio isolation and separation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/audio-isolation"
+  },
+  {
+    "id": "fal-ai/playai/inpaint/diffusion",
+    "category": "audio",
+    "description": "Audio inpainting using diffusion models",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/playai/inpaint/diffusion"
+  },
+  {
+    "id": "fal-ai/ai-avatar",
+    "category": "avatar",
+    "description": "Single-person talking avatar with lip-sync (image+audio).",
+    "aliases": [
+      "ai-avatar"
+    ],
+    "quality_tier": "balanced",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/ai-avatar"
+  },
+  {
+    "id": "fal-ai/bria/background/remove",
+    "category": "background_removal",
+    "description": "Bria Background Remove: alternative bg removal pipeline.",
+    "aliases": [
+      "bria-bg-remove"
+    ],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/bria/background/remove"
+  },
+  {
+    "id": "fal-ai/ideogram/v3/reframe",
+    "category": "background_removal",
+    "description": "Creative image extension",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/ideogram/v3/reframe"
+  },
+  {
+    "id": "fal-ai/birefnet/v2",
+    "category": "background_removal",
+    "description": "BiRefNet v2: high-resolution background removal.",
+    "aliases": [
+      "birefnet"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/birefnet/v2"
   },
   {
     "id": "fal-ai/flux/dev",
     "category": "image",
     "description": "Fast high-quality image generation, 12B parameter model.",
-    "aliases": ["flux-dev"],
+    "aliases": [
+      "flux-dev"
+    ],
     "quality_tier": "balanced",
     "cost_hint": "low",
     "docs_url": "https://fal.ai/models/fal-ai/flux/dev"
   },
   {
+    "id": "fal-ai/ideogram/v3",
+    "category": "image",
+    "description": "Typography-focused image generation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/ideogram/v3"
+  },
+  {
+    "id": "fal-ai/recraft/v3/text-to-image",
+    "category": "image",
+    "description": "Multi-format image generation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/recraft/v3/text-to-image"
+  },
+  {
+    "id": "fal-ai/flux/schnell",
+    "category": "image",
+    "description": "Ultra-fast 1-4 step image generation. Commercial use allowed.",
+    "aliases": [
+      "flux-schnell"
+    ],
+    "quality_tier": "fast",
+    "cost_hint": "very low",
+    "docs_url": "https://fal.ai/models/fal-ai/flux/schnell"
+  },
+  {
+    "id": "fal-ai/hidream-i1-fast",
+    "category": "image",
+    "description": "Fast state-of-the-art generation",
+    "aliases": [],
+    "quality_tier": "fast",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/hidream-i1-fast"
+  },
+  {
+    "id": "fal-ai/sana/sprint",
+    "category": "image",
+    "description": "Fast 4K image generation",
+    "aliases": [],
+    "quality_tier": "fast",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/sana/sprint"
+  },
+  {
     "id": "fal-ai/flux-pro/v1.1",
     "category": "image",
     "description": "Professional FLUX Pro v1.1: superior composition and detail.",
-    "aliases": ["flux-pro"],
+    "aliases": [
+      "flux-pro"
+    ],
     "quality_tier": "high",
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro/v1.1"
@@ -30,144 +132,299 @@
     "id": "fal-ai/flux-pro/v1.1-ultra",
     "category": "image",
     "description": "FLUX1.1 [pro] Ultra: 2K resolution, photo-realistic.",
-    "aliases": ["flux-ultra"],
+    "aliases": [
+      "flux-ultra"
+    ],
     "quality_tier": "ultra",
     "cost_hint": "high",
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro/v1.1-ultra"
   },
   {
+    "id": "fal-ai/imagen4/preview/ultra",
+    "category": "image",
+    "description": "Google's highest quality image generation",
+    "aliases": [],
+    "quality_tier": "ultra",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/imagen4/preview/ultra"
+  },
+  {
+    "id": "fal-ai/flux-kontext/dev",
+    "category": "image_edit",
+    "description": "FLUX Kontext [dev]: open-weight image editing.",
+    "aliases": [
+      "flux-kontext-dev"
+    ],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-kontext/dev"
+  },
+  {
+    "id": "fal-ai/omnigen-v2",
+    "category": "image_edit",
+    "description": "Unified multi-task image generation and editing",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/omnigen-v2"
+  },
+  {
+    "id": "fal-ai/bytedance/seededit/v3/edit-image",
+    "category": "image_edit",
+    "description": "ByteDance SeedEdit v3: precise instruction-following edits, strong content preservation.",
+    "aliases": [
+      "seededit"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/bytedance/seededit/v3/edit-image"
+  },
+  {
     "id": "fal-ai/flux-pro/kontext/max",
     "category": "image_edit",
     "description": "FLUX.1 Kontext [max]: premium image editing with strong prompt adherence.",
-    "aliases": ["flux-kontext-max"],
+    "aliases": [
+      "flux-kontext-max"
+    ],
     "quality_tier": "ultra",
     "cost_hint": "high",
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro/kontext/max"
   },
   {
-    "id": "fal-ai/veo3",
-    "category": "video",
-    "description": "Google's most advanced AI video generation, with sound.",
-    "aliases": ["veo3"],
-    "quality_tier": "ultra",
-    "cost_hint": "very high",
-    "docs_url": "https://fal.ai/models/fal-ai/veo3"
-  },
-  {
-    "id": "fal-ai/kling-video/v2.1/master/image-to-video",
-    "category": "video",
-    "description": "Premium image-to-video with cinematic visuals.",
-    "aliases": ["kling-master"],
-    "quality_tier": "high",
-    "cost_hint": "high",
-    "docs_url": "https://fal.ai/models/fal-ai/kling-video/v2.1/master/image-to-video"
-  },
-  {
     "id": "fal-ai/minimax/hailuo-02/pro/image-to-video",
-    "category": "video",
+    "category": "image_to_video",
     "description": "MiniMax Hailuo-02 Pro: 1080p image-to-video.",
-    "aliases": ["hailuo-pro"],
+    "aliases": [
+      "hailuo-pro"
+    ],
     "quality_tier": "balanced",
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/minimax/hailuo-02/pro/image-to-video"
   },
   {
-    "id": "fal-ai/minimax/speech-02-hd",
-    "category": "tts",
-    "description": "High-quality multilingual text-to-speech.",
-    "aliases": ["minimax-tts"],
-    "quality_tier": "high",
-    "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/minimax/speech-02-hd"
-  },
-  {
-    "id": "fal-ai/elevenlabs/tts/multilingual-v2",
-    "category": "tts",
-    "description": "ElevenLabs multilingual TTS.",
-    "aliases": ["elevenlabs-tts"],
-    "quality_tier": "high",
-    "cost_hint": "medium",
-    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/tts/multilingual-v2"
-  },
-  {
-    "id": "fal-ai/playai/tts/v3",
-    "category": "tts",
-    "description": "PlayAI TTS v3: blazing-fast TTS with emotional tones.",
-    "aliases": ["playai-tts"],
+    "id": "fal-ai/pixverse/v4.5/image-to-video",
+    "category": "image_to_video",
+    "description": "High-quality video generation",
+    "aliases": [],
     "quality_tier": "balanced",
-    "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/v3"
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/pixverse/v4.5/image-to-video"
   },
   {
-    "id": "fal-ai/minimax/voice-clone",
-    "category": "voice_clone",
-    "description": "Clone any voice with a few seconds of audio sample.",
-    "aliases": ["voice-clone"],
+    "id": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+    "category": "image_to_video",
+    "description": "ByteDance Seedance v1 Pro: high-quality image-to-video.",
+    "aliases": [
+      "seedance-i2v"
+    ],
     "quality_tier": "high",
-    "cost_hint": "medium",
-    "docs_url": "https://fal.ai/models/fal-ai/minimax/voice-clone"
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/bytedance/seedance/v1/pro/image-to-video"
   },
   {
-    "id": "fal-ai/ai-avatar",
-    "category": "avatar",
-    "description": "Single-person talking avatar with lip-sync.",
-    "aliases": ["ai-avatar"],
+    "id": "fal-ai/kling-video/v2.1/master/image-to-video",
+    "category": "image_to_video",
+    "description": "Kling 2.1 Master: cinematic image-to-video, strong motion fluidity.",
+    "aliases": [
+      "kling-master"
+    ],
+    "quality_tier": "ultra",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/kling-video/v2.1/master/image-to-video"
+  },
+  {
+    "id": "fal-ai/ai-avatar/multi",
+    "category": "lipsync",
+    "description": "Multi-person conversation video generation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/ai-avatar/multi"
+  },
+  {
+    "id": "fal-ai/kling-video/lipsync/audio-to-video",
+    "category": "lipsync",
+    "description": "Kling LipSync: realistic audio-to-video lip-sync.",
+    "aliases": [
+      "kling-lipsync"
+    ],
     "quality_tier": "balanced",
     "cost_hint": "medium",
-    "docs_url": "https://fal.ai/models/fal-ai/ai-avatar"
+    "docs_url": "https://fal.ai/models/fal-ai/kling-video/lipsync/audio-to-video"
   },
   {
     "id": "fal-ai/sync-lipsync/v2",
     "category": "lipsync",
-    "description": "Advanced lip-sync animation generation.",
-    "aliases": ["sync-lipsync"],
+    "description": "Sync Lipsync v2: advanced lip-sync animation from image+audio.",
+    "aliases": [
+      "sync-lipsync"
+    ],
     "quality_tier": "high",
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/sync-lipsync/v2"
   },
   {
-    "id": "fal-ai/clarity-upscaler",
-    "category": "upscale",
-    "description": "High-fidelity image upscaling.",
-    "aliases": ["clarity-upscaler"],
-    "quality_tier": "high",
-    "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/clarity-upscaler"
+    "id": "fal-ai/any-llm",
+    "category": "llm",
+    "description": "Universal LLM access (Claude, GPT-4o, Gemini, Llama).",
+    "aliases": [
+      "any-llm"
+    ],
+    "quality_tier": "balanced",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/any-llm"
   },
   {
-    "id": "fal-ai/birefnet/v2",
-    "category": "background_removal",
-    "description": "High-resolution background removal.",
-    "aliases": ["birefnet"],
-    "quality_tier": "high",
-    "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/birefnet/v2"
+    "id": "fal-ai/any-llm/vision",
+    "category": "llm",
+    "description": "Universal vision language model access",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/any-llm/vision"
   },
   {
     "id": "fal-ai/diffrhythm",
     "category": "music",
-    "description": "Fast song generation from lyrics (under 30s).",
-    "aliases": ["diffrhythm"],
+    "description": "DiffRhythm: fast song generation from lyrics.",
+    "aliases": [
+      "diffrhythm"
+    ],
     "quality_tier": "balanced",
     "cost_hint": "low",
     "docs_url": "https://fal.ai/models/fal-ai/diffrhythm"
   },
   {
+    "id": "fal-ai/mmaudio-v2/text-to-audio",
+    "category": "music",
+    "description": "Text-to-audio generation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/mmaudio-v2/text-to-audio"
+  },
+  {
     "id": "fal-ai/lyria2",
     "category": "music",
-    "description": "Google's universal music generation model.",
-    "aliases": ["lyria2"],
+    "description": "Google Lyria 2: universal music generation.",
+    "aliases": [
+      "lyria2"
+    ],
     "quality_tier": "high",
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/lyria2"
   },
   {
-    "id": "fal-ai/any-llm",
-    "category": "llm",
-    "description": "Universal LLM access (Claude, GPT-4o, Gemini, Llama).",
-    "aliases": ["any-llm"],
+    "id": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+    "category": "text_to_video",
+    "description": "ByteDance Seedance v1 Pro: high-quality text-to-video.",
+    "aliases": [
+      "seedance-t2v"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/bytedance/seedance/v1/pro/text-to-video"
+  },
+  {
+    "id": "fal-ai/veo3",
+    "category": "text_to_video",
+    "description": "Google Veo 3: most advanced text-to-video, with sound.",
+    "aliases": [
+      "veo3"
+    ],
+    "quality_tier": "ultra",
+    "cost_hint": "very high",
+    "docs_url": "https://fal.ai/models/fal-ai/veo3"
+  },
+  {
+    "id": "fal-ai/flux-lora-portrait-trainer",
+    "category": "training",
+    "description": "Specialized portrait training",
+    "aliases": [],
     "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-lora-portrait-trainer"
+  },
+  {
+    "id": "fal-ai/flux-lora-fast-training",
+    "category": "training",
+    "description": "Rapid LoRA training",
+    "aliases": [],
+    "quality_tier": "fast",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-lora-fast-training"
+  },
+  {
+    "id": "fal-ai/flux-pro-trainer",
+    "category": "training",
+    "description": "FLUX Pro LoRA training",
+    "aliases": [],
+    "quality_tier": "high",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/flux-pro-trainer"
+  },
+  {
+    "id": "fal-ai/playai/tts/dialog",
+    "category": "tts",
+    "description": "Multi-speaker dialogue generation",
+    "aliases": [],
+    "quality_tier": "balanced",
+    "cost_hint": "",
+    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/dialog"
+  },
+  {
+    "id": "fal-ai/playai/tts/v3",
+    "category": "tts",
+    "description": "PlayAI TTS v3: blazing-fast TTS with emotional tones.",
+    "aliases": [
+      "playai-tts"
+    ],
+    "quality_tier": "balanced",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/v3"
+  },
+  {
+    "id": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "category": "tts",
+    "description": "ElevenLabs multilingual TTS.",
+    "aliases": [
+      "elevenlabs-tts"
+    ],
+    "quality_tier": "high",
     "cost_hint": "medium",
-    "docs_url": "https://fal.ai/models/fal-ai/any-llm"
+    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/tts/multilingual-v2"
+  },
+  {
+    "id": "fal-ai/minimax/speech-02-hd",
+    "category": "tts",
+    "description": "High-quality multilingual text-to-speech.",
+    "aliases": [
+      "minimax-tts"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/minimax/speech-02-hd"
+  },
+  {
+    "id": "fal-ai/clarity-upscaler",
+    "category": "upscale",
+    "description": "Clarity Upscaler: high-fidelity image upscaling with creativity controls.",
+    "aliases": [
+      "clarity-upscaler"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "low",
+    "docs_url": "https://fal.ai/models/fal-ai/clarity-upscaler"
+  },
+  {
+    "id": "fal-ai/minimax/voice-clone",
+    "category": "voice_clone",
+    "description": "Clone any voice with a few seconds of audio sample.",
+    "aliases": [
+      "voice-clone"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "medium",
+    "docs_url": "https://fal.ai/models/fal-ai/minimax/voice-clone"
   }
 ]

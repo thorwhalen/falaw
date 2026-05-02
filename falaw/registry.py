@@ -101,20 +101,30 @@ def pick_model(
 ) -> ModelRecord:
     """Pick a sensible fal model for a (category, quality) request.
 
-    Tries the exact tier; if absent, walks neighboring tiers; if still
-    absent, falls back to any model in the category. Raises KeyError
-    only when the category has no models at all.
+    First-match semantics: when several models share a tier, the earlier
+    entry wins. Curated entries are written first in `data/models.json`,
+    so they take precedence over corpus-merged additions. If no model
+    has the exact tier, neighboring tiers are tried. KeyError only when
+    the category is empty.
     """
-    by_tier = {m.quality_tier: m for m in list_models(category=category)}
-    if quality_tier in by_tier:
-        return by_tier[quality_tier]
+    candidates = list_models(category=category)
+
+    def _first_with_tier(tier: str) -> Optional[ModelRecord]:
+        return next((m for m in candidates if m.quality_tier == tier), None)
+
+    exact = _first_with_tier(quality_tier)
+    if exact is not None:
+        return exact
     if quality_tier in _TIER_ORDER:
         i = _TIER_ORDER.index(quality_tier)
         for offset in range(1, len(_TIER_ORDER)):
             for j in (i - offset, i + offset):
-                if 0 <= j < len(_TIER_ORDER) and _TIER_ORDER[j] in by_tier:
-                    return by_tier[_TIER_ORDER[j]]
-    fallback = list_models(category=category)
-    if not fallback:
-        raise KeyError(f"No models known for category={category!r}. Try list_models().")
-    return fallback[0]
+                if 0 <= j < len(_TIER_ORDER):
+                    near = _first_with_tier(_TIER_ORDER[j])
+                    if near is not None:
+                        return near
+    if not candidates:
+        raise KeyError(
+            f"No models known for category={category!r}. Try list_models()."
+        )
+    return candidates[0]

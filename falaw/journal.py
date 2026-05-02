@@ -71,16 +71,19 @@ class Journal:
         suggestion: str = "",
         context: Optional[dict] = None,
     ) -> JournalEntry:
+        # Nanosecond resolution prevents back-to-back appends from sharing
+        # a filename prefix and falling back to UUID order in `sorted()`.
+        ts_ns = time.time_ns()
         entry = JournalEntry(
             id=uuid.uuid4().hex[:12],
-            timestamp=time.time(),
+            timestamp=ts_ns / 1_000_000_000,
             kind=kind,
             text=text,
             tags=tuple(tags),
             suggestion=suggestion,
             context=dict(context or {}),
         )
-        fname = f"{int(entry.timestamp * 1000):014d}-{entry.id}.json"
+        fname = f"{ts_ns:020d}-{entry.id}.json"
         path = os.path.join(self.directory, fname)
         with open(path, "w") as f:
             json.dump(asdict(entry), f, indent=2, default=str)
