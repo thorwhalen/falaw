@@ -107,8 +107,7 @@ class Journal:
         return [
             e
             for e in self
-            if (kind is None or e.kind == kind)
-            and (tag is None or tag in e.tags)
+            if (kind is None or e.kind == kind) and (tag is None or tag in e.tags)
         ]
 
 

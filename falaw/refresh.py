@@ -303,12 +303,13 @@ def refresh_full_docs(
 
     if not force:
         llms_full = next(
-            s
-            for s in default_sources(docs_dir=docs_dir)
-            if s.name == "llms-full"
+            s for s in default_sources(docs_dir=docs_dir) if s.name == "llms-full"
         )
         if not is_stale(llms_full):
-            return {"skipped": "llms-full unchanged", "hint": "pass force=True to override"}
+            return {
+                "skipped": "llms-full unchanged",
+                "hint": "pass force=True to override",
+            }
 
     if not os.path.exists(index_path):
         return {"error": f"missing index file: {index_path}"}

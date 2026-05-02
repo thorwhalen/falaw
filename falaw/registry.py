@@ -40,9 +40,7 @@ def register_tool(**spec_kwargs) -> Callable:
 
 def get_tool(name: str) -> ToolSpec:
     if name not in _TOOLS:
-        raise KeyError(
-            f"No falaw tool registered as {name!r}; known: {sorted(_TOOLS)}"
-        )
+        raise KeyError(f"No falaw tool registered as {name!r}; known: {sorted(_TOOLS)}")
     return _TOOLS[name]
 
 
@@ -118,7 +116,5 @@ def pick_model(
                     return by_tier[_TIER_ORDER[j]]
     fallback = list_models(category=category)
     if not fallback:
-        raise KeyError(
-            f"No models known for category={category!r}. Try list_models()."
-        )
+        raise KeyError(f"No models known for category={category!r}. Try list_models().")
     return fallback[0]
