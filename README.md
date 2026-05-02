@@ -1,9 +1,9 @@
-# falai
+# pyfal
 
 Agent-friendly Python facade over fal.ai for generating and managing AI media (images, video, audio).
 
 ```python
-from falai import generate_image, list_models, journal
+from pyfal import generate_image, list_models, journal
 
 r = generate_image("a tiger eye, macro, 35mm", quality="fast")
 r.first.download(to="./tiger.png")
@@ -16,7 +16,7 @@ journal.note("schnell at quality='fast' defaults to 1024x1024")
 
 `fal-client` already gives you 100+ models behind a uniform call. What
 agents (and humans) still struggle with is *which* model to use, *what*
-parameters it takes, and *what to do with* the URL it returns. `falai`
+parameters it takes, and *what to do with* the URL it returns. `pyfal`
 adds:
 
 - Task-level verbs (`generate_image`, `text_to_speech`, ...) with smart model selection by quality tier.
@@ -49,7 +49,7 @@ export FAL_KEY="your-fal-api-key"
 Single source of truth: a `ToolSpec` dataclass per tool. From it we derive every external surface:
 
 ```
-falai.registry  ──► bridges/skill.py    ──►  .claude/skills/falai/SKILL.md
+pyfal.registry  ──► bridges/skill.py    ──►  .claude/skills/pyfal/SKILL.md
                 ──► bridges/mcp.py      ──►  MCP server          (planned)
                 ──► bridges/service.py  ──►  qh HTTP service     (planned)
                 ──► (UI)                                          (planned)
@@ -59,7 +59,7 @@ Adding a new surface is a new bridge module, never a re-implementation of the op
 
 ## Self-improvement loop
 
-Every session can read and write the agent journal at `~/.config/falai/journal/`. The Claude skill instructs Claude to:
+Every session can read and write the agent journal at `~/.config/pyfal/journal/`. The Claude skill instructs Claude to:
 
 1. Read recent entries before novel work.
 2. Write a note / issue / improvement when something surprises it.
@@ -69,7 +69,7 @@ Every session can read and write the agent journal at `~/.config/falai/journal/`
 ## Layout
 
 ```
-falai/
+pyfal/
   base.py            ToolSpec, ModelRecord
   core.py            call_fal: subscribe + auto-journal
   registry.py        register_tool, list/get/pick model
@@ -85,7 +85,7 @@ falai/
     service.py       (stub)
   data/
     models.json      seed catalog
-    skills/falai/    generated skill files (shipped with package)
+    skills/pyfal/    generated skill files (shipped with package)
 misc/
   docs/              aggregated fal.ai docs (3MB md, llms.txt, llms-full.txt)
   regenerate_skill.py
@@ -98,7 +98,7 @@ tests/
 python misc/regenerate_skill.py
 ```
 
-Writes `falai/data/skills/falai/SKILL.md` and `.claude/skills/falai/SKILL.md`.
+Writes `pyfal/data/skills/pyfal/SKILL.md` and `.claude/skills/pyfal/SKILL.md`.
 
 ## Status
 

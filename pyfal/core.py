@@ -38,7 +38,7 @@ def call_fal(
     Returns:
         The raw response dict from the model.
     """
-    import fal_client  # lazy: keep import out of `from falai import ...`
+    import fal_client  # lazy: keep import out of `from pyfal import ...`
 
     log = on_log if on_log is not None else print
 

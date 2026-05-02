@@ -1,4 +1,4 @@
-from falai.results import parse_response
+from pyfal.results import parse_response
 
 
 def test_parse_image_list():

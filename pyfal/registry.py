@@ -22,7 +22,7 @@ _TOOLS: dict[str, ToolSpec] = {}
 
 
 def register_tool(**spec_kwargs) -> Callable:
-    """Decorator: register the wrapped function as a falai tool.
+    """Decorator: register the wrapped function as a pyfal tool.
 
     >>> @register_tool(name='echo', description='echo back', tags=('demo',))
     ... def _echo(x): return x
@@ -41,7 +41,7 @@ def register_tool(**spec_kwargs) -> Callable:
 def get_tool(name: str) -> ToolSpec:
     if name not in _TOOLS:
         raise KeyError(
-            f"No falai tool registered as {name!r}; known: {sorted(_TOOLS)}"
+            f"No pyfal tool registered as {name!r}; known: {sorted(_TOOLS)}"
         )
     return _TOOLS[name]
 
@@ -89,7 +89,7 @@ def get_model(id: str) -> ModelRecord:
     for m in models.values():
         if id in m.aliases:
             return m
-    raise KeyError(f"No model {id!r} known to falai. Try list_models() to browse.")
+    raise KeyError(f"No model {id!r} known to pyfal. Try list_models() to browse.")
 
 
 # Tier ordering used to fall back to nearby tiers when an exact match is missing.

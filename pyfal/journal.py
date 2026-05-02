@@ -1,13 +1,13 @@
 """Agent journal: append-only log of notes, issues and improvements.
 
-Why this exists: agents (and falai itself) leave traces here whenever
+Why this exists: agents (and pyfal itself) leave traces here whenever
 something is harder than expected, surprising, or worth remembering. The
 Claude skill teaches future sessions to read recent entries before doing
 novel work, so each session starts smarter than the last.
 
 Usage:
 
-    >>> from falai import journal
+    >>> from pyfal import journal
     >>> journal.note("schnell tier returns 1024x1024 by default")  # doctest: +SKIP
     >>> journal.issue("FLUX dev refused a benign prompt as NSFW",
     ...               suggestion="Try guidance_scale=2.0")  # doctest: +SKIP
@@ -29,7 +29,7 @@ EntryKind = Literal["note", "issue", "improvement", "trace"]
 
 
 def _default_journal_dir() -> str:
-    base = os.environ.get("FALAI_DATA_DIR") or os.path.expanduser("~/.config/falai")
+    base = os.environ.get("PYFAL_DATA_DIR") or os.path.expanduser("~/.config/pyfal")
     return os.path.join(base, "journal")
 
 

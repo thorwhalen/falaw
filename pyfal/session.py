@@ -1,4 +1,4 @@
-"""Session: optional stateful controller over a sequence of falai operations.
+"""Session: optional stateful controller over a sequence of pyfal operations.
 
 Plain function calls work without a session. Sessions exist to make multi-step
 flows ergonomic --- a working directory, a result history, and a journal
@@ -17,7 +17,7 @@ from .results import Result
 
 @dataclass
 class Session:
-    """A working session for a sequence of falai operations.
+    """A working session for a sequence of pyfal operations.
 
     >>> import tempfile
     >>> s = Session(output_dir=tempfile.mkdtemp())

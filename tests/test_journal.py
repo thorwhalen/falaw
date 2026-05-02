@@ -1,4 +1,4 @@
-from falai.journal import Journal
+from pyfal.journal import Journal
 
 
 def test_journal_append_iter(tmp_path):

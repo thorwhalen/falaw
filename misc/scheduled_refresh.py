@@ -3,7 +3,7 @@
 Designed to be invoked by a remote scheduled agent that has a fresh checkout
 of the repo. Behavior:
 
-1. Set ``FALAI_DATA_DIR`` to ``misc/falai_state`` (in-repo) so any journal
+1. Set ``PYFAL_DATA_DIR`` to ``misc/pyfal_state`` (in-repo) so any journal
    entries written during the run get committed alongside doc changes.
 2. Cheap watch: ``refresh_llms()``. If nothing changed, exit with a clean
    summary --- the scheduled agent should then make no commit.
@@ -25,11 +25,11 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-STATE_DIR = REPO / "misc" / "falai_state"
+STATE_DIR = REPO / "misc" / "pyfal_state"
 STATE_DIR.mkdir(parents=True, exist_ok=True)
-os.environ.setdefault("FALAI_DATA_DIR", str(STATE_DIR))
+os.environ.setdefault("PYFAL_DATA_DIR", str(STATE_DIR))
 
-from falai.refresh import refresh_full_docs, refresh_llms  # noqa: E402
+from pyfal.refresh import refresh_full_docs, refresh_llms  # noqa: E402
 
 
 def main() -> int:

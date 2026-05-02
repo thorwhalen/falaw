@@ -1,4 +1,4 @@
-from falai.registry import get_model, list_models, list_tools, pick_model
+from pyfal.registry import get_model, list_models, list_tools, pick_model
 
 
 def test_list_models_seeded():

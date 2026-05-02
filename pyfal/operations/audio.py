@@ -14,7 +14,7 @@ from ..results import Result, parse_response
     description=(
         "Synthesize speech from text. Picks a TTS model by quality tier; "
         "pass `voice` and `extra` for model-specific knobs. Returns a "
-        "falai.Result whose .first asset is the audio URL."
+        "pyfal.Result whose .first asset is the audio URL."
     ),
     tags=("audio", "tts", "generate"),
     input_schema={
@@ -35,7 +35,7 @@ from ..results import Result, parse_response
             "extra": {"type": "object"},
         },
     },
-    output_schema={"type": "object", "description": "falai.Result"},
+    output_schema={"type": "object", "description": "pyfal.Result"},
     examples=(
         {"text": "Hello world", "quality": "balanced"},
         {"text": "Bonjour le monde", "quality": "high", "voice": "fr-FR-female-1"},

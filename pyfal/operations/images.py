@@ -14,7 +14,7 @@ from ..results import Result, parse_response
     description=(
         "Generate an image from a text prompt. Picks a sensible FLUX model "
         "based on the requested quality tier ('fast', 'balanced', 'high', "
-        "'ultra'). Returns a falai.Result whose .first asset has a URL you "
+        "'ultra'). Returns a pyfal.Result whose .first asset has a URL you "
         "can .download(to=...)."
     ),
     tags=("image", "generate"),
@@ -39,7 +39,7 @@ from ..results import Result, parse_response
             },
         },
     },
-    output_schema={"type": "object", "description": "falai.Result"},
+    output_schema={"type": "object", "description": "pyfal.Result"},
     examples=(
         {"prompt": "A red panda eating bamboo", "quality": "fast"},
         {"prompt": "Cinematic portrait, 35mm film", "quality": "ultra"},

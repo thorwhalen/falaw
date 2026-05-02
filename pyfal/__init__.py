@@ -1,19 +1,19 @@
-"""falai: agent-friendly Python facade over fal.ai for AI media generation.
+"""pyfal: agent-friendly Python facade over fal.ai for AI media generation.
 
 Quick start:
 
-    >>> from falai import generate_image  # doctest: +SKIP
+    >>> from pyfal import generate_image  # doctest: +SKIP
     >>> r = generate_image("a tiger eye, macro, 35mm", quality="fast")
     >>> r.first.download(to="./tiger.png")
 
 Browse the catalog:
 
-    >>> from falai import list_models, list_tools  # doctest: +SKIP
+    >>> from pyfal import list_models, list_tools  # doctest: +SKIP
     >>> [m.id for m in list_models(category="video")]
 
 Leave notes for future sessions:
 
-    >>> from falai import journal  # doctest: +SKIP
+    >>> from pyfal import journal  # doctest: +SKIP
     >>> journal.note("Schnell tier defaults to 1024x1024")
 """
 

@@ -14,7 +14,7 @@ JSONSchema = Mapping[str, Any]
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class ToolSpec:
-    """Single source of truth for a tool exposed by falai.
+    """Single source of truth for a tool exposed by pyfal.
 
     A ToolSpec is what the registry stores. Bridges read it to produce
     Claude-skill instructions, MCP tool descriptors, HTTP endpoints, etc.

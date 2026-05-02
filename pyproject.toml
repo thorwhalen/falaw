@@ -5,7 +5,7 @@ requires = [
 build-backend = "hatchling.build"
 
 [project]
-name = "falai"
+name = "pyfal"
 version = "0.0.1"
 description = "Agent-friendly Python facade over fal.ai for generating and managing AI media (images, video, audio)."
 readme = "README.md"
@@ -19,18 +19,18 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["falai"]
+packages = ["pyfal"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"falai/data" = "falai/data"
+"pyfal/data" = "pyfal/data"
 
 [project.license]
 text = "mit"
 
 [project.urls]
-Homepage = "https://github.com/thorwhalen/falai"
-Repository = "https://github.com/thorwhalen/falai"
-Documentation = "https://thorwhalen.github.io/falai"
+Homepage = "https://github.com/thorwhalen/pyfal"
+Repository = "https://github.com/thorwhalen/pyfal"
+Documentation = "https://thorwhalen.github.io/pyfal"
 
 [project.optional-dependencies]
 dev = [
