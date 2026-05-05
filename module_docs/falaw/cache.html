@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -66,6 +66,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
@@ -152,7 +154,7 @@ the network when the (model_id, arguments) tuple was seen before.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.cache.cached_call_fal">
-<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cached_call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cached_call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cached_call_fal" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cached_call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cached_call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cached_call_fal" title="Link to this definition"></a></dt>
 <dd><p>Call a fal model, but reuse the cached response when present.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -160,6 +162,9 @@ the network when the (model_id, arguments) tuple was seen before.</p>
 <li><p><strong>application</strong> – fal model id.</p></li>
 <li><p><strong>arguments</strong> – model input dict.</p></li>
 <li><p><strong>refresh</strong> – if True, bypass the cache and overwrite it with a fresh result.</p></li>
+<li><p><strong>on_event</strong> – Per-call subscriber for <a class="reference internal" href="events.html#falaw.events.ProgressEvent" title="falaw.events.ProgressEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.events.ProgressEvent</span></code></a>.
+On a cache hit, a synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> event is emitted so
+UIs can show “skipped” instead of “running”.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

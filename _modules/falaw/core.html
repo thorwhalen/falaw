@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.core &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.core &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -98,21 +100,27 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.core</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Wrapper over `fal_client.subscribe` with progress logging and auto-journaling.</span>
+<span></span><span class="sd">&quot;&quot;&quot;Wrapper over `fal_client.subscribe` with progress events and auto-journaling.</span>
 
 <span class="sd">Operations should call `call_fal` rather than `fal_client.subscribe` directly,</span>
 <span class="sd">so we get one place to:</span>
 
-<span class="sd">* attach progress callbacks,</span>
+<span class="sd">* publish structured progress events to subscribers (UI, telemetry),</span>
 <span class="sd">* auto-journal failures (so the next agent learns from them),</span>
 <span class="sd">* layer retries / backoff later without changing call sites.</span>
+
+<span class="sd">See :mod:`falaw.events` for the event model. ``on_log`` (a</span>
+<span class="sd">string-only callback) still works for backward compatibility — when</span>
+<span class="sd">both ``on_log`` and ``on_event`` are given, both fire.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventCallback</span><span class="p">,</span> <span class="n">ProgressEvent</span><span class="p">,</span> <span class="n">emit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.journal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_default_journal</span>
 
 
@@ -123,6 +131,7 @@
     <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">on_log</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EventCallback</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">with_logs</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">journal_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -131,7 +140,11 @@
 <span class="sd">    Args:</span>
 <span class="sd">        application: fal model id (e.g. ``&quot;fal-ai/flux/dev&quot;``).</span>
 <span class="sd">        arguments: Input arguments. Keys depend on the model.</span>
-<span class="sd">        on_log: Progress callback. Defaults to ``print``.</span>
+<span class="sd">        on_log: Legacy log callback — receives raw log lines as strings.</span>
+<span class="sd">            Defaults to no-op (use ``on_event`` for structured access).</span>
+<span class="sd">        on_event: Per-call subscriber for :class:`ProgressEvent`s. Fires</span>
+<span class="sd">            in addition to the global subscribers registered via</span>
+<span class="sd">            :func:`falaw.events.subscribe`.</span>
 <span class="sd">        with_logs: Pass through to fal_client; when True the model streams logs.</span>
 <span class="sd">        journal_errors: When True, exceptions are recorded as journal issues</span>
 <span class="sd">            before being re-raised. The journal entry includes the application</span>
@@ -142,24 +155,46 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>  <span class="c1"># lazy: keep import out of `from falaw import ...`</span>
 
-    <span class="n">log</span> <span class="o">=</span> <span class="n">on_log</span> <span class="k">if</span> <span class="n">on_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">print</span>
+    <span class="n">call_id</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span>
+    <span class="n">started</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ev</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emit</span><span class="p">(</span>
+            <span class="n">ProgressEvent</span><span class="p">(</span>
+                <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
+                <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+                <span class="n">call_id</span><span class="o">=</span><span class="n">call_id</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                <span class="n">pct</span><span class="o">=</span><span class="n">pct</span><span class="p">,</span>
+                <span class="n">elapsed_s</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">also</span><span class="o">=</span><span class="p">(</span><span class="n">on_event</span><span class="p">,)</span> <span class="k">if</span> <span class="n">on_event</span> <span class="k">else</span> <span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="n">log</span> <span class="o">=</span> <span class="n">on_log</span> <span class="k">if</span> <span class="n">on_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_msg</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_on_queue_update</span><span class="p">(</span><span class="n">update</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">InProgress</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">update</span><span class="o">.</span><span class="n">logs</span> <span class="ow">or</span> <span class="p">():</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">logs</span> <span class="ow">or</span> <span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
+                <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;progress&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
                     <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="n">started</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;queued&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
             <span class="n">application</span><span class="p">,</span>
             <span class="n">arguments</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span>
             <span class="n">with_logs</span><span class="o">=</span><span class="n">with_logs</span><span class="p">,</span>
             <span class="n">on_queue_update</span><span class="o">=</span><span class="n">_on_queue_update</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">journal_errors</span><span class="p">:</span>
             <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;issue&quot;</span><span class="p">,</span>
@@ -171,7 +206,9 @@
                     <span class="s2">&quot;duration_s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
-        <span class="k">raise</span></div>
+        <span class="k">raise</span>
+    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>
 

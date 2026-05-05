@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.llm &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.operations.llm &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -120,7 +122,9 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beat</span><span class="p">,</span> <span class="n">Scene</span><span class="p">,</span> <span class="n">beat_id</span><span class="p">,</span> <span class="n">make_beat</span><span class="p">,</span> <span class="n">make_shot</span><span class="p">,</span> <span class="n">shot_id</span>
 
 <span class="n">_DEFAULT_LLM</span> <span class="o">=</span> <span class="s2">&quot;fal-ai/any-llm&quot;</span>
-<span class="n">_DEFAULT_MODEL</span> <span class="o">=</span> <span class="s2">&quot;anthropic/claude-3-5-sonnet&quot;</span>
+<span class="c1"># Valid any-llm OpenRouter ids (as of mid-2026); see fal-ai/any-llm schema.</span>
+<span class="c1"># Sonnet 4.5 is the strongest balanced default for structured-output tasks.</span>
+<span class="n">_DEFAULT_MODEL</span> <span class="o">=</span> <span class="s2">&quot;anthropic/claude-sonnet-4.5&quot;</span>
 
 
 <div class="viewcode-block" id="llm_complete">
@@ -139,15 +143,21 @@
         <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">_DEFAULT_MODEL</span><span class="p">,</span>
-                      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;OpenRouter model id, e.g. &#39;anthropic/claude-3-5-sonnet&#39;.&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">_DEFAULT_MODEL</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;OpenRouter model id, e.g. &#39;anthropic/claude-3-5-sonnet&#39;.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
             <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>
             <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;summarize this scene in one line&quot;</span><span class="p">,</span> <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="s2">&quot;you are a script consultant&quot;</span><span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;summarize this scene in one line&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="s2">&quot;you are a script consultant&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">llm_complete</span><span class="p">(</span>
@@ -268,8 +278,11 @@
         <span class="n">temperature</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parsed</span> <span class="o">=</span> <span class="n">_parse_json_loose</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_scene_from_llm_dict</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">default_title</span><span class="o">=</span><span class="n">title</span> <span class="ow">or</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">),</span>
-                                 <span class="n">default_style</span><span class="o">=</span><span class="n">style</span> <span class="ow">or</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">_scene_from_llm_dict</span><span class="p">(</span>
+        <span class="n">parsed</span><span class="p">,</span>
+        <span class="n">default_title</span><span class="o">=</span><span class="n">title</span> <span class="ow">or</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">),</span>
+        <span class="n">default_style</span><span class="o">=</span><span class="n">style</span> <span class="ow">or</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 
@@ -280,7 +293,9 @@
     <span class="c1"># Extract the largest balanced {...} substring.</span>
     <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\{.*\}&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;parse_screenplay: no JSON object in LLM response: </span><span class="si">{</span><span class="n">s</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;parse_screenplay: no JSON object in LLM response: </span><span class="si">{</span><span class="n">s</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="si">!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
     <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -319,8 +334,7 @@
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;shots&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
     <span class="p">)</span>
     <span class="n">beats</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-        <span class="n">_beat_with_explicit_id</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;beats&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
+        <span class="n">_beat_with_explicit_id</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;beats&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[])</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">Scene</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">default_title</span><span class="p">),</span>
@@ -335,6 +349,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_shot_with_explicit_id</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Shot</span>
+
     <span class="n">sid</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">shot_id</span><span class="p">(</span>
         <span class="n">description</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
         <span class="n">framing</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;framing&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
@@ -396,16 +411,24 @@
         <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;beat&quot;</span><span class="p">,</span> <span class="s2">&quot;note&quot;</span><span class="p">],</span>
         <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;beat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Beat&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                     <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Plain-English directorial instruction.&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Plain-English directorial instruction.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
             <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">_DEFAULT_MODEL</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Beat&quot;</span><span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;beat&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;001-john-abcd&quot;</span><span class="p">,</span> <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;line&quot;</span><span class="p">:</span> <span class="s2">&quot;It&#39;s fine.&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
-         <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="s2">&quot;He cracks on this line --- voice goes up.&quot;</span><span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;beat&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;001-john-abcd&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;line&quot;</span><span class="p">:</span> <span class="s2">&quot;It&#39;s fine.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotion&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="s2">&quot;He cracks on this line --- voice goes up.&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_note_to_beat</span><span class="p">(</span>
@@ -480,6 +503,7 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a cross-cutting note: LLM proposes per-beat edits, we apply them.&quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">scene_to_dict</span>
+
     <span class="n">user_prompt</span> <span class="o">=</span> <span class="p">(</span>
         <span class="sa">f</span><span class="s2">&quot;SCENE (JSON):</span><span class="se">\n</span><span class="si">{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">scene_to_dict</span><span class="p">(</span><span class="n">scene</span><span class="p">),</span><span class="w"> </span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
         <span class="sa">f</span><span class="s2">&quot;NOTE: </span><span class="si">{</span><span class="n">note</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
@@ -493,7 +517,9 @@
         <span class="n">temperature</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parsed</span> <span class="o">=</span> <span class="n">_parse_json_loose</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_scene_from_llm_dict</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="n">default_title</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">default_style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_scene_from_llm_dict</span><span class="p">(</span>
+        <span class="n">parsed</span><span class="p">,</span> <span class="n">default_title</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">default_style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.preproduction &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.operations.preproduction &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -135,15 +137,23 @@
         <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">],</span>
         <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual description used to generate the face.&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                          <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Skip generation and use this image as the face.&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual style applied to the face image (joined to description).&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
-                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual description used to generate the face.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Skip generation and use this image as the face.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Visual style applied to the face image (joined to description).&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
             <span class="s2">&quot;voice_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;reference_audio_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;voice_style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
@@ -151,7 +161,10 @@
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sarah&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;mid-30s, sharp features, dark curly hair, wary eyes&quot;</span><span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sarah&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;mid-30s, sharp features, dark curly hair, wary eyes&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">cast_character</span><span class="p">(</span>
@@ -265,15 +278,21 @@
             <span class="s2">&quot;time_of_day&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;lighting&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
-                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;diner&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;1950s American chrome diner, &quot;</span>
-         <span class="s2">&quot;neon outside, half-empty booths&quot;</span><span class="p">,</span> <span class="s2">&quot;time_of_day&quot;</span><span class="p">:</span> <span class="s2">&quot;midnight&quot;</span><span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;diner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;1950s American chrome diner, &quot;</span>
+            <span class="s2">&quot;neon outside, half-empty booths&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;time_of_day&quot;</span><span class="p">:</span> <span class="s2">&quot;midnight&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">establish_environment</span><span class="p">(</span>
@@ -331,9 +350,11 @@
             <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
             <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;list of falaw.Character&quot;</span><span class="p">},</span>
             <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
-                        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Result (the still)&quot;</span><span class="p">},</span>

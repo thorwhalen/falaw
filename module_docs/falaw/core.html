@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.core &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.core &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -62,6 +62,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
@@ -105,24 +107,31 @@
              
   <section id="module-falaw.core">
 <span id="falaw-core"></span><h1>falaw.core<a class="headerlink" href="#module-falaw.core" title="Link to this heading"></a></h1>
-<p>Wrapper over <cite>fal_client.subscribe</cite> with progress logging and auto-journaling.</p>
+<p>Wrapper over <cite>fal_client.subscribe</cite> with progress events and auto-journaling.</p>
 <p>Operations should call <cite>call_fal</cite> rather than <cite>fal_client.subscribe</cite> directly,
 so we get one place to:</p>
 <ul class="simple">
-<li><p>attach progress callbacks,</p></li>
+<li><p>publish structured progress events to subscribers (UI, telemetry),</p></li>
 <li><p>auto-journal failures (so the next agent learns from them),</p></li>
 <li><p>layer retries / backoff later without changing call sites.</p></li>
 </ul>
+<p>See <a class="reference internal" href="events.html#module-falaw.events" title="falaw.events"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.events</span></code></a> for the event model. <code class="docutils literal notranslate"><span class="pre">on_log</span></code> (a
+string-only callback) still works for backward compatibility — when
+both <code class="docutils literal notranslate"><span class="pre">on_log</span></code> and <code class="docutils literal notranslate"><span class="pre">on_event</span></code> are given, both fire.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.core.call_fal">
-<span class="sig-prename descclassname"><span class="pre">falaw.core.</span></span><span class="sig-name descname"><span class="pre">call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">journal_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/core.html#call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.core.call_fal" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.core.</span></span><span class="sig-name descname"><span class="pre">call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="events.html#falaw.events.ProgressEvent" title="falaw.events.ProgressEvent"><span class="pre">ProgressEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_logs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">journal_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/core.html#call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.core.call_fal" title="Link to this definition"></a></dt>
 <dd><p>Call a fal model via fal_client.subscribe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>application</strong> – fal model id (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;fal-ai/flux/dev&quot;</span></code>).</p></li>
 <li><p><strong>arguments</strong> – Input arguments. Keys depend on the model.</p></li>
-<li><p><strong>on_log</strong> – Progress callback. Defaults to <code class="docutils literal notranslate"><span class="pre">print</span></code>.</p></li>
+<li><p><strong>on_log</strong> – Legacy log callback — receives raw log lines as strings.
+Defaults to no-op (use <code class="docutils literal notranslate"><span class="pre">on_event</span></code> for structured access).</p></li>
+<li><p><strong>on_event</strong> – Per-call subscriber for <code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressEvent`s.</span> <span class="pre">Fires</span>
+<span class="pre">in</span> <span class="pre">addition</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">global</span> <span class="pre">subscribers</span> <span class="pre">registered</span> <span class="pre">via</span>
+<span class="pre">:func:`falaw.events.subscribe</span></code>.</p></li>
 <li><p><strong>with_logs</strong> – Pass through to fal_client; when True the model streams logs.</p></li>
 <li><p><strong>journal_errors</strong> – When True, exceptions are recorded as journal issues
 before being re-raised. The journal entry includes the application

@@ -12,6 +12,8 @@
    module_docs/falaw/cache
    module_docs/falaw/core
    module_docs/falaw/corpus
+   module_docs/falaw/cost
+   module_docs/falaw/events
    module_docs/falaw/journal
    module_docs/falaw/local
    module_docs/falaw/operations

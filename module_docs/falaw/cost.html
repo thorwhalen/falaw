@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.cost &mdash; falaw 0.0.5 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.events" href="events.html" />
+    <link rel="prev" title="falaw.corpus" href="corpus.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.cost</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cost.CostLine"><code class="docutils literal notranslate"><span class="pre">CostLine</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cost.CostRollup"><code class="docutils literal notranslate"><span class="pre">CostRollup</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.cost.CostRollup.by_kind"><code class="docutils literal notranslate"><span class="pre">CostRollup.by_kind()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cost.estimate_call_cost"><code class="docutils literal notranslate"><span class="pre">estimate_call_cost()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cost.estimate_scene_cost"><code class="docutils literal notranslate"><span class="pre">estimate_scene_cost()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.cost</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/cost.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.cost">
+<span id="falaw-cost"></span><h1>falaw.cost<a class="headerlink" href="#module-falaw.cost" title="Link to this heading"></a></h1>
+<p>Cost estimation: ModelRecord.cost_estimate + Scene rollups.</p>
+<p>Two surfaces here:</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_call_cost(record,</span> <span class="pre">*,</span> <span class="pre">count=1,</span> <span class="pre">seconds=None,</span> <span class="pre">megapixels=None,</span>
+<span class="pre">tokens=None)()</span></code> — turn one model’s <code class="xref py py-class docutils literal notranslate"><span class="pre">CostEstimate</span></code> into a USD figure.</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_scene_cost(scene,</span> <span class="pre">*,</span> <span class="pre">...)()</span></code> — walk every Shot + Beat in a
+<a class="reference internal" href="../falaw.html#falaw.Scene" title="falaw.Scene"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.Scene</span></code></a> and sum the per-call costs that
+<a class="reference internal" href="../falaw.html#falaw.render_scene" title="falaw.render_scene"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.render_scene()</span></code></a> would incur. Returns a structured rollup
+(per-line + totals) so UIs can show “this render would cost ~$0.42”.</p></li>
+</ul>
+<p>A scene-level estimate is <em>advisory</em>. It’s based on the same
+<code class="docutils literal notranslate"><span class="pre">pick_model(category,</span> <span class="pre">quality_tier=...)</span></code> lookup that the renderer
+uses, multiplied by per-line duration / pixel budgets. Real costs vary
+with model fluctuations and provider billing rules, but this is good
+enough to gate on (e.g. <code class="docutils literal notranslate"><span class="pre">--budget=1.00</span></code>) and to surface in
+<code class="docutils literal notranslate"><span class="pre">muvid</span> <span class="pre">status</span></code>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.cost.CostLine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.cost.</span></span><span class="sig-name descname"><span class="pre">CostLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">currency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/cost.html#CostLine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cost.CostLine" title="Link to this definition"></a></dt>
+<dd><p>One line item in a scene rollup.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.cost.CostRollup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.cost.</span></span><span class="sig-name descname"><span class="pre">CostRollup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">currency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'USD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.cost.CostLine" title="falaw.cost.CostLine"><span class="pre">CostLine</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/cost.html#CostRollup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cost.CostRollup" title="Link to this definition"></a></dt>
+<dd><p>Result of <a class="reference internal" href="#falaw.cost.estimate_scene_cost" title="falaw.cost.estimate_scene_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">estimate_scene_cost()</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.cost.CostRollup.by_kind">
+<span class="sig-name descname"><span class="pre">by_kind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/cost.html#CostRollup.by_kind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cost.CostRollup.by_kind" title="Link to this definition"></a></dt>
+<dd><p>Sum per <code class="docutils literal notranslate"><span class="pre">kind</span></code> for quick inspection.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cost.estimate_call_cost">
+<span class="sig-prename descclassname"><span class="pre">falaw.cost.</span></span><span class="sig-name descname"><span class="pre">estimate_call_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="base.html#falaw.base.ModelRecord" title="falaw.base.ModelRecord"><span class="pre">ModelRecord</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">megapixels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/cost.html#estimate_call_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cost.estimate_call_cost" title="Link to this definition"></a></dt>
+<dd><p>Cost of one fal call against <code class="docutils literal notranslate"><span class="pre">record</span></code>.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">None</span></code> if the record has no <code class="docutils literal notranslate"><span class="pre">cost_estimate</span></code> (so callers
+can distinguish “free” from “unknown”). The unit picked is whatever
+matches the record’s <code class="docutils literal notranslate"><span class="pre">cost_estimate.kind</span></code>; mismatched units fall
+back to the closest-fit default.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cost.estimate_scene_cost">
+<span class="sig-prename descclassname"><span class="pre">falaw.cost.</span></span><span class="sig-name descname"><span class="pre">estimate_scene_cost</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="scene.html#falaw.scene.Scene" title="falaw.scene.Scene"><span class="pre">Scene</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tts_quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'balanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lipsync_quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'high'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shot_quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'balanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shots_as_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.cost.CostRollup" title="falaw.cost.CostRollup"><span class="pre">CostRollup</span></a></span></span><a class="reference internal" href="../../_modules/falaw/cost.html#estimate_scene_cost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cost.estimate_scene_cost" title="Link to this definition"></a></dt>
+<dd><p>Estimate the USD cost of a full <code class="xref py py-func docutils literal notranslate"><span class="pre">render_scene()</span></code> invocation.</p>
+<p>Walks every shot + beat with the same <code class="docutils literal notranslate"><span class="pre">pick_model</span></code> semantics
+the renderer uses, then sums per-call costs. Returns a structured
+<a class="reference internal" href="#falaw.cost.CostRollup" title="falaw.cost.CostRollup"><code class="xref py py-class docutils literal notranslate"><span class="pre">CostRollup</span></code></a> with per-line breakdowns, plus a list of
+“skipped” entries the caller should surface (typically: a model
+with no <code class="docutils literal notranslate"><span class="pre">cost_estimate</span></code> populated).</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="corpus.html" class="btn btn-neutral float-left" title="falaw.corpus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="events.html" class="btn btn-neutral float-right" title="falaw.events" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

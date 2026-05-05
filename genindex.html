@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.4 documentation</title>
+  <title>Index &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="_static/documentation_options.js?v=282f96c0"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -109,8 +111,10 @@
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -124,6 +128,26 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.amount">amount (falaw.base.CostEstimate attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostEstimate.amount">(falaw.CostEstimate attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.animate_face">animate_face() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/operations/avatar.html#falaw.operations.avatar.animate_face">(in module falaw.operations.avatar)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.application">application (falaw.events.ProgressEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.application">(falaw.ProgressEvent attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.apply_note_to_beat">apply_note_to_beat() (in module falaw)</a>
 
       <ul>
@@ -136,8 +160,6 @@
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.apply_note_to_scene">(in module falaw.operations.llm)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.Asset">Asset (class in falaw)</a>
 
       <ul>
@@ -168,6 +190,12 @@
 </li>
       <li><a href="module_docs/falaw/bridges/skill.html#falaw.bridges.skill.build_skill_md">build_skill_md() (in module falaw.bridges.skill)</a>
 </li>
+      <li><a href="module_docs/falaw/cost.html#falaw.cost.CostRollup.by_kind">by_kind() (falaw.cost.CostRollup method)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostRollup.by_kind">(falaw.CostRollup method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -198,12 +226,16 @@
         <li><a href="module_docs/falaw/cache.html#falaw.cache.cached_call_fal">(in module falaw.cache)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.call_fal">call_fal() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/core.html#falaw.core.call_fal">(in module falaw.core)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.call_id">call_id (falaw.events.ProgressEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.call_id">(falaw.ProgressEvent attribute)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw.html#falaw.cast_character">cast_character() (in module falaw)</a>
@@ -212,6 +244,8 @@
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.cast_character">(in module falaw.operations.preproduction)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.cast_voice">cast_voice() (in module falaw)</a>
 
       <ul>
@@ -224,8 +258,38 @@
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Character">(class in falaw.scene)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.clear_subscribers">clear_subscribers() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/events.html#falaw.events.clear_subscribers">(in module falaw.events)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw/local.html#falaw.local.concatenate_clips">concatenate_clips() (in module falaw.local)</a>
 </li>
+      <li><a href="module_docs/falaw.html#falaw.CostEstimate">CostEstimate (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate">(class in falaw.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.CostLine">CostLine (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/cost.html#falaw.cost.CostLine">(class in falaw.cost)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.CostRollup">CostRollup (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/cost.html#falaw.cost.CostRollup">(class in falaw.cost)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.currency">currency (falaw.base.CostEstimate attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostEstimate.currency">(falaw.CostEstimate attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -256,18 +320,38 @@
         <li><a href="module_docs/falaw/operations/images.html#falaw.operations.images.edit_image">(in module falaw.operations.images)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.elapsed_s">elapsed_s (falaw.events.ProgressEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.elapsed_s">(falaw.ProgressEvent attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.emit">emit() (in module falaw.events)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Environment">Environment (class in falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Environment">(class in falaw.scene)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.establish_environment">establish_environment() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.establish_environment">(in module falaw.operations.preproduction)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.estimate_call_cost">estimate_call_cost() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/cost.html#falaw.cost.estimate_call_cost">(in module falaw.cost)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.estimate_scene_cost">estimate_scene_cost() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/cost.html#falaw.cost.estimate_scene_cost">(in module falaw.cost)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw.html#falaw.extract_models_from_corpus">extract_models_from_corpus() (in module falaw)</a>
@@ -355,6 +439,20 @@
 </li>
       </ul></li>
       <li>
+    falaw.cost
+
+      <ul>
+        <li><a href="module_docs/falaw/cost.html#module-falaw.cost">module</a>
+</li>
+      </ul></li>
+      <li>
+    falaw.events
+
+      <ul>
+        <li><a href="module_docs/falaw/events.html#module-falaw.events">module</a>
+</li>
+      </ul></li>
+      <li>
     falaw.journal
 
       <ul>
@@ -368,6 +466,8 @@
         <li><a href="module_docs/falaw/local.html#module-falaw.local">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations
 
@@ -375,8 +475,6 @@
         <li><a href="module_docs/falaw/operations.html#module-falaw.operations">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations.audio
 
@@ -491,6 +589,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.is_stale">is_stale() (in module falaw.refresh)</a>
 </li>
+      <li><a href="module_docs/falaw.html#falaw.iter_render_scene">iter_render_scene() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/operations/render.html#falaw.operations.render.iter_render_scene">(in module falaw.operations.render)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -503,6 +607,22 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/journal.html#falaw.journal.JournalEntry">JournalEntry (class in falaw.journal)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.kind">kind (falaw.base.CostEstimate attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostEstimate.kind">(falaw.CostEstimate attribute)</a>
+</li>
+        <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.kind">(falaw.events.ProgressEvent attribute)</a>
+</li>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.kind">(falaw.ProgressEvent attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -537,6 +657,12 @@
         <li><a href="module_docs/falaw/cache.html#falaw.cache.materialize_asset">(in module falaw.cache)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.message">message (falaw.events.ProgressEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.message">(falaw.ProgressEvent attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.ModelRecord">ModelRecord (class in falaw)</a>
 
       <ul>
@@ -566,6 +692,10 @@
         <li><a href="module_docs/falaw/core.html#module-falaw.core">falaw.core</a>
 </li>
         <li><a href="module_docs/falaw/corpus.html#module-falaw.corpus">falaw.corpus</a>
+</li>
+        <li><a href="module_docs/falaw/cost.html#module-falaw.cost">falaw.cost</a>
+</li>
+        <li><a href="module_docs/falaw/events.html#module-falaw.events">falaw.events</a>
 </li>
         <li><a href="module_docs/falaw/journal.html#module-falaw.journal">falaw.journal</a>
 </li>
@@ -601,6 +731,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.notes">notes (falaw.base.CostEstimate attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostEstimate.notes">(falaw.CostEstimate attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -624,12 +766,24 @@
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.parse_screenplay">(in module falaw.operations.llm)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent.pct">pct (falaw.events.ProgressEvent attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.ProgressEvent.pct">(falaw.ProgressEvent attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.pick_model">pick_model() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/registry.html#falaw.registry.pick_model">(in module falaw.registry)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.ProgressEvent">ProgressEvent (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent">(class in falaw.events)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -724,18 +878,30 @@
         <li><a href="module_docs/falaw/session.html#falaw.session.Session">(class in falaw.session)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.Shot">Shot (class in falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Shot">(class in falaw.scene)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.source">source (falaw.base.CostEstimate attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.CostEstimate.source">(falaw.CostEstimate attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.storyboard_shot">storyboard_shot() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.storyboard_shot">(in module falaw.operations.preproduction)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.subscribe">subscribe() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/events.html#falaw.events.subscribe">(in module falaw.events)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -775,6 +941,14 @@
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.unsubscribe">unsubscribe() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/events.html#falaw.events.unsubscribe">(in module falaw.events)</a>
+</li>
+      </ul></li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.upscale_image">upscale_image() (in module falaw)</a>
 

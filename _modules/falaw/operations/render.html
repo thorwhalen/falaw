@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.render &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.operations.render &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -185,8 +187,11 @@
             <span class="s2">&quot;character&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Character&quot;</span><span class="p">},</span>
             <span class="s2">&quot;tts_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
             <span class="s2">&quot;lipsync_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Bypass cache and re-render.&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;force&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Bypass cache and re-render.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
@@ -202,8 +207,12 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render one Beat to a lipsynced video. Returns a small manifest dict.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">beat</span><span class="o">.</span><span class="n">action</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;empty beat (no line, no action)&quot;</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;empty beat (no line, no action)&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="n">h</span> <span class="o">=</span> <span class="n">beat_content_hash</span><span class="p">(</span><span class="n">beat</span><span class="p">,</span> <span class="n">character</span><span class="o">=</span><span class="n">character</span><span class="p">)</span>
     <span class="n">cache_app</span> <span class="o">=</span> <span class="s2">&quot;falaw.render_beat&quot;</span>
@@ -221,9 +230,7 @@
         <span class="n">tts_model</span> <span class="o">=</span> <span class="n">_picked_tts_model</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">)</span>
         <span class="n">tts_args</span> <span class="o">=</span> <span class="n">_tts_arguments</span><span class="p">(</span><span class="n">character</span><span class="p">,</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span><span class="p">)</span>
         <span class="n">tts_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">tts_model</span><span class="p">,</span> <span class="n">tts_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-        <span class="n">tts_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
-            <span class="n">tts_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">tts_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">tts_args</span>
-        <span class="p">)</span>
+        <span class="n">tts_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">tts_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">tts_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">tts_args</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tts_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;render_beat: TTS produced no asset for beat </span><span class="si">{</span><span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span>
@@ -231,15 +238,23 @@
         <span class="n">audio_url</span> <span class="o">=</span> <span class="n">tts_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
 
     <span class="k">if</span> <span class="n">beat</span><span class="o">.</span><span class="n">line</span> <span class="ow">and</span> <span class="n">character</span><span class="o">.</span><span class="n">reference_image_url</span><span class="p">:</span>
-        <span class="n">ls_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;lipsync&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-        <span class="n">ls_args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># `avatar` category = image+audio → talking video (the right primitive</span>
+        <span class="c1"># for &quot;still face speaks line&quot;). `lipsync` category requires an</span>
+        <span class="c1"># existing video, which we don&#39;t have here.</span>
+        <span class="n">av_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;avatar&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+        <span class="c1"># ai-avatar requires a non-empty `prompt`; omnihuman accepts one.</span>
+        <span class="c1"># Use beat.emotion / beat.action as the directorial hint; fall back</span>
+        <span class="c1"># to a neutral default so the schema is satisfied.</span>
+        <span class="n">av_prompt</span> <span class="o">=</span> <span class="n">beat</span><span class="o">.</span><span class="n">emotion</span> <span class="ow">or</span> <span class="n">beat</span><span class="o">.</span><span class="n">action</span> <span class="ow">or</span> <span class="s2">&quot;natural delivery&quot;</span>
+        <span class="n">av_args</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">reference_image_url</span><span class="p">,</span>
             <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">av_prompt</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="n">ls_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">ls_model</span><span class="p">,</span> <span class="n">ls_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-        <span class="n">ls_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">ls_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">ls_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">ls_args</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ls_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-            <span class="n">video_url</span> <span class="o">=</span> <span class="n">ls_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">av_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">av_model</span><span class="p">,</span> <span class="n">av_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
+        <span class="n">av_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">av_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">av_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">av_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">av_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
+            <span class="n">video_url</span> <span class="o">=</span> <span class="n">av_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
 
     <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">video_url</span> <span class="ow">or</span> <span class="n">audio_url</span><span class="p">,</span>
@@ -274,8 +289,7 @@
         <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;shot&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Shot&quot;</span><span class="p">},</span>
             <span class="s2">&quot;environment&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Environment&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;list of falaw.Character&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;list of falaw.Character&quot;</span><span class="p">},</span>
             <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
             <span class="s2">&quot;as_video&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
             <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
@@ -321,19 +335,27 @@
 
     <span class="n">img_model</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
     <span class="n">img_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span>
-        <span class="n">img_model</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_16_9&quot;</span><span class="p">},</span>
+        <span class="n">img_model</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_16_9&quot;</span><span class="p">},</span>
         <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">img_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
         <span class="n">img_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">img_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">img_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;render_shot: image generation produced no asset for </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;render_shot: image generation produced no asset for </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
     <span class="n">still_url</span> <span class="o">=</span> <span class="n">img_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">as_video</span><span class="p">:</span>
-        <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">still_url</span><span class="p">,</span> <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
-                    <span class="s2">&quot;shot_id&quot;</span><span class="p">:</span> <span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">still_url</span><span class="p">,</span>
+            <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hash&quot;</span><span class="p">:</span> <span class="n">h</span><span class="p">,</span>
+            <span class="s2">&quot;shot_id&quot;</span><span class="p">:</span> <span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
         <span class="n">cache_put</span><span class="p">(</span><span class="n">cache_app</span><span class="p">,</span> <span class="n">cache_args</span><span class="p">,</span> <span class="n">manifest</span><span class="p">,</span> <span class="n">note</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;shot:</span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">manifest</span>
 
@@ -343,9 +365,7 @@
     <span class="k">if</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span><span class="p">:</span>
         <span class="n">i2v_args</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shot</span><span class="o">.</span><span class="n">camera</span>
     <span class="n">i2v_raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">i2v_model</span><span class="p">,</span> <span class="n">i2v_args</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">force</span><span class="p">)</span>
-    <span class="n">i2v_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span>
-        <span class="n">i2v_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">i2v_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">i2v_args</span>
-    <span class="p">)</span>
+    <span class="n">i2v_result</span> <span class="o">=</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">i2v_raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">i2v_model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">i2v_args</span><span class="p">)</span>
     <span class="n">video_url</span> <span class="o">=</span> <span class="n">i2v_result</span><span class="o">.</span><span class="n">first</span><span class="o">.</span><span class="n">url</span> <span class="k">if</span> <span class="n">i2v_result</span><span class="o">.</span><span class="n">first</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">video_url</span> <span class="ow">or</span> <span class="n">still_url</span><span class="p">,</span>
@@ -398,51 +418,36 @@
     <span class="n">shot_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
     <span class="n">shots_as_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render every shot and beat. Returns a manifest dict.&quot;&quot;&quot;</span>
-    <span class="n">chars_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">characters</span><span class="p">}</span>
-    <span class="n">envs_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">environments</span><span class="p">}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render every shot and beat. Returns a manifest dict.</span>
 
+<span class="sd">    ``concurrency`` controls how many shots/beats run in parallel</span>
+<span class="sd">    against fal. The work is HTTP-bound, so a thread pool is enough.</span>
+<span class="sd">    Default ``1`` preserves serial behavior. Use</span>
+<span class="sd">    :func:`iter_render_scene` instead if you want results yielded as</span>
+<span class="sd">    each unit completes (for live UI updates).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">iterator</span> <span class="o">=</span> <span class="n">iter_render_scene</span><span class="p">(</span>
+        <span class="n">scene</span><span class="p">,</span>
+        <span class="n">tts_quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">,</span>
+        <span class="n">lipsync_quality</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">,</span>
+        <span class="n">shot_quality</span><span class="o">=</span><span class="n">shot_quality</span><span class="p">,</span>
+        <span class="n">shots_as_video</span><span class="o">=</span><span class="n">shots_as_video</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">shot_results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">shot</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">shots</span><span class="p">:</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="n">envs_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span>
-        <span class="n">chars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-            <span class="n">chars_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">shot</span><span class="o">.</span><span class="n">characters</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">chars_by_name</span>
-        <span class="p">)</span>
-        <span class="n">shot_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">render_shot</span><span class="p">(</span>
-                <span class="n">shot</span><span class="p">,</span>
-                <span class="n">environment</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
-                <span class="n">characters</span><span class="o">=</span><span class="n">chars</span><span class="p">,</span>
-                <span class="n">style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
-                <span class="n">as_video</span><span class="o">=</span><span class="n">shots_as_video</span><span class="p">,</span>
-                <span class="n">quality</span><span class="o">=</span><span class="n">shot_quality</span><span class="p">,</span>
-                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
     <span class="n">beat_results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">beats</span><span class="p">:</span>
-        <span class="n">speaker</span> <span class="o">=</span> <span class="n">chars_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">speaker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">beat_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span><span class="s2">&quot;beat_id&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;no character&quot;</span><span class="p">,</span>
-                 <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-            <span class="p">)</span>
-            <span class="k">continue</span>
-        <span class="n">beat_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">render_beat</span><span class="p">(</span>
-                <span class="n">beat</span><span class="p">,</span> <span class="n">speaker</span><span class="p">,</span>
-                <span class="n">tts_quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">,</span>
-                <span class="n">lipsync_quality</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">,</span>
-                <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">kind</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">iterator</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;shot&quot;</span><span class="p">:</span>
+            <span class="n">shot_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">beat_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 
-    <span class="n">cache_hits</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache_hit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
-                     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">shot_results</span> <span class="o">+</span> <span class="n">beat_results</span><span class="p">)</span>
+    <span class="n">cache_hits</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache_hit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">shot_results</span> <span class="o">+</span> <span class="n">beat_results</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
         <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
@@ -452,6 +457,87 @@
         <span class="s2">&quot;shots&quot;</span><span class="p">:</span> <span class="n">shot_results</span><span class="p">,</span>
         <span class="s2">&quot;beats&quot;</span><span class="p">:</span> <span class="n">beat_results</span><span class="p">,</span>
     <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="iter_render_scene">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/render.html#falaw.iter_render_scene">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iter_render_scene</span><span class="p">(</span>
+    <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tts_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">lipsync_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+    <span class="n">shot_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">shots_as_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(kind, result)`` pairs as each shot/beat finishes.</span>
+
+<span class="sd">    ``kind`` ∈ ``{&quot;shot&quot;, &quot;beat&quot;}``. With ``concurrency=1`` results</span>
+<span class="sd">    arrive in submission order (shots before beats). With</span>
+<span class="sd">    ``concurrency &gt; 1`` they arrive in completion order (use the</span>
+<span class="sd">    ``&quot;shot_id&quot;`` / ``&quot;beat_id&quot;`` keys to re-key by identity).</span>
+
+<span class="sd">    Cache hits are immediate: a fully-cached scene yields all results</span>
+<span class="sd">    in close succession even at ``concurrency=1``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chars_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">characters</span><span class="p">}</span>
+    <span class="n">envs_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">environments</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_one_shot</span><span class="p">(</span><span class="n">shot</span><span class="p">:</span> <span class="n">Shot</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">envs_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">environment</span><span class="p">)</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">chars_by_name</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">shot</span><span class="o">.</span><span class="n">characters</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">chars_by_name</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_shot</span><span class="p">(</span>
+            <span class="n">shot</span><span class="p">,</span>
+            <span class="n">environment</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+            <span class="n">characters</span><span class="o">=</span><span class="n">chars</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">as_video</span><span class="o">=</span><span class="n">shots_as_video</span><span class="p">,</span>
+            <span class="n">quality</span><span class="o">=</span><span class="n">shot_quality</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_one_beat</span><span class="p">(</span><span class="n">beat</span><span class="p">:</span> <span class="n">Beat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">speaker</span> <span class="o">=</span> <span class="n">chars_by_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">speaker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;beat_id&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;skipped&quot;</span><span class="p">:</span> <span class="s2">&quot;no character&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;speaker&quot;</span><span class="p">:</span> <span class="n">beat</span><span class="o">.</span><span class="n">speaker</span><span class="p">,</span>
+                <span class="s2">&quot;cache_hit&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">return</span> <span class="n">render_beat</span><span class="p">(</span>
+            <span class="n">beat</span><span class="p">,</span>
+            <span class="n">speaker</span><span class="p">,</span>
+            <span class="n">tts_quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">,</span>
+            <span class="n">lipsync_quality</span><span class="o">=</span><span class="n">lipsync_quality</span><span class="p">,</span>
+            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">concurrency</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">shot</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">shots</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s2">&quot;shot&quot;</span><span class="p">,</span> <span class="n">_one_shot</span><span class="p">(</span><span class="n">shot</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">beats</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s2">&quot;beat&quot;</span><span class="p">,</span> <span class="n">_one_beat</span><span class="p">(</span><span class="n">beat</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">concurrency</span><span class="p">)</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">shot</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">shots</span><span class="p">:</span>
+            <span class="n">fut</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_one_shot</span><span class="p">,</span> <span class="n">shot</span><span class="p">)</span>
+            <span class="n">futures</span><span class="p">[</span><span class="n">fut</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;shot&quot;</span>
+        <span class="k">for</span> <span class="n">beat</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">beats</span><span class="p">:</span>
+            <span class="n">fut</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_one_beat</span><span class="p">,</span> <span class="n">beat</span><span class="p">)</span>
+            <span class="n">futures</span><span class="p">[</span><span class="n">fut</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;beat&quot;</span>
+        <span class="k">for</span> <span class="n">fut</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">futures</span><span class="p">[</span><span class="n">fut</span><span class="p">],</span> <span class="n">fut</span><span class="o">.</span><span class="n">result</span><span class="p">()</span></div>
 
 
 

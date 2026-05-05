@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.base &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.base &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -52,6 +52,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.base</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.base.CostEstimate"><code class="docutils literal notranslate"><span class="pre">CostEstimate</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.base.CostEstimate.kind"><code class="docutils literal notranslate"><span class="pre">CostEstimate.kind</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.base.CostEstimate.amount"><code class="docutils literal notranslate"><span class="pre">CostEstimate.amount</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.base.CostEstimate.currency"><code class="docutils literal notranslate"><span class="pre">CostEstimate.currency</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.base.CostEstimate.notes"><code class="docutils literal notranslate"><span class="pre">CostEstimate.notes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.base.CostEstimate.source"><code class="docutils literal notranslate"><span class="pre">CostEstimate.source</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.base.ModelRecord"><code class="docutils literal notranslate"><span class="pre">ModelRecord</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.base.ToolSpec"><code class="docutils literal notranslate"><span class="pre">ToolSpec</span></code></a></li>
 </ul>
@@ -63,6 +71,8 @@
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
@@ -110,8 +120,78 @@
 <p>These dataclasses are the single source of truth from which every external
 surface (Claude skill, MCP server, HTTP service, UI) is derived.</p>
 <dl class="py class">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">CostEstimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'per_call'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'per_image'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'per_second'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'per_token'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'per_megapixel'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">currency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'USD'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'approximate'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/base.html#CostEstimate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.base.CostEstimate" title="Link to this definition"></a></dt>
+<dd><p>Quantitative cost of one fal call against this model.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate.kind">
+<span class="sig-name descname"><span class="pre">kind</span></span><a class="headerlink" href="#falaw.base.CostEstimate.kind" title="Link to this definition"></a></dt>
+<dd><p>How the price scales. <code class="docutils literal notranslate"><span class="pre">per_call</span></code> is the simplest:
+constant per invocation regardless of size. <code class="docutils literal notranslate"><span class="pre">per_second</span></code>
+applies to video / TTS where output length matters.
+<code class="docutils literal notranslate"><span class="pre">per_image</span></code> covers batch image gen. <code class="docutils literal notranslate"><span class="pre">per_megapixel</span></code>
+covers high-res image generation. <code class="docutils literal notranslate"><span class="pre">per_token</span></code> covers
+LLM-style endpoints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Literal[‘per_call’, ‘per_image’, ‘per_second’, ‘per_token’, ‘per_megapixel’]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate.amount">
+<span class="sig-name descname"><span class="pre">amount</span></span><a class="headerlink" href="#falaw.base.CostEstimate.amount" title="Link to this definition"></a></dt>
+<dd><p>USD (or <code class="docutils literal notranslate"><span class="pre">currency</span></code>) per unit defined by <code class="docutils literal notranslate"><span class="pre">kind</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate.currency">
+<span class="sig-name descname"><span class="pre">currency</span></span><a class="headerlink" href="#falaw.base.CostEstimate.currency" title="Link to this definition"></a></dt>
+<dd><p>ISO 4217 code. <code class="docutils literal notranslate"><span class="pre">&quot;USD&quot;</span></code> is the only supported value
+today; the field exists so we can extend without a schema
+migration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate.notes">
+<span class="sig-name descname"><span class="pre">notes</span></span><a class="headerlink" href="#falaw.base.CostEstimate.notes" title="Link to this definition"></a></dt>
+<dd><p>Free-form caveats — “rounded up to next second”, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.base.CostEstimate.source">
+<span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#falaw.base.CostEstimate.source" title="Link to this definition"></a></dt>
+<dd><p>How the estimate was obtained — <code class="docutils literal notranslate"><span class="pre">&quot;docs&quot;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&quot;empirical&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;approximate&quot;</span></code>. Lets us flag stale or
+unverified entries in audits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="falaw.base.ModelRecord">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">ModelRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/base.html#ModelRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.base.ModelRecord" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">ModelRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality_tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_estimate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.base.CostEstimate" title="falaw.base.CostEstimate"><span class="pre">CostEstimate</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/base.html#ModelRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.base.ModelRecord" title="Link to this definition"></a></dt>
 <dd><p>One entry in the fal model catalog.</p>
 </dd></dl>
 

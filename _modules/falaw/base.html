@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.base &mdash; falaw 0.0.4 documentation</title>
+  <title>falaw.base &mdash; falaw 0.0.5 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8c5712d9"></script>
+      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -56,6 +56,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
@@ -107,9 +109,43 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="n">JSONSchema</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+
+<span class="n">CostKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;per_call&quot;</span><span class="p">,</span> <span class="s2">&quot;per_image&quot;</span><span class="p">,</span> <span class="s2">&quot;per_second&quot;</span><span class="p">,</span> <span class="s2">&quot;per_token&quot;</span><span class="p">,</span> <span class="s2">&quot;per_megapixel&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="CostEstimate">
+<a class="viewcode-back" href="../../module_docs/falaw/base.html#falaw.CostEstimate">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CostEstimate</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quantitative cost of one fal call against this model.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        kind: How the price scales. ``per_call`` is the simplest:</span>
+<span class="sd">            constant per invocation regardless of size. ``per_second``</span>
+<span class="sd">            applies to video / TTS where output length matters.</span>
+<span class="sd">            ``per_image`` covers batch image gen. ``per_megapixel``</span>
+<span class="sd">            covers high-res image generation. ``per_token`` covers</span>
+<span class="sd">            LLM-style endpoints.</span>
+<span class="sd">        amount: USD (or ``currency``) per unit defined by ``kind``.</span>
+<span class="sd">        currency: ISO 4217 code. ``&quot;USD&quot;`` is the only supported value</span>
+<span class="sd">            today; the field exists so we can extend without a schema</span>
+<span class="sd">            migration.</span>
+<span class="sd">        notes: Free-form caveats — &quot;rounded up to next second&quot;, etc.</span>
+<span class="sd">        source: How the estimate was obtained — ``&quot;docs&quot;``,</span>
+<span class="sd">            ``&quot;empirical&quot;``, ``&quot;approximate&quot;``. Lets us flag stale or</span>
+<span class="sd">            unverified entries in audits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">CostKind</span>
+    <span class="n">amount</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">currency</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;USD&quot;</span>
+    <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;approximate&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="ToolSpec">
@@ -144,7 +180,8 @@
     <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">aliases</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
     <span class="n">quality_tier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># &quot;fast&quot; | &quot;balanced&quot; | &quot;high&quot; | &quot;ultra&quot;</span>
-    <span class="n">cost_hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># free-form for now</span>
+    <span class="n">cost_hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># legacy free-form text; kept for back-compat</span>
+    <span class="n">cost_estimate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostEstimate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># quantitative; preferred</span>
     <span class="n">docs_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
 
 </pre></div>
