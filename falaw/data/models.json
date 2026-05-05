@@ -9,24 +9,26 @@
     "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/audio-isolation"
   },
   {
-    "id": "fal-ai/playai/inpaint/diffusion",
-    "category": "audio",
-    "description": "Audio inpainting using diffusion models",
-    "aliases": [],
-    "quality_tier": "balanced",
-    "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/playai/inpaint/diffusion"
-  },
-  {
     "id": "fal-ai/ai-avatar",
     "category": "avatar",
-    "description": "Single-person talking avatar with lip-sync (image+audio).",
+    "description": "Single-person talking avatar with lip-sync (image+audio). Requires a `prompt`.",
     "aliases": [
       "ai-avatar"
     ],
     "quality_tier": "balanced",
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/ai-avatar"
+  },
+  {
+    "id": "fal-ai/bytedance/omnihuman/v1.5",
+    "category": "avatar",
+    "description": "ByteDance OmniHuman v1.5: high-quality talking avatar from image+audio.",
+    "aliases": [
+      "omnihuman"
+    ],
+    "quality_tier": "high",
+    "cost_hint": "high",
+    "docs_url": "https://fal.ai/models/fal-ai/bytedance/omnihuman/v1.5"
   },
   {
     "id": "fal-ai/bria/background/remove",
@@ -362,26 +364,6 @@
     "quality_tier": "high",
     "cost_hint": "",
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro-trainer"
-  },
-  {
-    "id": "fal-ai/playai/tts/dialog",
-    "category": "tts",
-    "description": "Multi-speaker dialogue generation",
-    "aliases": [],
-    "quality_tier": "balanced",
-    "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/dialog"
-  },
-  {
-    "id": "fal-ai/playai/tts/v3",
-    "category": "tts",
-    "description": "PlayAI TTS v3: blazing-fast TTS with emotional tones.",
-    "aliases": [
-      "playai-tts"
-    ],
-    "quality_tier": "balanced",
-    "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/playai/tts/v3"
   },
   {
     "id": "fal-ai/elevenlabs/tts/multilingual-v2",

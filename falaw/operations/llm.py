@@ -20,7 +20,9 @@ from ..registry import register_tool
 from ..scene import Beat, Scene, beat_id, make_beat, make_shot, shot_id
 
 _DEFAULT_LLM = "fal-ai/any-llm"
-_DEFAULT_MODEL = "anthropic/claude-3-5-sonnet"
+# Valid any-llm OpenRouter ids (as of mid-2026); see fal-ai/any-llm schema.
+# Sonnet 4.5 is the strongest balanced default for structured-output tasks.
+_DEFAULT_MODEL = "anthropic/claude-sonnet-4.5"
 
 
 @register_tool(

@@ -113,22 +113,40 @@ def test_voice_clone(monkeypatch):
     assert r.first.kind == "audio"
 
 
-def test_lipsync(monkeypatch):
+def test_lipsync_takes_video_url(monkeypatch):
+    """lipsync re-syncs an existing VIDEO clip; image+audio is animate_face's job."""
     captured = _patch_subscribe(
         monkeypatch,
         lambda app: {"video": {"url": "http://x/synced.mp4"}},
     )
     from falaw import lipsync
 
-    r = lipsync("http://x/face.jpg", "http://x/audio.mp3")
+    r = lipsync("http://x/clip.mp4", "http://x/audio.mp3")
     assert captured[0]["application"] == "fal-ai/sync-lipsync/v2"
+    assert captured[0]["arguments"]["video_url"] == "http://x/clip.mp4"
     assert r.first.kind == "video"
 
 
-def test_talking_avatar_from_text_chains_two_calls(monkeypatch):
-    """Composer should TTS first, then pass the audio URL into lipsync."""
+def test_animate_face_image_plus_audio(monkeypatch):
+    """animate_face is the still-image+audio → talking video primitive."""
+    captured = _patch_subscribe(
+        monkeypatch,
+        lambda app: {"video": {"url": "http://x/talking.mp4"}},
+    )
+    from falaw import animate_face
+
+    r = animate_face("http://x/face.jpg", "http://x/audio.mp3", prompt="warm")
+    assert "avatar" in captured[0]["application"] or "omnihuman" in captured[0]["application"]
+    assert captured[0]["arguments"]["image_url"] == "http://x/face.jpg"
+    # ai-avatar requires `prompt`; omnihuman accepts it. We always pass it.
+    assert "prompt" in captured[0]["arguments"]
+    assert r.first.kind == "video"
+
+
+def test_talking_avatar_from_text_chains_via_animate_face(monkeypatch):
+    """Composer should TTS first, then pass the audio URL into animate_face."""
     def response_for(app):
-        if "tts" in app or "speech" in app or "playai" in app:
+        if "tts" in app or "speech" in app:
             return {"audio": {"url": "http://x/spoken.mp3",
                               "content_type": "audio/mpeg"}}
         return {"video": {"url": "http://x/talking.mp4"}}
@@ -138,9 +156,10 @@ def test_talking_avatar_from_text_chains_two_calls(monkeypatch):
 
     r = talking_avatar_from_text("Hello world.", "http://x/face.jpg")
     assert len(captured) == 2, f"expected 2 fal calls, got {len(captured)}"
-    # First call should be TTS, second should be lipsync.
     assert "tts" in captured[0]["application"] or "speech" in captured[0]["application"]
-    assert "lipsync" in captured[1]["application"]
-    # The audio URL from TTS should have been threaded into lipsync.
+    # Second call should hit the avatar (image+audio) family, NOT lipsync.
+    assert ("avatar" in captured[1]["application"]
+            or "omnihuman" in captured[1]["application"])
     assert captured[1]["arguments"]["audio_url"] == "http://x/spoken.mp3"
+    assert captured[1]["arguments"]["image_url"] == "http://x/face.jpg"
     assert r.first.kind == "video"

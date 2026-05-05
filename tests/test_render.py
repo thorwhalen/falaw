@@ -40,6 +40,8 @@ def _patch_fal(monkeypatch):
         captured.append({"application": application, "arguments": dict(arguments)})
         if "tts" in application or "speech" in application or "playai" in application:
             return {"audio": {"url": "http://x/spoken.mp3", "content_type": "audio/mpeg"}}
+        if "ai-avatar" in application or "omnihuman" in application:
+            return {"video": {"url": "http://x/talking.mp4"}}
         if "lipsync" in application:
             return {"video": {"url": "http://x/lipsynced.mp4"}}
         if "image-to-video" in application:
@@ -68,7 +70,7 @@ def test_render_beat_caches_subsequent_calls(monkeypatch):
 
     first = render_beat(beat, sarah)
     assert first["cache_hit"] is False
-    assert first["video_url"] == "http://x/lipsynced.mp4"
+    assert first["video_url"] == "http://x/talking.mp4"
     assert first["audio_url"]  # cloned audio URL set
 
     calls_after_first = len(captured)
