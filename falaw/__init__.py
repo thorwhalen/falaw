@@ -23,9 +23,15 @@ Leave notes for future sessions:
 from . import corpus as _corpus  # noqa: F401  (registers refresh_models_from_corpus)
 from . import journal, operations  # noqa: F401  (operations registers tools)
 from . import refresh as _refresh  # noqa: F401  (refresh registers tools too)
-from .base import ModelRecord, ToolSpec
+from .base import CostEstimate, ModelRecord, ToolSpec
 from .cache import cached_call_fal, cache_get, cache_put, cache_stats, materialize_asset
 from .core import call_fal
+from .cost import (
+    CostLine,
+    CostRollup,
+    estimate_call_cost,
+    estimate_scene_cost,
+)
 from .events import (
     ProgressEvent,
     clear_subscribers,
@@ -93,6 +99,9 @@ __all__ = [
     "Environment",
     "ModelRecord",
     "Result",
+    "CostEstimate",
+    "CostLine",
+    "CostRollup",
     "ProgressEvent",
     "Scene",
     "Session",
@@ -100,6 +109,8 @@ __all__ = [
     "ToolSpec",
     "Voice",
     "clear_subscribers",
+    "estimate_call_cost",
+    "estimate_scene_cost",
     "subscribe",
     "unsubscribe",
     "animate_face",
