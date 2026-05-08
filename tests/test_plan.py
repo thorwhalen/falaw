@@ -314,3 +314,77 @@ def test_execute_custom_artifact_converter(monkeypatch):
 def test_execute_empty_plan_returns_empty_list():
     assert execute(Plan(calls=()), dry_run=True) == []
     assert execute(Plan(calls=())) == []
+
+
+# --- placeholder resolution -------------------------------------------------
+
+
+def test_placeholder_resolution_in_execute(monkeypatch):
+    """`<from N>` in a CallPlan's arguments resolves to artifacts[N].url at execute time."""
+    captured: list[dict] = []
+
+    def subscribe(application, *, arguments, with_logs, on_queue_update):
+        captured.append({"app": application, "args": dict(arguments)})
+        if "image_to_video" in application or "hailuo" in application:
+            return {"video": {"url": "http://x/v.mp4", "duration": 8.0,
+                              "content_type": "video/mp4"}}
+        return {"images": [{"url": "http://x/img.png", "content_type": "image/png"}]}
+
+    fake = types.SimpleNamespace(InProgress=type("IP", (), {}), subscribe=subscribe)
+    monkeypatch.setitem(sys.modules, "fal_client", fake)
+
+    p1 = CallPlan(
+        tool="generate_image", application="fal-ai/flux/dev",
+        arguments={"prompt": "x"}, output_kind="image",
+    )
+    p2 = CallPlan(
+        tool="image_to_video",
+        application="fal-ai/minimax/hailuo-02/pro/image-to-video",
+        arguments={"image_url": "<from 0>", "prompt": "spin"},
+        output_kind="video",
+    )
+    plan = Plan(calls=(p1, p2))
+    artifacts = execute(plan, use_cache=False)
+    assert len(captured) == 2
+    # Second call should have received the URL from the first artifact, not the literal placeholder.
+    assert captured[1]["args"]["image_url"] == artifacts[0].url
+    assert captured[1]["args"]["prompt"] == "spin"
+
+
+def test_placeholder_bad_index_raises(monkeypatch):
+    p1 = CallPlan(
+        tool="generate_image", application="fal-ai/flux/dev",
+        arguments={"prompt": "x"}, output_kind="image",
+    )
+    p2 = CallPlan(
+        tool="t", application="m",
+        arguments={"image_url": "<from 5>"},  # only 1 artifact will exist
+        output_kind="video",
+    )
+    fake = types.SimpleNamespace(
+        InProgress=type("IP", (), {}),
+        subscribe=lambda app, **k: {"images": [{"url": "http://x/i.png"}]},
+    )
+    monkeypatch.setitem(sys.modules, "fal_client", fake)
+
+    with pytest.raises(ValueError, match="references artifact index 5"):
+        execute(Plan(calls=(p1, p2)), use_cache=False)
+
+
+def test_placeholder_in_nested_dict(monkeypatch):
+    """Placeholder rewriting recurses into nested dicts too."""
+    captured: list[dict] = []
+    def subscribe(application, *, arguments, with_logs, on_queue_update):
+        captured.append(dict(arguments))
+        return {"images": [{"url": "http://x/y.png"}]}
+    fake = types.SimpleNamespace(InProgress=type("IP", (), {}), subscribe=subscribe)
+    monkeypatch.setitem(sys.modules, "fal_client", fake)
+
+    p1 = CallPlan(tool="t1", application="m1", arguments={}, output_kind="image")
+    p2 = CallPlan(
+        tool="t2", application="m2",
+        arguments={"options": {"reference_image": "<from 0>"}},
+        output_kind="image",
+    )
+    artifacts = execute(Plan(calls=(p1, p2)), use_cache=False)
+    assert captured[1]["options"]["reference_image"] == artifacts[0].url

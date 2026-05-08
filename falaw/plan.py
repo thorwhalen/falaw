@@ -282,6 +282,15 @@ def execute(
             converter handles the common shapes (``{images: [{url}]}``,
             ``{video: {url}}``, ``{audio: {url}}``).
 
+    Placeholder resolution
+    ----------------------
+    Any string argument equal to ``"<from N>"`` (for an integer ``N``) is
+    rewritten to ``artifacts[N].url`` *just before* the call is made — so
+    a multi-step plan (e.g. generate_image → image_to_video) can reference
+    the upstream output without the planner needing to know its URL. The
+    rewrite happens after the upstream call has executed; planning itself
+    is unaffected.
+
     Returns:
         One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,
         in the same order.
@@ -295,14 +304,74 @@ def execute(
 
     artifacts: list[Artifact] = []
     for call in plan.calls:
+        resolved_args = _resolve_placeholders(call.arguments, artifacts)
         if use_cache:
             from .cache import cached_call_fal
-            raw = cached_call_fal(call.application, call.arguments, on_event=on_event)
+            raw = cached_call_fal(call.application, resolved_args, on_event=on_event)
         else:
             from .core import call_fal
-            raw = call_fal(call.application, call.arguments, on_event=on_event)
+            raw = call_fal(call.application, resolved_args, on_event=on_event)
         artifacts.append(converter(raw, call))
     return artifacts
+
+
+_PLACEHOLDER_PREFIX = "<from "
+
+
+def _resolve_placeholders(arguments: dict, artifacts: list) -> dict:
+    """Rewrite ``<from N>`` strings in ``arguments`` to ``artifacts[N].url``.
+
+    Only top-level string values are rewritten; nested dicts/lists are
+    recursed into. ``arguments`` is not modified — a new dict is returned
+    when any rewrite happens, otherwise the original is returned.
+    """
+    if not _has_placeholder(arguments):
+        return arguments
+    return _resolve(arguments, artifacts)
+
+
+def _has_placeholder(value) -> bool:
+    if isinstance(value, str):
+        return value.startswith(_PLACEHOLDER_PREFIX)
+    if isinstance(value, dict):
+        return any(_has_placeholder(v) for v in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_has_placeholder(v) for v in value)
+    return False
+
+
+def _resolve(value, artifacts: list):
+    if isinstance(value, str) and value.startswith(_PLACEHOLDER_PREFIX):
+        return _lookup_artifact_url(value, artifacts)
+    if isinstance(value, dict):
+        return {k: _resolve(v, artifacts) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_resolve(v, artifacts) for v in value]
+    if isinstance(value, tuple):
+        return tuple(_resolve(v, artifacts) for v in value)
+    return value
+
+
+def _lookup_artifact_url(placeholder: str, artifacts: list) -> str:
+    """Parse ``"<from N>"`` and return ``artifacts[N].url``."""
+    body = placeholder[len(_PLACEHOLDER_PREFIX) :].rstrip(">").strip()
+    try:
+        idx = int(body)
+    except ValueError as e:
+        raise ValueError(
+            f"Bad placeholder {placeholder!r} — expected '<from N>' where N is an integer."
+        ) from e
+    if idx < 0 or idx >= len(artifacts):
+        raise ValueError(
+            f"Placeholder {placeholder!r} references artifact index {idx}, "
+            f"but only {len(artifacts)} artifact(s) have been materialized."
+        )
+    artifact = artifacts[idx]
+    if not artifact.url:
+        raise ValueError(
+            f"Placeholder {placeholder!r} references artifact[{idx}] but it has no URL."
+        )
+    return artifact.url
 
 
 def _synthetic_artifact(call: CallPlan):

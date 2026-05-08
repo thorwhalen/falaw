@@ -90,7 +90,10 @@ def test_two_step_render_plan_roundtrip(monkeypatch):
         # In real use, p2's image_url would be filled in after p1 executes,
         # or via a placeholder the orchestrator resolves. For this test we
         # use a literal URL to keep the planning step self-contained.
-        image_url="<from p1>",
+        # Reference the upstream plan_generate_image artifact via the
+        # canonical placeholder syntax. The executor rewrites this to
+        # artifacts[0].url just before the i2v call fires.
+        image_url="<from 0>",
         duration_s=3.0,
         metadata={"shot_id": "s01", "step": "motion"},
     )
