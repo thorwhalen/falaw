@@ -99,9 +99,22 @@ def render_beat(
     *,
     tts_quality: str = "balanced",
     lipsync_quality: str = "high",
+    tts_model_id: Optional[str] = None,
+    avatar_model_id: Optional[str] = None,
     force: bool = False,
 ) -> dict:
-    """Render one Beat to a lipsynced video. Returns a small manifest dict."""
+    """Render one Beat to a lipsynced video. Returns a small manifest dict.
+
+    Args:
+        tts_model_id: Override the TTS model. When provided, takes precedence
+            over the character's voice.model_id and over ``tts_quality``-based
+            ``pick_model``. Use this to force a specific TTS engine for one
+            beat (e.g. eleven-v3 for emotional delivery, multilingual-v2 for
+            consistency).
+        avatar_model_id: Override the avatar/lipsync model (e.g.
+            ``"fal-ai/bytedance/omnihuman/v1.5"`` to bypass the default
+            ``ai-avatar`` which is known to hang).
+    """
     if not beat.line and not beat.action:
         return {
             "url": "",
@@ -123,7 +136,7 @@ def render_beat(
     video_url = ""
 
     if beat.line:
-        tts_model = _picked_tts_model(character, quality=tts_quality)
+        tts_model = tts_model_id or _picked_tts_model(character, quality=tts_quality)
         tts_args = _tts_arguments(character, beat.line)
         tts_raw = cached_call_fal(tts_model, tts_args, refresh=force)
         tts_result = parse_response(tts_raw, application=tts_model, arguments=tts_args)
@@ -137,7 +150,7 @@ def render_beat(
         # `avatar` category = image+audio → talking video (the right primitive
         # for "still face speaks line"). `lipsync` category requires an
         # existing video, which we don't have here.
-        av_model = pick_model(category="avatar", quality_tier=lipsync_quality).id
+        av_model = avatar_model_id or pick_model(category="avatar", quality_tier=lipsync_quality).id
         # ai-avatar requires a non-empty `prompt`; omnihuman accepts one.
         # Use beat.emotion / beat.action as the directorial hint; fall back
         # to a neutral default so the schema is satisfied.
@@ -200,9 +213,18 @@ def render_shot(
     style: str = "",
     as_video: bool = False,
     quality: str = "balanced",
+    image_model_id: Optional[str] = None,
+    image_to_video_model_id: Optional[str] = None,
     force: bool = False,
 ) -> dict:
-    """Render a Shot as a still (default) or a short clip."""
+    """Render a Shot as a still (default) or a short clip.
+
+    Args:
+        image_model_id: Override the image-gen model used for the storyboard
+            still (defaults to ``pick_model(category="image", …)``).
+        image_to_video_model_id: Override the image-to-video model used when
+            ``as_video=True`` (e.g. ``"fal-ai/minimax/hailuo-02/pro/image-to-video"``).
+    """
     h = shot_content_hash(shot, environment=environment) + ("-v" if as_video else "-i")
     cache_app = "falaw.render_shot"
     cache_args = {"hash": h, "quality": quality}
@@ -226,7 +248,7 @@ def render_shot(
         parts.append(f"style: {style}")
     prompt = " | ".join(parts)
 
-    img_model = pick_model(category="image", quality_tier=quality).id
+    img_model = image_model_id or pick_model(category="image", quality_tier=quality).id
     img_raw = cached_call_fal(
         img_model,
         {"prompt": prompt, "image_size": "landscape_16_9"},
@@ -253,7 +275,7 @@ def render_shot(
         return manifest
 
     # image -> video
-    i2v_model = pick_model(category="image_to_video", quality_tier=quality).id
+    i2v_model = image_to_video_model_id or pick_model(category="image_to_video", quality_tier=quality).id
     i2v_args: dict = {"image_url": still_url}
     if shot.camera:
         i2v_args["prompt"] = shot.camera

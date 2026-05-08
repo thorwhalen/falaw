@@ -163,3 +163,53 @@ def test_render_scene_skips_empty_beats(monkeypatch):
     m = render_scene(scene)
     assert m["beat_count"] == 2
     assert any("skipped" in b for b in m["beats"])
+
+
+def test_render_beat_avatar_model_id_override(monkeypatch):
+    """avatar_model_id forces a specific avatar model regardless of quality tier."""
+    captured = _patch_fal(monkeypatch)
+    from falaw import render_beat
+
+    sarah = Character(
+        name="Sarah", description="mid-30s",
+        reference_image_url="http://x/face.png",
+        voice=Voice(name="Sarah", voice_id="v1"),
+    )
+    beat = make_beat("Sarah", "Hello.", emotion="calm", index=0)
+
+    render_beat(beat, sarah, avatar_model_id="fal-ai/bytedance/omnihuman/v1.5")
+
+    avatar_calls = [c for c in captured if "omnihuman" in c["application"]]
+    assert len(avatar_calls) == 1, (
+        f"expected exactly one omnihuman call when avatar_model_id is set, "
+        f"got {[c['application'] for c in captured]}"
+    )
+
+
+def test_render_shot_image_model_id_override(monkeypatch):
+    """image_model_id forces a specific image model regardless of quality tier."""
+    captured = _patch_fal(monkeypatch)
+    from falaw import render_shot
+    from falaw.scene import Shot
+
+    shot = make_shot(description="bell tower at night", framing="wide", index=0)
+    render_shot(shot, image_model_id="fal-ai/flux-pro/v1.1")
+
+    img_calls = [c for c in captured if "flux-pro" in c["application"]]
+    assert len(img_calls) == 1
+
+
+def test_render_shot_image_to_video_model_id_override(monkeypatch):
+    """image_to_video_model_id forces a specific i2v model when as_video=True."""
+    captured = _patch_fal(monkeypatch)
+    from falaw import render_shot
+
+    shot = make_shot(description="frosty bells", framing="medium", index=0)
+    render_shot(
+        shot,
+        as_video=True,
+        image_to_video_model_id="fal-ai/minimax/hailuo-02/pro/image-to-video",
+    )
+
+    i2v_calls = [c for c in captured if "hailuo" in c["application"]]
+    assert len(i2v_calls) == 1
