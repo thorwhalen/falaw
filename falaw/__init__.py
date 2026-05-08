@@ -20,12 +20,26 @@ Leave notes for future sessions:
     >>> journal.note("Sarah's voice clone needs ~10s reference for stability")
 """
 
-from . import corpus as _corpus  # noqa: F401  (registers refresh_models_from_corpus)
+from . import account, corpus as _corpus  # noqa: F401  (registers refresh_models_from_corpus)
 from . import journal, operations  # noqa: F401  (operations registers tools)
 from . import refresh as _refresh  # noqa: F401  (refresh registers tools too)
+from .account import AccountStatus, health_check
 from .base import CostEstimate, ModelRecord, ToolSpec
 from .cache import cached_call_fal, cache_get, cache_put, cache_stats, materialize_asset
 from .core import call_fal
+from .errors import (
+    FalAccountLocked,
+    FalBadRequest,
+    FalDurationOutOfRange,
+    FalError,
+    FalHTTPError,
+    FalInsufficientFunds,
+    FalModelHung,
+    FalRateLimited,
+    FalServerError,
+    FalTimeout,
+    FalUnauthorized,
+)
 from .cost import (
     CostLine,
     CostRollup,
@@ -93,10 +107,22 @@ from .scene import (
 from .session import Session
 
 __all__ = [
+    "AccountStatus",
     "Asset",
     "Beat",
     "Character",
     "Environment",
+    "FalAccountLocked",
+    "FalBadRequest",
+    "FalDurationOutOfRange",
+    "FalError",
+    "FalHTTPError",
+    "FalInsufficientFunds",
+    "FalModelHung",
+    "FalRateLimited",
+    "FalServerError",
+    "FalTimeout",
+    "FalUnauthorized",
     "ModelRecord",
     "Result",
     "CostEstimate",

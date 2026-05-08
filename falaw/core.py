@@ -18,6 +18,7 @@ import time
 import uuid
 from typing import Any, Callable, Mapping, Optional
 
+from .errors import translate as _translate_error
 from .events import EventCallback, ProgressEvent, emit
 from .journal import _default_journal
 
@@ -89,19 +90,23 @@ def call_fal(
             with_logs=with_logs,
             on_queue_update=_on_queue_update,
         )
-    except Exception as exc:
+    except Exception as raw_exc:
+        # Translate fal_client errors into typed falaw exceptions so callers
+        # can catch FalAccountLocked / FalRateLimited / etc. specifically.
+        exc = _translate_error(raw_exc, application=application)
         _ev("error", message=repr(exc))
         if journal_errors:
             _default_journal().append(
                 kind="issue",
                 text=f"call_fal({application!r}) failed: {exc!r}",
-                tags=("call_fal", "error"),
+                tags=("call_fal", "error", type(exc).__name__),
                 context={
                     "application": application,
                     "arguments": dict(arguments),
                     "duration_s": time.time() - started,
+                    "status_code": getattr(exc, "status_code", None),
                 },
             )
-        raise
+        raise exc from raw_exc
     _ev("done")
     return result
