@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.events &mdash; falaw 0.0.5 documentation</title>
+  <title>falaw.events &mdash; falaw 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,9 +14,9 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -48,6 +48,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -57,6 +58,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
@@ -129,9 +131,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
 
-<span class="n">EventKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span>
-    <span class="s2">&quot;queued&quot;</span><span class="p">,</span> <span class="s2">&quot;progress&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span>
-<span class="p">]</span>
+<span class="n">EventKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;queued&quot;</span><span class="p">,</span> <span class="s2">&quot;progress&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;done&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;cache_hit&quot;</span><span class="p">]</span>
 
 <span class="n">EventCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;ProgressEvent&quot;</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
@@ -220,9 +220,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># pragma: no cover — defensive</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;falaw progress subscriber </span><span class="si">{</span><span class="n">cb</span><span class="si">!r}</span><span class="s2"> raised: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">&quot;</span>
-            <span class="p">)</span></div>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;falaw progress subscriber </span><span class="si">{</span><span class="n">cb</span><span class="si">!r}</span><span class="s2"> raised: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

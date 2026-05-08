@@ -1,0 +1,4 @@
+falaw.errors
+============
+.. automodule:: falaw.errors
+   :members:

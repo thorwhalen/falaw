@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.5 documentation</title>
+  <title>Index &mdash; falaw 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,9 +14,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=282f96c0"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -48,6 +48,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/account.html">falaw.account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -57,6 +58,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a></li>
@@ -109,6 +111,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
@@ -128,6 +131,12 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.AccountStatus">AccountStatus (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus">(class in falaw.account)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw/base.html#falaw.base.CostEstimate.amount">amount (falaw.base.CostEstimate attribute)</a>
 
       <ul>
@@ -296,12 +305,18 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/falaw/refresh.html#falaw.refresh.diff_against_previous">diff_against_previous() (in module falaw.refresh)</a>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.detail">detail (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.detail">(falaw.AccountStatus attribute)</a>
 </li>
-      <li><a href="module_docs/falaw/refresh.html#falaw.refresh.DocSource">DocSource (class in falaw.refresh)</a>
+      </ul></li>
+      <li><a href="module_docs/falaw/refresh.html#falaw.refresh.diff_against_previous">diff_against_previous() (in module falaw.refresh)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/refresh.html#falaw.refresh.DocSource">DocSource (class in falaw.refresh)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Asset.download">download() (falaw.Asset method)</a>
 
       <ul>
@@ -334,14 +349,20 @@
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Environment">(class in falaw.scene)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.error">error (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.error">(falaw.AccountStatus attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.establish_environment">establish_environment() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.establish_environment">(in module falaw.operations.preproduction)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.estimate_call_cost">estimate_call_cost() (in module falaw)</a>
 
       <ul>
@@ -368,6 +389,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.FalAccountLocked">FalAccountLocked</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalAccountLocked">[1]</a>
+</li>
       <li>
     falaw
 
@@ -380,6 +403,13 @@
 
       <ul>
         <li><a href="module_docs/falaw/__main__.html#module-falaw.__main__">module</a>
+</li>
+      </ul></li>
+      <li>
+    falaw.account
+
+      <ul>
+        <li><a href="module_docs/falaw/account.html#module-falaw.account">module</a>
 </li>
       </ul></li>
       <li>
@@ -446,6 +476,13 @@
 </li>
       </ul></li>
       <li>
+    falaw.errors
+
+      <ul>
+        <li><a href="module_docs/falaw/errors.html#module-falaw.errors">module</a>
+</li>
+      </ul></li>
+      <li>
     falaw.events
 
       <ul>
@@ -466,8 +503,6 @@
         <li><a href="module_docs/falaw/local.html#module-falaw.local">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations
 
@@ -475,6 +510,8 @@
         <li><a href="module_docs/falaw/operations.html#module-falaw.operations">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations.audio
 
@@ -559,6 +596,26 @@
         <li><a href="module_docs/falaw/session.html#module-falaw.session">module</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.FalBadRequest">FalBadRequest</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalBadRequest">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalDurationOutOfRange">FalDurationOutOfRange</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalDurationOutOfRange">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalError">FalError</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalError">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalHTTPError">FalHTTPError</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalHTTPError">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalInsufficientFunds">FalInsufficientFunds</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalInsufficientFunds">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalModelHung">FalModelHung</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalModelHung">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalRateLimited">FalRateLimited</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalRateLimited">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalServerError">FalServerError</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalServerError">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalTimeout">FalTimeout</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalTimeout">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalUnauthorized">FalUnauthorized</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalUnauthorized">[1]</a>
+</li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.fetch_if_changed">fetch_if_changed() (in module falaw.refresh)</a>
 </li>
   </ul></td>
@@ -573,6 +630,14 @@
         <li><a href="module_docs/falaw/operations/images.html#falaw.operations.images.generate_image">(in module falaw.operations.images)</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/account.html#falaw.account.health_check">health_check() (in module falaw.account)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -635,12 +700,18 @@
         <li><a href="module_docs/falaw/operations/avatar.html#falaw.operations.avatar.lipsync">(in module falaw.operations.avatar)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.llm_complete">llm_complete() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.llm_complete">(in module falaw.operations.llm)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.locked">locked (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.locked">(falaw.AccountStatus attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -663,6 +734,12 @@
         <li><a href="module_docs/falaw.html#falaw.ProgressEvent.message">(falaw.ProgressEvent attribute)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.message_for_user">message_for_user() (falaw.account.AccountStatus method)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.message_for_user">(falaw.AccountStatus method)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.ModelRecord">ModelRecord (class in falaw)</a>
 
       <ul>
@@ -676,6 +753,8 @@
         <li><a href="module_docs/falaw.html#module-falaw">falaw</a>
 </li>
         <li><a href="module_docs/falaw/__main__.html#module-falaw.__main__">falaw.__main__</a>
+</li>
+        <li><a href="module_docs/falaw/account.html#module-falaw.account">falaw.account</a>
 </li>
         <li><a href="module_docs/falaw/base.html#module-falaw.base">falaw.base</a>
 </li>
@@ -694,6 +773,8 @@
         <li><a href="module_docs/falaw/corpus.html#module-falaw.corpus">falaw.corpus</a>
 </li>
         <li><a href="module_docs/falaw/cost.html#module-falaw.cost">falaw.cost</a>
+</li>
+        <li><a href="module_docs/falaw/errors.html#module-falaw.errors">falaw.errors</a>
 </li>
         <li><a href="module_docs/falaw/events.html#module-falaw.events">falaw.events</a>
 </li>
@@ -745,6 +826,14 @@
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.ok">ok (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.ok">(falaw.AccountStatus attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/local.html#falaw.local.overlay_audio">overlay_audio() (in module falaw.local)</a>
 </li>
@@ -892,6 +981,12 @@
         <li><a href="module_docs/falaw.html#falaw.CostEstimate.source">(falaw.CostEstimate attribute)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.status_code">status_code (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.status_code">(falaw.AccountStatus attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.storyboard_shot">storyboard_shot() (in module falaw)</a>
 
       <ul>
@@ -936,12 +1031,20 @@
         <li><a href="module_docs/falaw/base.html#falaw.base.ToolSpec">(class in falaw.base)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/errors.html#falaw.errors.translate">translate() (in module falaw.errors)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.unauthorized">unauthorized (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.unauthorized">(falaw.AccountStatus attribute)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.unsubscribe">unsubscribe() (in module falaw)</a>
 
       <ul>
@@ -954,6 +1057,12 @@
 
       <ul>
         <li><a href="module_docs/falaw/operations/images.html#falaw.operations.images.upscale_image">(in module falaw.operations.images)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.url">url (falaw.account.AccountStatus attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.AccountStatus.url">(falaw.AccountStatus attribute)</a>
 </li>
       </ul></li>
   </ul></td>

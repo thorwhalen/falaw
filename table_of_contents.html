@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; falaw 0.0.5 documentation</title>
+  <title>&lt;no title&gt; &mdash; falaw 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -15,9 +15,9 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=282f96c0"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
-      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="_static/copybutton.js?v=f281be69"></script>
@@ -49,6 +49,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/account.html">falaw.account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -58,6 +59,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a></li>
@@ -104,6 +106,7 @@
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw.html">falaw</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.AccountStatus"><code class="docutils literal notranslate"><span class="pre">AccountStatus</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Asset"><code class="docutils literal notranslate"><span class="pre">Asset</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Beat"><code class="docutils literal notranslate"><span class="pre">Beat</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Character"><code class="docutils literal notranslate"><span class="pre">Character</span></code></a></li>
@@ -111,6 +114,17 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.CostLine"><code class="docutils literal notranslate"><span class="pre">CostLine</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.CostRollup"><code class="docutils literal notranslate"><span class="pre">CostRollup</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Environment"><code class="docutils literal notranslate"><span class="pre">Environment</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalAccountLocked"><code class="docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalBadRequest"><code class="docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalDurationOutOfRange"><code class="docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalError"><code class="docutils literal notranslate"><span class="pre">FalError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalHTTPError"><code class="docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalInsufficientFunds"><code class="docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalModelHung"><code class="docutils literal notranslate"><span class="pre">FalModelHung</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalRateLimited"><code class="docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.FalUnauthorized"><code class="docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.ModelRecord"><code class="docutils literal notranslate"><span class="pre">ModelRecord</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.ProgressEvent"><code class="docutils literal notranslate"><span class="pre">ProgressEvent</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
@@ -166,6 +180,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/account.html">falaw.account</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/account.html#falaw.account.AccountStatus"><code class="docutils literal notranslate"><span class="pre">AccountStatus</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/account.html#falaw.account.health_check"><code class="docutils literal notranslate"><span class="pre">health_check()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/base.html">falaw.base</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/base.html#falaw.base.CostEstimate"><code class="docutils literal notranslate"><span class="pre">CostEstimate</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/base.html#falaw.base.ModelRecord"><code class="docutils literal notranslate"><span class="pre">ModelRecord</span></code></a></li>
@@ -202,6 +221,21 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cost.html#falaw.cost.CostRollup"><code class="docutils literal notranslate"><span class="pre">CostRollup</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cost.html#falaw.cost.estimate_call_cost"><code class="docutils literal notranslate"><span class="pre">estimate_call_cost()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cost.html#falaw.cost.estimate_scene_cost"><code class="docutils literal notranslate"><span class="pre">estimate_scene_cost()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/errors.html">falaw.errors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalAccountLocked"><code class="docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalBadRequest"><code class="docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalDurationOutOfRange"><code class="docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalError"><code class="docutils literal notranslate"><span class="pre">FalError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalHTTPError"><code class="docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalInsufficientFunds"><code class="docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalModelHung"><code class="docutils literal notranslate"><span class="pre">FalModelHung</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalRateLimited"><code class="docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.FalUnauthorized"><code class="docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/errors.html#falaw.errors.translate"><code class="docutils literal notranslate"><span class="pre">translate()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a><ul>

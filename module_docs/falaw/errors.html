@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.errors &mdash; falaw 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.events" href="events.html" />
+    <link rel="prev" title="falaw.cost" href="cost.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.errors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalAccountLocked"><code class="docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalBadRequest"><code class="docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalDurationOutOfRange"><code class="docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalError"><code class="docutils literal notranslate"><span class="pre">FalError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalHTTPError"><code class="docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalInsufficientFunds"><code class="docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalModelHung"><code class="docutils literal notranslate"><span class="pre">FalModelHung</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalRateLimited"><code class="docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalUnauthorized"><code class="docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.translate"><code class="docutils literal notranslate"><span class="pre">translate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.errors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/errors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.errors">
+<span id="falaw-errors"></span><h1>falaw.errors<a class="headerlink" href="#module-falaw.errors" title="Link to this heading"></a></h1>
+<p>Typed exceptions for falaw operations.</p>
+<p>The bare <code class="docutils literal notranslate"><span class="pre">fal_client</span></code> exposes <code class="docutils literal notranslate"><span class="pre">FalClientError</span></code>, <code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">FalClientTimeoutError</span></code>. These are correct but coarse — every 403, 429,
+402, and timeout looks the same to a caller. This module wraps fal_client
+errors in a more specific hierarchy so:</p>
+<ul class="simple">
+<li><p>An agent can catch <a class="reference internal" href="#falaw.errors.FalAccountLocked" title="falaw.errors.FalAccountLocked"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a> and surface a “go fix billing”
+message instead of debugging a generic 403.</p></li>
+<li><p>A retry layer can catch <a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a> and back off, but let
+<a class="reference internal" href="#falaw.errors.FalAccountLocked" title="falaw.errors.FalAccountLocked"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a> propagate (no amount of retry will fix it).</p></li>
+<li><p>Scripts can catch <a class="reference internal" href="#falaw.errors.FalDurationOutOfRange" title="falaw.errors.FalDurationOutOfRange"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a> to fall back to splitting
+a shot, instead of silently truncating to whatever the model produced.</p></li>
+</ul>
+<p>Use <a class="reference internal" href="#falaw.errors.translate" title="falaw.errors.translate"><code class="xref py py-func docutils literal notranslate"><span class="pre">translate()</span></code></a> to convert a fal_client exception to the appropriate
+typed subclass — <a class="reference internal" href="core.html#falaw.core.call_fal" title="falaw.core.call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.core.call_fal()</span></code></a> does this automatically.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">err</span> <span class="o">=</span> <span class="n">FalAccountLocked</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;account locked&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">status_code</span><span class="o">=</span><span class="mi">403</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Verify your email at fal.ai/settings&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://fal.ai/dashboard/billing&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">err</span><span class="o">.</span><span class="n">url</span>
+<span class="go">&#39;https://fal.ai/dashboard/billing&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">FalError</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalAccountLocked">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalAccountLocked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalAccountLocked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalAccountLocked" title="Link to this definition"></a></dt>
+<dd><p>fal account is locked / suspended / awaiting verification.</p>
+<p>Typical 403 with a body indicating the account is not in good standing.
+No amount of retrying or model-switching will fix this — the user has
+to act (verify email, top up billing, contact support).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalBadRequest">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalBadRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalBadRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalBadRequest" title="Link to this definition"></a></dt>
+<dd><p>Server rejected the request payload — typical 400 / 422.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalDurationOutOfRange">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalDurationOutOfRange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">valid_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalDurationOutOfRange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalDurationOutOfRange" title="Link to this definition"></a></dt>
+<dd><p>The requested duration is outside what the model can produce.</p>
+<p>Raised by Plan/Execute when the caller asks for <code class="docutils literal notranslate"><span class="pre">duration_s</span></code> that the
+model’s declared <code class="docutils literal notranslate"><span class="pre">expected_duration_range</span></code> cannot satisfy. Callers can
+catch this to split the shot, repeat it, or pick a different model.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalError</span></span><a class="reference internal" href="../../_modules/falaw/errors.html#FalError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalError" title="Link to this definition"></a></dt>
+<dd><p>Base for all falaw-raised exceptions.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalHTTPError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalHTTPError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalHTTPError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalHTTPError" title="Link to this definition"></a></dt>
+<dd><p>Wraps an HTTP error from fal.ai with the original status, body, and headers.</p>
+<p>Subclasses pick out specific status codes / patterns. Use this base when
+you want to catch any HTTP failure (e.g. for retry).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalInsufficientFunds">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalInsufficientFunds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalInsufficientFunds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalInsufficientFunds" title="Link to this definition"></a></dt>
+<dd><p>Account balance is insufficient — typical 402.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalModelHung">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalModelHung</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalModelHung"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalModelHung" title="Link to this definition"></a></dt>
+<dd><p>A model was queued but never returned — distinct from a network timeout.</p>
+<p>Raised by higher-level orchestration that sets a per-call wall-clock
+budget (e.g. “give up on this lipsync after 5 minutes and pick another model”).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalRateLimited">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalRateLimited</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_after_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalRateLimited"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalRateLimited" title="Link to this definition"></a></dt>
+<dd><p>fal is throttling requests — typical 429.</p>
+<p><code class="docutils literal notranslate"><span class="pre">retry_after_s</span></code> is parsed from the <code class="docutils literal notranslate"><span class="pre">Retry-After</span></code> header if present,
+else <code class="docutils literal notranslate"><span class="pre">None</span></code> (caller decides backoff).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalServerError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalServerError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalServerError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalServerError" title="Link to this definition"></a></dt>
+<dd><p>fal-side server error — typical 5xx. Generally retryable.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalTimeout">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalTimeout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">elapsed_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalTimeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalTimeout" title="Link to this definition"></a></dt>
+<dd><p>The fal call timed out before producing a result.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalUnauthorized">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalUnauthorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalUnauthorized"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalUnauthorized" title="Link to this definition"></a></dt>
+<dd><p>Missing or invalid API credentials — typical 401.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.errors.translate">
+<span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">BaseException</span></span></span><a class="reference internal" href="../../_modules/falaw/errors.html#translate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.translate" title="Link to this definition"></a></dt>
+<dd><p>Convert an underlying fal_client / network exception to a typed falaw exception.</p>
+<p>Returns the original exception unchanged if no specific subclass applies
+(so callers always get <em>something</em> — never silently swallowed).</p>
+<p>Logic:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 403 + lock-pattern body → <a class="reference internal" href="#falaw.errors.FalAccountLocked" title="falaw.errors.FalAccountLocked"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 401 → <a class="reference internal" href="#falaw.errors.FalUnauthorized" title="falaw.errors.FalUnauthorized"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 402 → <a class="reference internal" href="#falaw.errors.FalInsufficientFunds" title="falaw.errors.FalInsufficientFunds"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 429 → <a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a> (parses Retry-After)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 4xx → <a class="reference internal" href="#falaw.errors.FalBadRequest" title="falaw.errors.FalBadRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientHTTPError</span></code> with 5xx → <a class="reference internal" href="#falaw.errors.FalServerError" title="falaw.errors.FalServerError"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalServerError</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FalClientTimeoutError</span></code> → <a class="reference internal" href="#falaw.errors.FalTimeout" title="falaw.errors.FalTimeout"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></p></li>
+<li><p>anything else → returned unchanged</p></li>
+</ul>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cost.html" class="btn btn-neutral float-left" title="falaw.cost" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="events.html" class="btn btn-neutral float-right" title="falaw.events" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

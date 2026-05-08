@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.journal &mdash; falaw 0.0.5 documentation</title>
+  <title>falaw.journal &mdash; falaw 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,9 +15,9 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=282f96c0"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
       <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -51,6 +51,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
 <li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -60,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.journal</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.journal.Journal"><code class="docutils literal notranslate"><span class="pre">Journal</span></code></a></li>
@@ -115,16 +117,16 @@ Claude skill teaches future sessions to read recent entries before doing
 novel work, so each session starts smarter than the last.</p>
 <p>Usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">journal</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;schnell tier returns 1024x1024 by default&quot;</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;schnell tier returns 1024x1024 by default&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">issue</span><span class="p">(</span><span class="s2">&quot;FLUX dev refused a benign prompt as NSFW&quot;</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;Try guidance_scale=2.0&quot;</span><span class="p">)</span>  
+<span class="gp">... </span>              <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;Try guidance_scale=2.0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">improvement</span><span class="p">(</span><span class="s2">&quot;Add an `upscale_image` wrapper for clarity-upscaler&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;backlog&quot;</span><span class="p">,))</span>  
+<span class="gp">... </span>                    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;backlog&quot;</span><span class="p">,))</span>
 </pre></div>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="falaw.journal.Journal">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.journal.</span></span><span class="sig-name descname"><span class="pre">Journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/journal.html#Journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.journal.Journal" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.journal.</span></span><span class="sig-name descname"><span class="pre">Journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/journal.html#Journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.journal.Journal" title="Link to this definition"></a></dt>
 <dd><p>File-backed append-only journal.</p>
 <p>Each entry becomes a single JSON file. Names are timestamp-prefixed so
 <cite>sorted(os.listdir(…))</cite> yields chronological order without parsing.</p>
@@ -140,7 +142,7 @@ novel work, so each session starts smarter than the last.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="falaw.journal.JournalEntry">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">falaw.journal.</span></span><span class="sig-name descname"><span class="pre">JournalEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id:</span> <span class="pre">'str'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp:</span> <span class="pre">'float'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind:</span> <span class="pre">'EntryKind'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text:</span> <span class="pre">'str'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags:</span> <span class="pre">'tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]'</span> <span class="pre">=</span> <span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggestion:</span> <span class="pre">'str'</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context:</span> <span class="pre">'dict'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/journal.html#JournalEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.journal.JournalEntry" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.journal.</span></span><span class="sig-name descname"><span class="pre">JournalEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'EntryKind'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">'tuple[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">...]'</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggestion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'dict'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/journal.html#JournalEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.journal.JournalEntry" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </section>

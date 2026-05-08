@@ -4,6 +4,7 @@
 
    module_docs/falaw
    module_docs/falaw/__main__
+   module_docs/falaw/account
    module_docs/falaw/base
    module_docs/falaw/bridges
    module_docs/falaw/bridges/mcp
@@ -13,6 +14,7 @@
    module_docs/falaw/core
    module_docs/falaw/corpus
    module_docs/falaw/cost
+   module_docs/falaw/errors
    module_docs/falaw/events
    module_docs/falaw/journal
    module_docs/falaw/local

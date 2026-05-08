@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.errors &mdash; falaw 0.0.6 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=1fd71caa"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.errors</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.errors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Typed exceptions for falaw operations.</span>
+
+<span class="sd">The bare ``fal_client`` exposes ``FalClientError``, ``FalClientHTTPError``, and</span>
+<span class="sd">``FalClientTimeoutError``. These are correct but coarse — every 403, 429,</span>
+<span class="sd">402, and timeout looks the same to a caller. This module wraps fal_client</span>
+<span class="sd">errors in a more specific hierarchy so:</span>
+
+<span class="sd">- An agent can catch :class:`FalAccountLocked` and surface a &quot;go fix billing&quot;</span>
+<span class="sd">  message instead of debugging a generic 403.</span>
+<span class="sd">- A retry layer can catch :class:`FalRateLimited` and back off, but let</span>
+<span class="sd">  :class:`FalAccountLocked` propagate (no amount of retry will fix it).</span>
+<span class="sd">- Scripts can catch :class:`FalDurationOutOfRange` to fall back to splitting</span>
+<span class="sd">  a shot, instead of silently truncating to whatever the model produced.</span>
+
+<span class="sd">Use :func:`translate` to convert a fal_client exception to the appropriate</span>
+<span class="sd">typed subclass — :func:`falaw.core.call_fal` does this automatically.</span>
+
+<span class="sd">Examples</span>
+<span class="sd">--------</span>
+
+<span class="sd">&gt;&gt;&gt; err = FalAccountLocked(</span>
+<span class="sd">...     &quot;account locked&quot;,</span>
+<span class="sd">...     status_code=403,</span>
+<span class="sd">...     detail=&quot;Verify your email at fal.ai/settings&quot;,</span>
+<span class="sd">...     url=&quot;https://fal.ai/dashboard/billing&quot;,</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; err.url</span>
+<span class="sd">&#39;https://fal.ai/dashboard/billing&#39;</span>
+<span class="sd">&gt;&gt;&gt; isinstance(err, FalError)</span>
+<span class="sd">True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+
+<div class="viewcode-block" id="FalError">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base for all falaw-raised exceptions.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalHTTPError">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalHTTPError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalHTTPError</span><span class="p">(</span><span class="n">FalError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps an HTTP error from fal.ai with the original status, body, and headers.</span>
+
+<span class="sd">    Subclasses pick out specific status codes / patterns. Use this base when</span>
+<span class="sd">    you want to catch any HTTP failure (e.g. for retry).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">detail</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">body</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cause</span><span class="p">:</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status_code</span> <span class="o">=</span> <span class="n">status_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detail</span> <span class="o">=</span> <span class="n">detail</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">application</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cause__</span> <span class="o">=</span> <span class="n">cause</span></div>
+
+
+
+<div class="viewcode-block" id="FalAccountLocked">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalAccountLocked">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalAccountLocked</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;fal account is locked / suspended / awaiting verification.</span>
+
+<span class="sd">    Typical 403 with a body indicating the account is not in good standing.</span>
+<span class="sd">    No amount of retrying or model-switching will fix this — the user has</span>
+<span class="sd">    to act (verify email, top up billing, contact support).</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalUnauthorized">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalUnauthorized">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalUnauthorized</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Missing or invalid API credentials — typical 401.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalRateLimited">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalRateLimited">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalRateLimited</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;fal is throttling requests — typical 429.</span>
+
+<span class="sd">    ``retry_after_s`` is parsed from the ``Retry-After`` header if present,</span>
+<span class="sd">    else ``None`` (caller decides backoff).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">retry_after_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_after_s</span> <span class="o">=</span> <span class="n">retry_after_s</span></div>
+
+
+
+<div class="viewcode-block" id="FalInsufficientFunds">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalInsufficientFunds">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalInsufficientFunds</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Account balance is insufficient — typical 402.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalBadRequest">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalBadRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalBadRequest</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Server rejected the request payload — typical 400 / 422.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalServerError">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalServerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalServerError</span><span class="p">(</span><span class="n">FalHTTPError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;fal-side server error — typical 5xx. Generally retryable.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="FalTimeout">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalTimeout">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalTimeout</span><span class="p">(</span><span class="n">FalError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The fal call timed out before producing a result.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">elapsed_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elapsed_s</span> <span class="o">=</span> <span class="n">elapsed_s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">application</span></div>
+
+
+
+<div class="viewcode-block" id="FalModelHung">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalModelHung">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalModelHung</span><span class="p">(</span><span class="n">FalError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A model was queued but never returned — distinct from a network timeout.</span>
+
+<span class="sd">    Raised by higher-level orchestration that sets a per-call wall-clock</span>
+<span class="sd">    budget (e.g. &quot;give up on this lipsync after 5 minutes and pick another model&quot;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">elapsed_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elapsed_s</span> <span class="o">=</span> <span class="n">elapsed_s</span></div>
+
+
+
+<div class="viewcode-block" id="FalDurationOutOfRange">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalDurationOutOfRange">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalDurationOutOfRange</span><span class="p">(</span><span class="n">FalError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The requested duration is outside what the model can produce.</span>
+
+<span class="sd">    Raised by Plan/Execute when the caller asks for ``duration_s`` that the</span>
+<span class="sd">    model&#39;s declared ``expected_duration_range`` cannot satisfy. Callers can</span>
+<span class="sd">    catch this to split the shot, repeat it, or pick a different model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">requested</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">valid_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requested</span> <span class="o">=</span> <span class="n">requested</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid_range</span> <span class="o">=</span> <span class="n">valid_range</span></div>
+
+
+
+<span class="c1"># --- Translation from fal_client errors --------------------------------------</span>
+
+
+<span class="n">_LOCK_PATTERNS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;account is locked&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;account locked&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;account is suspended&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;verify your email&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;verify your account&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="translate">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.translate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">translate</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">application</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="ne">BaseException</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an underlying fal_client / network exception to a typed falaw exception.</span>
+
+<span class="sd">    Returns the original exception unchanged if no specific subclass applies</span>
+<span class="sd">    (so callers always get *something* — never silently swallowed).</span>
+
+<span class="sd">    Logic:</span>
+
+<span class="sd">    - ``FalClientHTTPError`` with 403 + lock-pattern body → :class:`FalAccountLocked`</span>
+<span class="sd">    - ``FalClientHTTPError`` with 401 → :class:`FalUnauthorized`</span>
+<span class="sd">    - ``FalClientHTTPError`` with 402 → :class:`FalInsufficientFunds`</span>
+<span class="sd">    - ``FalClientHTTPError`` with 429 → :class:`FalRateLimited` (parses Retry-After)</span>
+<span class="sd">    - ``FalClientHTTPError`` with 4xx → :class:`FalBadRequest`</span>
+<span class="sd">    - ``FalClientHTTPError`` with 5xx → :class:`FalServerError`</span>
+<span class="sd">    - ``FalClientTimeoutError`` → :class:`FalTimeout`</span>
+<span class="sd">    - anything else → returned unchanged</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>  <span class="c1"># type: ignore[import-untyped]</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">exc</span>
+
+    <span class="c1"># Tests stub `fal_client` with a SimpleNamespace that may lack these</span>
+    <span class="c1"># classes; use getattr to fall back to the bare exception type.</span>
+    <span class="n">timeout_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fal_client</span><span class="p">,</span> <span class="s2">&quot;FalClientTimeoutError&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">http_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fal_client</span><span class="p">,</span> <span class="s2">&quot;FalClientHTTPError&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">timeout_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">timeout_cls</span><span class="p">):</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;elapsed_s&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="n">FalTimeout</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;call_fal(</span><span class="si">{</span><span class="n">application</span><span class="si">!r}</span><span class="s2">) timed out after </span><span class="si">{</span><span class="n">elapsed</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_s</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">elapsed</span><span class="p">),</span>
+            <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">http_cls</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">http_cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">exc</span>
+
+    <span class="n">status</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">status_code</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">response_headers</span><span class="p">)</span> <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">response_headers</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">body_text</span><span class="p">,</span> <span class="n">body_obj</span> <span class="o">=</span> <span class="n">_read_body</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+    <span class="n">body_lower</span> <span class="o">=</span> <span class="n">body_text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">body_text</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">common</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+        <span class="n">detail</span><span class="o">=</span><span class="n">body_text</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">body_obj</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="n">cause</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">403</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span> <span class="ow">in</span> <span class="n">body_lower</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_LOCK_PATTERNS</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FalAccountLocked</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;fal account locked / unverified (HTTP 403): </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://fal.ai/dashboard/billing&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FalUnauthorized</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;unauthorized (HTTP 401) — check FAL_KEY: </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">402</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FalInsufficientFunds</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;insufficient funds (HTTP 402): </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://fal.ai/dashboard/billing&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+        <span class="n">retry_after</span> <span class="o">=</span> <span class="n">_parse_retry_after</span><span class="p">(</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;retry-after&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">FalRateLimited</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;rate limited (HTTP 429): </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">retry_after_s</span><span class="o">=</span><span class="n">retry_after</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="mi">400</span> <span class="o">&lt;=</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">500</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FalBadRequest</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;bad request (HTTP </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="mi">500</span> <span class="o">&lt;=</span> <span class="n">status</span> <span class="o">&lt;</span> <span class="mi">600</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FalServerError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;fal server error (HTTP </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Unknown status — wrap conservatively but still surface specifics.</span>
+    <span class="k">return</span> <span class="n">FalHTTPError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;HTTP </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">body_text</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">common</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_body</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Best-effort read of an httpx-backed FalClientHTTPError&#39;s body.</span>
+
+<span class="sd">    fal_client swallows the JSON body in __str__; we go to .response directly.</span>
+<span class="sd">    Returns (text, parsed-object-or-None). Both are best-effort.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="c1"># Prefer the &quot;detail&quot; / &quot;message&quot; / &quot;error&quot; sub-field if present.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;detail&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parsed</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parsed</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">parsed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="k">break</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">parsed</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_retry_after</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="c1"># Could be an HTTP-date; we don&#39;t bother parsing — None is fine.</span>
+        <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
