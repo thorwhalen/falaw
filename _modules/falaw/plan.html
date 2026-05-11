@@ -1,0 +1,673 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.plan &mdash; falaw 0.0.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.plan</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.plan</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Plan / Execute primitives — separate planning (data) from execution (effects).</span>
+
+<span class="sd">Today every falaw operation is eager: ``generate_image(prompt)`` makes the</span>
+<span class="sd">API call immediately. That means:</span>
+
+<span class="sd">- A budget gate has to predict cost from outside the call and *hope* the</span>
+<span class="sd">  prediction matches what the operation will actually do.</span>
+<span class="sd">- Tests need a fake fal_client to exercise any code that touches an</span>
+<span class="sd">  operation, even when the test is about composition or cost.</span>
+<span class="sd">- A UI can&#39;t show &quot;you&#39;re about to spend $4.12, click confirm&quot; without</span>
+<span class="sd">  a separate, parallel cost-prediction code path.</span>
+
+<span class="sd">The fix is to give every operation two surfaces:</span>
+
+<span class="sd">1. ``plan_X(...) -&gt; CallPlan``: pure data describing the call that *would*</span>
+<span class="sd">   happen — model_id, arguments, predicted cost, cache status. No API contact.</span>
+<span class="sd">2. ``execute(plan, ...) -&gt; list[Artifact]``: turns a Plan (one or more</span>
+<span class="sd">   CallPlans) into materialized Artifacts. The eager wrappers</span>
+<span class="sd">   (``generate_image``, etc.) are now thin: ``execute(plan_X(...))[0]``.</span>
+
+<span class="sd">A higher-level orchestrator (a music-video render, a storyboard generation)</span>
+<span class="sd">builds a Plan by composing CallPlans across multiple operations. The Plan</span>
+<span class="sd">gets a typed ``total_cost_usd``, can be inspected, edited, dry-run, or</span>
+<span class="sd">serialized — all without the network.</span>
+
+<span class="sd">Examples</span>
+<span class="sd">--------</span>
+
+<span class="sd">&gt;&gt;&gt; from falaw.plan import CallPlan, Plan</span>
+<span class="sd">&gt;&gt;&gt; p1 = CallPlan(</span>
+<span class="sd">...     tool=&quot;generate_image&quot;,</span>
+<span class="sd">...     application=&quot;fal-ai/flux/dev&quot;,</span>
+<span class="sd">...     arguments={&quot;prompt&quot;: &quot;a tiger&quot;, &quot;image_size&quot;: &quot;landscape_4_3&quot;},</span>
+<span class="sd">...     output_kind=&quot;image&quot;,</span>
+<span class="sd">...     estimated_cost_usd=0.025,</span>
+<span class="sd">...     cache_status=&quot;miss&quot;,</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; p2 = CallPlan(</span>
+<span class="sd">...     tool=&quot;image_to_video&quot;,</span>
+<span class="sd">...     application=&quot;fal-ai/minimax/hailuo-02/pro/image-to-video&quot;,</span>
+<span class="sd">...     arguments={&quot;image_url&quot;: &quot;&lt;from p1&gt;&quot;},</span>
+<span class="sd">...     output_kind=&quot;video&quot;,</span>
+<span class="sd">...     estimated_cost_usd=0.50,</span>
+<span class="sd">...     cache_status=&quot;miss&quot;,</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; plan = Plan(calls=(p1, p2))</span>
+<span class="sd">&gt;&gt;&gt; plan.total_cost_usd</span>
+<span class="sd">0.525</span>
+<span class="sd">&gt;&gt;&gt; plan.cache_hit_savings_usd</span>
+<span class="sd">0.0</span>
+<span class="sd">&gt;&gt;&gt; [c.tool for c in plan.calls]</span>
+<span class="sd">[&#39;generate_image&#39;, &#39;image_to_video&#39;]</span>
+
+<span class="sd">Plans concatenate, so an orchestrator can build one shot&#39;s Plan and then</span>
+<span class="sd">append it to a scene-level Plan:</span>
+
+<span class="sd">&gt;&gt;&gt; shot_plan = Plan(calls=(p1,))</span>
+<span class="sd">&gt;&gt;&gt; scene_plan = Plan(calls=()) + shot_plan + Plan(calls=(p2,))</span>
+<span class="sd">&gt;&gt;&gt; len(scene_plan.calls)</span>
+<span class="sd">2</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<span class="n">CacheStatus</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hit&quot;</span><span class="p">,</span> <span class="s2">&quot;miss&quot;</span><span class="p">,</span> <span class="s2">&quot;stale&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Whether the cache will short-circuit this call.</span>
+
+<span class="sd">- ``hit``: A cached response exists and will be returned without an API call.</span>
+<span class="sd">- ``miss``: No cache entry; the call will hit fal.</span>
+<span class="sd">- ``stale``: An entry exists but is expected to be invalidated (e.g. a</span>
+<span class="sd">  ``force=True`` re-render asked for it). Today we don&#39;t distinguish stale</span>
+<span class="sd">  from miss for cost — both are billed.</span>
+<span class="sd">- ``unknown``: Plan was built without consulting the cache.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="n">OutputKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;binary&quot;</span><span class="p">]</span>
+<span class="sd">&quot;&quot;&quot;Coarse class of what this call produces. Mirrors :class:`lacing.Artifact.kind`</span>
+<span class="sd">so the producer knows what shape of Artifact to materialize.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="CallPlan">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.CallPlan">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CallPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A single planned fal call. Pure data — no API contact yet.</span>
+
+<span class="sd">    ``application`` and ``arguments`` are the *exact* tuple</span>
+<span class="sd">    ``cached_call_fal(application, arguments)`` would take, so a Plan can be</span>
+<span class="sd">    cache-checked, executed, or replayed without ambiguity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;High-level tool name — ``&quot;generate_image&quot;``, ``&quot;image_to_video&quot;``, etc.</span>
+<span class="sd">    Distinct from ``application`` because one tool may dispatch to several</span>
+<span class="sd">    fal models depending on quality tier.&quot;&quot;&quot;</span>
+
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The fal model id that will be invoked (e.g. ``&quot;fal-ai/flux/dev&quot;``).&quot;&quot;&quot;</span>
+
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keyword arguments to pass to fal. Will be JSON-canonicalized for</span>
+<span class="sd">    cache key computation; should be JSON-serializable.&quot;&quot;&quot;</span>
+
+    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKind</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What kind of Artifact this call will produce.&quot;&quot;&quot;</span>
+
+    <span class="n">estimated_cost_usd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicted cost in USD. ``None`` when the model has no ``cost_estimate``</span>
+<span class="sd">    populated (callers can distinguish &quot;free&quot; from &quot;unknown&quot;).&quot;&quot;&quot;</span>
+
+    <span class="n">cache_status</span><span class="p">:</span> <span class="n">CacheStatus</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the cache will short-circuit this call. ``&quot;hit&quot;`` means</span>
+<span class="sd">    ``execute`` won&#39;t bill, so :attr:`Plan.total_cost_usd` and</span>
+<span class="sd">    :attr:`Plan.cache_hit_savings_usd` reflect that.&quot;&quot;&quot;</span>
+
+    <span class="n">expected_duration_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(min, max)`` duration the model can produce, or ``None`` if no</span>
+<span class="sd">    duration contract is known. Plan-level validators can check that the</span>
+<span class="sd">    requested duration fits this range and raise :class:`FalDurationOutOfRange`</span>
+<span class="sd">    *before* the call instead of letting it silently truncate.&quot;&quot;&quot;</span>
+
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Free-form labels for downstream consumers. Conventional keys:</span>
+<span class="sd">    ``shot_id``, ``beat_id``, ``character_name``, ``strategy``.&quot;&quot;&quot;</span>
+
+    <span class="c1"># -- predicted-billable cost --------------------------------------------</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">billable_cost_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cost that will actually be billed (0 on cache hit, estimate otherwise).</span>
+
+<span class="sd">        Returns ``0.0`` (not ``None``) on cache hit or unknown estimate so</span>
+<span class="sd">        sums are well-defined; use :attr:`estimated_cost_usd` ``is None`` to</span>
+<span class="sd">        check unknown status explicitly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_status</span> <span class="o">==</span> <span class="s2">&quot;hit&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">or</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="Plan">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.Plan">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Plan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An ordered sequence of :class:`CallPlan` — a render plan, in essence.</span>
+
+<span class="sd">    Plans compose: ``a + b`` returns a new Plan with ``a.calls`` followed by</span>
+<span class="sd">    ``b.calls``. ``Plan(calls=())`` is the identity. Plans are frozen, so</span>
+<span class="sd">    edits return new Plans (use :meth:`with_call_replaced` for in-place-feel).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">calls</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallPlan</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Plan&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Plan&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Plan</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">total_cost_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sum of :attr:`CallPlan.billable_cost_usd` across all calls.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span><span class="n">c</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cache_hit_savings_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;USD that would have been spent without the cache.</span>
+
+<span class="sd">        Equal to ``sum(c.estimated_cost_usd for c in calls if c.cache_status == &quot;hit&quot;</span>
+<span class="sd">        and c.estimated_cost_usd is not None)``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">or</span> <span class="mf">0.0</span>
+                <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span>
+                <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">cache_status</span> <span class="o">==</span> <span class="s2">&quot;hit&quot;</span>
+            <span class="p">),</span>
+            <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_unknown_costs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True if any non-cache-hit call has no cost estimate.</span>
+
+<span class="sd">        Use this to refuse to gate on a budget when the estimate is incomplete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">cache_status</span> <span class="o">!=</span> <span class="s2">&quot;hit&quot;</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Plan.with_call_replaced">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.Plan.with_call_replaced">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_call_replaced</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">new_call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Plan&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new Plan with ``calls[index]`` replaced.&quot;&quot;&quot;</span>
+        <span class="n">new_calls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+        <span class="n">new_calls</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_call</span>
+        <span class="k">return</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">new_calls</span><span class="p">))</span></div>
+</div>
+
+
+
+<span class="c1"># --- planning helpers -------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="make_call_plan">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.make_call_plan">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_call_plan</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tool</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">output_kind</span><span class="p">:</span> <span class="n">OutputKind</span><span class="p">,</span>
+    <span class="n">estimated_cost_usd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">expected_duration_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a :class:`CallPlan` and (optionally) check the cache.</span>
+
+<span class="sd">    When ``consult_cache=True`` (the default), the cache is peeked using the</span>
+<span class="sd">    same key the eventual call would produce; ``cache_status`` is set to</span>
+<span class="sd">    ``&quot;hit&quot;`` if a cached entry exists, ``&quot;miss&quot;`` otherwise. This makes</span>
+<span class="sd">    ``Plan.total_cost_usd`` honest: a fully-cached Plan reports $0.</span>
+
+<span class="sd">    When ``consult_cache=False`` (e.g. for unit tests or &quot;what would a fresh</span>
+<span class="sd">    run cost?&quot; reporting), ``cache_status`` is ``&quot;unknown&quot;``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">CacheStatus</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="k">if</span> <span class="n">consult_cache</span><span class="p">:</span>
+        <span class="c1"># Local import to avoid a cycle: cache imports from core, core imports</span>
+        <span class="c1"># from errors, none of which need plan.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_get</span>  <span class="c1"># type: ignore[import-not-found]</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;hit&quot;</span> <span class="k">if</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;miss&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Cache lookup is best-effort — if it errors (corrupted manifest,</span>
+            <span class="c1"># etc.) fall back to ``&quot;unknown&quot;`` rather than fail the planner.</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="k">return</span> <span class="n">CallPlan</span><span class="p">(</span>
+        <span class="n">tool</span><span class="o">=</span><span class="n">tool</span><span class="p">,</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
+        <span class="n">output_kind</span><span class="o">=</span><span class="n">output_kind</span><span class="p">,</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">estimated_cost_usd</span><span class="p">,</span>
+        <span class="n">cache_status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+        <span class="n">expected_duration_s</span><span class="o">=</span><span class="n">expected_duration_s</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{},</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># --- execution --------------------------------------------------------------</span>
+
+
+<span class="c1"># Type for the per-call result-to-Artifact converter.</span>
+<span class="n">ResultToArtifact</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">CallPlan</span><span class="p">],</span> <span class="s2">&quot;Artifact&quot;</span><span class="p">]</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="execute">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.execute">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">artifact_converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultToArtifact</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a Plan, returning a list of materialized :class:`lacing.Artifact`s.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plan: The Plan to execute.</span>
+<span class="sd">        on_event: Optional per-call event subscriber (passed to ``call_fal``).</span>
+<span class="sd">        dry_run: When True, no fal calls are made; synthetic Artifacts are</span>
+<span class="sd">            returned with placeholder ``asset_id`` and ``url=None``. Useful</span>
+<span class="sd">            for exercising downstream composition without an API key.</span>
+<span class="sd">        use_cache: When True (default), executes via ``cached_call_fal`` so</span>
+<span class="sd">            cache hits skip the network. When False, every call is fresh.</span>
+<span class="sd">        artifact_converter: Per-CallPlan converter from raw fal response to</span>
+<span class="sd">            :class:`lacing.Artifact`. When ``None`` (default), a built-in</span>
+<span class="sd">            converter handles the common shapes (``{images: [{url}]}``,</span>
+<span class="sd">            ``{video: {url}}``, ``{audio: {url}}``).</span>
+
+<span class="sd">    Placeholder resolution</span>
+<span class="sd">    ----------------------</span>
+<span class="sd">    Any string argument equal to ``&quot;&lt;from N&gt;&quot;`` (for an integer ``N``) is</span>
+<span class="sd">    rewritten to ``artifacts[N].url`` *just before* the call is made — so</span>
+<span class="sd">    a multi-step plan (e.g. generate_image → image_to_video) can reference</span>
+<span class="sd">    the upstream output without the planner needing to know its URL. The</span>
+<span class="sd">    rewrite happens after the upstream call has executed; planning itself</span>
+<span class="sd">    is unaffected.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,</span>
+<span class="sd">        in the same order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span>
+
+    <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
+
+    <span class="n">converter</span> <span class="o">=</span> <span class="n">artifact_converter</span> <span class="ow">or</span> <span class="n">_default_artifact_converter</span>
+
+    <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Artifact</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">:</span>
+        <span class="n">resolved_args</span> <span class="o">=</span> <span class="n">_resolve_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_call_fal</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">resolved_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_fal</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">resolved_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
+        <span class="n">artifacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">artifacts</span></div>
+
+
+
+<span class="n">_PLACEHOLDER_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;&lt;from &quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_placeholders</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rewrite ``&lt;from N&gt;`` strings in ``arguments`` to ``artifacts[N].url``.</span>
+
+<span class="sd">    Only top-level string values are rewritten; nested dicts/lists are</span>
+<span class="sd">    recursed into. ``arguments`` is not modified — a new dict is returned</span>
+<span class="sd">    when any rewrite happens, otherwise the original is returned.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_placeholder</span><span class="p">(</span><span class="n">arguments</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">arguments</span>
+    <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_placeholder</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">_has_placeholder</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">_has_placeholder</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_lookup_artifact_url</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lookup_artifact_url</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse ``&quot;&lt;from N&gt;&quot;`` and return ``artifacts[N].url``.&quot;&quot;&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Bad placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> — expected &#39;&lt;from N&gt;&#39; where N is an integer.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;but only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">)</span><span class="si">}</span><span class="s2"> artifact(s) have been materialized.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">artifact</span> <span class="o">=</span> <span class="n">artifacts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact[</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] but it has no URL.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_synthetic_artifact</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A placeholder Artifact for ``dry_run=True``. Not byte-stable across runs.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span><span class="p">,</span> <span class="n">hash_bytes</span>
+
+    <span class="c1"># Deterministic asset_id from the call&#39;s identity, so dry-run twice over</span>
+    <span class="c1"># the same Plan yields the same Artifact.id pair (helpful for testing).</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">},</span>
+        <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
+        <span class="n">asset_id</span><span class="o">=</span><span class="n">fake_id</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">bytes_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">duration_s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">provenance</span><span class="o">=</span><span class="n">_dry_run_provenance</span><span class="p">(</span><span class="n">call</span><span class="p">),</span>
+        <span class="n">cost_usd</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">producer_call_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dry-run:</span><span class="si">{</span><span class="n">fake_id</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dry_run_provenance</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.artifact</span><span class="w"> </span><span class="kn">import</span> <span class="n">_now_rt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Provenance</span>
+
+    <span class="k">return</span> <span class="n">Provenance</span><span class="p">(</span>
+        <span class="n">was_generated_by</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;agent:falaw-plan@</span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">was_attributed_to</span><span class="o">=</span><span class="s2">&quot;dry-run&quot;</span><span class="p">,</span>
+        <span class="n">was_derived_from</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">generated_at_time</span><span class="o">=</span><span class="n">_now_rt</span><span class="p">(),</span>
+        <span class="n">activity</span><span class="o">=</span><span class="s2">&quot;infer&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_artifact_converter</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a fal response to an Artifact using the common response shapes.</span>
+
+<span class="sd">    Handles these patterns observed across fal models:</span>
+
+<span class="sd">    - ``{&quot;images&quot;: [{&quot;url&quot;: ..., &quot;content_type&quot;: ...}, ...]}`` — flux family</span>
+<span class="sd">    - ``{&quot;image&quot;: {&quot;url&quot;: ..., &quot;content_type&quot;: ...}}``        — some edits</span>
+<span class="sd">    - ``{&quot;video&quot;: {&quot;url&quot;: ..., &quot;content_type&quot;: ...}}``        — i2v / t2v / lipsync</span>
+<span class="sd">    - ``{&quot;audio&quot;: {&quot;url&quot;: ..., &quot;content_type&quot;: ...}}``        — TTS</span>
+<span class="sd">    - ``{&quot;audio_url&quot;: &quot;...&quot;}``                                — voice-clone</span>
+<span class="sd">    - ``{&quot;output&quot;: &quot;...&quot;}`` (string)                          — some LLM endpoints</span>
+
+<span class="sd">    The first matching pattern wins. For multi-asset responses (e.g. flux</span>
+<span class="sd">    with ``num_images &gt; 1``), only the first asset becomes an Artifact —</span>
+<span class="sd">    callers wanting all assets should provide their own converter.</span>
+
+<span class="sd">    The Artifact&#39;s ``asset_id`` is the SHA-256 of the URL (when present);</span>
+<span class="sd">    ``bytes_size`` is 0 because we don&#39;t download by default. Callers who</span>
+<span class="sd">    want byte-content addressing should download the asset and re-hash.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span><span class="p">,</span> <span class="n">hash_bytes</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.artifact</span><span class="w"> </span><span class="kn">import</span> <span class="n">_now_rt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Provenance</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">_extract_first_url</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="n">_extract_duration_s</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+    <span class="n">mime</span> <span class="o">=</span> <span class="n">_extract_content_type</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="c1"># asset_id from URL when we don&#39;t have bytes — stable across re-runs of</span>
+    <span class="c1"># the same fal response. When bytes are downloaded later, callers should</span>
+    <span class="c1"># re-hash and produce a new Artifact.</span>
+    <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+        <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Last-resort: hash the response itself.</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
+        <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+    <span class="n">prov</span> <span class="o">=</span> <span class="n">Provenance</span><span class="p">(</span>
+        <span class="n">was_generated_by</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;agent:fal@</span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">was_attributed_to</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;attributed_to&quot;</span><span class="p">,</span> <span class="s2">&quot;user:unknown&quot;</span><span class="p">),</span>
+        <span class="n">was_derived_from</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">generated_at_time</span><span class="o">=</span><span class="n">_now_rt</span><span class="p">(),</span>
+        <span class="n">activity</span><span class="o">=</span><span class="s2">&quot;create&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
+        <span class="n">asset_id</span><span class="o">=</span><span class="n">fake_id</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="n">bytes_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">duration_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
+        <span class="n">mime</span><span class="o">=</span><span class="n">mime</span><span class="p">,</span>
+        <span class="n">provenance</span><span class="o">=</span><span class="n">prov</span><span class="p">,</span>
+        <span class="n">cost_usd</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">producer_call_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># set by orchestrators that thread through call_id</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_first_url</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find the first asset URL in a fal response, regardless of shape.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;images&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">images</span><span class="p">:</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">first</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">first</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;url&quot;</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;audio_url&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;audio_url&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;video_url&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;video_url&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image_url&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">raw</span><span class="p">[</span><span class="s2">&quot;image_url&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_duration_s</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;audio&quot;</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;duration_s&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_content_type</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;audio&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content_type&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">v</span><span class="p">[</span><span class="s2">&quot;content_type&quot;</span><span class="p">]</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;images&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">images</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content_type&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

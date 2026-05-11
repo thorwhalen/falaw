@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.plan &mdash; falaw 0.0.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f7cdbf68"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.refresh" href="refresh.html" />
+    <link rel="prev" title="falaw.operations.video" href="operations/video.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.plan</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CacheStatus"><code class="docutils literal notranslate"><span class="pre">CacheStatus</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CallPlan"><code class="docutils literal notranslate"><span class="pre">CallPlan</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.application"><code class="docutils literal notranslate"><span class="pre">CallPlan.application</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.arguments"><code class="docutils literal notranslate"><span class="pre">CallPlan.arguments</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.billable_cost_usd"><code class="docutils literal notranslate"><span class="pre">CallPlan.billable_cost_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.cache_status"><code class="docutils literal notranslate"><span class="pre">CallPlan.cache_status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.estimated_cost_usd"><code class="docutils literal notranslate"><span class="pre">CallPlan.estimated_cost_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.expected_duration_s"><code class="docutils literal notranslate"><span class="pre">CallPlan.expected_duration_s</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.metadata"><code class="docutils literal notranslate"><span class="pre">CallPlan.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.output_kind"><code class="docutils literal notranslate"><span class="pre">CallPlan.output_kind</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.tool"><code class="docutils literal notranslate"><span class="pre">CallPlan.tool</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.OutputKind"><code class="docutils literal notranslate"><span class="pre">OutputKind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.Plan"><code class="docutils literal notranslate"><span class="pre">Plan</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.Plan.cache_hit_savings_usd"><code class="docutils literal notranslate"><span class="pre">Plan.cache_hit_savings_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.Plan.has_unknown_costs"><code class="docutils literal notranslate"><span class="pre">Plan.has_unknown_costs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.Plan.total_cost_usd"><code class="docutils literal notranslate"><span class="pre">Plan.total_cost_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.Plan.with_call_replaced"><code class="docutils literal notranslate"><span class="pre">Plan.with_call_replaced()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.execute"><code class="docutils literal notranslate"><span class="pre">execute()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.make_call_plan"><code class="docutils literal notranslate"><span class="pre">make_call_plan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.plan</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/plan.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.plan">
+<span id="falaw-plan"></span><h1>falaw.plan<a class="headerlink" href="#module-falaw.plan" title="Link to this heading"></a></h1>
+<p>Plan / Execute primitives — separate planning (data) from execution (effects).</p>
+<p>Today every falaw operation is eager: <code class="docutils literal notranslate"><span class="pre">generate_image(prompt)</span></code> makes the
+API call immediately. That means:</p>
+<ul class="simple">
+<li><p>A budget gate has to predict cost from outside the call and <em>hope</em> the
+prediction matches what the operation will actually do.</p></li>
+<li><p>Tests need a fake fal_client to exercise any code that touches an
+operation, even when the test is about composition or cost.</p></li>
+<li><p>A UI can’t show “you’re about to spend $4.12, click confirm” without
+a separate, parallel cost-prediction code path.</p></li>
+</ul>
+<p>The fix is to give every operation two surfaces:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">plan_X(...)</span> <span class="pre">-&gt;</span> <span class="pre">CallPlan</span></code>: pure data describing the call that <em>would</em>
+happen — model_id, arguments, predicted cost, cache status. No API contact.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">execute(plan,</span> <span class="pre">...)</span> <span class="pre">-&gt;</span> <span class="pre">list[Artifact]</span></code>: turns a Plan (one or more
+CallPlans) into materialized Artifacts. The eager wrappers
+(<code class="docutils literal notranslate"><span class="pre">generate_image</span></code>, etc.) are now thin: <code class="docutils literal notranslate"><span class="pre">execute(plan_X(...))[0]</span></code>.</p></li>
+</ol>
+<p>A higher-level orchestrator (a music-video render, a storyboard generation)
+builds a Plan by composing CallPlans across multiple operations. The Plan
+gets a typed <code class="docutils literal notranslate"><span class="pre">total_cost_usd</span></code>, can be inspected, edited, dry-run, or
+serialized — all without the network.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">Plan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;a tiger&quot;</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_4_3&quot;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">&quot;miss&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/minimax/hailuo-02/pro/image-to-video&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from p1&gt;&quot;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">&quot;miss&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span><span class="o">.</span><span class="n">total_cost_usd</span>
+<span class="go">0.525</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span><span class="o">.</span><span class="n">cache_hit_savings_usd</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">tool</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
+<span class="go">[&#39;generate_image&#39;, &#39;image_to_video&#39;]</span>
+</pre></div>
+</div>
+<p>Plans concatenate, so an orchestrator can build one shot’s Plan and then
+append it to a scene-level Plan:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">shot_plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">p1</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">scene_plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">())</span> <span class="o">+</span> <span class="n">shot_plan</span> <span class="o">+</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">p2</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">scene_plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+<span class="go">2</span>
+</pre></div>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.CacheStatus">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CacheStatus</span></span><a class="headerlink" href="#falaw.plan.CacheStatus" title="Link to this definition"></a></dt>
+<dd><p>Whether the cache will short-circuit this call.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hit</span></code>: A cached response exists and will be returned without an API call.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">miss</span></code>: No cache entry; the call will hit fal.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stale</span></code>: An entry exists but is expected to be invalidated (e.g. a
+<code class="docutils literal notranslate"><span class="pre">force=True</span></code> re-render asked for it). Today we don’t distinguish stale
+from miss for cost — both are billed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknown</span></code>: Plan was built without consulting the cache.</p></li>
+</ul>
+<p>alias of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code>[‘hit’, ‘miss’, ‘stale’, ‘unknown’]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CallPlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">tool:</span> <span class="pre">str,</span> <span class="pre">application:</span> <span class="pre">str,</span> <span class="pre">arguments:</span> <span class="pre">dict,</span> <span class="pre">output_kind:</span> <span class="pre">~typing.Literal['image',</span> <span class="pre">'video',</span> <span class="pre">'audio',</span> <span class="pre">'json',</span> <span class="pre">'text',</span> <span class="pre">'binary'],</span> <span class="pre">estimated_cost_usd:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">cache_status:</span> <span class="pre">~typing.Literal['hit',</span> <span class="pre">'miss',</span> <span class="pre">'stale',</span> <span class="pre">'unknown']</span> <span class="pre">=</span> <span class="pre">'unknown',</span> <span class="pre">expected_duration_s:</span> <span class="pre">tuple[float,</span> <span class="pre">float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">metadata:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/plan.html#CallPlan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.CallPlan" title="Link to this definition"></a></dt>
+<dd><p>A single planned fal call. Pure data — no API contact yet.</p>
+<p><code class="docutils literal notranslate"><span class="pre">application</span></code> and <code class="docutils literal notranslate"><span class="pre">arguments</span></code> are the <em>exact</em> tuple
+<code class="docutils literal notranslate"><span class="pre">cached_call_fal(application,</span> <span class="pre">arguments)</span></code> would take, so a Plan can be
+cache-checked, executed, or replayed without ambiguity.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.application">
+<span class="sig-name descname"><span class="pre">application</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#falaw.plan.CallPlan.application" title="Link to this definition"></a></dt>
+<dd><p>The fal model id that will be invoked (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;fal-ai/flux/dev&quot;</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.arguments">
+<span class="sig-name descname"><span class="pre">arguments</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#falaw.plan.CallPlan.arguments" title="Link to this definition"></a></dt>
+<dd><p>Keyword arguments to pass to fal. Will be JSON-canonicalized for
+cache key computation; should be JSON-serializable.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.billable_cost_usd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">billable_cost_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#falaw.plan.CallPlan.billable_cost_usd" title="Link to this definition"></a></dt>
+<dd><p>Cost that will actually be billed (0 on cache hit, estimate otherwise).</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">0.0</span></code> (not <code class="docutils literal notranslate"><span class="pre">None</span></code>) on cache hit or unknown estimate so
+sums are well-defined; use <a class="reference internal" href="#falaw.plan.CallPlan.estimated_cost_usd" title="falaw.plan.CallPlan.estimated_cost_usd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code></a> <code class="docutils literal notranslate"><span class="pre">is</span> <span class="pre">None</span></code> to
+check unknown status explicitly.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.cache_status">
+<span class="sig-name descname"><span class="pre">cache_status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'hit'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'miss'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'stale'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'unknown'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.plan.CallPlan.cache_status" title="Link to this definition"></a></dt>
+<dd><p>Whether the cache will short-circuit this call. <code class="docutils literal notranslate"><span class="pre">&quot;hit&quot;</span></code> means
+<code class="docutils literal notranslate"><span class="pre">execute</span></code> won’t bill, so <a class="reference internal" href="#falaw.plan.Plan.total_cost_usd" title="falaw.plan.Plan.total_cost_usd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Plan.total_cost_usd</span></code></a> and
+<a class="reference internal" href="#falaw.plan.Plan.cache_hit_savings_usd" title="falaw.plan.Plan.cache_hit_savings_usd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Plan.cache_hit_savings_usd</span></code></a> reflect that.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.estimated_cost_usd">
+<span class="sig-name descname"><span class="pre">estimated_cost_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#falaw.plan.CallPlan.estimated_cost_usd" title="Link to this definition"></a></dt>
+<dd><p>Predicted cost in USD. <code class="docutils literal notranslate"><span class="pre">None</span></code> when the model has no <code class="docutils literal notranslate"><span class="pre">cost_estimate</span></code>
+populated (callers can distinguish “free” from “unknown”).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.expected_duration_s">
+<span class="sig-name descname"><span class="pre">expected_duration_s</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#falaw.plan.CallPlan.expected_duration_s" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(min,</span> <span class="pre">max)</span></code> duration the model can produce, or <code class="docutils literal notranslate"><span class="pre">None</span></code> if no
+duration contract is known. Plan-level validators can check that the
+requested duration fits this range and raise <code class="xref py py-class docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code>
+<em>before</em> the call instead of letting it silently truncate.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#falaw.plan.CallPlan.metadata" title="Link to this definition"></a></dt>
+<dd><p>Free-form labels for downstream consumers. Conventional keys:
+<code class="docutils literal notranslate"><span class="pre">shot_id</span></code>, <code class="docutils literal notranslate"><span class="pre">beat_id</span></code>, <code class="docutils literal notranslate"><span class="pre">character_name</span></code>, <code class="docutils literal notranslate"><span class="pre">strategy</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.output_kind">
+<span class="sig-name descname"><span class="pre">output_kind</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'image'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'video'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'audio'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'json'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'text'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'binary'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.plan.CallPlan.output_kind" title="Link to this definition"></a></dt>
+<dd><p>What kind of Artifact this call will produce.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.tool">
+<span class="sig-name descname"><span class="pre">tool</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#falaw.plan.CallPlan.tool" title="Link to this definition"></a></dt>
+<dd><p>High-level tool name — <code class="docutils literal notranslate"><span class="pre">&quot;generate_image&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;image_to_video&quot;</span></code>, etc.
+Distinct from <code class="docutils literal notranslate"><span class="pre">application</span></code> because one tool may dispatch to several
+fal models depending on quality tier.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.OutputKind">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">OutputKind</span></span><a class="headerlink" href="#falaw.plan.OutputKind" title="Link to this definition"></a></dt>
+<dd><p>Coarse class of what this call produces. Mirrors <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact.kind</span></code>
+so the producer knows what shape of Artifact to materialize.</p>
+<p>alias of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code>[‘image’, ‘video’, ‘audio’, ‘json’, ‘text’, ‘binary’]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.plan.Plan">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">Plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">calls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/plan.html#Plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.Plan" title="Link to this definition"></a></dt>
+<dd><p>An ordered sequence of <a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallPlan</span></code></a> — a render plan, in essence.</p>
+<p>Plans compose: <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> returns a new Plan with <code class="docutils literal notranslate"><span class="pre">a.calls</span></code> followed by
+<code class="docutils literal notranslate"><span class="pre">b.calls</span></code>. <code class="docutils literal notranslate"><span class="pre">Plan(calls=())</span></code> is the identity. Plans are frozen, so
+edits return new Plans (use <a class="reference internal" href="#falaw.plan.Plan.with_call_replaced" title="falaw.plan.Plan.with_call_replaced"><code class="xref py py-meth docutils literal notranslate"><span class="pre">with_call_replaced()</span></code></a> for in-place-feel).</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.plan.Plan.cache_hit_savings_usd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cache_hit_savings_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#falaw.plan.Plan.cache_hit_savings_usd" title="Link to this definition"></a></dt>
+<dd><p>USD that would have been spent without the cache.</p>
+<p>Equal to <code class="docutils literal notranslate"><span class="pre">sum(c.estimated_cost_usd</span> <span class="pre">for</span> <span class="pre">c</span> <span class="pre">in</span> <span class="pre">calls</span> <span class="pre">if</span> <span class="pre">c.cache_status</span> <span class="pre">==</span> <span class="pre">&quot;hit&quot;</span>
+<span class="pre">and</span> <span class="pre">c.estimated_cost_usd</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">None)</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.plan.Plan.has_unknown_costs">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">has_unknown_costs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#falaw.plan.Plan.has_unknown_costs" title="Link to this definition"></a></dt>
+<dd><p>True if any non-cache-hit call has no cost estimate.</p>
+<p>Use this to refuse to gate on a budget when the estimate is incomplete.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.plan.Plan.total_cost_usd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_cost_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></span><a class="headerlink" href="#falaw.plan.Plan.total_cost_usd" title="Link to this definition"></a></dt>
+<dd><p>Sum of <a class="reference internal" href="#falaw.plan.CallPlan.billable_cost_usd" title="falaw.plan.CallPlan.billable_cost_usd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CallPlan.billable_cost_usd</span></code></a> across all calls.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.plan.Plan.with_call_replaced">
+<span class="sig-name descname"><span class="pre">with_call_replaced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_call</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#Plan.with_call_replaced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.Plan.with_call_replaced" title="Link to this definition"></a></dt>
+<dd><p>Return a new Plan with <code class="docutils literal notranslate"><span class="pre">calls[index]</span></code> replaced.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.plan.execute">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute" title="Link to this definition"></a></dt>
+<dd><p>Execute a Plan, returning a list of materialized :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>lacing.Artifact`s.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plan</strong> – The Plan to execute.</p></li>
+<li><p><strong>on_event</strong> – Optional per-call event subscriber (passed to <code class="docutils literal notranslate"><span class="pre">call_fal</span></code>).</p></li>
+<li><p><strong>dry_run</strong> – When True, no fal calls are made; synthetic Artifacts are
+returned with placeholder <code class="docutils literal notranslate"><span class="pre">asset_id</span></code> and <code class="docutils literal notranslate"><span class="pre">url=None</span></code>. Useful
+for exercising downstream composition without an API key.</p></li>
+<li><p><strong>use_cache</strong> – When True (default), executes via <code class="docutils literal notranslate"><span class="pre">cached_call_fal</span></code> so
+cache hits skip the network. When False, every call is fresh.</p></li>
+<li><p><strong>artifact_converter</strong> – Per-CallPlan converter from raw fal response to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>. When <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), a built-in
+converter handles the common shapes (<code class="docutils literal notranslate"><span class="pre">{images:</span> <span class="pre">[{url}]}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">{video:</span> <span class="pre">{url}}</span></code>, <code class="docutils literal notranslate"><span class="pre">{audio:</span> <span class="pre">{url}}</span></code>).</p></li>
+</ul>
+</dd>
+</dl>
+<section id="placeholder-resolution">
+<h2>Placeholder resolution<a class="headerlink" href="#placeholder-resolution" title="Link to this heading"></a></h2>
+<p>Any string argument equal to <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code> (for an integer <code class="docutils literal notranslate"><span class="pre">N</span></code>) is
+rewritten to <code class="docutils literal notranslate"><span class="pre">artifacts[N].url</span></code> <em>just before</em> the call is made — so
+a multi-step plan (e.g. generate_image → image_to_video) can reference
+the upstream output without the planner needing to know its URL. The
+rewrite happens after the upstream call has executed; planning itself
+is unaffected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>One <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact</span></code> per <a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallPlan</span></code></a> in <code class="docutils literal notranslate"><span class="pre">plan.calls</span></code>,
+in the same order.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.plan.make_call_plan">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">make_call_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'image'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'video'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'audio'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'json'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'text'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'binary'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cost_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_duration_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consult_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#make_call_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.make_call_plan" title="Link to this definition"></a></dt>
+<dd><p>Build a <a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallPlan</span></code></a> and (optionally) check the cache.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">consult_cache=True</span></code> (the default), the cache is peeked using the
+same key the eventual call would produce; <code class="docutils literal notranslate"><span class="pre">cache_status</span></code> is set to
+<code class="docutils literal notranslate"><span class="pre">&quot;hit&quot;</span></code> if a cached entry exists, <code class="docutils literal notranslate"><span class="pre">&quot;miss&quot;</span></code> otherwise. This makes
+<code class="docutils literal notranslate"><span class="pre">Plan.total_cost_usd</span></code> honest: a fully-cached Plan reports $0.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">consult_cache=False</span></code> (e.g. for unit tests or “what would a fresh
+run cost?” reporting), <code class="docutils literal notranslate"><span class="pre">cache_status</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="operations/video.html" class="btn btn-neutral float-left" title="falaw.operations.video" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="refresh.html" class="btn btn-neutral float-right" title="falaw.refresh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright NO COPYRIGHT.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

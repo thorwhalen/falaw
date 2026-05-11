@@ -1,0 +1,4 @@
+falaw.operations._plan
+======================
+.. automodule:: falaw.operations._plan
+   :members:
