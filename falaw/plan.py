@@ -248,9 +248,7 @@ def call_plan_from_dict(d: dict) -> CallPlan:
         output_kind=d["output_kind"],
         estimated_cost_usd=d.get("estimated_cost_usd"),
         cache_status=d.get("cache_status", "unknown"),
-        expected_duration_s=(
-            tuple(duration) if duration is not None else None
-        ),
+        expected_duration_s=(tuple(duration) if duration is not None else None),
         metadata=dict(d.get("metadata") or {}),
     )
 
