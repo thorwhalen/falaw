@@ -462,7 +462,9 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
         content = _extract_text_content(raw)
         path, fake_id = _materialize_text_to_cache(content, call.output_kind)
         bytes_size = len(content.encode("utf-8"))
-        mime = mime or ("application/json" if call.output_kind == "json" else "text/plain")
+        mime = mime or (
+            "application/json" if call.output_kind == "json" else "text/plain"
+        )
     else:
         # Last-resort: hash the response itself.
         import json as _json
