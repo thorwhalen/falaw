@@ -5,4 +5,5 @@ is that adding a new surface (e.g. a CLI, a Slack bot, a TUI) is a new
 bridge module --- never a re-implementation of the operations themselves.
 """
 
+from .mcp import build_mcp_server, register_tools, serve  # noqa: F401
 from .skill import build_skill_md, write_skill_files  # noqa: F401
