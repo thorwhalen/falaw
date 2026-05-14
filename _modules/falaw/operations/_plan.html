@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations._plan &mdash; falaw 0.0.10 documentation</title>
+  <title>falaw.operations._plan &mdash; falaw 0.0.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../../_static/documentation_options.js?v=0c446633"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -406,6 +406,63 @@
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">,</span>
         <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># llm_complete  (the planning sibling of falaw.llm_complete)</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="plan_llm_complete">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/_plan.html#falaw.plan_llm_complete">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plan_llm_complete</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">output_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan a :func:`falaw.llm_complete` call without executing it.</span>
+
+<span class="sd">    Routes through ``fal-ai/any-llm`` with the *exact same* application id and</span>
+<span class="sd">    argument shape as the eager :func:`falaw.llm_complete`, so a planned call</span>
+<span class="sd">    and an eager call with identical inputs collapse to the same cache entry.</span>
+
+<span class="sd">    ``output_kind`` is ``&quot;text&quot;`` for a free-form completion or ``&quot;json&quot;`` when</span>
+<span class="sd">    the prompt asks for a strict-JSON response — it tells :func:`falaw.execute`</span>
+<span class="sd">    what kind of :class:`lacing.Artifact` to materialize. Either way the LLM</span>
+<span class="sd">    response is materialized to a content-addressed cache *file*</span>
+<span class="sd">    (``Artifact.path``), because LLM output is text, not a URL.</span>
+
+<span class="sd">    Cost is the ``fal-ai/any-llm`` per-call estimate (``source=&quot;approximate&quot;``</span>
+<span class="sd">    — real pricing is per-token); pass ``model`` to pick the underlying model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DEFAULT_LLM</span><span class="p">,</span> <span class="n">_DEFAULT_MODEL</span>
+
+    <span class="n">application</span> <span class="o">=</span> <span class="n">_DEFAULT_LLM</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">_DEFAULT_MODEL</span><span class="p">,</span>
+        <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+        <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">system</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;system_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
+        <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;llm_complete&quot;</span><span class="p">,</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
+        <span class="n">output_kind</span><span class="o">=</span><span class="n">output_kind</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]  # &quot;text&quot; | &quot;json&quot;</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
     <span class="p">)</span></div>

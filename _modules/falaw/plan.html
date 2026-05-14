@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.10 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=a83ce22a"></script>
+      <script src="../../_static/documentation_options.js?v=0c446633"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -548,15 +548,19 @@
 <span class="sd">    - ``{&quot;video&quot;: {&quot;url&quot;: ..., &quot;content_type&quot;: ...}}``        — i2v / t2v / lipsync</span>
 <span class="sd">    - ``{&quot;audio&quot;: {&quot;url&quot;: ..., &quot;content_type&quot;: ...}}``        — TTS</span>
 <span class="sd">    - ``{&quot;audio_url&quot;: &quot;...&quot;}``                                — voice-clone</span>
-<span class="sd">    - ``{&quot;output&quot;: &quot;...&quot;}`` (string)                          — some LLM endpoints</span>
+<span class="sd">    - ``{&quot;output&quot;: &quot;...&quot;}`` (string)                          — LLM endpoints</span>
 
 <span class="sd">    The first matching pattern wins. For multi-asset responses (e.g. flux</span>
 <span class="sd">    with ``num_images &gt; 1``), only the first asset becomes an Artifact —</span>
 <span class="sd">    callers wanting all assets should provide their own converter.</span>
 
-<span class="sd">    The Artifact&#39;s ``asset_id`` is the SHA-256 of the URL (when present);</span>
-<span class="sd">    ``bytes_size`` is 0 because we don&#39;t download by default. Callers who</span>
-<span class="sd">    want byte-content addressing should download the asset and re-hash.</span>
+<span class="sd">    For media calls the Artifact&#39;s ``asset_id`` is the SHA-256 of the URL and</span>
+<span class="sd">    ``bytes_size`` is 0 (we don&#39;t download by default). For ``json`` / ``text``</span>
+<span class="sd">    calls with **no URL** — the ``fal-ai/any-llm`` case — the textual response</span>
+<span class="sd">    is *materialized* to a content-addressed file in the falaw cache and</span>
+<span class="sd">    ``Artifact.path`` points at it (``asset_id`` is the SHA-256 of the</span>
+<span class="sd">    content). So ``execute`` returns a usable Artifact regardless of kind:</span>
+<span class="sd">    media via ``url``, LLM output via ``path``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span><span class="p">,</span> <span class="n">hash_bytes</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.artifact</span><span class="w"> </span><span class="kn">import</span> <span class="n">_now_rt</span>
@@ -565,12 +569,21 @@
     <span class="n">url</span> <span class="o">=</span> <span class="n">_extract_first_url</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">_extract_duration_s</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
     <span class="n">mime</span> <span class="o">=</span> <span class="n">_extract_content_type</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">bytes_size</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c1"># asset_id from URL when we don&#39;t have bytes — stable across re-runs of</span>
-    <span class="c1"># the same fal response. When bytes are downloaded later, callers should</span>
-    <span class="c1"># re-hash and produce a new Artifact.</span>
     <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
+        <span class="c1"># asset_id from URL when we don&#39;t have bytes — stable across re-runs of</span>
+        <span class="c1"># the same fal response. When bytes are downloaded later, callers</span>
+        <span class="c1"># should re-hash and produce a new Artifact.</span>
         <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">):</span>
+        <span class="c1"># LLM-style response: no URL, the content *is* the text. Materialize</span>
+        <span class="c1"># it to a content-addressed cache file so the Artifact is usable.</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">_extract_text_content</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">fake_id</span> <span class="o">=</span> <span class="n">_materialize_text_to_cache</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">)</span>
+        <span class="n">bytes_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="n">mime</span> <span class="o">=</span> <span class="n">mime</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">&quot;application/json&quot;</span> <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span> <span class="k">else</span> <span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Last-resort: hash the response itself.</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
@@ -590,15 +603,60 @@
     <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
         <span class="n">asset_id</span><span class="o">=</span><span class="n">fake_id</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
-        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
         <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-        <span class="n">bytes_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">bytes_size</span><span class="o">=</span><span class="n">bytes_size</span><span class="p">,</span>
         <span class="n">duration_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
         <span class="n">mime</span><span class="o">=</span><span class="n">mime</span><span class="p">,</span>
         <span class="n">provenance</span><span class="o">=</span><span class="n">prov</span><span class="p">,</span>
         <span class="n">cost_usd</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">producer_call_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># set by orchestrators that thread through call_id</span>
     <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_text_content</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pull plain text out of an LLM response shape (any-llm / OpenAI-style).</span>
+
+<span class="sd">    Mirrors the extraction in ``falaw.operations.llm``; kept here so the</span>
+<span class="sd">    converter has no dependency on the operations layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">raw</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="s2">&quot;completion&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">v</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;choices&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="n">choices</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">),</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_materialize_text_to_cache</span><span class="p">(</span><span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write ``content`` to a content-addressed file in the falaw cache.</span>
+
+<span class="sd">    Returns ``(path, asset_id)`` where ``asset_id`` is the SHA-256 hex of the</span>
+<span class="sd">    content bytes. Idempotent: the same content writes the same file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">hash_bytes</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">_cache_dir</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">asset_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="s2">&quot;.json&quot;</span> <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span> <span class="k">else</span> <span class="s2">&quot;.txt&quot;</span>
+    <span class="n">assets_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="s2">&quot;assets&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">assets_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">assets_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;llm-</span><span class="si">{</span><span class="n">asset_id</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span><span class="p">,</span> <span class="n">asset_id</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_extract_first_url</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
