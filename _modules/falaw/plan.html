@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.14 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.15 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=544df88d"></script>
+      <script src="../../_static/documentation_options.js?v=f0357c94"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -674,6 +674,10 @@
         <span class="c1"># LLM-style response: no URL, the content *is* the text. Materialize</span>
         <span class="c1"># it to a content-addressed cache file so the Artifact is usable.</span>
         <span class="n">content</span> <span class="o">=</span> <span class="n">_extract_text_content</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span><span class="p">:</span>
+            <span class="c1"># ``output_kind=&quot;json&quot;`` promises a parseable JSON artifact,</span>
+            <span class="c1"># but real models wrap it in a ```json fence anyway.</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">_unwrap_json_fence</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
         <span class="n">path</span><span class="p">,</span> <span class="n">fake_id</span> <span class="o">=</span> <span class="n">_materialize_text_to_cache</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">)</span>
         <span class="n">bytes_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
         <span class="n">mime</span> <span class="o">=</span> <span class="n">mime</span> <span class="ow">or</span> <span class="p">(</span>
@@ -707,6 +711,27 @@
         <span class="n">cost_usd</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">producer_call_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># set by orchestrators that thread through call_id</span>
     <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_unwrap_json_fence</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Strip a Markdown code fence an LLM wrapped a JSON response in.</span>
+
+<span class="sd">    ``output_kind=&quot;json&quot;`` promises the materialized artifact is a</span>
+<span class="sd">    parseable JSON document, but real models routinely answer with</span>
+<span class="sd">    ```` ```json … ``` ```` even when the prompt forbids it. Drop a</span>
+<span class="sd">    leading ```` ``` ```` / ```` ```json ```` line and a trailing</span>
+<span class="sd">    ```` ``` ```` line; a clean (non-fenced) body is returned unchanged</span>
+<span class="sd">    apart from surrounding whitespace. This normalizes — it does not</span>
+<span class="sd">    validate — so unparseable text passes through untouched.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>  <span class="c1"># drop the opening ``` / ```json line</span>
+    <span class="k">if</span> <span class="n">lines</span> <span class="ow">and</span> <span class="n">lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;```&quot;</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_extract_text_content</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
