@@ -541,6 +541,10 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
         # LLM-style response: no URL, the content *is* the text. Materialize
         # it to a content-addressed cache file so the Artifact is usable.
         content = _extract_text_content(raw)
+        if call.output_kind == "json":
+            # ``output_kind="json"`` promises a parseable JSON artifact,
+            # but real models wrap it in a ```json fence anyway.
+            content = _unwrap_json_fence(content)
         path, fake_id = _materialize_text_to_cache(content, call.output_kind)
         bytes_size = len(content.encode("utf-8"))
         mime = mime or (
@@ -574,6 +578,27 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
         cost_usd=call.billable_cost_usd or None,
         producer_call_id=None,  # set by orchestrators that thread through call_id
     )
+
+
+def _unwrap_json_fence(text: str) -> str:
+    """Strip a Markdown code fence an LLM wrapped a JSON response in.
+
+    ``output_kind="json"`` promises the materialized artifact is a
+    parseable JSON document, but real models routinely answer with
+    ```` ```json … ``` ```` even when the prompt forbids it. Drop a
+    leading ```` ``` ```` / ```` ```json ```` line and a trailing
+    ```` ``` ```` line; a clean (non-fenced) body is returned unchanged
+    apart from surrounding whitespace. This normalizes — it does not
+    validate — so unparseable text passes through untouched.
+    """
+    s = text.strip()
+    if not s.startswith("```"):
+        return s
+    lines = s.splitlines()
+    lines = lines[1:]  # drop the opening ``` / ```json line
+    if lines and lines[-1].strip() == "```":
+        lines = lines[:-1]
+    return "\n".join(lines).strip()
 
 
 def _extract_text_content(raw) -> str:
