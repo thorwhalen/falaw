@@ -109,6 +109,26 @@ def test_converter_materializes_json_response_to_a_file():
     assert art.mime == "application/json"
 
 
+def test_converter_unwraps_a_json_code_fence():
+    """``output_kind="json"`` materializes a directly-parseable artifact
+    even when the model wraps its answer in a ```json fence."""
+    cp = plan_llm_complete("Return JSON.", output_kind="json", consult_cache=False)
+    raw = {"output": '```json\n[{"name": "Alex"}]\n```'}
+    art = _default_artifact_converter(raw, cp)
+    content = Path(art.path).read_text(encoding="utf-8")
+    # The fence is gone — the artifact parses without any caller-side cleanup.
+    assert json.loads(content) == [{"name": "Alex"}]
+
+
+def test_converter_leaves_a_fence_in_text_output_alone():
+    """Only ``output_kind="json"`` is unwrapped — a code block is
+    legitimate content in a ``text`` response."""
+    cp = plan_llm_complete("Summarize.", output_kind="text", consult_cache=False)
+    fenced = "```\nsome code\n```"
+    art = _default_artifact_converter({"output": fenced}, cp)
+    assert Path(art.path).read_text(encoding="utf-8") == fenced
+
+
 def test_converter_materializes_text_response_to_a_file():
     cp = plan_llm_complete("Summarize.", output_kind="text", consult_cache=False)
     art = _default_artifact_converter({"output": "a terse summary"}, cp)
