@@ -14,13 +14,72 @@ both ``on_log`` and ``on_event`` are given, both fire.
 
 from __future__ import annotations
 
+import contextvars
 import time
 import uuid
-from typing import Any, Callable, Mapping, Optional
+from contextlib import contextmanager
+from typing import Any, Callable, Iterator, Mapping, Optional
 
 from .errors import translate as _translate_error
 from .events import EventCallback, ProgressEvent, emit
 from .journal import _default_journal
+
+
+# --------------------------------------------------------------------------- #
+# Per-context fal credential (bring-your-own-key support)
+# --------------------------------------------------------------------------- #
+
+#: The fal API key bound for the current execution context, if any. Set via
+#: :func:`using_fal_credentials` so a server handling a per-request
+#: "bring-your-own-key" call can route every nested :func:`call_fal` through
+#: the caller's key — without threading a credential argument through every
+#: intermediate signature (plan → execute → cached_call_fal → call_fal).
+#:
+#: A :class:`contextvars.ContextVar` (rather than an ``os.environ`` mutation)
+#: keeps the binding naturally scoped to the entering context and the threads
+#: it spawns: concurrent requests on other tasks/threads are unaffected, and
+#: no process-wide lock is needed. This is the seam reelee's HTTP server uses
+#: to forward a BYO key into server-side fal calls (reelee#159).
+_FAL_KEY_VAR: "contextvars.ContextVar[Optional[str]]" = contextvars.ContextVar(
+    "falaw_fal_key", default=None
+)
+
+
+def current_fal_key() -> Optional[str]:
+    """The fal API key bound for the current context, or ``None``.
+
+    Resolution order callers should mirror: an explicit ``api_key`` argument
+    to :func:`call_fal` wins over this context value, which in turn wins over
+    the fal SDK's own ``FAL_KEY`` env-var lookup.
+    """
+    return _FAL_KEY_VAR.get()
+
+
+@contextmanager
+def using_fal_credentials(key: Optional[str]) -> Iterator[None]:
+    """Bind ``key`` as the fal credential for every :func:`call_fal` in this context.
+
+    Intended for server-side bring-your-own-key flows: wrap a unit of work
+    that will make one or more fal calls, and they all authenticate with
+    ``key`` instead of the server's ``FAL_KEY`` env var — without any
+    intermediate function needing a credential parameter.
+
+    A falsy ``key`` is a deliberate no-op (the context is left untouched), so
+    a caller can pass an optional header value straight through without
+    special-casing "no BYO key — fall back to the server/env key".
+
+    Thread/async safe: backed by a :class:`contextvars.ContextVar`, so the
+    binding is visible only within the entering context (and threads/tasks it
+    spawns), never to concurrent requests.
+    """
+    if not key:
+        yield
+        return
+    token = _FAL_KEY_VAR.set(key)
+    try:
+        yield
+    finally:
+        _FAL_KEY_VAR.reset(token)
 
 
 def call_fal(
@@ -31,6 +90,7 @@ def call_fal(
     on_event: Optional[EventCallback] = None,
     with_logs: bool = True,
     journal_errors: bool = True,
+    api_key: Optional[str] = None,
 ) -> dict:
     """Call a fal model via fal_client.subscribe.
 
@@ -46,11 +106,28 @@ def call_fal(
         journal_errors: When True, exceptions are recorded as journal issues
             before being re-raised. The journal entry includes the application
             id and arguments so future agents can recognize the same trap.
+        api_key: Explicit fal key for this call. When ``None`` (default) the
+            key bound via :func:`using_fal_credentials` is used; when that is
+            also unset, the fal SDK's own ``FAL_KEY`` env-var lookup applies
+            (the historical behaviour). A resolved key is used per-call via a
+            dedicated ``fal_client.SyncClient`` — it is never written to a
+            global or an env var.
 
     Returns:
         The raw response dict from the model.
     """
     import fal_client  # lazy: keep import out of `from falaw import ...`
+
+    # Resolve the per-call credential: explicit arg > context binding > SDK
+    # default. Only when a key is resolved do we route through a dedicated
+    # ``SyncClient`` — otherwise we call the module-level ``subscribe`` so the
+    # SDK's own env/global resolution is preserved exactly as before.
+    key = api_key or _FAL_KEY_VAR.get()
+    subscribe = fal_client.subscribe
+    if key:
+        client_cls = getattr(fal_client, "SyncClient", None)
+        if client_cls is not None:
+            subscribe = client_cls(key=key).subscribe
 
     call_id = uuid.uuid4().hex[:12]
     started = time.time()
@@ -84,7 +161,7 @@ def call_fal(
 
     _ev("queued")
     try:
-        result = fal_client.subscribe(
+        result = subscribe(
             application,
             arguments=dict(arguments),
             with_logs=with_logs,
