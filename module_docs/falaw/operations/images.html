@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.images &mdash; falaw 0.0.17 documentation</title>
+  <title>falaw.operations.images &mdash; falaw 0.0.18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=63b572e7"></script>
+      <script src="../../../_static/documentation_options.js?v=8bafd125"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -73,6 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.composite_character_in_environment"><code class="docutils literal notranslate"><span class="pre">composite_character_in_environment()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.edit_image"><code class="docutils literal notranslate"><span class="pre">edit_image()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.generate_image"><code class="docutils literal notranslate"><span class="pre">generate_image()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.generate_image_with_refs"><code class="docutils literal notranslate"><span class="pre">generate_image_with_refs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.remove_background"><code class="docutils literal notranslate"><span class="pre">remove_background()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.operations.images.upscale_image"><code class="docutils literal notranslate"><span class="pre">upscale_image()</span></code></a></li>
 </ul>
@@ -143,6 +144,19 @@ balanced/high tier). Pass <code class="docutils literal notranslate"><span class
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.operations.images.generate_image_with_refs">
+<span class="sig-prename descclassname"><span class="pre">falaw.operations.images.</span></span><span class="sig-name descname"><span class="pre">generate_image_with_refs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_image_urls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'balanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../results.html#falaw.results.Result" title="falaw.results.Result"><span class="pre">Result</span></a></span></span><a class="reference internal" href="../../../_modules/falaw/operations/images.html#generate_image_with_refs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.operations.images.generate_image_with_refs" title="Link to this definition"></a></dt>
+<dd><p>Generate a new image conditioned on one or more reference images.</p>
+<p>The missing twin of <a class="reference internal" href="#falaw.operations.images.generate_image" title="falaw.operations.images.generate_image"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_image()</span></code></a>: text-to-image models silently
+ignore reference images, so callers wanting a recurring subject to stay
+consistent (a character’s face across storyboard panels) need a model that
+actually ingests references. This routes to the <code class="docutils literal notranslate"><span class="pre">image_edit</span></code> category
+(Flux Kontext et al.) and threads the references as <code class="docutils literal notranslate"><span class="pre">image_url</span></code> (first)
++ <code class="docutils literal notranslate"><span class="pre">image_urls</span></code> (all) — the same wire shape image-edit models understand.</p>
+<p>Pass <code class="docutils literal notranslate"><span class="pre">model_id</span></code> to override the picked model.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.operations.images.remove_background">
 <span class="sig-prename descclassname"><span class="pre">falaw.operations.images.</span></span><span class="sig-name descname"><span class="pre">remove_background</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'high'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../results.html#falaw.results.Result" title="falaw.results.Result"><span class="pre">Result</span></a></span></span><a class="reference internal" href="../../../_modules/falaw/operations/images.html#remove_background"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.operations.images.remove_background" title="Link to this definition"></a></dt>
 <dd><p>Remove the background from an image.</p>
@@ -167,7 +181,7 @@ balanced/high tier). Pass <code class="docutils literal notranslate"><span class
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

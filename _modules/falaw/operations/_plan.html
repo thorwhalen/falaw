@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations._plan &mdash; falaw 0.0.17 documentation</title>
+  <title>falaw.operations._plan &mdash; falaw 0.0.18 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=63b572e7"></script>
+      <script src="../../../_static/documentation_options.js?v=8bafd125"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -225,6 +225,57 @@
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;edit_image&quot;</span><span class="p">,</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
+        <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># generate_image_with_refs (reference-conditioned image generation)</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="plan_generate_image_with_refs">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/_plan.html#falaw.plan_generate_image_with_refs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plan_generate_image_with_refs</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">reference_image_urls</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan a :func:`falaw.generate_image_with_refs` call.</span>
+
+<span class="sd">    The planning sibling of the eager op: text-to-image models ignore</span>
+<span class="sd">    reference images, so a caller wanting a recurring subject to stay</span>
+<span class="sd">    consistent must route to a reference-capable model. This picks the</span>
+<span class="sd">    ``image_edit`` category (Flux Kontext et al.) and threads the references</span>
+<span class="sd">    as ``image_url`` (first) + ``image_urls`` (all), the same wire shape the</span>
+<span class="sd">    eager op uses — so a planned and an eager call with identical inputs</span>
+<span class="sd">    collapse to one cache entry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">_refs_arguments</span>
+
+    <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="p">(</span><span class="n">reference_image_urls</span> <span class="ow">or</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">u</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">refs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;plan_generate_image_with_refs requires at least one reference &quot;</span>
+            <span class="s2">&quot;URL; use plan_generate_image for pure text-to-image.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">application</span><span class="p">,</span> <span class="n">record</span> <span class="o">=</span> <span class="n">_resolve_model_id_and_record</span><span class="p">(</span>
+        <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">&quot;image_edit&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span>
+    <span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">_refs_arguments</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
+        <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image_with_refs&quot;</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
@@ -524,7 +575,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright NO COPYRIGHT.</p>
+    <p></p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
