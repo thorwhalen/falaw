@@ -103,6 +103,102 @@ def edit_image(
 
 
 @register_tool(
+    name="generate_image_with_refs",
+    description=(
+        "Generate a NEW image from a text prompt while conditioning on one or "
+        "more reference images, so a recurring subject (a character's face, a "
+        "location, a prop) stays consistent across renders. Unlike "
+        "generate_image (pure text-to-image — reference images have no effect), "
+        "this routes to a reference-capable image model (Flux Kontext / OmniGen "
+        "/ SeedEdit) that actually ingests the references. The first reference "
+        "anchors the primary subject; all references are also passed together. "
+        "Returns a falaw.Result with the generated image."
+    ),
+    tags=("image", "generate", "reference", "consistency"),
+    input_schema={
+        "type": "object",
+        "required": ["prompt", "reference_image_urls"],
+        "properties": {
+            "prompt": {"type": "string"},
+            "reference_image_urls": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": (
+                    "One or more reference image URLs. The first anchors the "
+                    "primary subject; subsequent ones add secondary references "
+                    "(e.g. environment, second character)."
+                ),
+            },
+            "quality": {
+                "type": "string",
+                "enum": ["fast", "balanced", "high", "ultra"],
+                "default": "balanced",
+            },
+            "model_id": {"type": "string"},
+            "extra": {"type": "object"},
+        },
+    },
+    output_schema={"type": "object", "description": "falaw.Result"},
+    examples=(
+        {
+            "prompt": "Alex looks up at the bell, candlelight on his face",
+            "reference_image_urls": ["https://x/alex-modelsheet.png"],
+            "quality": "balanced",
+        },
+    ),
+)
+def generate_image_with_refs(
+    prompt: str,
+    reference_image_urls: list[str],
+    *,
+    quality: str = "balanced",
+    model_id: Optional[str] = None,
+    extra: Optional[dict] = None,
+) -> Result:
+    """Generate a new image conditioned on one or more reference images.
+
+    The missing twin of :func:`generate_image`: text-to-image models silently
+    ignore reference images, so callers wanting a recurring subject to stay
+    consistent (a character's face across storyboard panels) need a model that
+    actually ingests references. This routes to the ``image_edit`` category
+    (Flux Kontext et al.) and threads the references as ``image_url`` (first)
+    + ``image_urls`` (all) — the same wire shape image-edit models understand.
+
+    Pass ``model_id`` to override the picked model.
+    """
+    refs = [u for u in (reference_image_urls or []) if u]
+    if not refs:
+        raise ValueError(
+            "generate_image_with_refs requires at least one reference URL; "
+            "use generate_image for pure text-to-image."
+        )
+    model = model_id or pick_model(category="image_edit", quality_tier=quality).id
+    arguments = _refs_arguments(prompt, refs, extra)
+    raw = call_fal(model, arguments)
+    return parse_response(raw, application=model, arguments=arguments)
+
+
+def _refs_arguments(
+    prompt: str, refs: list[str], extra: Optional[dict]
+) -> dict:
+    """Build the argument dict for a reference-conditioned image call.
+
+    Image-edit models disagree on the parameter name — some read ``image_url``
+    (singular), others ``image_urls`` (plural). Passing both lets the receiving
+    model use whichever it understands; ``image_url`` carries the primary
+    (first) reference. Shared by the eager op and its ``plan_*`` sibling so an
+    eager call and a planned call with identical inputs collapse to one cache
+    entry.
+    """
+    return {
+        "image_url": refs[0],
+        "image_urls": list(refs),
+        "prompt": prompt,
+        **(extra or {}),
+    }
+
+
+@register_tool(
     name="composite_character_in_environment",
     description=(
         "Place a specific character into a specific environment as a single "

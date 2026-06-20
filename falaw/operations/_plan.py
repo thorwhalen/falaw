@@ -124,6 +124,54 @@ def plan_edit_image(
 
 
 # ---------------------------------------------------------------------------
+# generate_image_with_refs (reference-conditioned image generation)
+# ---------------------------------------------------------------------------
+
+
+def plan_generate_image_with_refs(
+    prompt: str,
+    reference_image_urls: list[str],
+    *,
+    quality: str = "balanced",
+    model_id: Optional[str] = None,
+    extra: Optional[dict] = None,
+    metadata: Optional[dict] = None,
+    consult_cache: bool = True,
+) -> CallPlan:
+    """Plan a :func:`falaw.generate_image_with_refs` call.
+
+    The planning sibling of the eager op: text-to-image models ignore
+    reference images, so a caller wanting a recurring subject to stay
+    consistent must route to a reference-capable model. This picks the
+    ``image_edit`` category (Flux Kontext et al.) and threads the references
+    as ``image_url`` (first) + ``image_urls`` (all), the same wire shape the
+    eager op uses — so a planned and an eager call with identical inputs
+    collapse to one cache entry.
+    """
+    from .images import _refs_arguments
+
+    refs = [u for u in (reference_image_urls or []) if u]
+    if not refs:
+        raise ValueError(
+            "plan_generate_image_with_refs requires at least one reference "
+            "URL; use plan_generate_image for pure text-to-image."
+        )
+    application, record = _resolve_model_id_and_record(
+        model_id=model_id, category="image_edit", quality_tier=quality
+    )
+    arguments = _refs_arguments(prompt, refs, extra)
+    return make_call_plan(
+        tool="generate_image_with_refs",
+        application=application,
+        arguments=arguments,
+        output_kind="image",
+        estimated_cost_usd=_estimate_cost_with_record(record),
+        metadata=metadata,
+        consult_cache=consult_cache,
+    )
+
+
+# ---------------------------------------------------------------------------
 # composite_character_in_environment (multi-reference image edit)
 # ---------------------------------------------------------------------------
 
