@@ -178,9 +178,7 @@ def generate_image_with_refs(
     return parse_response(raw, application=model, arguments=arguments)
 
 
-def _refs_arguments(
-    prompt: str, refs: list[str], extra: Optional[dict]
-) -> dict:
+def _refs_arguments(prompt: str, refs: list[str], extra: Optional[dict]) -> dict:
     """Build the argument dict for a reference-conditioned image call.
 
     Image-edit models disagree on the parameter name — some read ``image_url``
