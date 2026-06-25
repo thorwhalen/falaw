@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.base &mdash; falaw 0.0.18 documentation</title>
+  <title>falaw.base &mdash; falaw 0.0.19 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=8bafd125"></script>
+      <script src="../../_static/documentation_options.js?v=2fd7553c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -186,7 +186,22 @@
     <span class="n">quality_tier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># &quot;fast&quot; | &quot;balanced&quot; | &quot;high&quot; | &quot;ultra&quot;</span>
     <span class="n">cost_hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># legacy free-form text; kept for back-compat</span>
     <span class="n">cost_estimate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostEstimate</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># quantitative; preferred</span>
-    <span class="n">docs_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+    <span class="n">docs_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># --- capability / limit metadata (the &quot;static reminder of limitations&quot;</span>
+    <span class="c1">#     a shot-list builder surfaces; mostly meaningful for video models) ---</span>
+    <span class="n">max_clip_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Practical max length of a single generated clip, in seconds (e.g. ~10</span>
+<span class="sd">    for Seedance). Drives the &quot;this shot is too long, split it&quot; warning.&quot;&quot;&quot;</span>
+    <span class="n">single_character_recommended</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True when the model handles a single character per shot far better than</span>
+<span class="sd">    multiple interacting ones — drives the &quot;two characters, consider</span>
+<span class="sd">    shot/reverse-shot&quot; warning.&quot;&quot;&quot;</span>
+    <span class="n">supported_resolutions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolutions the model offers, cheap→expensive (e.g. (&quot;720p&quot;, &quot;1080p&quot;)).&quot;&quot;&quot;</span>
+    <span class="n">default_negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quality/realism negatives worth appending by default (e.g. to avoid the</span>
+<span class="sd">    plastic-skin look). Empty when none.&quot;&quot;&quot;</span></div>
 
 </pre></div>
 
