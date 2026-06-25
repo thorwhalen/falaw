@@ -106,8 +106,10 @@ from .registry import (
     get_tool,
     list_models,
     list_tools,
+    model_constraints,
     pick_model,
     register_tool,
+    video_model_constraints,
 )
 from .results import Asset, Result, parse_response
 from .scene import (
@@ -204,6 +206,8 @@ __all__ = [
     "parse_response",
     "parse_screenplay",
     "pick_model",
+    "model_constraints",
+    "video_model_constraints",
     "plan_animate_face",
     "plan_composite_character_in_environment",
     "plan_edit_image",
