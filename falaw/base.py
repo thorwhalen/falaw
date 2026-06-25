@@ -73,3 +73,18 @@ class ModelRecord:
     cost_hint: str = ""  # legacy free-form text; kept for back-compat
     cost_estimate: Optional[CostEstimate] = None  # quantitative; preferred
     docs_url: str = ""
+
+    # --- capability / limit metadata (the "static reminder of limitations"
+    #     a shot-list builder surfaces; mostly meaningful for video models) ---
+    max_clip_seconds: Optional[float] = None
+    """Practical max length of a single generated clip, in seconds (e.g. ~10
+    for Seedance). Drives the "this shot is too long, split it" warning."""
+    single_character_recommended: bool = False
+    """True when the model handles a single character per shot far better than
+    multiple interacting ones — drives the "two characters, consider
+    shot/reverse-shot" warning."""
+    supported_resolutions: tuple[str, ...] = ()
+    """Resolutions the model offers, cheap→expensive (e.g. ("720p", "1080p"))."""
+    default_negative_prompt: str = ""
+    """Quality/realism negatives worth appending by default (e.g. to avoid the
+    plastic-skin look). Empty when none."""

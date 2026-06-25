@@ -63,12 +63,44 @@ def _load_models() -> dict[str, ModelRecord]:
     for r in records:
         r = dict(r)
         r["aliases"] = tuple(r.get("aliases") or ())
+        if "supported_resolutions" in r:
+            r["supported_resolutions"] = tuple(r.get("supported_resolutions") or ())
         ce = r.get("cost_estimate")
         if isinstance(ce, dict):
             r["cost_estimate"] = CostEstimate(**ce)
         # else: None or already a CostEstimate — pass through unchanged.
         out[r["id"]] = ModelRecord(**r)
     return out
+
+
+def model_constraints(id: str) -> dict:
+    """The capability/limit fields for a model — the "static reminder of
+    limitations" a shot-list builder surfaces. Resolves aliases.
+
+    Returns a JSON-able dict; ``max_clip_seconds`` etc. are ``None`` / empty
+    when unknown for that model.
+    """
+    m = get_model(id)
+    return {
+        "id": m.id,
+        "category": m.category,
+        "quality_tier": m.quality_tier,
+        "max_clip_seconds": m.max_clip_seconds,
+        "single_character_recommended": m.single_character_recommended,
+        "supported_resolutions": list(m.supported_resolutions),
+        "default_negative_prompt": m.default_negative_prompt,
+        "docs_url": m.docs_url,
+    }
+
+
+def video_model_constraints() -> list[dict]:
+    """``model_constraints`` for every video model in the catalog — the data a
+    shot-list builder shows as its model-limits reference."""
+    return [
+        model_constraints(m.id)
+        for m in _load_models().values()
+        if "video" in m.category.lower()
+    ]
 
 
 def list_models(
