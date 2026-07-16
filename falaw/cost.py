@@ -66,10 +66,23 @@ def estimate_call_cost(
 ) -> Optional[float]:
     """Cost of one fal call against ``record``.
 
-    Returns ``None`` if the record has no ``cost_estimate`` (so callers
-    can distinguish "free" from "unknown"). The unit picked is whatever
-    matches the record's ``cost_estimate.kind``; mismatched units fall
-    back to the closest-fit default.
+    Returns ``None`` when the cost is **unknown**, so callers can
+    distinguish "free" from "we can't say". That happens when the record
+    carries no ``cost_estimate`` at all, or when its pricing is
+    quantity-based (``per_second`` / ``per_token``) and the caller did
+    not supply the quantity — an unpriceable call, not a free one.
+
+    Returning ``0.0`` for a missing quantity would be actively dangerous:
+    a ``per_second`` clip is the single most expensive thing fal bills
+    for, and a caller gating a budget on the answer would read
+    "$0.00" and spend real money without a prompt. ``None`` instead
+    propagates to ``CallPlan.estimated_cost_usd`` and lights up
+    ``Plan.has_unknown_costs``, which exists for exactly this case.
+    Callers that know the quantity should pass it; ``per_second`` callers
+    can fall back to ``record.max_clip_seconds`` for an upper bound.
+
+    ``per_megapixel`` is deliberately different: an image's pixel budget
+    has a sane house default (below), so it stays priceable.
     """
     ce: CostEstimate | None = record.cost_estimate
     if ce is None:
@@ -79,14 +92,18 @@ def estimate_call_cost(
     if ce.kind == "per_image":
         return ce.amount * count
     if ce.kind == "per_second":
-        return ce.amount * (seconds if seconds is not None else 0.0) * count
+        if seconds is None:
+            return None  # unknown duration → unpriceable, NOT free
+        return ce.amount * seconds * count
     if ce.kind == "per_megapixel":
         # Default to a 16:9 1024-wide canvas if the caller didn't say
         # (≈0.59 MP); enough to give a useful upper-bound estimate.
         mp = megapixels if megapixels is not None else 0.6
         return ce.amount * mp * count
     if ce.kind == "per_token":
-        return ce.amount * (tokens if tokens is not None else 0.0) * count
+        if tokens is None:
+            return None  # unknown token count → unpriceable, NOT free
+        return ce.amount * tokens * count
     return None
 
 

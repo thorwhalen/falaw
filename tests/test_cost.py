@@ -46,6 +46,57 @@ def test_cost_estimate_per_second():
     assert estimate_call_cost(record, seconds=12.0) == pytest.approx(1.20)
 
 
+def test_cost_estimate_per_second_is_unknown_without_a_duration():
+    """An unpriceable per-second call is ``None`` (unknown), never 0.0 (free).
+
+    Reporting 0.0 here would tell a cost gate that the single most
+    expensive thing fal bills for is free, and it would spend without
+    prompting. See :func:`estimate_call_cost`.
+    """
+    record = ModelRecord(
+        id="x",
+        category="text_to_video",
+        cost_estimate=CostEstimate(kind="per_second", amount=0.10),
+    )
+    assert estimate_call_cost(record, seconds=None) is None
+    # An *explicit* zero is a real quantity, and still prices at zero.
+    assert estimate_call_cost(record, seconds=0.0) == pytest.approx(0.0)
+
+
+def test_cost_estimate_per_token_is_unknown_without_a_token_count():
+    record = ModelRecord(
+        id="x",
+        category="llm",
+        cost_estimate=CostEstimate(kind="per_token", amount=0.002),
+    )
+    assert estimate_call_cost(record, tokens=None) is None
+    assert estimate_call_cost(record, tokens=1000) == pytest.approx(2.0)
+
+
+def test_unknown_per_second_cost_lights_up_plan_has_unknown_costs():
+    """The end of the wire: an unknown duration must reach the gate.
+
+    ``total_cost_usd`` alone reads $0.00 either way (``billable_cost_usd``
+    coerces ``None``→0.0 so sums stay well-defined), so ``has_unknown_costs``
+    is the *only* signal separating "free" from "unpriceable". This asserts
+    it actually fires through a real planner call.
+    """
+    from falaw import Plan
+    from falaw.operations._plan import plan_image_to_video
+
+    seedance = "fal-ai/bytedance/seedance/v1/pro/image-to-video"  # per_second
+
+    unpriced = Plan(calls=(plan_image_to_video("https://e/a.png", model_id=seedance),))
+    assert unpriced.has_unknown_costs is True
+    assert unpriced.total_cost_usd == pytest.approx(0.0)  # NOT evidence of "free"
+
+    priced = Plan(
+        calls=(plan_image_to_video("https://e/a.png", model_id=seedance, duration_s=5.0),)
+    )
+    assert priced.has_unknown_costs is False
+    assert priced.total_cost_usd > 0
+
+
 def test_cost_estimate_per_megapixel_uses_default_when_missing():
     record = ModelRecord(
         id="x",
