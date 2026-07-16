@@ -241,17 +241,61 @@ def test_estimate_scene_cost_includes_video_when_shots_as_video(monkeypatch):
 
     shot = make_shot("a", index=0)
 
-    # The Shot dataclass doesn't carry duration; we approximate with 0
-    # for the price test (per_second × 0 = 0). Scene-shot duration comes
-    # from the renderer's per-shot run, not from Shot itself, so the
-    # scene-rollup will price the i2v line at 0 here. The test still
-    # asserts the line APPEARS — correctness of duration is the
-    # caller's job (passing seconds= when calling estimate_call_cost).
+    # A Shot carries no duration (screen time comes from the renderer's
+    # per-shot run, not the IR), and the i2v model here is priced
+    # per_second — so the video line is genuinely UNPRICEABLE and is
+    # reported in ``skipped`` rather than as a line.
+    #
+    # This previously emitted a $0.00 ``shot.video`` line: "unknown"
+    # laundered into "free" via a `or 0.0` before estimate_call_cost
+    # could object. That is strictly worse than omitting it, because a
+    # CostRollup carrying a $0.00 line and an empty ``skipped`` looks
+    # COMPLETE — a caller gating a budget sees a free clip, not a
+    # missing one. ``skipped`` exists for exactly this.
     scene = Scene(title="t", shots=(shot,))
     rollup = estimate_scene_cost(scene, shots_as_video=True)
     kinds = {ln.kind for ln in rollup.lines}
     assert "shot.image" in kinds
-    assert "shot.video" in kinds
+    assert "shot.video" not in kinds, "an unpriceable clip must not appear as $0.00"
+    assert any("i2v" in s and "duration" in s for s in rollup.skipped), (
+        f"the rollup must say WHY the clip is unpriced; got {rollup.skipped}"
+    )
+
+
+def test_estimate_scene_cost_prices_video_when_told_the_clip_length(monkeypatch):
+    """Tell it the length and the video line is priced normally.
+
+    The other half of the contract: the "unpriceable" guard is *narrow*.
+    A caller who knows the clip length still gets a real number — the
+    rollup didn't become useless, it became honest about what it needs.
+    """
+    from falaw import cost as cost_mod
+
+    fake_records = {
+        "image": ModelRecord(
+            id="img", category="image",
+            cost_estimate=CostEstimate(kind="per_image", amount=0.01),
+        ),
+        "image_to_video": ModelRecord(
+            id="i2v", category="image_to_video",
+            cost_estimate=CostEstimate(kind="per_second", amount=0.50),
+        ),
+    }
+    monkeypatch.setattr(
+        cost_mod, "pick_model",
+        lambda *, category, quality_tier="balanced": fake_records[category],
+    )
+
+    rollup = estimate_scene_cost(
+        Scene(title="t", shots=(make_shot("a", index=0),)),
+        shots_as_video=True,
+        shot_seconds=4.0,
+    )
+
+    video = [ln for ln in rollup.lines if ln.kind == "shot.video"]
+    assert len(video) == 1
+    assert video[0].amount == pytest.approx(2.0)  # $0.50/s × 4s
+    assert not rollup.skipped
 
 
 def test_cost_rollup_by_kind_sums_correctly():

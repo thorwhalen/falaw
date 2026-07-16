@@ -114,9 +114,21 @@ def _shot_pricing_lines(
     shots_as_video: bool,
     quality: str,
     skipped: list[str],
+    seconds: float | None = None,
 ) -> list[CostLine]:
     out: list[CostLine] = []
-    duration = float(getattr(shot, "duration_s", 0.0) or 0.0)
+    # A Shot carries no duration (screen time comes from the renderer's
+    # per-shot run, not the IR), so this falls back to the caller's
+    # ``seconds`` and is otherwise None → the i2v line is unpriceable and
+    # lands in ``skipped``. Coercing it to 0.0 here instead would launder
+    # "unknown" into "free" *before* ``estimate_call_cost`` ever sees it,
+    # defeating that function's guard and putting a $0.00 line —
+    # indistinguishable from a real price, and absent from ``skipped`` —
+    # on a clip that bills ~$1-2.
+    duration = getattr(shot, "duration_s", None)
+    if duration is None:
+        duration = seconds
+    duration = float(duration) if duration is not None else None
 
     img_record = pick_model(category="image", quality_tier=quality)
     img_cost = estimate_call_cost(img_record)
@@ -144,7 +156,12 @@ def _shot_pricing_lines(
         v_record = pick_model(category="image_to_video", quality_tier=quality)
         v_cost = estimate_call_cost(v_record, seconds=duration)
         if v_cost is None:
-            skipped.append(f"shot {shot.id} i2v: no cost_estimate on {v_record.id!r}")
+            why = (
+                "no duration on the Shot, and the model is priced per second"
+                if duration is None
+                else f"no cost_estimate on {v_record.id!r}"
+            )
+            skipped.append(f"shot {shot.id} i2v: {why}")
         else:
             out.append(
                 CostLine(
@@ -238,6 +255,7 @@ def estimate_scene_cost(
     lipsync_quality: str = "high",
     shot_quality: str = "balanced",
     shots_as_video: bool = False,
+    shot_seconds: float | None = None,
 ) -> CostRollup:
     """Estimate the USD cost of a full :func:`render_scene` invocation.
 
@@ -246,6 +264,15 @@ def estimate_scene_cost(
     :class:`CostRollup` with per-line breakdowns, plus a list of
     "skipped" entries the caller should surface (typically: a model
     with no ``cost_estimate`` populated).
+
+    ``shot_seconds`` is the assumed clip length used to price
+    ``shots_as_video``. A :class:`Shot` carries no duration of its own —
+    screen time comes from the renderer's per-shot run — and
+    image-to-video models bill **per second**, so without this the video
+    lines are genuinely unpriceable and are reported in
+    :attr:`CostRollup.skipped` rather than silently priced at $0.00.
+    Pass the length you expect (the beat path has the same knob as
+    ``estimated_seconds``).
     """
     chars_by_name = {c.name: c for c in scene.characters}
     lines: list[CostLine] = []
@@ -258,6 +285,7 @@ def estimate_scene_cost(
                 style=scene.style,
                 shots_as_video=shots_as_video,
                 quality=shot_quality,
+                seconds=shot_seconds,
                 skipped=skipped,
             )
         )
