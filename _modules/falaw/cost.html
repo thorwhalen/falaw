@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cost &mdash; falaw 0.0.19 documentation</title>
+  <title>falaw.cost &mdash; falaw 0.0.20 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=2fd7553c"></script>
+      <script src="../../_static/documentation_options.js?v=056c92e6"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -183,10 +183,23 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Cost of one fal call against ``record``.</span>
 
-<span class="sd">    Returns ``None`` if the record has no ``cost_estimate`` (so callers</span>
-<span class="sd">    can distinguish &quot;free&quot; from &quot;unknown&quot;). The unit picked is whatever</span>
-<span class="sd">    matches the record&#39;s ``cost_estimate.kind``; mismatched units fall</span>
-<span class="sd">    back to the closest-fit default.</span>
+<span class="sd">    Returns ``None`` when the cost is **unknown**, so callers can</span>
+<span class="sd">    distinguish &quot;free&quot; from &quot;we can&#39;t say&quot;. That happens when the record</span>
+<span class="sd">    carries no ``cost_estimate`` at all, or when its pricing is</span>
+<span class="sd">    quantity-based (``per_second`` / ``per_token``) and the caller did</span>
+<span class="sd">    not supply the quantity — an unpriceable call, not a free one.</span>
+
+<span class="sd">    Returning ``0.0`` for a missing quantity would be actively dangerous:</span>
+<span class="sd">    a ``per_second`` clip is the single most expensive thing fal bills</span>
+<span class="sd">    for, and a caller gating a budget on the answer would read</span>
+<span class="sd">    &quot;$0.00&quot; and spend real money without a prompt. ``None`` instead</span>
+<span class="sd">    propagates to ``CallPlan.estimated_cost_usd`` and lights up</span>
+<span class="sd">    ``Plan.has_unknown_costs``, which exists for exactly this case.</span>
+<span class="sd">    Callers that know the quantity should pass it; ``per_second`` callers</span>
+<span class="sd">    can fall back to ``record.max_clip_seconds`` for an upper bound.</span>
+
+<span class="sd">    ``per_megapixel`` is deliberately different: an image&#39;s pixel budget</span>
+<span class="sd">    has a sane house default (below), so it stays priceable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ce</span><span class="p">:</span> <span class="n">CostEstimate</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">cost_estimate</span>
     <span class="k">if</span> <span class="n">ce</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -196,14 +209,18 @@
     <span class="k">if</span> <span class="n">ce</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;per_image&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="n">count</span>
     <span class="k">if</span> <span class="n">ce</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;per_second&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="p">(</span><span class="n">seconds</span> <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">count</span>
+        <span class="k">if</span> <span class="n">seconds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># unknown duration → unpriceable, NOT free</span>
+        <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="n">seconds</span> <span class="o">*</span> <span class="n">count</span>
     <span class="k">if</span> <span class="n">ce</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;per_megapixel&quot;</span><span class="p">:</span>
         <span class="c1"># Default to a 16:9 1024-wide canvas if the caller didn&#39;t say</span>
         <span class="c1"># (≈0.59 MP); enough to give a useful upper-bound estimate.</span>
         <span class="n">mp</span> <span class="o">=</span> <span class="n">megapixels</span> <span class="k">if</span> <span class="n">megapixels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.6</span>
         <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="n">mp</span> <span class="o">*</span> <span class="n">count</span>
     <span class="k">if</span> <span class="n">ce</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;per_token&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="p">(</span><span class="n">tokens</span> <span class="k">if</span> <span class="n">tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">count</span>
+        <span class="k">if</span> <span class="n">tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># unknown token count → unpriceable, NOT free</span>
+        <span class="k">return</span> <span class="n">ce</span><span class="o">.</span><span class="n">amount</span> <span class="o">*</span> <span class="n">tokens</span> <span class="o">*</span> <span class="n">count</span>
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
@@ -215,9 +232,21 @@
     <span class="n">shots_as_video</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">skipped</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CostLine</span><span class="p">]:</span>
     <span class="n">out</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CostLine</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="s2">&quot;duration_s&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="c1"># A Shot carries no duration (screen time comes from the renderer&#39;s</span>
+    <span class="c1"># per-shot run, not the IR), so this falls back to the caller&#39;s</span>
+    <span class="c1"># ``seconds`` and is otherwise None → the i2v line is unpriceable and</span>
+    <span class="c1"># lands in ``skipped``. Coercing it to 0.0 here instead would launder</span>
+    <span class="c1"># &quot;unknown&quot; into &quot;free&quot; *before* ``estimate_call_cost`` ever sees it,</span>
+    <span class="c1"># defeating that function&#39;s guard and putting a $0.00 line —</span>
+    <span class="c1"># indistinguishable from a real price, and absent from ``skipped`` —</span>
+    <span class="c1"># on a clip that bills ~$1-2.</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">shot</span><span class="p">,</span> <span class="s2">&quot;duration_s&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">seconds</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="n">img_record</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span>
     <span class="n">img_cost</span> <span class="o">=</span> <span class="n">estimate_call_cost</span><span class="p">(</span><span class="n">img_record</span><span class="p">)</span>
@@ -245,7 +274,12 @@
         <span class="n">v_record</span> <span class="o">=</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span>
         <span class="n">v_cost</span> <span class="o">=</span> <span class="n">estimate_call_cost</span><span class="p">(</span><span class="n">v_record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">v_cost</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;shot </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> i2v: no cost_estimate on </span><span class="si">{</span><span class="n">v_record</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">why</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;no duration on the Shot, and the model is priced per second&quot;</span>
+                <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;no cost_estimate on </span><span class="si">{</span><span class="n">v_record</span><span class="o">.</span><span class="n">id</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">skipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;shot </span><span class="si">{</span><span class="n">shot</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> i2v: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">CostLine</span><span class="p">(</span>
@@ -341,6 +375,7 @@
     <span class="n">lipsync_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
     <span class="n">shot_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
     <span class="n">shots_as_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">shot_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CostRollup</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimate the USD cost of a full :func:`render_scene` invocation.</span>
 
@@ -349,6 +384,15 @@
 <span class="sd">    :class:`CostRollup` with per-line breakdowns, plus a list of</span>
 <span class="sd">    &quot;skipped&quot; entries the caller should surface (typically: a model</span>
 <span class="sd">    with no ``cost_estimate`` populated).</span>
+
+<span class="sd">    ``shot_seconds`` is the assumed clip length used to price</span>
+<span class="sd">    ``shots_as_video``. A :class:`Shot` carries no duration of its own —</span>
+<span class="sd">    screen time comes from the renderer&#39;s per-shot run — and</span>
+<span class="sd">    image-to-video models bill **per second**, so without this the video</span>
+<span class="sd">    lines are genuinely unpriceable and are reported in</span>
+<span class="sd">    :attr:`CostRollup.skipped` rather than silently priced at $0.00.</span>
+<span class="sd">    Pass the length you expect (the beat path has the same knob as</span>
+<span class="sd">    ``estimated_seconds``).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">chars_by_name</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">characters</span><span class="p">}</span>
     <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CostLine</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -361,6 +405,7 @@
                 <span class="n">style</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">style</span><span class="p">,</span>
                 <span class="n">shots_as_video</span><span class="o">=</span><span class="n">shots_as_video</span><span class="p">,</span>
                 <span class="n">quality</span><span class="o">=</span><span class="n">shot_quality</span><span class="p">,</span>
+                <span class="n">seconds</span><span class="o">=</span><span class="n">shot_seconds</span><span class="p">,</span>
                 <span class="n">skipped</span><span class="o">=</span><span class="n">skipped</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
