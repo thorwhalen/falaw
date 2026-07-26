@@ -18,9 +18,9 @@ Generate an image in three lines of code. Install the client, set your [API key]
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a futuristic cityscape at sunset"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a futuristic cityscape at sunset"}
+  )
   print(result["images"][0]["url"])
   ```
 

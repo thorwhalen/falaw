@@ -164,6 +164,7 @@ What could be a tedious process of running and coordinating three different mode
     import asyncio
     import fal_client
 
+
     async def main():
         stream = await fal_client.stream_async(
             "workflows/fal-ai/sdxl-sticker",

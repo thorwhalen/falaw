@@ -17,18 +17,15 @@ The `requirements` attribute in your `fal.App` class is where you specify the Py
 ```python theme={null}
 import fal
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
-    
-    requirements = [
-        "torch==2.4.0",
-        "transformers",
-        "diffusers",
-        "accelerate"
-    ]
-    
+
+    requirements = ["torch==2.4.0", "transformers", "diffusers", "accelerate"]
+
     def setup(self):
         import torch
+
         ...
 ```
 
@@ -167,6 +164,7 @@ When you need different wheels for different Python versions or platforms, use a
 ```python theme={null}
 def get_package_wheel():
     import sys
+
     wheels = {
         10: "https://example.com/wheels/mypackage-1.0.0-cp310-cp310-linux_x86_64.whl",
         11: "https://example.com/wheels/mypackage-1.0.0-cp311-cp311-linux_x86_64.whl",

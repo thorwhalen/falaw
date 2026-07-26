@@ -21,15 +21,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo",
           arguments={
-              "prompt": "A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says \"Just Waiting for Halloween with Ideogram 2.0 at fal.ai\""
+              "prompt": 'A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says "Just Waiting for Halloween with Ideogram 2.0 at fal.ai"'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -147,16 +149,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo/remix",
           arguments={
               "prompt": "An ice field in north atlantic",
-              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -285,17 +289,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo/edit",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
-              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg"
+              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

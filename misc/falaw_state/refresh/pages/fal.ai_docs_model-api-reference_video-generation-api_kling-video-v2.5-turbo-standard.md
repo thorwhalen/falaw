@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.5-turbo/standard/image-to-video",
       arguments={
           "prompt": "In a dimly lit room, a playful cat's eyes light up, fixated on a dancing red dot. With boundless energy, it pounces and leaps, chasing the elusive beam across the floor and up the walls. The simple joy of the hunt unfolds in clear, uncomplicated visuals.",
-          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_v25_std_i2v_input.png"
+          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_v25_std_i2v_input.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

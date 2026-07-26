@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v5/lite/edit",
@@ -33,8 +35,8 @@
               "image_urls": [
                   "https://v3b.fal.media/files/b/0a8f9936/KOsb_qPB_W0ZJ0Ee2OsnU_586e2892841d46f09049ee7199b303d3.png",
                   "https://v3b.fal.media/files/b/0a8f994e/JroWTogO6jOTFk9b6B3XM_591ca38cef2f44bbba2843cbf80fb1b2.png",
-                  "https://v3b.fal.media/files/b/0a8f9960/Q6pzwXAiFaFPOpSScoE-D_0eca5db19e5242739f127efe49b38922.png"
-              ]
+                  "https://v3b.fal.media/files/b/0a8f9960/Q6pzwXAiFaFPOpSScoE-D_0eca5db19e5242739f127efe49b38922.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -193,15 +195,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v5/lite/text-to-image",
           arguments={
-              "prompt": "Realistic DSLR photograph of anthropomorphic Penkingese dog enjoying a bowl of ramen on the Great Wall of China with the words \"Seedream 5.0 Lite available on fal\" visible at the top."
+              "prompt": 'Realistic DSLR photograph of anthropomorphic Penkingese dog enjoying a bowl of ramen on the Great Wall of China with the words "Seedream 5.0 Lite available on fal" visible at the top.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,

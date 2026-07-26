@@ -31,21 +31,31 @@ beats don't re-render.
 from falaw import parse_screenplay, Scene, Character, Environment, make_beat, make_shot
 
 # Option A: feed prose / treatment text and let any-llm draft the structure.
-scene = parse_screenplay(prose_text, title="Diner Encounter",
-                         style="Wes-Anderson pastel")
+scene = parse_screenplay(
+    prose_text, title="Diner Encounter", style="Wes-Anderson pastel"
+)
 
 # Option B: build the Scene directly.
 scene = Scene(
     title="Diner Encounter",
     style="Wes-Anderson symmetrical pastel",
     characters=(Character(name="Sarah", description="mid-30s, dark curly hair"),),
-    environments=(Environment(name="diner", description="1950s chrome diner",
-                              time_of_day="midnight"),),
-    shots=(make_shot("two-shot at the booth", framing="medium",
-                     environment="diner", characters=("Sarah", "Tom"), index=0),),
+    environments=(
+        Environment(
+            name="diner", description="1950s chrome diner", time_of_day="midnight"
+        ),
+    ),
+    shots=(
+        make_shot(
+            "two-shot at the booth",
+            framing="medium",
+            environment="diner",
+            characters=("Sarah", "Tom"),
+            index=0,
+        ),
+    ),
     beats=(
-        make_beat("Sarah", "Why are you here?",
-                  shot_id="...", emotion="wary", index=0),
+        make_beat("Sarah", "Why are you here?", shot_id="...", emotion="wary", index=0),
         make_beat("Tom", "I came to apologize.", index=1),
     ),
 )
@@ -60,11 +70,17 @@ identity continuity.
 ```python
 from falaw import cast_character, establish_environment
 
-sarah = cast_character("Sarah", "mid-30s, dark curly hair, wary eyes",
-                       reference_audio_url="https://.../sarah_sample.wav")
-diner = establish_environment("diner",
-                              "1950s chrome diner, neon outside, half-empty booths",
-                              time_of_day="midnight", lighting="cool fluorescents")
+sarah = cast_character(
+    "Sarah",
+    "mid-30s, dark curly hair, wary eyes",
+    reference_audio_url="https://.../sarah_sample.wav",
+)
+diner = establish_environment(
+    "diner",
+    "1950s chrome diner, neon outside, half-empty booths",
+    time_of_day="midnight",
+    lighting="cool fluorescents",
+)
 scene = scene.with_character(sarah).with_environment(diner)
 ```
 
@@ -73,8 +89,8 @@ scene = scene.with_character(sarah).with_environment(diner)
 ```python
 from falaw import render_scene, save_scene
 
-manifest = render_scene(scene)             # all beats + shots
-save_scene(scene, "out/diner_v1.json")     # snapshot the IR alongside
+manifest = render_scene(scene)  # all beats + shots
+save_scene(scene, "out/diner_v1.json")  # snapshot the IR alongside
 ```
 
 ### Phase 4: Direct (notes -> IR edits -> re-render)
@@ -86,8 +102,8 @@ from falaw import apply_note_to_beat
 beat = scene.beat("002-tom-...")
 edited = apply_note_to_beat(beat, "He cracks on this line; tries to hide it.")
 scene2 = scene.with_beat(edited)
-manifest2 = render_scene(scene2)   # only the edited beat re-renders;
-                                   # the rest are cache hits.
+manifest2 = render_scene(scene2)  # only the edited beat re-renders;
+# the rest are cache hits.
 ```
 
 For cross-cutting notes like "tighten the pacing", use
@@ -102,8 +118,10 @@ a watchable scene:
 
 ```python
 from falaw.local import concatenate_clips
-concatenate_clips([m["url"] for m in manifest["beats"]],
-                  output_path="out/scene.mp4", transition_s=0.2)
+
+concatenate_clips(
+    [m["url"] for m in manifest["beats"]], output_path="out/scene.mp4", transition_s=0.2
+)
 ```
 
 ## Read the journal first
@@ -113,18 +131,25 @@ left notes that save you time:
 
 ```python
 from falaw import journal
+
 for e in journal.recent(20):
-    print(e.kind, '-', e.text[:120])
+    print(e.kind, "-", e.text[:120])
 ```
 
 ## Leave a journal entry when something surprises you
 
 ```python
 from falaw import journal
-journal.issue("FLUX dev returned NSFW=True for a benign prompt",
-              suggestion="Try guidance_scale=2.0", tags=("flux", "safety"))
-journal.improvement("Pass beat.emotion as a TTS prompt arg for emotion-aware models",
-                    tags=("backlog", "directorial"))
+
+journal.issue(
+    "FLUX dev returned NSFW=True for a benign prompt",
+    suggestion="Try guidance_scale=2.0",
+    tags=("flux", "safety"),
+)
+journal.improvement(
+    "Pass beat.emotion as a TTS prompt arg for emotion-aware models",
+    tags=("backlog", "directorial"),
+)
 journal.note("schnell at quality='fast' returns 1024x1024 by default")
 ```
 
@@ -132,8 +157,9 @@ journal.note("schnell at quality='fast' returns 1024x1024 by default")
 
 ```python
 from falaw import list_models, pick_model
-[m.id for m in list_models(category='image_to_video')]
-pick_model(category='image_edit', quality_tier='ultra').id
+
+[m.id for m in list_models(category="image_to_video")]
+pick_model(category="image_edit", quality_tier="ultra").id
 ```
 
 ## Tools

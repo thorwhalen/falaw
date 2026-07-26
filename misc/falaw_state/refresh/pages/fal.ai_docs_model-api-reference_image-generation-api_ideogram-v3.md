@@ -21,15 +21,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3",
           arguments={
-              "prompt": "The Bone Forest stretched across the horizon, its trees fashioned from the ossified remains of ancient leviathans that once swam through the sky. Shamans with antlers growing from their shoulders and eyes that revealed the true nature of any being they beheld conducted rituals to commune with the spirits that still inhabited the calcified grove. In sky writes \"Ideogram V3 in fal.ai\""
+              "prompt": 'The Bone Forest stretched across the horizon, its trees fashioned from the ossified remains of ancient leviathans that once swam through the sky. Shamans with antlers growing from their shoulders and eyes that revealed the true nature of any being they beheld conducted rituals to commune with the spirits that still inhabited the calcified grove. In sky writes "Ideogram V3 in fal.ai"'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -178,16 +180,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/reframe",
           arguments={
               "image_url": "https://v3.fal.media/files/lion/0qJs_qW8nz0wYsXhFa6Tk.png",
-              "image_size": "square_hd"
+              "image_size": "square_hd",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -330,16 +334,16 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/generate-transparent",
-          arguments={
-              "prompt": "A logo for Ideogram Coffee."
-          },
+          arguments={"prompt": "A logo for Ideogram Coffee."},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -471,17 +475,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/edit",
           arguments={
               "prompt": "black bag",
               "image_url": "https://v3.fal.media/files/panda/-LC_gNNV3wUHaGMQT3klE_output.png",
-              "mask_url": "https://v3.fal.media/files/kangaroo/1dd3zEL5MXQ3Kb4-mRi9d_indir%20(20).png"
+              "mask_url": "https://v3.fal.media/files/kangaroo/1dd3zEL5MXQ3Kb4-mRi9d_indir%20(20).png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -628,10 +634,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/layerize-text",
@@ -798,16 +806,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/remix",
           arguments={
               "prompt": "Old ancient city day light",
-              "image_url": "https://v3.fal.media/files/lion/9-Yt8JfTw4OxrAjiUzwP9_output.png"
+              "image_url": "https://v3.fal.media/files/lion/9-Yt8JfTw4OxrAjiUzwP9_output.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -966,16 +976,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/replace-background",
           arguments={
               "prompt": "A beautiful sunset over mountains that writes Ideogram v3 in fal.ai",
-              "image_url": "https://v3.fal.media/files/rabbit/F6dvKPFL9VzKiM8asJOgm_MJj6yUB6rGjTsv_1YHIcA_image.webp"
+              "image_url": "https://v3.fal.media/files/rabbit/F6dvKPFL9VzKiM8asJOgm_MJj6yUB6rGjTsv_1YHIcA_image.webp",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

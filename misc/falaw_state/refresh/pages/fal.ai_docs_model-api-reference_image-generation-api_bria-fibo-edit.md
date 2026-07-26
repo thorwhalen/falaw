@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/edit",
@@ -185,10 +187,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/restore",
@@ -289,17 +293,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/relight",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/bria_result+-+2026-01-13T095546.173.png",
               "light_direction": "front",
-              "light_type": "soft overcast daylight lighting"
+              "light_type": "soft overcast daylight lighting",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -413,10 +419,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/sketch_to_colored_image",
@@ -517,16 +525,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/erase_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/an_empty_table_in_living_room.png",
-              "object_name": "Table"
+              "object_name": "Table",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -629,16 +639,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/colorize",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/png+-+2026-01-13T083840.113.png",
-              "color": "contemporary color"
+              "color": "contemporary color",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -743,16 +755,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/restyle",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/high_camera_angle_warm_filter.png",
-              "style": "3D Render"
+              "style": "3D Render",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -857,16 +871,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/rewrite_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/create_an_image_of_cake__with_text_on_it_saying___Hi_there__.png",
-              "new_text": "FIBO Edit!"
+              "new_text": "FIBO Edit!",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -969,16 +985,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/add_object_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/an_empty_table_in_living_room.png",
-              "instruction": "Place a red vase with flowers on the table."
+              "instruction": "Place a red vase with flowers on the table.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -1081,16 +1099,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/blend",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/shirt.png",
-              "instruction": "Place the art on the shirt, keep the art exactly the same"
+              "instruction": "Place the art on the shirt, keep the art exactly the same",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -1193,16 +1213,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/replace_object_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/a_bowl_of_fruits__should_have_a_red_apple.png",
-              "instruction": "Replace the red apple with a green pear"
+              "instruction": "Replace the red apple with a green pear",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -1305,16 +1327,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/reseason",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/create_a_realistic_image_of_a_green_field_in_the_spring__also_add_trees.png",
-              "season": "winter"
+              "season": "winter",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

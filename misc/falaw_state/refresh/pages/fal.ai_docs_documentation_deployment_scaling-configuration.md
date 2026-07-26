@@ -15,6 +15,7 @@ You can set scaling parameters in three ways.
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     max_multiplexing = 1

@@ -258,9 +258,9 @@ fal auth login
           warmup_result = await self.runner.invoke(
               ExampleRequest(prompt="a cat wearing a hat").dict()
           )
-          assert (
-              "image" in warmup_result
-          ), "Warm-up failed, no image returned from the worker"
+          assert "image" in warmup_result, (
+              "Warm-up failed, no image returned from the worker"
+          )
 
       @fal.endpoint("/")
       async def run(self, request: ExampleRequest, response: Response) -> ExampleResponse:
@@ -449,8 +449,7 @@ def __call__(
     # Prepare gather list on rank 0
     if self.rank == 0:
         gather_list = [
-            torch.zeros_like(image, device=self.device)
-            for _ in range(self.world_size)
+            torch.zeros_like(image, device=self.device) for _ in range(self.world_size)
         ]
     else:
         gather_list = None
@@ -503,8 +502,7 @@ def pipeline_callback(
     # Gather previews from all workers
     if self.rank == 0:
         gather_list = [
-            torch.zeros_like(image, device=self.device)
-            for _ in range(self.world_size)
+            torch.zeros_like(image, device=self.device) for _ in range(self.world_size)
         ]
     else:
         gather_list = None
@@ -608,6 +606,7 @@ class ExampleRequest(BaseModel):
     width: int = Field(default=1024)
     height: int = Field(default=1024)
 
+
 class ExampleResponse(BaseModel):
     image: File = Field()
 ```
@@ -655,8 +654,8 @@ result = fal_client.submit(
     "username/app-name",  # Replace with your deployed app name
     arguments={
         "prompt": "A serene mountain landscape at sunset",
-        "num_inference_steps": 30
-    }
+        "num_inference_steps": 30,
+    },
 )
 
 # Get the result
@@ -673,9 +672,9 @@ for event in fal_client.stream(
     "username/app-name",  # Replace with your deployed app name
     arguments={
         "prompt": "A serene mountain landscape at sunset",
-        "num_inference_steps": 30
+        "num_inference_steps": 30,
     },
-    path="/stream"
+    path="/stream",
 ):
     print(f"Step {event['step']}: {event['progress'] * 100}%")
     if event.get("preview_image"):

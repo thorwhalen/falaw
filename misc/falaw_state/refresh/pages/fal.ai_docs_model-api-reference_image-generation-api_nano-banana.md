@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana",
@@ -162,10 +164,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana/edit",
@@ -173,8 +177,8 @@
               "prompt": "make a photo of the man driving the car down the california coastline",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,

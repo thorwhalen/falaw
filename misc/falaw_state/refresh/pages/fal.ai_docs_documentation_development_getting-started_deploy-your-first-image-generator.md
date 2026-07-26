@@ -45,14 +45,17 @@ import fal
 from pydantic import BaseModel, Field
 from fal.toolkit import Image
 
+
 class Input(BaseModel):
     prompt: str = Field(
         description="The prompt to generate an image from",
         examples=["A beautiful image of a cat"],
     )
 
+
 class Output(BaseModel):
     image: Image
+
 
 class MyApp(fal.App):
     keep_alive = 300

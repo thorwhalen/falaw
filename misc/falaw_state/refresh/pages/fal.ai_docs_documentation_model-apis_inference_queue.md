@@ -40,9 +40,9 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  handler = fal_client.submit(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(handler.request_id)
   ```
@@ -51,11 +51,13 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   import asyncio
   import fal_client
 
+
   async def main():
-      handler = await fal_client.submit_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      handler = await fal_client.submit_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(handler.request_id)
+
 
   asyncio.run(main())
   ```
@@ -338,7 +340,8 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/schnell",
+  handler = fal_client.submit(
+      "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -349,7 +352,8 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async("fal-ai/flux/schnell",
+  handler = await fal_client.submit_async(
+      "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -399,7 +403,9 @@ Endpoint path appended to the model ID. Most models expose a single root endpoin
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint")
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -442,7 +448,9 @@ Routing hint sent as the `X-Fal-Runner-Hint` header. When you pass a hint string
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc")
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -501,7 +509,9 @@ Additional HTTP headers passed with the request. Use this to set [platform-level
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"})
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"}
+  )
   ```
 
   ```javascript JavaScript theme={null}

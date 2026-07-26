@@ -48,10 +48,12 @@ Get started with **OpenRouter \[Vision]**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "openrouter/router/vision",
@@ -60,7 +62,7 @@ Get started with **OpenRouter \[Vision]**:
               "https://fal.media/files/tiger/4Ew1xYW6oZCs6STQVC7V8_86440216d0fe42e4b826d03a2121468e.jpg"
           ],
           "prompt": "Caption this image for a text-to-image model with as much detail as possible.",
-          "model": "google/gemini-2.5-flash"
+          "model": "google/gemini-2.5-flash",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

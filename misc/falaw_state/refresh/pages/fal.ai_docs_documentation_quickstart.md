@@ -82,9 +82,9 @@ Both paths start with an [API key](/documentation/model-apis/authentication) and
           ```python Python theme={null}
           import fal_client
 
-          result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-              "prompt": "a futuristic cityscape at sunset"
-          })
+          result = fal_client.subscribe(
+              "fal-ai/flux/schnell", arguments={"prompt": "a futuristic cityscape at sunset"}
+          )
           print(result["images"][0]["url"])
           ```
 
@@ -194,6 +194,7 @@ Both paths start with an [API key](/documentation/model-apis/authentication) and
 
         ```python my_app.py theme={null}
         import fal
+
 
         class MyApp(fal.App):
             @fal.endpoint("/")

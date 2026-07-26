@@ -31,12 +31,14 @@ DistributedRunner(
 ```python theme={null}
 from fal.distributed import DistributedRunner, DistributedWorker
 
+
 class MyWorker(DistributedWorker):
     def setup(self, **kwargs):
         self.model = load_model().to(self.device)
-    
+
     def __call__(self, prompt: str, **kwargs):
         return self.model.generate(prompt)
+
 
 # Create runner for 4 GPUs
 runner = DistributedRunner(
@@ -133,13 +135,15 @@ async def invoke(
 @fal.endpoint("/generate")
 async def generate(self, request: GenerateRequest) -> GenerateResponse:
     # Invoke workers to generate images
-    result = await self.runner.invoke({
-        "prompt": request.prompt,
-        "num_steps": request.num_steps,
-        "width": 1024,
-        "height": 1024,
-    })
-    
+    result = await self.runner.invoke(
+        {
+            "prompt": request.prompt,
+            "num_steps": request.num_steps,
+            "width": 1024,
+            "height": 1024,
+        }
+    )
+
     return GenerateResponse(image=result["image"])
 ```
 
@@ -364,22 +368,18 @@ def __call__(self, streaming: bool = False, **kwargs: Any) -> Any
 ```python theme={null}
 class FluxWorker(DistributedWorker):
     def __call__(
-        self,
-        prompt: str,
-        num_steps: int = 20,
-        streaming: bool = False,
-        **kwargs
+        self, prompt: str, num_steps: int = 20, streaming: bool = False, **kwargs
     ) -> dict:
         """Generate an image on this GPU"""
         import torch.distributed as dist
-        
+
         # Each GPU generates independently
         image = self.pipeline(
             prompt=prompt,
             num_inference_steps=num_steps,
             output_type="pt",
         ).images[0]
-        
+
         # Gather all images to rank 0
         if self.rank == 0:
             gather_list = [
@@ -388,14 +388,14 @@ class FluxWorker(DistributedWorker):
             ]
         else:
             gather_list = None
-        
+
         dist.gather(image, gather_list, dst=0)
-        
+
         # Only rank 0 returns the result
         if self.rank == 0:
             combined_image = create_grid(gather_list)
             return {"image": combined_image}
-        
+
         return {}  # Other ranks return empty dict
 ```
 
@@ -429,16 +429,19 @@ def __call__(self, prompt: str, num_steps: int = 20, streaming: bool = False):
     for step in range(num_steps):
         # Generate intermediate result
         latent = self.model.step(prompt)
-        
+
         # Stream progress (only rank 0)
         if streaming and self.rank == 0 and step % 5 == 0:
             preview_image = self.decode_latent(latent)
-            self.add_streaming_result({
-                "step": step,
-                "progress": (step + 1) / num_steps,
-                "preview": preview_image,
-            }, as_text_event=True)
-    
+            self.add_streaming_result(
+                {
+                    "step": step,
+                    "progress": (step + 1) / num_steps,
+                    "preview": preview_image,
+                },
+                as_text_event=True,
+            )
+
     # Return final result
     return {"image": final_image}
 ```
@@ -512,45 +515,45 @@ All GPUs have the same model, process different batches, and sync gradients:
 class DDPWorker(DistributedWorker):
     def setup(self, **kwargs):
         from torch.nn.parallel import DistributedDataParallel as DDP
-        
+
         self.model = MyModel().to(self.device)
-        
+
         # Wrap with DDP for gradient synchronization
         self.model = DDP(
             self.model,
             device_ids=[self.rank],
             output_device=self.rank,
         )
-        
+
         self.optimizer = torch.optim.Adam(self.model.parameters())
-    
+
     def __call__(self, data_path: str, **kwargs):
         import torch.distributed as dist
-        
+
         # Load and distribute data
         if self.rank == 0:
             data = load_data(data_path)
         else:
             data = None
-        
+
         # Broadcast to all ranks
         data = dist.broadcast_object_list([data], src=0)[0]
-        
+
         # Each GPU processes different batch
-        local_batch = data[self.rank::self.world_size]
-        
+        local_batch = data[self.rank :: self.world_size]
+
         # Training loop
         for batch in local_batch:
             loss = self.model(batch)
             loss.backward()  # DDP syncs gradients automatically
             self.optimizer.step()
             self.optimizer.zero_grad()
-        
+
         # Only rank 0 saves checkpoint
         if self.rank == 0:
             torch.save(self.model.state_dict(), "checkpoint.pt")
             return {"checkpoint": "checkpoint.pt"}
-        
+
         return {}
 ```
 
@@ -564,20 +567,23 @@ Stream intermediate results during long-running operations:
 class StreamingWorker(DistributedWorker):
     def __call__(self, prompt: str, steps: int = 50, streaming: bool = False):
         import torch.distributed as dist
-        
+
         for step in range(steps):
             result = self.model.step(prompt)
-            
+
             # Stream progress every 5 steps
             if streaming and self.rank == 0 and step % 5 == 0:
-                self.add_streaming_result({
-                    "step": step,
-                    "progress": step / steps,
-                }, as_text_event=True)
-            
+                self.add_streaming_result(
+                    {
+                        "step": step,
+                        "progress": step / steps,
+                    },
+                    as_text_event=True,
+                )
+
             # Sync all workers
             dist.barrier()
-        
+
         # Return final result
         if self.rank == 0:
             return {"output": result}

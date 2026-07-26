@@ -108,6 +108,7 @@ Features:
 ```python theme={null}
 from fal.toolkit.pydantic import FalBaseModel, Field, Hidden
 
+
 class Input(FalBaseModel):
     FIELD_ORDERS = ["prompt", "image_url"]
 

@@ -19,17 +19,19 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/veo3.1/first-last-frame-to-video",
       arguments={
-          "prompt": "A woman looks into the camera, breathes in, then exclaims energetically, \"have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It's incredible!\"",
+          "prompt": 'A woman looks into the camera, breathes in, then exclaims energetically, "have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It\'s incredible!"',
           "first_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-1.jpeg",
-          "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg"
+          "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

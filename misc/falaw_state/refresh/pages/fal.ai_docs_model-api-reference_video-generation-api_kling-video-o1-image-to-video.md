@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o1/image-to-video",
       arguments={
           "prompt": "Create a magical timelapse transition. The snow melts rapidly to reveal green grass, and the tree branches burst into bloom with pink flowers in real-time. The lighting shifts from cold winter light to warm spring sunshine. The camera pushes in slowly towards the tree. Disney-style magical transformation, cinematic, 8k.",
-          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png"
+          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

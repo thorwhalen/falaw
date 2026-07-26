@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/image-to-video",
           arguments={
-              "prompt": "A king walks slowly and says \"My people, here I am! I am here to save you all\"",
-              "start_image_url": "https://v3b.fal.media/files/b/0a84ab29/BSJXz9Ht-jgRgMf4IGxLU_upscaled.png"
+              "prompt": 'A king walks slowly and says "My people, here I am! I am here to save you all"',
+              "start_image_url": "https://v3b.fal.media/files/b/0a84ab29/BSJXz9Ht-jgRgMf4IGxLU_upscaled.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -145,10 +147,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/text-to-video",
@@ -268,17 +272,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/motion-control",
           arguments={
               "image_url": "https://v3b.fal.media/files/b/0a875302/8NaxQrQxDNHppHtqcchMm.png",
               "video_url": "https://v3b.fal.media/files/b/0a8752bc/2xrNS217ngQ3wzXqA7LXr_output.mp4",
-              "character_orientation": "video"
+              "character_orientation": "video",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

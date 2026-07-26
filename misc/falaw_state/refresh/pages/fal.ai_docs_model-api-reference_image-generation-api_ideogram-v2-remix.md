@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2/remix",
       arguments={
           "prompt": "An ice field in north atlantic",
-          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

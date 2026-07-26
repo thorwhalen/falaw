@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2/master/image-to-video",
           arguments={
               "prompt": "slow-motion sequence captures the catastrophic implosion of a skyscraper, dust and debris billowing outwards in a chaotic ballet of destruction, while a haunting, orchestral score underscores the sheer power and finality of the event.",
-              "image_url": "https://v3.fal.media/files/elephant/rkH-9qoXtXu3rAYTsx9V5_image.webp"
+              "image_url": "https://v3.fal.media/files/elephant/rkH-9qoXtXu3rAYTsx9V5_image.webp",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -151,10 +153,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2/master/text-to-video",

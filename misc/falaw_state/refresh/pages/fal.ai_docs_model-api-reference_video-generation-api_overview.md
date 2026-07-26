@@ -96,10 +96,12 @@ Get started with **Bytedance Seedance 2.0 Text To Video**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bytedance/seedance-2.0/text-to-video",

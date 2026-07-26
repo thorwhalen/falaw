@@ -21,15 +21,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -213,16 +215,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/image-to-image",
           arguments={
               "prompt": "A photo of a lion sitting on a stone bench",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -419,17 +423,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/inpainting",
           arguments={
               "prompt": "A photo of a lion sitting on a stone bench",
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png",
-              "mask_url": "https://storage.googleapis.com/falserverless/example_inputs/dog_mask.png"
+              "mask_url": "https://storage.googleapis.com/falserverless/example_inputs/dog_mask.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -613,15 +619,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/stream",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,

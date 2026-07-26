@@ -15,10 +15,10 @@ Its namespaces and methods mirror the CLI so you can automate the same workflows
 from fal.api import SyncServerlessClient
 
 client = SyncServerlessClient(
-    host=None,     # Optional. Override API host
+    host=None,  # Optional. Override API host
     api_key=None,  # Optional. If omitted, read from env/profile
     profile=None,  # Optional. Named profile to use
-    team=None,     # Optional. Team context for runner ops
+    team=None,  # Optional. Team context for runner ops
 )
 ```
 
@@ -53,8 +53,10 @@ staging_apps = client.apps.list(environment_name="staging")
 app_runners = client.apps.runners("my-app")
 
 # Optional filters
-recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1)) # last hour
-running_only = client.apps.runners("my-app", state=["running"])                   # by state
+recent = client.apps.runners(
+    "my-app", since=datetime.now() - timedelta(hours=1)
+)  # last hour
+running_only = client.apps.runners("my-app", state=["running"])  # by state
 
 # List runners for an app in a specific environment
 staging_runners = client.apps.runners("my-app", environment_name="staging")
@@ -67,12 +69,12 @@ Maps to CLI flags in `fal apps scale`. Any omitted option keeps the current valu
 ```python theme={null}
 client.apps.scale(
     "my-app",
-    keep_alive=300,            # seconds
+    keep_alive=300,  # seconds
     max_multiplexing=1,
     max_concurrency=10,
     min_concurrency=1,
-    request_timeout=600,       # seconds
-    startup_timeout=900,       # seconds
+    request_timeout=600,  # seconds
+    startup_timeout=900,  # seconds
     machine_types=["GPU-H100", "GPU-H200"],
     regions=["us-east-1", "us-west-2"],
     concurrency_buffer=1,
@@ -117,7 +119,7 @@ from fal.sdk import KeyScope
 
 # ADMIN keys can manage resources; API keys are limited to app invocation.
 key_id, key_secret = client.keys.create(
-    scope=KeyScope.ADMIN,          # or KeyScope.API
+    scope=KeyScope.ADMIN,  # or KeyScope.API
     description="CI deploy key",
 )
 print(f"Store securely: {key_id}:{key_secret}")  # secret shown only once
@@ -221,10 +223,10 @@ client.deploy("my-app")
 client.deploy(
     app_ref="path/to/myfile.py::MyApp",
     app_name="myapp",
-    auth="public",                # "private" | "public"
-    strategy="rolling",           # "recreate" | "rolling"
-    reset_scale=True,             # use previous scaling if False
-    environment_name="staging",   # target environment
+    auth="public",  # "private" | "public"
+    strategy="rolling",  # "recreate" | "rolling"
+    reset_scale=True,  # use previous scaling if False
+    environment_name="staging",  # target environment
 )
 ```
 

@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/image-to-video",
@@ -173,10 +175,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/text-to-video",
@@ -304,17 +308,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/motion-control",
           arguments={
               "image_url": "https://v3b.fal.media/files/b/0a90ee31/VHtWK5BZMa-XoT6gahJKS_077.png",
               "video_url": "https://v3b.fal.media/files/b/0a90edae/3nvl30ic9g2otKRcOV5nO_output.mp4",
-              "character_orientation": "video"
+              "character_orientation": "video",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

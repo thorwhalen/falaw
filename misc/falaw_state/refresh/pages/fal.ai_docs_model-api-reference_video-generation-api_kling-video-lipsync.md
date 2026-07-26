@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/lipsync/audio-to-video",
           arguments={
               "video_url": "https://fal.media/files/koala/8teUPbRRMtAUTORDvqy0l.mp4",
-              "audio_url": "https://storage.googleapis.com/falserverless/kling/kling-audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/kling/kling-audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -119,17 +121,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/lipsync/text-to-video",
           arguments={
               "video_url": "https://fal.media/files/koala/8teUPbRRMtAUTORDvqy0l.mp4",
               "text": "Mental health is as important as physical health, shaping our emotions, thoughts, and daily interactions.",
-              "voice_id": "genshin_klee2"
+              "voice_id": "genshin_klee2",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

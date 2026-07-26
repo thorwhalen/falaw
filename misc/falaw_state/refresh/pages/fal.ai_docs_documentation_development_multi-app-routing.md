@@ -47,12 +47,14 @@ Three apps: a CPU router and two GPU backends for different resolutions.
 import fal
 from fal.toolkit import Image
 
+
 class ImageGenStandard(fal.App):
     machine_type = "GPU-A100"
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -69,12 +71,14 @@ class ImageGenStandard(fal.App):
 import fal
 from fal.toolkit import Image
 
+
 class ImageGenHighRes(fal.App):
     machine_type = "GPU-H100"
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -102,6 +106,7 @@ import fal_client
 
 STANDARD_THRESHOLD = 1024 * 1024  # 1 megapixel
 
+
 class ImageRouter(fal.App):
     machine_type = "S"  # Lightweight CPU -- just routing, no GPU needed
     requirements = ["fal-client"]
@@ -115,11 +120,14 @@ class ImageRouter(fal.App):
         else:
             app_id = "your-username/image-gen-highres"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": prompt,
-            "width": width,
-            "height": height,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": prompt,
+                "width": width,
+                "height": height,
+            },
+        )
 
         return result
 ```
@@ -141,6 +149,7 @@ import fal
 import fal_client
 import random
 
+
 class ABTestRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
@@ -153,9 +162,12 @@ class ABTestRouter(fal.App):
         else:
             app_id = "your-username/model-v2"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": prompt,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": prompt,
+            },
+        )
 
         # Include which version was used in the response
         result["model_version"] = app_id
@@ -172,6 +184,7 @@ Chain multiple apps together:
 import fal
 import fal_client
 
+
 class PipelineRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
@@ -180,14 +193,12 @@ class PipelineRouter(fal.App):
     def run_pipeline(self, image_url: str) -> dict:
         # Step 1: Upscale
         upscaled = fal_client.subscribe(
-            "fal-ai/real-esrgan",
-            arguments={"image_url": image_url, "scale": 4}
+            "fal-ai/real-esrgan", arguments={"image_url": image_url, "scale": 4}
         )
 
         # Step 2: Remove background
         result = fal_client.subscribe(
-            "fal-ai/birefnet",
-            arguments={"image_url": upscaled["image"]["url"]}
+            "fal-ai/birefnet", arguments={"image_url": upscaled["image"]["url"]}
         )
 
         return result

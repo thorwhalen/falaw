@@ -28,6 +28,7 @@ PORT = 8080
 PERSISTENCE_DIR = "/data/pushgateway"
 PERSISTENCE_FILE = f"{PERSISTENCE_DIR}/metrics.dat"
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(
         r"""

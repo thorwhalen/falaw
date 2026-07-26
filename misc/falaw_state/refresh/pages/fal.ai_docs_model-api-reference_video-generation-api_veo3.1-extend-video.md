@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/veo3.1/extend-video",
       arguments={
           "prompt": "Continue the scene naturally, maintaining the same style and motion.",
-          "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4"
+          "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

@@ -61,9 +61,9 @@ Register `track` callbacks on `event_handler` to react to the media the client p
 
 ```python theme={null}
 BatchedFnTrack(
-    source_track,        # the inbound track (e.g. the browser webcam)
-    batch_size=4,        # number of frames to group before running fn
-    fn=run_inference,    # callable over the batched frames
+    source_track,  # the inbound track (e.g. the browser webcam)
+    batch_size=4,  # number of frames to group before running fn
+    fn=run_inference,  # callable over the batched frames
 )
 ```
 
@@ -115,9 +115,11 @@ class GrayscaleTrack:
 
     async def recv(self):
         import av
+
         frame = await self._track.recv()
         img = frame.to_ndarray(format="bgr24")
         import numpy as np
+
         gray = np.mean(img, axis=2, keepdims=True).astype(np.uint8)
         img_gray = np.broadcast_to(gray, img.shape).copy()
         new_frame = av.VideoFrame.from_ndarray(img_gray, format="bgr24")
@@ -170,11 +172,17 @@ class GrayscaleDemo(fal.App, name="grayscale-demo"):
         async def event_stream():
             try:
                 # First event: hand the SDP answer back to the client.
-                yield "data: " + json.dumps({
-                    "sdp": pc.localDescription.sdp,
-                    "type": pc.localDescription.type,
-                    "session_id": request.session_id,
-                }) + "\n\n"
+                yield (
+                    "data: "
+                    + json.dumps(
+                        {
+                            "sdp": pc.localDescription.sdp,
+                            "type": pc.localDescription.type,
+                            "session_id": request.session_id,
+                        }
+                    )
+                    + "\n\n"
+                )
 
                 # Hold the request open while the peer connection is alive.
                 # Emit an SSE comment every 15s so intermediaries don't

@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/sora-2/video-to-video/remix",
       arguments={
           "video_id": "video_123",
-          "prompt": "Change the cat's fur color to purple."
+          "prompt": "Change the cat's fur color to purple.",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

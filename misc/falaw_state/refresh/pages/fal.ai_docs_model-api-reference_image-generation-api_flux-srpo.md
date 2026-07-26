@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/srpo",
@@ -190,16 +192,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/srpo/image-to-image",
           arguments={
               "image_url": "https://fal.media/files/koala/Chls9L2ZnvuipUTEwlnJC.png",
-              "prompt": "A cat dressed as a wizard with a background of a mystic forest."
+              "prompt": "A cat dressed as a wizard with a background of a mystic forest.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

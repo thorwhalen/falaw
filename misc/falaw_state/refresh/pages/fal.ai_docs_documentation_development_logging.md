@@ -88,6 +88,7 @@ For quick debugging, `print()` is the simplest approach. Both `stdout` and `stde
 import fal
 import sys
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self) -> dict:

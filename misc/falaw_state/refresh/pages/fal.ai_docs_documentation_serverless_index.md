@@ -27,6 +27,7 @@ import subprocess
 import fal
 from fal.container import ContainerImage
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str("FROM your-existing-image:latest"),
     machine_type="GPU-A100",
@@ -49,6 +50,7 @@ If you have a Docker image with your model and dependencies baked in but not a f
 import fal
 from fal.container import ContainerImage
 
+
 class MyModel(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
@@ -59,6 +61,7 @@ class MyModel(fal.App):
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0"
         ).to("cuda")
@@ -79,11 +82,14 @@ If you are building from scratch, use a native `fal.App` with pip requirements. 
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     result: str
+
 
 class MyModel(fal.App):
     machine_type = "GPU-H100"
@@ -91,6 +97,7 @@ class MyModel(fal.App):
 
     def setup(self):
         from transformers import pipeline
+
         self.pipe = pipeline("text-generation", model="gpt2", device="cuda")
 
     @fal.endpoint("/")

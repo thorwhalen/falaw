@@ -192,6 +192,7 @@ GPU/CPU instance type for your runners.
 class MyApp(fal.App):
     machine_type = "GPU-A100"
 
+
 # With fallback options (tried in order)
 class MyApp(fal.App):
     machine_type = ["GPU-H100", "GPU-A100"]

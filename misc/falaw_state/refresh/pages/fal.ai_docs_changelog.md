@@ -535,6 +535,7 @@
   ```python theme={null}
   from fal.toolkit import FalBaseModel, Field, Hidden, ImageField
 
+
   class TextToImageInput(FalBaseModel):
       FIELD_ORDERS = ["prompt", "negative_prompt", "image_size"]
 
@@ -545,6 +546,7 @@
       # Hidden from playground but accessible via API
       debug_mode: bool = Hidden(Field(default=False))
       internal_seed: int = Hidden(Field(default=-1))
+
 
   class ImageToImageInput(FalBaseModel):
       image_url: str = ImageField(description="Input image")
@@ -650,6 +652,7 @@
   COPY src/ ./src/
   """
 
+
   class MyApp(fal.App):
       image = ContainerImage.from_dockerfile_str(dockerfile_str)
   ```
@@ -664,7 +667,7 @@
 
   ```python theme={null}
   class MyApp(fal.App):
-      skip_retry_conditions=["timeout"]  # This app won't retry on timeout
+      skip_retry_conditions = ["timeout"]  # This app won't retry on timeout
       ...
   ```
 

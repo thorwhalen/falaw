@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.1/pro/image-to-video",
       arguments={
           "prompt": "Warm, incandescent streetlights paint the rain-slicked cobblestones in pools of amber light as a couple walks hand-in-hand, their silhouettes stark against the blurry backdrop of a city shrouded in a gentle downpour; the camera lingers on the subtle textures of their rain-soaked coats and the glistening reflections dancing on the wet pavement, creating a sense of intimate vulnerability and shared quietude.",
-          "image_url": "https://v3.fal.media/files/lion/_I_io6Gtk83c72d-afXf8_image.webp"
+          "image_url": "https://v3.fal.media/files/lion/_I_io6Gtk83c72d-afXf8_image.webp",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

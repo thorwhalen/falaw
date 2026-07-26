@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character",
@@ -32,7 +34,7 @@
               "prompt": "Place the woman leisurely enjoying a cup of espresso while relaxing at a sunlit café table in Siena, Italy. The café setting showcases vintage wooden furniture with peeling white paint, aged brick flooring, and sun-bleached stone walls decorated with trailing ivy and vibrant potted geraniums that capture Siena's medieval character. Golden late-morning light streams through overhead, creating soft shadows that highlight the weathered architectural details. The composition appears slightly off-center, conveying the unguarded tranquility and personal intimacy of a peaceful moment savoring the Tuscan morning ambiance.",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -195,10 +197,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character/edit",
@@ -208,7 +212,7 @@
               "mask_url": "https://v3.fal.media/files/panda/jVDAgSkpsZFDP080ceSZJ_woman_face_mask.png",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -366,10 +370,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character/remix",
@@ -378,7 +384,7 @@
               "image_url": "https://v3.fal.media/files/panda/mcxydS-_4ZjfBWFtgoo2z_XHLsl7khq6dC6Qp3cIdJl08rG0I.avif",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,

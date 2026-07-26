@@ -19,6 +19,7 @@ pip install fal
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self) -> dict:

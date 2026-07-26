@@ -17,6 +17,7 @@ Users provide file inputs as URLs. The `download_file` function downloads them t
 ```python theme={null}
 from fal.toolkit import download_file
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
 
@@ -72,9 +73,12 @@ For the common pattern of downloading model weights to persistent storage, `down
 ```python theme={null}
 from fal.toolkit import download_model_weights
 
+
 class MyModel(fal.App):
     def setup(self):
-        weights_path = download_model_weights("https://huggingface.co/org/model/resolve/main/weights.bin")
+        weights_path = download_model_weights(
+            "https://huggingface.co/org/model/resolve/main/weights.bin"
+        )
         self.model = load_from_weights(weights_path)
 ```
 
@@ -89,6 +93,7 @@ When your model generates a file, wrap it in one of the toolkit's file types bef
 ```python theme={null}
 import fal
 from fal.toolkit import Image
+
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -143,7 +148,9 @@ audio = Audio.from_path("/tmp/output.wav")
 audio = Audio.from_bytes(raw_bytes, content_type="audio/wav", file_name="output.wav")
 
 generic = File.from_path("/tmp/result.obj")
-generic = File.from_bytes(data, content_type="application/octet-stream", file_name="model.glb")
+generic = File.from_bytes(
+    data, content_type="application/octet-stream", file_name="model.glb"
+)
 ```
 
 ### The Type System and Playground
@@ -152,6 +159,7 @@ Using `Image`, `Video`, or `Audio` in your Pydantic output schema tells the Play
 
 ```python theme={null}
 from fal.toolkit import Image, Video, Audio
+
 
 class Output(BaseModel):
     image: Image
@@ -167,6 +175,7 @@ For richer input schemas with file URL types that validate correctly, see the `F
 
 ```python theme={null}
 from fal.toolkit import CompressedFile
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")

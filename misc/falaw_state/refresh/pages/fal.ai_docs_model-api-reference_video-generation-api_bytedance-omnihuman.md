@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/omnihuman",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman.png",
-              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -123,16 +125,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/omnihuman/v1.5",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_image.png",
-              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

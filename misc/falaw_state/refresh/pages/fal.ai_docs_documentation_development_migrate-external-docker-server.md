@@ -37,6 +37,7 @@ FROM your-base-image
 # ... your setup
 """
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(DOCKERFILE),
     machine_type="GPU-A100",
@@ -89,11 +90,14 @@ FROM your-base-image
 
 SERVER_PORT = 8000
 
+
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
 
+
 class GenerateResponse(BaseModel):
     image: Image
+
 
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"

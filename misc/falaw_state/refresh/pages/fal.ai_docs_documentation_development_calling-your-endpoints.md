@@ -19,9 +19,9 @@ Submits a request to the queue, polls automatically, and returns the result when
     ```python theme={null}
     import fal_client
 
-    result = fal_client.subscribe("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    })
+    result = fal_client.subscribe(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    )
     print(result)
     ```
 
@@ -30,10 +30,12 @@ Submits a request to the queue, polls automatically, and returns the result when
     ```python theme={null}
     import fal_client
 
+
     def on_queue_update(update):
         if isinstance(update, fal_client.InProgress):
             for log in update.logs:
                 print(log["message"])
+
 
     result = fal_client.subscribe(
         "your-username/your-app-name",
@@ -85,9 +87,9 @@ For fire-and-forget workflows. Submit a request, get a request ID, and retrieve 
     ```python theme={null}
     import fal_client
 
-    handler = fal_client.submit("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    })
+    handler = fal_client.submit(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    )
 
     print(f"Request ID: {handler.request_id}")
 
@@ -138,9 +140,9 @@ For apps that produce progressive output via Server-Sent Events (SSE). Your app 
     ```python theme={null}
     import fal_client
 
-    for event in fal_client.stream("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    }):
+    for event in fal_client.stream(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    ):
         print(event)
     ```
   </Tab>
@@ -193,11 +195,13 @@ For bidirectional, low-latency communication over a persistent connection. Your 
     import asyncio
     import fal_client
 
+
     async def main():
         async with fal_client.realtime_async("your-username/your-app-name") as connection:
             await connection.send({"prompt": "Hello, world!"})
             result = await connection.recv()
             print(result)
+
 
     asyncio.run(main())
     ```

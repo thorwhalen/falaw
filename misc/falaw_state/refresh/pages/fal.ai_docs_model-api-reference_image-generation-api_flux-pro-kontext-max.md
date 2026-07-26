@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max",
           arguments={
               "prompt": "Put a donut next to the flour.",
-              "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png"
+              "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -209,10 +211,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max/multi",
@@ -220,8 +224,8 @@
               "prompt": "Put the little duckling on top of the woman's t-shirt.",
               "image_urls": [
                   "https://v3.fal.media/files/penguin/XoW0qavfF-ahg-jX4BMyL_image.webp",
-                  "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp"
-              ]
+                  "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -388,15 +392,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max/text-to-image",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,

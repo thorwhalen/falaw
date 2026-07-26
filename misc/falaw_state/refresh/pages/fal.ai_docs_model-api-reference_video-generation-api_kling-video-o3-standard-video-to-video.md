@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/standard/video-to-video/edit",
           arguments={
               "prompt": "change the main character to be Popeye from @Element1, dark lighting and rain, 3d character. make him sad, with rain dropping on him, dark light on the character.",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-edit/standard_video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-edit/standard_video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -149,16 +151,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/standard/video-to-video/reference",
           arguments={
               "prompt": "Replace both character with @Element1 and @Element2",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-reference/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-reference/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

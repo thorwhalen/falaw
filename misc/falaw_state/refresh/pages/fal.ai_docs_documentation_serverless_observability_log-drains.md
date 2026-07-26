@@ -63,10 +63,9 @@ Every delivery includes an `X-Fal-Signature` header containing an HMAC-SHA256 si
 import hmac
 import hashlib
 
+
 def verify_signature(body: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(
-        secret.encode(), body, hashlib.sha256
-    ).hexdigest()
+    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(signature, expected)
 ```
 

@@ -13,6 +13,7 @@ Request headers are per-request context, complementing [environment variables](/
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
 
@@ -48,19 +49,24 @@ Attach the request ID to Sentry events so you can find the exact fal request tha
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     requirements = ["sentry-sdk"]
 
     def setup(self):
         import sentry_sdk
+
         sentry_sdk.init(dsn="https://your-sentry-dsn")
         self.model = load_model()
 
     @fal.endpoint("/")
     def generate(self, prompt: str) -> dict:
         import sentry_sdk
-        sentry_sdk.set_tag("fal_request_id", self.current_request.headers.get("x-fal-request-id"))
+
+        sentry_sdk.set_tag(
+            "fal_request_id", self.current_request.headers.get("x-fal-request-id")
+        )
         return {"image": self.model(prompt)}
 ```
 
@@ -73,6 +79,7 @@ import fal
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -96,12 +103,11 @@ Callers can pass custom headers that are forwarded to your app:
 
 ```python theme={null}
 # Caller passes a custom header
-result = fal_client.subscribe("your-user/your-app", arguments={
-    "prompt": "a sunset"
-}, headers={
-    "X-My-Trace-Id": "abc-123",
-    "X-My-User-Tier": "premium"
-})
+result = fal_client.subscribe(
+    "your-user/your-app",
+    arguments={"prompt": "a sunset"},
+    headers={"X-My-Trace-Id": "abc-123", "X-My-User-Tier": "premium"},
+)
 ```
 
 ```python theme={null}

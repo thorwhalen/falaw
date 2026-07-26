@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/image-to-video",
           arguments={
               "prompt": "A little dog is running in the sunshine. The camera follows the dog as it plays in a garden.",
-              "image_url": "https://fal.media/files/koala/f_xmiodPjhiKjdBkFmTu1.png"
+              "image_url": "https://fal.media/files/koala/f_xmiodPjhiKjdBkFmTu1.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -169,10 +171,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/text-to-video",
@@ -305,10 +309,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/reference-to-video",
@@ -316,8 +322,8 @@
               "prompt": "The girl catches the puppy and hugs it.",
               "reference_image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference.jpeg",
-                  "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference_2.jpeg"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference_2.jpeg",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,

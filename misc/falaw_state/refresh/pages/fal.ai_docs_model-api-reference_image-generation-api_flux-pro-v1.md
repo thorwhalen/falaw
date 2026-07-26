@@ -21,17 +21,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1/fill",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
-              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg"
+              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -182,18 +184,20 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1/fill-finetuned",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
               "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
-              "finetune_id": ""
+              "finetune_id": "",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

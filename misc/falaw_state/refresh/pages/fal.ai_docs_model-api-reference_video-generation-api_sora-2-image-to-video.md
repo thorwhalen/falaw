@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/image-to-video",
           arguments={
               "prompt": "Front-facing 'invisible' action-cam on a skydiver in freefall above bright clouds; camera locked on his face. He speaks over the wind with clear lipsync: 'This is insanely fun! You've got to try it—book a tandem and go!' Natural wind roar, voice close-mic'd and slightly compressed so it's intelligible. Midday sun, goggles and jumpsuit flutter, altimeter visible, parachute rig on shoulders. Energetic but stable framing with subtle shake; brief horizon roll. End on first tug of canopy and wind noise dropping.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -175,16 +177,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/image-to-video/pro",
           arguments={
               "prompt": "Front-facing 'invisible' action-cam on a skydiver in freefall above bright clouds; camera locked on his face. He speaks over the wind with clear lipsync: 'This is insanely fun! You've got to try it—book a tandem and go!' Natural wind roar, voice close-mic'd and slightly compressed so it's intelligible. Midday sun, goggles and jumpsuit flutter, altimeter visible, parachute rig on shoulders. Energetic but stable framing with subtle shake; brief horizon roll. End on first tug of canopy and wind noise dropping.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

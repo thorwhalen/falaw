@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/image-to-video",
           arguments={
               "prompt": "Snowflakes fall as a car moves forward along the road.",
-              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg"
+              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -135,10 +137,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/text-to-video",
@@ -250,10 +254,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/elements",
@@ -261,8 +267,8 @@
               "prompt": "A cute girl and a baby cow sleeping together on a bed",
               "input_image_urls": [
                   "https://storage.googleapis.com/falserverless/web-examples/kling-elements/first_image.jpeg",
-                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -380,16 +386,16 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/effects",
-          arguments={
-              "effect_scene": "hug"
-          },
+          arguments={"effect_scene": "hug"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )

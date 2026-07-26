@@ -21,10 +21,9 @@ Random seed for reproducible outputs. The same seed with the same inputs produce
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "seed": 42
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "seed": 42}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -46,10 +45,9 @@ Number of images to generate per request. Higher values produce more results in 
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "num_images": 4
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "num_images": 4}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -74,15 +72,15 @@ Output image dimensions, used by models built with fal's [toolkit](/documentatio
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "image_size": "landscape_16_9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={"prompt": "a sunset", "image_size": "landscape_16_9"},
+  )
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "image_size": {"width": 1280, "height": 720}
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={"prompt": "a sunset", "image_size": {"width": 1280, "height": 720}},
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -108,10 +106,9 @@ Some models (such as [Nano Banana 2](https://fal.ai/models/fal-ai/nano-banana-2)
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "aspect_ratio": "16:9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "aspect_ratio": "16:9"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -151,10 +148,10 @@ In this example, the second image was flagged and replaced with a black image.
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "enable_safety_checker": True
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a sunset", "enable_safety_checker": True},
+  )
 
   if any(result.get("has_nsfw_concepts", [])):
       print("Some images were filtered by the safety checker")
@@ -175,10 +172,10 @@ To disable the safety checker:
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "enable_safety_checker": False
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a sunset", "enable_safety_checker": False},
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -207,10 +204,9 @@ The expansion adds an LLM inference step before generation, so expect slightly h
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "expand_prompt": True
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "expand_prompt": True}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -236,10 +232,9 @@ Format of the generated image file. Choose based on your use case: `jpeg` for sm
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "output_format": "png"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset", "output_format": "png"}
+  )
   ```
 
   ```javascript JavaScript theme={null}

@@ -111,6 +111,7 @@ import fal
 from fal.container import ContainerImage
 from fastapi.responses import StreamingResponse
 
+
 class SAM3DStreamApp(
     fal.App,
     keep_alive=600,
@@ -122,7 +123,7 @@ class SAM3DStreamApp(
     def setup(self):
         # Download model weights and initialize pipeline
         from huggingface_hub import snapshot_download
-        
+
         snapshot_download(
             "jetjodh/sam-3d-objects",
             local_dir=str(CACHE_DIR),
@@ -132,24 +133,28 @@ class SAM3DStreamApp(
     @fal.endpoint("/stream")
     def stream_3d_reconstruction(self, input: SAM3DStreamInput, request: Request):
         """Stream 3D reconstruction with real-time voxel visualization."""
-        
+
         def geometry_callback(stage, step, total_steps, coords, **kwargs):
             # Encode and queue voxel data for streaming
             voxel_data = encode_voxels_binary(coords)
-            progress_queue.put({
-                "stage": "geometry",
-                "step": step,
-                "voxel_data": voxel_data,
-            })
+            progress_queue.put(
+                {
+                    "stage": "geometry",
+                    "step": step,
+                    "voxel_data": voxel_data,
+                }
+            )
 
         def appearance_callback(stage, step, total_steps, coords, colors, **kwargs):
             # Stream colored voxels during appearance diffusion
             voxel_data = encode_voxels_binary(coords, colors)
-            progress_queue.put({
-                "stage": "appearance",
-                "step": step,
-                "voxel_data": voxel_data,
-            })
+            progress_queue.put(
+                {
+                    "stage": "appearance",
+                    "step": step,
+                    "voxel_data": voxel_data,
+                }
+            )
 
         # Run pipeline with streaming callbacks
         outputs = self.pipeline.run(
@@ -283,6 +288,7 @@ RUN git clone https://github.com/rehan-remade/sam-3d-objects.git && \
 # Additional 3D libraries
 RUN pip install kaolin pytorch3d gsplat
 """
+
 
 class SAM3DStreamApp(
     fal.App,

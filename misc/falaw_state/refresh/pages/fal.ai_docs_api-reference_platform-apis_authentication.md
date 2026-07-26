@@ -73,14 +73,10 @@ Using an API scope key:
 ```python theme={null}
 import requests
 
-headers = {
-    "Authorization": "Key YOUR_API_KEY"
-}
+headers = {"Authorization": "Key YOUR_API_KEY"}
 
 response = requests.get(
-    "https://api.fal.ai/v1/models",
-    headers=headers,
-    params={"limit": 10}
+    "https://api.fal.ai/v1/models", headers=headers, params={"limit": 10}
 )
 
 print(response.json())

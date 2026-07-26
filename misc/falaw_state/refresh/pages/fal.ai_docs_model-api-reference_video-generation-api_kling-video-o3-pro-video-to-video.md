@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/pro/video-to-video/edit",
           arguments={
               "prompt": "Change environment to be fully snow as @Image1. Replace animal with @Element1",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-edit/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-edit/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -151,16 +153,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/pro/video-to-video/reference",
           arguments={
               "prompt": "Integrate @Element1 in the scene. Style video should be following watercolor style of @Image1",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-reference/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-reference/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

@@ -54,12 +54,8 @@ response.headers["x-fal-billable-units"] = str(input.num_images)
 Scale the charge with output resolution. Higher resolutions cost proportionally more:
 
 ```python theme={null}
-resolution_factor = math.ceil(
-    (image_size.width * image_size.height) / (1024 * 1024)
-)
-response.headers["x-fal-billable-units"] = str(
-    resolution_factor * input.num_images
-)
+resolution_factor = math.ceil((image_size.width * image_size.height) / (1024 * 1024))
+response.headers["x-fal-billable-units"] = str(resolution_factor * input.num_images)
 ```
 
 **Per video second**

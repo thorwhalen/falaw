@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1.5/pro/image-to-video",
           arguments={
-              "prompt": "A man is crying and he says \"I shouldn't have done it. I regret everything\"",
-              "image_url": "https://v3b.fal.media/files/b/0a8773cd/REzCWn1BKUVuMFTxR-R3W_image_317.png"
+              "prompt": 'A man is crying and he says "I shouldn\'t have done it. I regret everything"',
+              "image_url": "https://v3b.fal.media/files/b/0a8773cd/REzCWn1BKUVuMFTxR-R3W_image_317.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -168,10 +170,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1.5/pro/text-to-video",

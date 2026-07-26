@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/controlnet",
           arguments={
               "prompt": "A single leopard, its spotted golden coat detailed with black rosettes, cautiously peeks its head through dense green foliage. The leopard’s eyes are alert and focused forward, ears perked, whiskers slightly visible. The bushes consist of thick, leafy shrubs with varying shades of green, some leaves partially obscuring the leopard’s muzzle and forehead. Soft natural daylight filters through the canopy above, casting dappled shadows across the animal’s fur and surrounding leaves. The composition is a medium close-up, centered on the leopard’s head emerging from the undergrowth, with shallow depth of field blurring the background vegetation.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -224,16 +226,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/controlnet/lora",
           arguments={
               "prompt": "A single leopard, its spotted golden coat detailed with black rosettes, cautiously peeks its head through dense green foliage. The leopard’s eyes are alert and focused forward, ears perked, whiskers slightly visible. The bushes consist of thick, leafy shrubs with varying shades of green, some leaves partially obscuring the leopard’s muzzle and forehead. Soft natural daylight filters through the canopy above, casting dappled shadows across the animal’s fur and surrounding leaves. The composition is a medium close-up, centered on the leopard’s head emerging from the undergrowth, with shallow depth of field blurring the background vegetation.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

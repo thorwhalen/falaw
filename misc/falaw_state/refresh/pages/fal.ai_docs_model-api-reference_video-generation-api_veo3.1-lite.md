@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite",
@@ -163,16 +165,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite/image-to-video",
           arguments={
               "prompt": "The subject turns to face the camera and smiles warmly.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/veo3-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/veo3-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -316,17 +320,19 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite/first-last-frame-to-video",
           arguments={
               "prompt": "A smooth transition between the two frames with natural motion.",
               "first_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-1.jpeg",
-              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg"
+              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,

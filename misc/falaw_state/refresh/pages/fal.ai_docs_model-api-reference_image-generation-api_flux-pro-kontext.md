@@ -19,16 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/flux-pro/kontext",
       arguments={
           "prompt": "Put a donut next to the flour.",
-          "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png"
+          "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -149,10 +151,13 @@ For Python:
 from fal_client import FalClient
 
 client = FalClient("YOUR_FAL_KEY")
-result = client.subscribe("fal-ai/flux-pro/kontext", {
-    "prompt": "Change the red car to blue while keeping everything else the same",
-    "image_url": "https://your-image-url.com/image.jpg"
-})
+result = client.subscribe(
+    "fal-ai/flux-pro/kontext",
+    {
+        "prompt": "Change the red car to blue while keeping everything else the same",
+        "image_url": "https://your-image-url.com/image.jpg",
+    },
+)
 ```
 
 ### Technical Specifications

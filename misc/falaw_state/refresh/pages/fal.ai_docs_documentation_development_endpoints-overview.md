@@ -18,11 +18,14 @@ At minimum, an endpoint is a method on your `fal.App` class decorated with `@fal
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     text: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -41,12 +44,10 @@ You can define multiple endpoints on the same app at different paths. Callers re
 ```python theme={null}
 class MyApp(fal.App):
     @fal.endpoint("/")
-    def generate(self, input: GenerateInput) -> GenerateOutput:
-        ...
+    def generate(self, input: GenerateInput) -> GenerateOutput: ...
 
     @fal.endpoint("/enhance")
-    def enhance(self, input: EnhanceInput) -> EnhanceOutput:
-        ...
+    def enhance(self, input: EnhanceInput) -> EnhanceOutput: ...
 ```
 
 ## What's in This Section

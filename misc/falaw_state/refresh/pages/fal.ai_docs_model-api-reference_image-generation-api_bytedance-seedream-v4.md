@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4/edit",
@@ -34,8 +36,8 @@
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_1.png",
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_2.png",
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_3.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_4.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_4.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -191,15 +193,17 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4/text-to-image",
           arguments={
-              "prompt": "A trendy restaurant with a digital menu board displaying \"Seedream 4.0 is available on fal\" in elegant script, with diners enjoying their meals."
+              "prompt": 'A trendy restaurant with a digital menu board displaying "Seedream 4.0 is available on fal" in elegant script, with diners enjoying their meals.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,

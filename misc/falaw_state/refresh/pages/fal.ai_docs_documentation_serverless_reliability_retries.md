@@ -51,6 +51,7 @@ The status code your endpoint returns determines what happens to the [runner](/d
 import fal
 from fastapi.responses import JSONResponse
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def predict(self, input: dict) -> dict:
@@ -130,6 +131,7 @@ Override the default retry behavior on a per-response basis by returning the `X-
 import fal
 from fastapi.responses import JSONResponse
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self, input: Input) -> Output:
@@ -163,6 +165,7 @@ Use this when you want to decouple retry behavior from runner termination. For e
 
 ```python theme={null}
 from fastapi.responses import JSONResponse
+
 
 @fal.endpoint("/")
 def predict(self, input: dict) -> dict:

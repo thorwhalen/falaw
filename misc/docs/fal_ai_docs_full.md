@@ -4518,12 +4518,9 @@ import fal_client
 
 result = fal_client.subscribe(
     "fal-ai/flux/dev",
-    arguments={
-        "prompt": "a cat wearing a hat",
-        "image_size": "landscape_4_3"
-    },
+    arguments={"prompt": "a cat wearing a hat", "image_size": "landscape_4_3"},
     with_logs=True,
-    on_queue_update=lambda status: print(f"Status: {status}")
+    on_queue_update=lambda status: print(f"Status: {status}"),
 )
 
 print(result["images"][0]["url"])
@@ -4705,14 +4702,10 @@ Using an API scope key:
 ```python theme={null}
 import requests
 
-headers = {
-    "Authorization": "Key YOUR_API_KEY"
-}
+headers = {"Authorization": "Key YOUR_API_KEY"}
 
 response = requests.get(
-    "https://api.fal.ai/v1/models",
-    headers=headers,
-    params={"limit": 10}
+    "https://api.fal.ai/v1/models", headers=headers, params={"limit": 10}
 )
 
 print(response.json())
@@ -5548,9 +5541,7 @@ client.apps.scale("my-app", max_concurrency=10)
   from datetime import datetime, timedelta
 
   runners = client.apps.runners("my-app")
-  recent = client.apps.runners(
-      "my-app", since=datetime.now() - timedelta(hours=1)
-  )
+  recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1))
   running = client.apps.runners("my-app", state=["running"])
   ```
 
@@ -5837,10 +5828,10 @@ Its namespaces and methods mirror the CLI so you can automate the same workflows
 from fal.api import SyncServerlessClient
 
 client = SyncServerlessClient(
-    host=None,     # Optional. Override API host
+    host=None,  # Optional. Override API host
     api_key=None,  # Optional. If omitted, read from env/profile
     profile=None,  # Optional. Named profile to use
-    team=None,     # Optional. Team context for runner ops
+    team=None,  # Optional. Team context for runner ops
 )
 ```
 
@@ -5875,8 +5866,10 @@ staging_apps = client.apps.list(environment_name="staging")
 app_runners = client.apps.runners("my-app")
 
 # Optional filters
-recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1)) # last hour
-running_only = client.apps.runners("my-app", state=["running"])                   # by state
+recent = client.apps.runners(
+    "my-app", since=datetime.now() - timedelta(hours=1)
+)  # last hour
+running_only = client.apps.runners("my-app", state=["running"])  # by state
 
 # List runners for an app in a specific environment
 staging_runners = client.apps.runners("my-app", environment_name="staging")
@@ -5889,12 +5882,12 @@ Maps to CLI flags in `fal apps scale`. Any omitted option keeps the current valu
 ```python theme={null}
 client.apps.scale(
     "my-app",
-    keep_alive=300,            # seconds
+    keep_alive=300,  # seconds
     max_multiplexing=1,
     max_concurrency=10,
     min_concurrency=1,
-    request_timeout=600,       # seconds
-    startup_timeout=900,       # seconds
+    request_timeout=600,  # seconds
+    startup_timeout=900,  # seconds
     machine_types=["GPU-H100", "GPU-H200"],
     regions=["us-east-1", "us-west-2"],
     concurrency_buffer=1,
@@ -5939,7 +5932,7 @@ from fal.sdk import KeyScope
 
 # ADMIN keys can manage resources; API keys are limited to app invocation.
 key_id, key_secret = client.keys.create(
-    scope=KeyScope.ADMIN,          # or KeyScope.API
+    scope=KeyScope.ADMIN,  # or KeyScope.API
     description="CI deploy key",
 )
 print(f"Store securely: {key_id}:{key_secret}")  # secret shown only once
@@ -6043,10 +6036,10 @@ client.deploy("my-app")
 client.deploy(
     app_ref="path/to/myfile.py::MyApp",
     app_name="myapp",
-    auth="public",                # "private" | "public"
-    strategy="rolling",           # "recreate" | "rolling"
-    reset_scale=True,             # use previous scaling if False
-    environment_name="staging",   # target environment
+    auth="public",  # "private" | "public"
+    strategy="rolling",  # "recreate" | "rolling"
+    reset_scale=True,  # use previous scaling if False
+    environment_name="staging",  # target environment
 )
 ```
 
@@ -6528,6 +6521,7 @@ pip install fal
 
 ```python theme={null}
 import fal
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -7352,6 +7346,7 @@ Features:
 ```python theme={null}
 from fal.toolkit.pydantic import FalBaseModel, Field, Hidden
 
+
 class Input(FalBaseModel):
     FIELD_ORDERS = ["prompt", "image_url"]
 
@@ -7916,7 +7911,11 @@ The cache is loaded on entry and synced on exit (even if an exception occurs).
 > API reference for fal.toolkit.image.nsfw_filter
 
 ```python theme={null}
-from fal.toolkit.image.nsfw_filter import NSFWImageDetectionInput, NSFWImageDetectionOutput, run_nsfw_estimation
+from fal.toolkit.image.nsfw_filter import (
+    NSFWImageDetectionInput,
+    NSFWImageDetectionOutput,
+    run_nsfw_estimation,
+)
 ```
 
 ## Classes
@@ -8525,6 +8524,7 @@ def run_nsfw_estimation(input: fal.toolkit.image.nsfw_filter.inference.NSFWImage
   ```python theme={null}
   from fal.toolkit import FalBaseModel, Field, Hidden, ImageField
 
+
   class TextToImageInput(FalBaseModel):
       FIELD_ORDERS = ["prompt", "negative_prompt", "image_size"]
 
@@ -8535,6 +8535,7 @@ def run_nsfw_estimation(input: fal.toolkit.image.nsfw_filter.inference.NSFWImage
       # Hidden from playground but accessible via API
       debug_mode: bool = Hidden(Field(default=False))
       internal_seed: int = Hidden(Field(default=-1))
+
 
   class ImageToImageInput(FalBaseModel):
       image_url: str = ImageField(description="Input image")
@@ -8640,6 +8641,7 @@ def run_nsfw_estimation(input: fal.toolkit.image.nsfw_filter.inference.NSFWImage
   COPY src/ ./src/
   """
 
+
   class MyApp(fal.App):
       image = ContainerImage.from_dockerfile_str(dockerfile_str)
   ```
@@ -8654,7 +8656,7 @@ def run_nsfw_estimation(input: fal.toolkit.image.nsfw_filter.inference.NSFWImage
 
   ```python theme={null}
   class MyApp(fal.App):
-      skip_retry_conditions=["timeout"]  # This app won't retry on timeout
+      skip_retry_conditions = ["timeout"]  # This app won't retry on timeout
       ...
   ```
 
@@ -9300,7 +9302,7 @@ print(f"GPU count: {torch.cuda.device_count()}")
 
 if torch.cuda.is_available():
     # Create large tensors on GPU
-    device = torch.device('cuda')
+    device = torch.device("cuda")
 
     # Simple matrix multiplication test
     print("Running GPU compute test...")
@@ -10696,6 +10698,7 @@ GPU/CPU instance type for your runners.
 class MyApp(fal.App):
     machine_type = "GPU-A100"
 
+
 # With fallback options (tried in order)
 class MyApp(fal.App):
     machine_type = ["GPU-H100", "GPU-A100"]
@@ -10772,6 +10775,7 @@ You can set scaling parameters in three ways.
 
 ```python theme={null}
 import fal
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -10895,8 +10899,10 @@ Use the `health_check` keyword argument in the `@fal.endpoint()` decorator to de
 import fal
 from pydantic import BaseModel
 
+
 class HealthResponse(BaseModel):
     status: str
+
 
 class MyApp(fal.App):
     def setup(self):
@@ -11104,11 +11110,14 @@ You write a Python class that inherits from `fal.App`. This class declares what 
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     result: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-H100"
@@ -11116,6 +11125,7 @@ class MyApp(fal.App):
 
     def setup(self):
         from transformers import pipeline
+
         self.pipe = pipeline("text-generation", model="gpt2", device="cuda")
 
     @fal.endpoint("/")
@@ -11143,8 +11153,10 @@ import fal
 
 CONFIG = {"api_key": os.environ["MY_API_KEY"]}
 
+
 def helper(x):
     import torch
+
     return torch.tensor(x)
 ```
 
@@ -11161,15 +11173,17 @@ import fal
 
 CONFIG = {"model_name": "stabilityai/sdxl-base"}
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     requirements = ["torch", "diffusers"]
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
-        self.pipe = StableDiffusionXLPipeline.from_pretrained(
-            CONFIG["model_name"]
-        ).to("cuda")
+
+        self.pipe = StableDiffusionXLPipeline.from_pretrained(CONFIG["model_name"]).to(
+            "cuda"
+        )
 
     @fal.endpoint("/")
     def generate(self, input: dict) -> dict:
@@ -11237,6 +11251,7 @@ Runners shut down when they reach their keep\_alive expiration, when you manuall
 ```python theme={null}
 import threading
 import fal
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -11344,9 +11359,9 @@ Submits a request to the queue, polls automatically, and returns the result when
     ```python theme={null}
     import fal_client
 
-    result = fal_client.subscribe("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    })
+    result = fal_client.subscribe(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    )
     print(result)
     ```
 
@@ -11355,10 +11370,12 @@ Submits a request to the queue, polls automatically, and returns the result when
     ```python theme={null}
     import fal_client
 
+
     def on_queue_update(update):
         if isinstance(update, fal_client.InProgress):
             for log in update.logs:
                 print(log["message"])
+
 
     result = fal_client.subscribe(
         "your-username/your-app-name",
@@ -11410,9 +11427,9 @@ For fire-and-forget workflows. Submit a request, get a request ID, and retrieve 
     ```python theme={null}
     import fal_client
 
-    handler = fal_client.submit("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    })
+    handler = fal_client.submit(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    )
 
     print(f"Request ID: {handler.request_id}")
 
@@ -11463,9 +11480,9 @@ For apps that produce progressive output via Server-Sent Events (SSE). Your app 
     ```python theme={null}
     import fal_client
 
-    for event in fal_client.stream("your-username/your-app-name", arguments={
-        "prompt": "a sunset over mountains"
-    }):
+    for event in fal_client.stream(
+        "your-username/your-app-name", arguments={"prompt": "a sunset over mountains"}
+    ):
         print(event)
     ```
   </Tab>
@@ -11518,11 +11535,13 @@ For bidirectional, low-latency communication over a persistent connection. Your 
     import asyncio
     import fal_client
 
+
     async def main():
         async with fal_client.realtime_async("your-username/your-app-name") as connection:
             await connection.send({"prompt": "Hello, world!"})
             result = await connection.recv()
             print(result)
+
 
     asyncio.run(main())
     ```
@@ -11697,6 +11716,7 @@ When you need full control over the environment, use a Dockerfile. This is the r
 
 ```python theme={null}
 from fal.container import ContainerImage
+
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -12001,11 +12021,7 @@ There are 3 ways to speed up downloads:
   os.environ["HF_XET_CHUNK_CACHE_SIZE_BYTES"] = "1000000000000"
   os.environ["HF_XET_NUM_CONCURRENT_RANGE_GETS"] = "32"
 
-  snapshot_download(
-      repo_id=model_id,
-      local_dir=model_dir,
-      max_workers=32
-  )
+  snapshot_download(repo_id=model_id, local_dir=model_dir, max_workers=32)
   ```
 
 * Download many models in parallel: when downloading multiple models, it helps to start a separate Fal run for each one. The different source IP address reduces the risk of rate limiting.
@@ -12073,11 +12089,14 @@ At minimum, an endpoint is a method on your `fal.App` class decorated with `@fal
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     text: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -12096,12 +12115,10 @@ You can define multiple endpoints on the same app at different paths. Callers re
 ```python theme={null}
 class MyApp(fal.App):
     @fal.endpoint("/")
-    def generate(self, input: GenerateInput) -> GenerateOutput:
-        ...
+    def generate(self, input: GenerateInput) -> GenerateOutput: ...
 
     @fal.endpoint("/enhance")
-    def enhance(self, input: EnhanceInput) -> EnhanceOutput:
-        ...
+    def enhance(self, input: EnhanceInput) -> EnhanceOutput: ...
 ```
 
 ## What's in This Section
@@ -12129,6 +12146,7 @@ These platform variables are separate from your own [secrets](/documentation/dev
 import os
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         app_name = os.getenv("FAL_APP_NAME")
@@ -12149,12 +12167,13 @@ The `FAL_KEY` variable is set automatically when your app runs with privileged a
 ```python theme={null}
 import fal_client
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self, prompt: str):
-        result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-            "prompt": prompt
-        })
+        result = fal_client.subscribe(
+            "fal-ai/flux/schnell", arguments={"prompt": prompt}
+        )
         return result
 ```
 
@@ -12185,6 +12204,7 @@ These are useful for structured logging, metrics tagging, and conditional logic.
 import os
 import logging
 
+
 class MyApp(fal.App):
     def setup(self):
         self.logger = logging.getLogger(os.getenv("FAL_APP_NAME", "app"))
@@ -12205,6 +12225,7 @@ fal sets this variable at each stage of the [runner lifecycle](/documentation/de
 
 ```python theme={null}
 import os
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -12231,6 +12252,7 @@ fal sets `HF_HOME` to a path on the [persistent /data filesystem](/documentation
 
 ```python theme={null}
 from transformers import AutoModel
+
 
 class MyApp(fal.App):
     def setup(self):
@@ -12269,18 +12291,15 @@ The `requirements` attribute in your `fal.App` class is where you specify the Py
 ```python theme={null}
 import fal
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
-    
-    requirements = [
-        "torch==2.4.0",
-        "transformers",
-        "diffusers",
-        "accelerate"
-    ]
-    
+
+    requirements = ["torch==2.4.0", "transformers", "diffusers", "accelerate"]
+
     def setup(self):
         import torch
+
         ...
 ```
 
@@ -12419,6 +12438,7 @@ When you need different wheels for different Python versions or platforms, use a
 ```python theme={null}
 def get_package_wheel():
     import sys
+
     wheels = {
         10: "https://example.com/wheels/mypackage-1.0.0-cp310-cp310-linux_x86_64.whl",
         11: "https://example.com/wheels/mypackage-1.0.0-cp311-cp311-linux_x86_64.whl",
@@ -12494,14 +12514,17 @@ import fal
 from pydantic import BaseModel, Field
 from fal.toolkit import Image
 
+
 class Input(BaseModel):
     prompt: str = Field(
         description="The prompt to generate an image from",
         examples=["A beautiful image of a cat"],
     )
 
+
 class Output(BaseModel):
     image: Image
+
 
 class MyApp(fal.App):
     keep_alive = 300
@@ -12790,6 +12813,7 @@ Create a file called `hello_world.py` with this simple app:
 
 ```python theme={null}
 import fal
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13178,6 +13202,7 @@ For the best experience defining inputs and outputs, use `FalBaseModel` from the
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, Hidden
 
+
 class TextToImageInput(FalBaseModel):
     FIELD_ORDERS = ["prompt", "negative_prompt", "image_size"]
 
@@ -13199,12 +13224,14 @@ This is particularly useful when you have a base model with common fields that m
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, ImageField
 
+
 # Base model with common fields
 class BaseTextInput(FalBaseModel):
     FIELD_ORDERS = ["prompt", "negative_prompt"]
 
     prompt: str = Field(description="Text prompt")
     negative_prompt: str = Field(default="", description="What to avoid")
+
 
 # Extended model for image-to-image
 class ImageToImageInput(BaseTextInput):
@@ -13213,6 +13240,7 @@ class ImageToImageInput(BaseTextInput):
 
     image_url: str = ImageField(description="Input image")
     strength: float = Field(default=0.8, description="How much to transform")
+
 
 # Without FIELD_ORDERS, schema would show: image_url, strength, prompt, negative_prompt
 # With FIELD_ORDERS, schema shows: prompt, negative_prompt, image_url, strength
@@ -13232,6 +13260,7 @@ Use `Hidden()` to wrap any field that should be available via API but hidden fro
 
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, Hidden
+
 
 class MyInput(FalBaseModel):
     prompt: str = Field(description="User prompt")
@@ -13254,6 +13283,7 @@ For better playground rendering, use the specialized field helpers instead of pl
 
 ```python theme={null}
 from fal.toolkit import FalBaseModel, ImageField, AudioField
+
 
 class MyInput(FalBaseModel):
     # Renders as image upload in playground
@@ -13304,11 +13334,13 @@ Name your field with a `file_url` suffix and it will be rendered as a file in th
 ```python theme={null}
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     file_url: str
 
-class MyOutput(BaseModel):
-    ...
+
+class MyOutput(BaseModel): ...
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13323,6 +13355,7 @@ Alternatively if that naming convention is not suitable, you can use the `FileFi
 ```python theme={null}
 from fal.toolkit import FalBaseModel, FileField
 
+
 class MyInput(FalBaseModel):
     document: str = FileField(description="Upload a document")
 ```
@@ -13334,12 +13367,14 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
+
     class MyInput(BaseModel):
         document: str = Field(..., json_schema_extra={"ui": {"field": "file"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
+
 
     class MyInput(BaseModel):
         document: str = Field(..., ui={"field": "file"})
@@ -13354,6 +13389,7 @@ Use the `File` type from `fal.toolkit` in your output schema. The Playground ren
 ```python theme={null}
 from fal.toolkit import File
 from pydantic import BaseModel
+
 
 class MyOutput(BaseModel):
     file: File
@@ -13382,11 +13418,13 @@ Name your field with a `image_url` suffix and it will be rendered as an image in
 from pydantic import BaseModel
 from fal.toolkit import download_file
 
+
 class MyInput(BaseModel):
     image_url: str
 
-class MyOutput(BaseModel):
-    ...
+
+class MyOutput(BaseModel): ...
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13401,6 +13439,7 @@ Alternatively if that naming convention is not suitable, you can use the `ImageF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, ImageField
 
+
 class MyInput(FalBaseModel):
     photo: str = ImageField(description="Upload a photo")
 ```
@@ -13412,12 +13451,14 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
+
     class MyInput(BaseModel):
         photo: str = Field(..., json_schema_extra={"ui": {"field": "image"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
+
 
     class MyInput(BaseModel):
         photo: str = Field(..., ui={"field": "image"})
@@ -13432,6 +13473,7 @@ Use the `Image` type in your output schema. The Playground renders it as an imag
 ```python theme={null}
 from fal.toolkit import Image
 from pydantic import BaseModel
+
 
 class MyOutput(BaseModel):
     image: Image
@@ -13463,9 +13505,11 @@ from typing import List
 from fal.toolkit import Image
 from pydantic import BaseModel
 
+
 class MyOutput(BaseModel):
     images: List[Image]
     has_nsfw_concepts: List[bool]
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13509,6 +13553,7 @@ Use `image_urls` suffix to render a dataset of images in the playground.
 from typing import List
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     image_urls: List[str]
 ```
@@ -13521,11 +13566,13 @@ Name your field with a `audio_url` suffix and it will be rendered as an audio in
 from typing import List
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     audio_url: str
 
-class MyOutput(BaseModel):
-    ...
+
+class MyOutput(BaseModel): ...
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13540,6 +13587,7 @@ Alternatively if that naming convention is not suitable, you can use the `AudioF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, AudioField
 
+
 class MyInput(FalBaseModel):
     voice_sample: str = AudioField(description="Upload a voice sample")
 ```
@@ -13551,12 +13599,14 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
+
     class MyInput(BaseModel):
         voice_sample: str = Field(..., json_schema_extra={"ui": {"field": "audio"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
+
 
     class MyInput(BaseModel):
         voice_sample: str = Field(..., ui={"field": "audio"})
@@ -13571,6 +13621,7 @@ Use the `Audio` type in your output schema. The Playground renders it as an audi
 ```python theme={null}
 from fal.toolkit import Audio
 from pydantic import BaseModel
+
 
 class MyOutput(BaseModel):
     audio: Audio
@@ -13600,6 +13651,7 @@ from typing import List
 from fal.toolkit import Audio
 from pydantic import BaseModel
 
+
 class MyOutput(BaseModel):
     audios: List[Audio]
 ```
@@ -13614,6 +13666,7 @@ Use `audio_urls` suffix to render a dataset of audios in the playground.
 from typing import List
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     audio_urls: List[str]
 ```
@@ -13626,11 +13679,13 @@ Name your field with a `video_url` suffix and it will be rendered as a video in 
 from typing import List
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     video_url: str
 
-class MyOutput(BaseModel):
-    ...
+
+class MyOutput(BaseModel): ...
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13645,6 +13700,7 @@ Alternatively if that naming convention is not suitable, you can use the `VideoF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, VideoField
 
+
 class MyInput(FalBaseModel):
     clip: str = VideoField(description="Upload a video clip")
 ```
@@ -13656,12 +13712,14 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
+
     class MyInput(BaseModel):
         clip: str = Field(..., json_schema_extra={"ui": {"field": "video"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
+
 
     class MyInput(BaseModel):
         clip: str = Field(..., ui={"field": "video"})
@@ -13676,6 +13734,7 @@ Use the `Video` type in your output schema. The Playground renders it as a video
 ```python theme={null}
 from fal.toolkit import Video
 from pydantic import BaseModel
+
 
 class MyOutput(BaseModel):
     video: Video
@@ -13705,6 +13764,7 @@ from typing import List
 from fal.toolkit import Video
 from pydantic import BaseModel
 
+
 class MyOutput(BaseModel):
     videos: List[Video]
 ```
@@ -13719,6 +13779,7 @@ Use `video_urls` suffix to render a dataset of videos in the playground.
 from typing import List
 from pydantic import BaseModel
 
+
 class MyInput(BaseModel):
     video_urls: List[str]
 ```
@@ -13729,6 +13790,7 @@ Name your field with a `mask_image_url` or `mask_url` suffix (or prefix) and the
 
 ```python theme={null}
 from pydantic import BaseModel
+
 
 class InpaintInput(BaseModel):
     image_url: str
@@ -13746,10 +13808,12 @@ If your input uses a Pydantic model named `RGBColor` with `r`, `g`, `b` integer 
 from pydantic import BaseModel, Field
 from typing import List
 
+
 class RGBColor(BaseModel):
     r: int = Field(ge=0, le=255)
     g: int = Field(ge=0, le=255)
     b: int = Field(ge=0, le=255)
+
 
 class MyInput(BaseModel):
     background_color: RGBColor = RGBColor(r=255, g=255, b=255)
@@ -13767,8 +13831,10 @@ Use `ImageSizeInput` from `fal.toolkit` to render an image size selector with pr
 ```python theme={null}
 from fal.toolkit import ImageSizeInput, get_image_size
 
+
 class MyInput(BaseModel):
     image_size: ImageSizeInput = "square_hd"
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -13787,6 +13853,7 @@ Name your field with a `face_image_url` suffix and the Playground renders a came
 ```python theme={null}
 from pydantic import BaseModel
 
+
 class FaceSwapInput(BaseModel):
     face_image_url: str
     target_image_url: str
@@ -13799,11 +13866,12 @@ Use `ui.field = "camera_control"` or name your field ending with `advanced_camer
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
+
 class VideoInput(FalBaseModel):
     prompt: str
     camera_control: dict = Field(
         default={"movement_type": "default", "movement_value": 0},
-        json_schema_extra={"ui": {"field": "camera_control"}}
+        json_schema_extra={"ui": {"field": "camera_control"}},
     )
 ```
 
@@ -13813,6 +13881,7 @@ Name your field with a `model_url` suffix and the Playground renders a 3D model 
 
 ```python theme={null}
 from pydantic import BaseModel
+
 
 class TextureInput(BaseModel):
     model_url: str
@@ -13826,6 +13895,7 @@ Name your field with a `data_url` or `archive_url` suffix to render a dataset up
 ```python theme={null}
 from pydantic import BaseModel
 
+
 class TrainingInput(BaseModel):
     training_data_url: str
     trigger_word: str
@@ -13838,6 +13908,7 @@ Fields ending in `model_name` automatically render as a preset selector. The Pla
 ```python theme={null}
 from pydantic import BaseModel, Field
 
+
 class MyInput(BaseModel):
     model_name: str = Field(
         default="stabilityai/stable-diffusion-xl-base-1.0",
@@ -13845,7 +13916,7 @@ class MyInput(BaseModel):
             "stabilityai/stable-diffusion-xl-base-1.0",
             "runwayml/stable-diffusion-v1-5",
             "black-forest-labs/FLUX.1-dev",
-        ]
+        ],
     )
 ```
 
@@ -13863,17 +13934,21 @@ import numpy as np
 from pydantic import BaseModel
 from fal.toolkit import File
 
+
 class DepthInput(BaseModel):
     image_url: str
 
+
 class DepthOutput(BaseModel):
     depth_map: File
+
 
 class DepthApp(fal.App):
     machine_type = "GPU-A100"
 
     def setup(self):
         import cv2
+
         self.cv2 = cv2
 
     @fal.endpoint("/")
@@ -13915,11 +13990,14 @@ import fal
 from pydantic import BaseModel
 from fal.toolkit import File
 
+
 class MeshInput(BaseModel):
     image_url: str
 
+
 class MeshOutput(BaseModel):
     mesh: File
+
 
 class MeshApp(fal.App):
     machine_type = "GPU-A100"
@@ -13995,6 +14073,7 @@ class MyInput(BaseModel):
 ```python theme={null}
 from typing import Literal
 
+
 class MyInput(BaseModel):
     scheduler: Literal["euler", "ddim", "dpm++"] = "euler"
     image_size: Literal["square_hd", "landscape_16_9", "portrait_4_3"] = "square_hd"
@@ -14012,11 +14091,11 @@ class MyInput(BaseModel):
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
+
 class MyInput(FalBaseModel):
     prompt: str = Field(description="This automatically renders as textarea")
     system_message: str = Field(
-        default="",
-        json_schema_extra={"ui": {"field": "textarea"}}
+        default="", json_schema_extra={"ui": {"field": "textarea"}}
     )
 ```
 
@@ -14024,6 +14103,7 @@ class MyInput(FalBaseModel):
 
 ```python theme={null}
 from typing import List, Literal
+
 
 class MyInput(BaseModel):
     styles: List[Literal["photorealistic", "anime", "oil-painting", "watercolor"]] = []
@@ -14036,31 +14116,25 @@ You can control Playground behavior with `json_schema_extra` metadata on any fie
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
+
 class MyInput(FalBaseModel):
     prompt: str = Field(description="Main prompt")
 
     # Override the widget type
-    notes: str = Field(
-        default="",
-        json_schema_extra={"ui": {"field": "textarea"}}
-    )
+    notes: str = Field(default="", json_schema_extra={"ui": {"field": "textarea"}})
 
     # Show helper text below the field
     lora_url: str = Field(
         default="",
-        json_schema_extra={"ui": {"hint": "Paste a HuggingFace or Civitai URL"}}
+        json_schema_extra={"ui": {"hint": "Paste a HuggingFace or Civitai URL"}},
     )
 
     # Mark as read-only in Playground (API-only parameter)
-    internal_config: str = Field(
-        default="",
-        json_schema_extra={"ui": {"frozen": True}}
-    )
+    internal_config: str = Field(default="", json_schema_extra={"ui": {"frozen": True}})
 
     # Force field into the main form (not "Additional Settings")
     negative_prompt: str = Field(
-        default="",
-        json_schema_extra={"ui": {"important": True}}
+        default="", json_schema_extra={"ui": {"important": True}}
     )
 ```
 
@@ -14201,6 +14275,7 @@ The `local_python_modules` attribute ships a Python module alongside your app by
 ```python theme={null}
 from mymodule import myfunction
 
+
 class MyApp(fal.App):
     local_python_modules = ["mymodule"]
 
@@ -14219,6 +14294,7 @@ Use `clone_repository` to pull code from a Git repository at runner startup. The
 ```python theme={null}
 from fal.toolkit import clone_repository
 
+
 class MyApp(fal.App):
     def setup(self):
         path = clone_repository(
@@ -14228,6 +14304,7 @@ class MyApp(fal.App):
         )
 
         import myproject
+
         ...
 ```
 
@@ -14325,6 +14402,7 @@ For quick debugging, `print()` is the simplest approach. Both `stdout` and `stde
 ```python theme={null}
 import fal
 import sys
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -14453,9 +14531,11 @@ Secrets are available as standard environment variables inside your app. Use `os
 import os
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         import huggingface_hub
+
         huggingface_hub.login(token=os.getenv("HF_TOKEN"))
         self.pipe = load_gated_model()
 
@@ -14478,10 +14558,9 @@ Instead, use the `${}` substitution syntax in your `requirements` list. fal repl
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
-    requirements = [
-        "git+https://${GITHUB_TOKEN}@github.com/myorg/private-package"
-    ]
+    requirements = ["git+https://${GITHUB_TOKEN}@github.com/myorg/private-package"]
 ```
 
 This is the only way to use secrets during dependency installation. The substitution happens server-side before pip runs, and the token is not stored in the final image.
@@ -14587,6 +14666,7 @@ FROM your-base-image
 # ... your setup
 """
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(DOCKERFILE),
     machine_type="GPU-A100",
@@ -14639,11 +14719,14 @@ FROM your-base-image
 
 SERVER_PORT = 8000
 
+
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
 
+
 class GenerateResponse(BaseModel):
     image: Image
+
 
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
@@ -14880,11 +14963,14 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     app = modal.App()
     image = modal.Image.debian_slim().pip_install("torch", "transformers")
 
+
     @app.function(image=image, gpu="A100")
     def generate(prompt: str):
         from transformers import pipeline
+
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
+
 
     @app.local_entrypoint()
     def main():
@@ -14897,12 +14983,14 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     ```python theme={null}
     import fal
 
+
     @fal.function(
         requirements=["torch", "transformers"],
         machine_type="GPU-A100",
     )
     def generate(prompt: str):
         from transformers import pipeline
+
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
     ```
@@ -14921,10 +15009,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     import modal
 
     app = modal.App()
-    image = (
-        modal.Image.debian_slim()
-        .pip_install("torch", "diffusers", "transformers", "accelerate")
+    image = modal.Image.debian_slim().pip_install(
+        "torch", "diffusers", "transformers", "accelerate"
     )
+
 
     @app.cls(image=image, gpu="A100")
     class TextToImage:
@@ -14947,6 +15035,7 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
         def cleanup(self):
             del self.pipe
 
+
     @app.local_entrypoint()
     def main():
         result = TextToImage().generate.remote(prompt="a sunset")
@@ -14957,6 +15046,7 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     ```python theme={null}
     import fal
     from fal.toolkit import Image
+
 
     class TextToImage(fal.App):
         machine_type = "GPU-A100"
@@ -15000,9 +15090,10 @@ TextToImage().generate.remote(prompt="a sunset")
 
 # fal
 import fal_client
-result = fal_client.subscribe("your-username/text-to-image", arguments={
-    "prompt": "a sunset"
-})
+
+result = fal_client.subscribe(
+    "your-username/text-to-image", arguments={"prompt": "a sunset"}
+)
 ```
 
 ***
@@ -15033,17 +15124,18 @@ Modal chains image methods (`Image.debian_slim().pip_install(...).apt_install(..
 ```python theme={null}
 # Modal
 image = (
-    modal.Image.debian_slim()
-    .apt_install("ffmpeg")
-    .pip_install("torch", "diffusers")
+    modal.Image.debian_slim().apt_install("ffmpeg").pip_install("torch", "diffusers")
 )
+
 
 # fal (simple)
 class MyApp(fal.App):
     requirements = ["torch", "diffusers"]
 
+
 # fal (Dockerfile)
 from fal.container import ContainerImage
+
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -15061,9 +15153,10 @@ Modal uses named `Volume` objects mounted at specific paths. fal provides `/data
 # Modal
 volume = modal.Volume.from_name("model-cache")
 
+
 @app.cls(volumes={"/cache": volume})
-class MyModel:
-    ...
+class MyModel: ...
+
 
 # fal -- /data is always available, no configuration needed
 class MyModel(fal.App):
@@ -15147,6 +15240,7 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     import torch
     from diffusers import StableDiffusionXLPipeline
 
+
     class Predictor(BasePredictor):
         def setup(self):
             self.pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -15168,11 +15262,14 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     from pydantic import BaseModel, Field
     from fal.toolkit import Image
 
+
     class Input(BaseModel):
         prompt: str = Field(description="Text prompt")
 
+
     class Output(BaseModel):
         image: Image
+
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -15219,6 +15316,7 @@ Then reference the Dockerfile in your fal app:
 import fal
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile("Dockerfile")
@@ -15255,9 +15353,9 @@ fal deploy my_app.py::MyApp
 # Call your deployed app
 import fal_client
 
-result = fal_client.subscribe("your-username/my-app", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "your-username/my-app", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["image"]["url"])
 ```
 
@@ -15324,11 +15422,13 @@ The most common pattern on RunPod is a handler function that loads a model at mo
         torch_dtype=torch.float16,
     ).to("cuda")
 
+
     def handler(job):
         prompt = job["input"]["prompt"]
         image = model(prompt).images[0]
         image.save("/tmp/output.png")
         return {"image_path": "/tmp/output.png"}
+
 
     runpod.serverless.start({"handler": handler})
     ```
@@ -15340,11 +15440,14 @@ The most common pattern on RunPod is a handler function that loads a model at mo
     from pydantic import BaseModel
     from fal.toolkit import Image
 
+
     class Input(BaseModel):
         prompt: str
 
+
     class Output(BaseModel):
         image: Image
+
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -15400,14 +15503,12 @@ RunPod exposes `/run` (async), `/runsync` (sync), and `/stream` endpoints. fal p
     import fal_client
 
     # Sync (subscribe polls automatically)
-    result = fal_client.subscribe("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    result = fal_client.subscribe(
+        "your-username/your-app", arguments={"prompt": "a sunset"}
+    )
 
     # Async
-    handler = fal_client.submit("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    handler = fal_client.submit("your-username/your-app", arguments={"prompt": "a sunset"})
     status = handler.status()
     result = handler.get()
     ```
@@ -15448,8 +15549,7 @@ On RunPod, the deployment unit is a Docker image. Your handler code lives inside
         machine_type = "GPU-A100"
         requirements = ["torch", "diffusers", "transformers"]
 
-        def setup(self):
-            ...
+        def setup(self): ...
     ```
 
     ```bash theme={null}
@@ -15477,6 +15577,7 @@ class MyApp(fal.App):
 ```python theme={null}
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
@@ -15492,9 +15593,11 @@ RunPod offers three approaches for model weights: Hugging Face cache, baked into
 ```python theme={null}
 def setup(self):
     import os
+
     os.environ["HF_HOME"] = "/data/.cache/huggingface"
 
     from diffusers import StableDiffusionXLPipeline
+
     self.model = StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0"
     ).to("cuda")
@@ -15573,12 +15676,14 @@ Three apps: a CPU router and two GPU backends for different resolutions.
 import fal
 from fal.toolkit import Image
 
+
 class ImageGenStandard(fal.App):
     machine_type = "GPU-A100"
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -15595,12 +15700,14 @@ class ImageGenStandard(fal.App):
 import fal
 from fal.toolkit import Image
 
+
 class ImageGenHighRes(fal.App):
     machine_type = "GPU-H100"
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -15628,6 +15735,7 @@ import fal_client
 
 STANDARD_THRESHOLD = 1024 * 1024  # 1 megapixel
 
+
 class ImageRouter(fal.App):
     machine_type = "S"  # Lightweight CPU -- just routing, no GPU needed
     requirements = ["fal-client"]
@@ -15641,11 +15749,14 @@ class ImageRouter(fal.App):
         else:
             app_id = "your-username/image-gen-highres"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": prompt,
-            "width": width,
-            "height": height,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": prompt,
+                "width": width,
+                "height": height,
+            },
+        )
 
         return result
 ```
@@ -15667,6 +15778,7 @@ import fal
 import fal_client
 import random
 
+
 class ABTestRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
@@ -15679,9 +15791,12 @@ class ABTestRouter(fal.App):
         else:
             app_id = "your-username/model-v2"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": prompt,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": prompt,
+            },
+        )
 
         # Include which version was used in the response
         result["model_version"] = app_id
@@ -15698,6 +15813,7 @@ Chain multiple apps together:
 import fal
 import fal_client
 
+
 class PipelineRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
@@ -15706,14 +15822,12 @@ class PipelineRouter(fal.App):
     def run_pipeline(self, image_url: str) -> dict:
         # Step 1: Upscale
         upscaled = fal_client.subscribe(
-            "fal-ai/real-esrgan",
-            arguments={"image_url": image_url, "scale": 4}
+            "fal-ai/real-esrgan", arguments={"image_url": image_url, "scale": 4}
         )
 
         # Step 2: Remove background
         result = fal_client.subscribe(
-            "fal-ai/birefnet",
-            arguments={"image_url": upscaled["image"]["url"]}
+            "fal-ai/birefnet", arguments={"image_url": upscaled["image"]["url"]}
         )
 
         return result
@@ -15822,20 +15936,22 @@ import os
 import boto3
 import base64
 
+
 def get_ecr_token(region: str) -> str:
     ecr_client = boto3.client(
-        'ecr',
+        "ecr",
         aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name=region
+        region_name=region,
     )
     response = ecr_client.get_authorization_token()
-    auth_data = response['authorizationData'][0]
-    token = auth_data['authorizationToken']
+    auth_data = response["authorizationData"][0]
+    token = auth_data["authorizationToken"]
     # Decode from base64, format is "AWS:password"
-    decoded_token = base64.b64decode(token).decode('utf-8')
-    _, password = decoded_token.split(':', 1)
+    decoded_token = base64.b64decode(token).decode("utf-8")
+    _, password = decoded_token.split(":", 1)
     return password
+
 
 class MyModel(fal.App):
     image = fal.container.ContainerImage.from_dockerfile_str(
@@ -15939,11 +16055,13 @@ with fal_client.realtime("your-username/your-app-name") as connection:
 import asyncio
 import fal_client
 
+
 async def main():
     async with fal_client.realtime_async("your-username/your-app-name") as connection:
         await connection.send({"prompt": "Hello, world!"})
         result = await connection.recv()
         print(result)
+
 
 asyncio.run(main())
 ```
@@ -15968,12 +16086,16 @@ with fal_client.ws_connect("your-username/your-app-name", path="/echo") as ws:
 import asyncio
 import fal_client
 
+
 async def main():
-    async with fal_client.ws_connect_async("your-username/your-app-name", path="/echo") as ws:
+    async with fal_client.ws_connect_async(
+        "your-username/your-app-name", path="/echo"
+    ) as ws:
         await ws.send("Hello, world!")
         for _ in range(3):
             message = await ws.recv()
             print(message)
+
 
 asyncio.run(main())
 ```
@@ -16029,6 +16151,7 @@ Request headers are per-request context, complementing [environment variables](/
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
 
@@ -16064,19 +16187,24 @@ Attach the request ID to Sentry events so you can find the exact fal request tha
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     requirements = ["sentry-sdk"]
 
     def setup(self):
         import sentry_sdk
+
         sentry_sdk.init(dsn="https://your-sentry-dsn")
         self.model = load_model()
 
     @fal.endpoint("/")
     def generate(self, prompt: str) -> dict:
         import sentry_sdk
-        sentry_sdk.set_tag("fal_request_id", self.current_request.headers.get("x-fal-request-id"))
+
+        sentry_sdk.set_tag(
+            "fal_request_id", self.current_request.headers.get("x-fal-request-id")
+        )
         return {"image": self.model(prompt)}
 ```
 
@@ -16089,6 +16217,7 @@ import fal
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -16112,12 +16241,11 @@ Callers can pass custom headers that are forwarded to your app:
 
 ```python theme={null}
 # Caller passes a custom header
-result = fal_client.subscribe("your-user/your-app", arguments={
-    "prompt": "a sunset"
-}, headers={
-    "X-My-Trace-Id": "abc-123",
-    "X-My-User-Tier": "premium"
-})
+result = fal_client.subscribe(
+    "your-user/your-app",
+    arguments={"prompt": "a sunset"},
+    headers={"X-My-Trace-Id": "abc-123", "X-My-User-Tier": "premium"},
+)
 ```
 
 ```python theme={null}
@@ -16264,15 +16392,19 @@ class StreamingSDXLApp(fal.App):
             # Convert to base64 data URI
             buffer = BytesIO()
             image.save(buffer, format="JPEG", quality=70)
-            data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            data_uri = (
+                f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            )
 
             # Stream the image in the format the playground expects
-            event_queue.put({
-                "image": {
-                    "url": data_uri,
-                    "content_type": "image/jpeg",
+            event_queue.put(
+                {
+                    "image": {
+                        "url": data_uri,
+                        "content_type": "image/jpeg",
+                    }
                 }
-            })
+            )
 
             return callback_kwargs
 
@@ -16298,12 +16430,14 @@ class StreamingSDXLApp(fal.App):
                 data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
 
                 # Send final result in the same format
-                event_queue.put({
-                    "image": {
-                        "url": data_uri,
-                        "content_type": "image/jpeg",
+                event_queue.put(
+                    {
+                        "image": {
+                            "url": data_uri,
+                            "content_type": "image/jpeg",
+                        }
                     }
-                })
+                )
                 event_queue.put(None)  # Signal completion
 
             # Run pipeline in background thread
@@ -16467,9 +16601,11 @@ Now you can write comprehensive tests for this app:
 ```python theme={null}
 def test_myapp():
     with fal.app.AppClient.connect(MyApp) as client:
-        result = client.generate_image(prompt="A cat holding a sign that says hello world")
+        result = client.generate_image(
+            prompt="A cat holding a sign that says hello world"
+        )
         assert result is not None
-        assert hasattr(result, 'url')
+        assert hasattr(result, "url")
 ```
 
 ## Running locally with `fal run --local`
@@ -16527,11 +16663,14 @@ RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/list
 RUN pip install --no-cache-dir diffusers transformers accelerate
 """
 
+
 class Input(BaseModel):
     prompt: str = Field(description="The prompt to generate an image from.")
 
+
 class Output(BaseModel):
     image: Image
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -16596,6 +16735,7 @@ RUN pip install -r requirements.txt
 COPY src/ ./src/
 """
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str(dockerfile_str)
 ```
@@ -16604,8 +16744,7 @@ You can customize the build context directory for monorepos or shared code:
 
 ```python theme={null}
 image = ContainerImage.from_dockerfile_str(
-    dockerfile_str,
-    context_dir=Path(__file__).parent / "docker_context"
+    dockerfile_str, context_dir=Path(__file__).parent / "docker_context"
 )
 ```
 
@@ -16637,13 +16776,13 @@ Create a `.dockerignore` file in your project to exclude files from the build co
 
 ```python theme={null}
 # Inline patterns
-image = ContainerImage.from_dockerfile_str(dockerfile_str, dockerignore=[
-    ".git", "*.pyc", "__pycache__", ".env", "data/"
-])
+image = ContainerImage.from_dockerfile_str(
+    dockerfile_str, dockerignore=[".git", "*.pyc", "__pycache__", ".env", "data/"]
+)
 
 # Or reference an external file
-image = ContainerImage.from_dockerfile_str(dockerfile_str,
-    dockerignore_path=".dockerignore"
+image = ContainerImage.from_dockerfile_str(
+    dockerfile_str, dockerignore_path=".dockerignore"
 )
 
 # Or use the add_dockerignore method
@@ -16699,13 +16838,16 @@ Use [BuildKit secret mounts](https://docs.docker.com/build/building/secrets/#sec
 
 ```python theme={null}
 class MyApp(fal.App):
-    image = ContainerImage.from_dockerfile_str("""
+    image = ContainerImage.from_dockerfile_str(
+        """
         FROM python:3.11
         RUN --mount=type=secret,id=pip_token \\
             pip install --extra-index-url \\
             https://$(cat /run/secrets/pip_token)@pypi.company.com/simple \\
             my-private-package
-    """, secrets={"pip_token": "$MY_PIP_TOKEN"})
+    """,
+        secrets={"pip_token": "$MY_PIP_TOKEN"},
+    )
 ```
 
 ## Build Args
@@ -16714,15 +16856,18 @@ Use `build_args` to pass standard Docker build arguments. Build args are not sec
 
 ```python theme={null}
 class MyApp(fal.App):
-    image = ContainerImage.from_dockerfile_str("""
+    image = ContainerImage.from_dockerfile_str(
+        """
         ARG PY_VERSION=3.11
         FROM python:${PY_VERSION}-slim
         ARG EXTRA_INDEX_URL
         RUN pip install --no-cache-dir --extra-index-url ${EXTRA_INDEX_URL} mypkg
-    """, build_args={
-        "PY_VERSION": "3.11",
-        "EXTRA_INDEX_URL": "https://example.com/simple",
-    })
+    """,
+        build_args={
+            "PY_VERSION": "3.11",
+            "EXTRA_INDEX_URL": "https://example.com/simple",
+        },
+    )
 ```
 
 ## Using Private Registries
@@ -16749,11 +16894,14 @@ Both `ContainerImage.from_dockerfile_str()` and `ContainerImage.from_dockerfile(
 Docker build arguments passed as `--build-arg` during image build. Use to parameterize your Dockerfile.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile_str("""
+image = ContainerImage.from_dockerfile_str(
+    """
     ARG CUDA_VERSION=12.1
     FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
     RUN pip install torch
-""", build_args={"CUDA_VERSION": "12.4"})
+""",
+    build_args={"CUDA_VERSION": "12.4"},
+)
 ```
 
 ### secrets
@@ -16761,13 +16909,16 @@ image = ContainerImage.from_dockerfile_str("""
 Build-time secrets mounted via BuildKit `--secret`. Unlike `build_args`, secrets are not baked into image layers. Use for private package indexes or git tokens. Values prefixed with `$` are resolved from your [fal secrets](/documentation/development/manage-secrets-securely) at build time.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile_str("""
+image = ContainerImage.from_dockerfile_str(
+    """
     FROM python:3.11
     RUN --mount=type=secret,id=pip_token \\
         pip install --extra-index-url \\
         https://$(cat /run/secrets/pip_token)@pypi.company.com/simple \\
         my-private-package
-""", secrets={"pip_token": "$MY_PIP_TOKEN"})
+""",
+    secrets={"pip_token": "$MY_PIP_TOKEN"},
+)
 ```
 
 ### context\_dir
@@ -16775,9 +16926,7 @@ image = ContainerImage.from_dockerfile_str("""
 The build context directory. Files from this directory are available via `COPY` in your Dockerfile. Defaults to the current working directory.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile("docker/Dockerfile",
-    context_dir="./my-project"
-)
+image = ContainerImage.from_dockerfile("docker/Dockerfile", context_dir="./my-project")
 ```
 
 ### dockerignore / dockerignore\_path
@@ -16857,23 +17006,24 @@ import fal
 import json
 from fal.toolkit.kv import KVStore
 
+
 class MyApp(fal.App):
     def setup(self):
         self.kv = KVStore("myapp")
-    
+
     @fal.endpoint("/")
     def process(self, input: Input):
         # Check cache
         cache_key = f"result-{input.id}"
         cached = self.kv.get(cache_key)
-        
+
         if cached:
             return json.loads(cached)
-        
+
         # Compute and cache result
         result = self.expensive_operation(input)
         self.kv.set(cache_key, json.dumps(result))
-        
+
         return result
 ```
 
@@ -16965,6 +17115,7 @@ from pathlib import Path
 
 DATA_DIR = Path("/data/mnist")
 
+
 class MyModel(fal.App):
     requirements = ["torch>=2.0.0", "torchvision"]
     machine_type = "GPU"
@@ -16999,6 +17150,7 @@ from pathlib import Path
 
 WEIGHTS_FILE = Path("/data/weights.safetensors")
 
+
 class MyModel(fal.App):
     def setup(self):
         if not WEIGHTS_FILE.exists():
@@ -17016,8 +17168,7 @@ import subprocess
 
 MODEL_DIR = "/data/models/deepseek-ai"
 subprocess.check_call(
-    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-    shell=True
+    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null", shell=True
 )
 ```
 
@@ -17044,12 +17195,14 @@ To upload files programmatically (for example, downloading weights from a URL to
 ```python theme={null}
 import fal
 
+
 @fal.function(machine_type="S")
 def upload_weights():
     import urllib.request
+
     urllib.request.urlretrieve(
         "https://example.com/model-weights.safetensors",
-        "/data/models/weights.safetensors"
+        "/data/models/weights.safetensors",
     )
     print("Weights uploaded to /data")
 ```
@@ -17138,9 +17291,9 @@ Register `track` callbacks on `event_handler` to react to the media the client p
 
 ```python theme={null}
 BatchedFnTrack(
-    source_track,        # the inbound track (e.g. the browser webcam)
-    batch_size=4,        # number of frames to group before running fn
-    fn=run_inference,    # callable over the batched frames
+    source_track,  # the inbound track (e.g. the browser webcam)
+    batch_size=4,  # number of frames to group before running fn
+    fn=run_inference,  # callable over the batched frames
 )
 ```
 
@@ -17192,9 +17345,11 @@ class GrayscaleTrack:
 
     async def recv(self):
         import av
+
         frame = await self._track.recv()
         img = frame.to_ndarray(format="bgr24")
         import numpy as np
+
         gray = np.mean(img, axis=2, keepdims=True).astype(np.uint8)
         img_gray = np.broadcast_to(gray, img.shape).copy()
         new_frame = av.VideoFrame.from_ndarray(img_gray, format="bgr24")
@@ -17247,11 +17402,17 @@ class GrayscaleDemo(fal.App, name="grayscale-demo"):
         async def event_stream():
             try:
                 # First event: hand the SDP answer back to the client.
-                yield "data: " + json.dumps({
-                    "sdp": pc.localDescription.sdp,
-                    "type": pc.localDescription.type,
-                    "session_id": request.session_id,
-                }) + "\n\n"
+                yield (
+                    "data: "
+                    + json.dumps(
+                        {
+                            "sdp": pc.localDescription.sdp,
+                            "type": pc.localDescription.type,
+                            "session_id": request.session_id,
+                        }
+                    )
+                    + "\n\n"
+                )
 
                 # Hold the request open while the peer connection is alive.
                 # Emit an SSE comment every 15s so intermediaries don't
@@ -17454,6 +17615,7 @@ Users provide file inputs as URLs. The `download_file` function downloads them t
 ```python theme={null}
 from fal.toolkit import download_file
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
 
@@ -17509,9 +17671,12 @@ For the common pattern of downloading model weights to persistent storage, `down
 ```python theme={null}
 from fal.toolkit import download_model_weights
 
+
 class MyModel(fal.App):
     def setup(self):
-        weights_path = download_model_weights("https://huggingface.co/org/model/resolve/main/weights.bin")
+        weights_path = download_model_weights(
+            "https://huggingface.co/org/model/resolve/main/weights.bin"
+        )
         self.model = load_from_weights(weights_path)
 ```
 
@@ -17526,6 +17691,7 @@ When your model generates a file, wrap it in one of the toolkit's file types bef
 ```python theme={null}
 import fal
 from fal.toolkit import Image
+
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -17580,7 +17746,9 @@ audio = Audio.from_path("/tmp/output.wav")
 audio = Audio.from_bytes(raw_bytes, content_type="audio/wav", file_name="output.wav")
 
 generic = File.from_path("/tmp/result.obj")
-generic = File.from_bytes(data, content_type="application/octet-stream", file_name="model.glb")
+generic = File.from_bytes(
+    data, content_type="application/octet-stream", file_name="model.glb"
+)
 ```
 
 ### The Type System and Playground
@@ -17589,6 +17757,7 @@ Using `Image`, `Video`, or `Audio` in your Pydantic output schema tells the Play
 
 ```python theme={null}
 from fal.toolkit import Image, Video, Audio
+
 
 class Output(BaseModel):
     image: Image
@@ -17604,6 +17773,7 @@ For richer input schemas with file URL types that validate correctly, see the `F
 
 ```python theme={null}
 from fal.toolkit import CompressedFile
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -17727,8 +17897,8 @@ For per-request temporary files that don't need to persist, use `/tmp`. It is lo
     ```python Python theme={null}
     import fal_client
 
-    result = fal_client.subscribe("fal-ai/nano-banana-2", 
-        arguments={"prompt": "a sunset over mountains"}
+    result = fal_client.subscribe(
+        "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
     )
     print(result["images"][0]["url"])
     ```
@@ -17769,12 +17939,13 @@ For per-request temporary files that don't need to persist, use `/tmp`. It is lo
       ```python theme={null}
       import fal
 
+
       class MyModel(fal.App):
           machine_type = "GPU-H100"
-          
+
           def setup(self):
               self.model = load_my_model()
-          
+
           @fal.endpoint("/")
           def generate(self, prompt: str):
               return self.model(prompt)
@@ -17927,10 +18098,10 @@ Control how long generated files (images, videos, audio) are stored on fal's CDN
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
       headers={
-          "X-Fal-Object-Lifecycle-Preference": json.dumps({
-              "expiration_duration_seconds": 3600
-          })
-      }
+          "X-Fal-Object-Lifecycle-Preference": json.dumps(
+              {"expiration_duration_seconds": 3600}
+          )
+      },
   )
   ```
 
@@ -17975,7 +18146,7 @@ Prevent fal from storing request payloads (JSON inputs and outputs). Payloads ar
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-Store-IO": "0"}
+      headers={"X-Fal-Store-IO": "0"},
   )
   ```
 
@@ -18016,7 +18187,7 @@ Disable automatic retries for this request. By default, queue-based requests are
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-No-Retry": "1"}
+      headers={"X-Fal-No-Retry": "1"},
   )
   ```
 
@@ -18056,7 +18227,7 @@ Disable automatic model fallbacks for this request. By default, fal may reroute 
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"x-app-fal-disable-fallback": "true"}
+      headers={"x-app-fal-disable-fallback": "true"},
   )
   ```
 
@@ -18181,9 +18352,9 @@ The key difference is how the retry happens. With `subscribe()` (or `submit()`),
 import fal_client
 
 # Recommended: queue-based call handles concurrency limits server-side
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+)
 ```
 
 If you are making raw HTTP requests without the SDK, a `429` response with the `concurrent_requests_limit` type indicates you have hit your concurrency limit. The response includes an `X-Fal-needs-retry: 1` header. You should retry with exponential backoff:
@@ -19097,10 +19268,13 @@ Then pass the URL to any model:
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-      "prompt": "a cat wearing sunglasses",
-      "image_url": url  # CDN URL from upload
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/dev",
+      arguments={
+          "prompt": "a cat wearing sunglasses",
+          "image_url": url,  # CDN URL from upload
+      },
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -19120,10 +19294,13 @@ You don't have to use fal's CDN. If you already have files hosted elsewhere, pas
 **Presigned URLs** from S3, GCS, or R2 work because the auth credentials are embedded in the URL itself:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-    "prompt": "enhance this image",
-    "image_url": "https://your-bucket.s3.amazonaws.com/image.png?X-Amz-Signature=..."
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/dev",
+    arguments={
+        "prompt": "enhance this image",
+        "image_url": "https://your-bucket.s3.amazonaws.com/image.png?X-Amz-Signature=...",
+    },
+)
 ```
 
 **Public URLs** from any web server also work, as long as they return the file directly without requiring cookies or auth headers.
@@ -19135,9 +19312,9 @@ result = fal_client.subscribe("fal-ai/flux/dev", arguments={
 Models also accept base64-encoded data URIs:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-    "image_url": "data:image/png;base64,iVBORw0KGgo..."
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/dev", arguments={"image_url": "data:image/png;base64,iVBORw0KGgo..."}
+)
 ```
 
 <Warning>
@@ -19353,9 +19530,7 @@ No additional configuration is needed. The client reads `FAL_KEY` from the envir
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.run("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset"
-  })
+  result = fal_client.run("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
   ```
 
   ```javascript JavaScript theme={null}
@@ -19372,6 +19547,7 @@ In some environments (serverless functions, containers) you may not have access 
 <CodeGroup>
   ```python Python theme={null}
   import os
+
   os.environ["FAL_KEY"] = "your-api-key-here"
 
   import fal_client
@@ -19434,10 +19610,13 @@ Once configured, you can call any model:
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a futuristic cityscape at sunset",
-      "image_size": "landscape_16_9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={
+          "prompt": "a futuristic cityscape at sunset",
+          "image_size": "landscape_16_9",
+      },
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -19446,15 +19625,17 @@ Once configured, you can call any model:
   import asyncio
   import fal_client
 
+
   async def main():
       result = await fal_client.subscribe_async(
           "fal-ai/flux/schnell",
           arguments={
               "prompt": "a futuristic cityscape at sunset",
-              "image_size": "landscape_16_9"
+              "image_size": "landscape_16_9",
           },
       )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -19623,9 +19804,9 @@ The simplest way to call a model. Sends a direct HTTP request to `fal.run` and r
 ```python theme={null}
 import fal_client
 
-result = fal_client.run("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.run(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["images"][0]["url"])
 ```
 
@@ -19648,9 +19829,9 @@ Like `run`, but uses the queue under the hood. Submits a request, polls automati
 ```python theme={null}
 import fal_client
 
-result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["images"][0]["url"])
 ```
 
@@ -19672,9 +19853,9 @@ The recommended approach for production. Submit a request to the [queue](/docume
 import time
 import fal_client
 
-handler = fal_client.submit("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+handler = fal_client.submit(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 
 while True:
     status = handler.status(with_logs=True)
@@ -19711,9 +19892,10 @@ In JavaScript, the equivalent types are `InQueueQueueStatus`, `InProgressQueueSt
 ```python theme={null}
 import fal_client
 
-handler = fal_client.submit("fal-ai/nano-banana-2",
+handler = fal_client.submit(
+    "fal-ai/nano-banana-2",
     arguments={"prompt": "a sunset over mountains"},
-    webhook_url="https://your-server.com/api/webhook"
+    webhook_url="https://your-server.com/api/webhook",
 )
 ```
 
@@ -19732,9 +19914,9 @@ For models that produce output progressively. Each event arrives as it is genera
 ```python theme={null}
 import fal_client
 
-for event in fal_client.stream("fal-ai/flux-kontext-lora", arguments={
-    "prompt": "a sunset over mountains"
-}):
+for event in fal_client.stream(
+    "fal-ai/flux-kontext-lora", arguments={"prompt": "a sunset over mountains"}
+):
     print(event)
 ```
 
@@ -19756,10 +19938,7 @@ For interactive applications that need the lowest possible latency. Opens a pers
 import fal_client
 
 with fal_client.realtime("fal-ai/fast-sdxl") as connection:
-    connection.send({
-        "prompt": "a sunset over mountains",
-        "num_inference_steps": 2
-    })
+    connection.send({"prompt": "a sunset over mountains", "num_inference_steps": 2})
     result = connection.recv()
     print(result)
 ```
@@ -19970,9 +20149,9 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  handler = fal_client.submit(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(handler.request_id)
   ```
@@ -19981,11 +20160,13 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   import asyncio
   import fal_client
 
+
   async def main():
-      handler = await fal_client.submit_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      handler = await fal_client.submit_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(handler.request_id)
+
 
   asyncio.run(main())
   ```
@@ -20268,7 +20449,8 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/schnell",
+  handler = fal_client.submit(
+      "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -20279,7 +20461,8 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async("fal-ai/flux/schnell",
+  handler = await fal_client.submit_async(
+      "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -20329,7 +20512,9 @@ Endpoint path appended to the model ID. Most models expose a single root endpoin
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint")
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -20372,7 +20557,9 @@ Routing hint sent as the `X-Fal-Runner-Hint` header. When you pass a hint string
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc")
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -20431,7 +20618,9 @@ Additional HTTP headers passed with the request. Use this to set [platform-level
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"})
+  handler = fal_client.submit(
+      "fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -20552,11 +20741,13 @@ Unlike [queue-based inference](/documentation/model-apis/inference), real-time c
   import fal_client
 
   with fal_client.realtime("fal-ai/fast-lcm-diffusion") as connection:
-      connection.send({
-          "prompt": "a sunset over mountains",
-          "sync_mode": True,
-          "image_url": "data:image/png;base64,..."
-      })
+      connection.send(
+          {
+              "prompt": "a sunset over mountains",
+              "sync_mode": True,
+              "image_url": "data:image/png;base64,...",
+          }
+      )
       result = connection.recv()
       print(result)
   ```
@@ -20565,15 +20756,19 @@ Unlike [queue-based inference](/documentation/model-apis/inference), real-time c
   import asyncio
   import fal_client
 
+
   async def realtime():
       async with fal_client.realtime_async("fal-ai/fast-lcm-diffusion") as connection:
-          await connection.send({
-              "prompt": "a sunset over mountains",
-              "sync_mode": True,
-              "image_url": "data:image/png;base64,..."
-          })
+          await connection.send(
+              {
+                  "prompt": "a sunset over mountains",
+                  "sync_mode": True,
+                  "image_url": "data:image/png;base64,...",
+              }
+          )
           result = await connection.recv()
           print(result)
+
 
   asyncio.run(realtime())
   ```
@@ -20749,7 +20944,9 @@ const connection = fal.realtime.connect("fal-ai/my-app", {
 In Python, pass the `path` parameter to `realtime()`:
 
 ```python theme={null}
-connection = fal_client.realtime("fal-ai/my-app", path="/my-custom-ws", on_result=handle_result)
+connection = fal_client.realtime(
+    "fal-ai/my-app", path="/my-custom-ws", on_result=handle_result
+)
 ```
 
 ***
@@ -20870,9 +21067,9 @@ Under the hood, `stream()` sends a direct HTTP request to `fal.run` using [Serve
   ```python Python theme={null}
   import fal_client
 
-  for event in fal_client.stream("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  }):
+  for event in fal_client.stream(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  ):
       print(event)
   ```
 
@@ -20880,11 +21077,13 @@ Under the hood, `stream()` sends a direct HTTP request to `fal.run` using [Serve
   import asyncio
   import fal_client
 
+
   async def main():
-      async for event in fal_client.stream_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      }):
+      async for event in fal_client.stream_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      ):
           print(event)
+
 
   asyncio.run(main())
   ```
@@ -20959,9 +21158,9 @@ Both are good starting points for scripts, prototyping, and any situation where 
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.run("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  result = fal_client.run(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -20970,11 +21169,13 @@ Both are good starting points for scripts, prototyping, and any situation where 
   import asyncio
   import fal_client
 
+
   async def main():
-      result = await fal_client.run_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      result = await fal_client.run_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -20998,9 +21199,9 @@ Both are good starting points for scripts, prototyping, and any situation where 
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -21009,11 +21210,13 @@ Both are good starting points for scripts, prototyping, and any situation where 
   import asyncio
   import fal_client
 
+
   async def main():
-      result = await fal_client.subscribe_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      result = await fal_client.subscribe_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -21037,22 +21240,25 @@ Track progress while waiting for results:
   ```python Python theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
               print(log["message"])
 
+
   result = fal_client.subscribe(
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       with_logs=True,
-      on_queue_update=on_queue_update
+      on_queue_update=on_queue_update,
   )
   ```
 
   ```python Python (async) theme={null}
   import asyncio
   import fal_client
+
 
   async def main():
       def on_queue_update(update):
@@ -21064,9 +21270,10 @@ Track progress while waiting for results:
           "fal-ai/flux/schnell",
           arguments={"prompt": "a sunset over mountains"},
           with_logs=True,
-          on_queue_update=on_queue_update
+          on_queue_update=on_queue_update,
       )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -21098,7 +21305,9 @@ Endpoint path appended to the model ID. Leave empty for the default root endpoin
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint")
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -21141,7 +21350,9 @@ Routing hint for session affinity -- routes requests to the same runner. See [`h
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc")
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -21159,7 +21370,9 @@ Additional HTTP headers for [platform-level controls](/documentation/model-apis/
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"})
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -21232,6 +21445,7 @@ A callback function that fires once, immediately after the request enters the qu
   def save_request_id(request_id):
       print(f"Enqueued: {request_id}")
 
+
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
@@ -21263,6 +21477,7 @@ In Python, the status is one of three types: `Queued` (has `position`), `InProgr
       elif isinstance(update, fal_client.InProgress):
           for log in update.logs:
               print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
@@ -21318,7 +21533,8 @@ Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a 
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/dev",
+  handler = fal_client.submit(
+      "fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -21329,7 +21545,8 @@ Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a 
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async("fal-ai/flux/dev",
+  handler = await fal_client.submit_async(
+      "fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -21557,6 +21774,7 @@ Below are simplified functions to verify webhook signatures by passing the heade
     _jwks_cache = None
     _jwks_cache_time = 0
 
+
     def fetch_jwks() -> list:
         """Fetch and cache JWKS, refreshing after 24 hours."""
         global _jwks_cache, _jwks_cache_time
@@ -21568,12 +21786,9 @@ Below are simplified functions to verify webhook signatures by passing the heade
             _jwks_cache_time = current_time
         return _jwks_cache
 
+
     def verify_webhook_signature(
-        request_id: str,
-        user_id: str,
-        timestamp: str,
-        signature_hex: str,
-        body: bytes
+        request_id: str, user_id: str, timestamp: str, signature_hex: str, body: bytes
     ) -> bool:
         """
         Verify a webhook signature using provided headers and body.
@@ -21605,7 +21820,7 @@ Below are simplified functions to verify webhook signatures by passing the heade
                 request_id,
                 user_id,
                 timestamp,
-                hashlib.sha256(body).hexdigest()
+                hashlib.sha256(body).hexdigest(),
             ]
             if any(part is None for part in message_parts):
                 print("Missing required header value.")
@@ -21808,10 +22023,10 @@ Control how long generated media is stored using the `X-Fal-Object-Lifecycle-Pre
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset"},
       headers={
-          "X-Fal-Object-Lifecycle-Preference": json.dumps({
-              "expiration_duration_seconds": 3600
-          })
-      }
+          "X-Fal-Object-Lifecycle-Preference": json.dumps(
+              {"expiration_duration_seconds": 3600}
+          )
+      },
   )
   ```
 
@@ -21858,7 +22073,7 @@ To prevent fal from storing request payloads entirely, add the `X-Fal-Store-IO: 
   result = fal_client.subscribe(
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-Store-IO": "0"}
+      headers={"X-Fal-Store-IO": "0"},
   )
   ```
 
@@ -21930,10 +22145,9 @@ Random seed for reproducible outputs. The same seed with the same inputs produce
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "seed": 42
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "seed": 42}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -21955,10 +22169,9 @@ Number of images to generate per request. Higher values produce more results in 
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "num_images": 4
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "num_images": 4}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -21983,15 +22196,15 @@ Output image dimensions, used by models built with fal's [toolkit](/documentatio
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "image_size": "landscape_16_9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={"prompt": "a sunset", "image_size": "landscape_16_9"},
+  )
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "image_size": {"width": 1280, "height": 720}
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={"prompt": "a sunset", "image_size": {"width": 1280, "height": 720}},
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -22017,10 +22230,9 @@ Some models (such as [Nano Banana 2](https://fal.ai/models/fal-ai/nano-banana-2)
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "aspect_ratio": "16:9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "aspect_ratio": "16:9"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -22060,10 +22272,10 @@ In this example, the second image was flagged and replaced with a black image.
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "enable_safety_checker": True
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a sunset", "enable_safety_checker": True},
+  )
 
   if any(result.get("has_nsfw_concepts", [])):
       print("Some images were filtered by the safety checker")
@@ -22084,10 +22296,10 @@ To disable the safety checker:
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "enable_safety_checker": False
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a sunset", "enable_safety_checker": False},
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -22116,10 +22328,9 @@ The expansion adds an LLM inference step before generation, so expect slightly h
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a sunset",
-      "expand_prompt": True
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a sunset", "expand_prompt": True}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -22145,10 +22356,9 @@ Format of the generated image file. Choose based on your use case: `jpeg` for sm
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset",
-      "output_format": "png"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset", "output_format": "png"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -22181,9 +22391,9 @@ Generate an image in three lines of code. Install the client, set your [API key]
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a futuristic cityscape at sunset"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2", arguments={"prompt": "a futuristic cityscape at sunset"}
+  )
   print(result["images"][0]["url"])
   ```
 
@@ -22403,10 +22613,10 @@ Every Playground result includes generated code that reproduces the exact reques
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a futuristic cityscape at sunset",
-      "aspect_ratio": "16:9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a futuristic cityscape at sunset", "aspect_ratio": "16:9"},
+  )
   print(result["images"][0]["url"])
   ```
 
@@ -23288,6 +23498,7 @@ What could be a tedious process of running and coordinating three different mode
     import asyncio
     import fal_client
 
+
     async def main():
         stream = await fal_client.stream_async(
             "workflows/fal-ai/sdxl-sticker",
@@ -23635,9 +23846,9 @@ Both paths start with an [API key](/documentation/model-apis/authentication) and
           ```python Python theme={null}
           import fal_client
 
-          result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-              "prompt": "a futuristic cityscape at sunset"
-          })
+          result = fal_client.subscribe(
+              "fal-ai/flux/schnell", arguments={"prompt": "a futuristic cityscape at sunset"}
+          )
           print(result["images"][0]["url"])
           ```
 
@@ -23748,6 +23959,7 @@ Both paths start with an [API key](/documentation/model-apis/authentication) and
         ```python my_app.py theme={null}
         import fal
 
+
         class MyApp(fal.App):
             @fal.endpoint("/")
             def run(self, prompt: str) -> dict:
@@ -23828,12 +24040,14 @@ DistributedRunner(
 ```python theme={null}
 from fal.distributed import DistributedRunner, DistributedWorker
 
+
 class MyWorker(DistributedWorker):
     def setup(self, **kwargs):
         self.model = load_model().to(self.device)
-    
+
     def __call__(self, prompt: str, **kwargs):
         return self.model.generate(prompt)
+
 
 # Create runner for 4 GPUs
 runner = DistributedRunner(
@@ -23930,13 +24144,15 @@ async def invoke(
 @fal.endpoint("/generate")
 async def generate(self, request: GenerateRequest) -> GenerateResponse:
     # Invoke workers to generate images
-    result = await self.runner.invoke({
-        "prompt": request.prompt,
-        "num_steps": request.num_steps,
-        "width": 1024,
-        "height": 1024,
-    })
-    
+    result = await self.runner.invoke(
+        {
+            "prompt": request.prompt,
+            "num_steps": request.num_steps,
+            "width": 1024,
+            "height": 1024,
+        }
+    )
+
     return GenerateResponse(image=result["image"])
 ```
 
@@ -24161,22 +24377,18 @@ def __call__(self, streaming: bool = False, **kwargs: Any) -> Any
 ```python theme={null}
 class FluxWorker(DistributedWorker):
     def __call__(
-        self,
-        prompt: str,
-        num_steps: int = 20,
-        streaming: bool = False,
-        **kwargs
+        self, prompt: str, num_steps: int = 20, streaming: bool = False, **kwargs
     ) -> dict:
         """Generate an image on this GPU"""
         import torch.distributed as dist
-        
+
         # Each GPU generates independently
         image = self.pipeline(
             prompt=prompt,
             num_inference_steps=num_steps,
             output_type="pt",
         ).images[0]
-        
+
         # Gather all images to rank 0
         if self.rank == 0:
             gather_list = [
@@ -24185,14 +24397,14 @@ class FluxWorker(DistributedWorker):
             ]
         else:
             gather_list = None
-        
+
         dist.gather(image, gather_list, dst=0)
-        
+
         # Only rank 0 returns the result
         if self.rank == 0:
             combined_image = create_grid(gather_list)
             return {"image": combined_image}
-        
+
         return {}  # Other ranks return empty dict
 ```
 
@@ -24226,16 +24438,19 @@ def __call__(self, prompt: str, num_steps: int = 20, streaming: bool = False):
     for step in range(num_steps):
         # Generate intermediate result
         latent = self.model.step(prompt)
-        
+
         # Stream progress (only rank 0)
         if streaming and self.rank == 0 and step % 5 == 0:
             preview_image = self.decode_latent(latent)
-            self.add_streaming_result({
-                "step": step,
-                "progress": (step + 1) / num_steps,
-                "preview": preview_image,
-            }, as_text_event=True)
-    
+            self.add_streaming_result(
+                {
+                    "step": step,
+                    "progress": (step + 1) / num_steps,
+                    "preview": preview_image,
+                },
+                as_text_event=True,
+            )
+
     # Return final result
     return {"image": final_image}
 ```
@@ -24309,45 +24524,45 @@ All GPUs have the same model, process different batches, and sync gradients:
 class DDPWorker(DistributedWorker):
     def setup(self, **kwargs):
         from torch.nn.parallel import DistributedDataParallel as DDP
-        
+
         self.model = MyModel().to(self.device)
-        
+
         # Wrap with DDP for gradient synchronization
         self.model = DDP(
             self.model,
             device_ids=[self.rank],
             output_device=self.rank,
         )
-        
+
         self.optimizer = torch.optim.Adam(self.model.parameters())
-    
+
     def __call__(self, data_path: str, **kwargs):
         import torch.distributed as dist
-        
+
         # Load and distribute data
         if self.rank == 0:
             data = load_data(data_path)
         else:
             data = None
-        
+
         # Broadcast to all ranks
         data = dist.broadcast_object_list([data], src=0)[0]
-        
+
         # Each GPU processes different batch
-        local_batch = data[self.rank::self.world_size]
-        
+        local_batch = data[self.rank :: self.world_size]
+
         # Training loop
         for batch in local_batch:
             loss = self.model(batch)
             loss.backward()  # DDP syncs gradients automatically
             self.optimizer.step()
             self.optimizer.zero_grad()
-        
+
         # Only rank 0 saves checkpoint
         if self.rank == 0:
             torch.save(self.model.state_dict(), "checkpoint.pt")
             return {"checkpoint": "checkpoint.pt"}
-        
+
         return {}
 ```
 
@@ -24361,20 +24576,23 @@ Stream intermediate results during long-running operations:
 class StreamingWorker(DistributedWorker):
     def __call__(self, prompt: str, steps: int = 50, streaming: bool = False):
         import torch.distributed as dist
-        
+
         for step in range(steps):
             result = self.model.step(prompt)
-            
+
             # Stream progress every 5 steps
             if streaming and self.rank == 0 and step % 5 == 0:
-                self.add_streaming_result({
-                    "step": step,
-                    "progress": step / steps,
-                }, as_text_event=True)
-            
+                self.add_streaming_result(
+                    {
+                        "step": step,
+                        "progress": step / steps,
+                    },
+                    as_text_event=True,
+                )
+
             # Sync all workers
             dist.barrier()
-        
+
         # Return final result
         if self.rank == 0:
             return {"output": result}
@@ -24492,32 +24710,33 @@ Returns an async iterator that streams intermediate results from workers. Use th
 ```python theme={null}
 from fal.distributed import DistributedRunner, DistributedWorker
 
+
 class MyWorker(DistributedWorker):
     def setup(self, model_path):
         # Load model on this GPU (called once per worker)
         self.model = load_model(model_path).to(self.device)
-    
+
     def __call__(self, prompt, **kwargs):
         # Process request (called for each request)
         return self.model.generate(prompt)
 
+
 class MyApp(fal.App):
     num_gpus = 4  # Use 4 GPUs
-    
+
     async def setup(self):
         # Create and start the runner
-        self.runner = DistributedRunner(
-            worker_cls=MyWorker,
-            world_size=self.num_gpus
-        )
+        self.runner = DistributedRunner(worker_cls=MyWorker, world_size=self.num_gpus)
         await self.runner.start(model_path="/data/model")
-    
+
     @fal.endpoint("/")
     async def run(self, request: MyRequest):
         # Invoke workers for each request
-        result = await self.runner.invoke({
-            "prompt": request.prompt,
-        })
+        result = await self.runner.invoke(
+            {
+                "prompt": request.prompt,
+            }
+        )
         return result
 ```
 
@@ -24773,20 +24992,24 @@ In your `DistributedWorker`, use `add_streaming_result()` to send intermediate r
 from fal.distributed import DistributedWorker
 import torch.distributed as dist
 
+
 class StreamingWorker(DistributedWorker):
     def __call__(self, prompt: str, steps: int = 20):
         for step in range(steps):
             # Do some processing
             result = self.model.step(prompt)
-            
+
             # Only rank 0 streams to avoid duplicates
             if self.rank == 0:
-                self.add_streaming_result({
-                    "step": step,
-                    "progress": (step + 1) / steps,
-                    "message": f"Processing step {step + 1}/{steps}"
-                }, as_text_event=True)
-        
+                self.add_streaming_result(
+                    {
+                        "step": step,
+                        "progress": (step + 1) / steps,
+                        "message": f"Processing step {step + 1}/{steps}",
+                    },
+                    as_text_event=True,
+                )
+
         # Return final result
         return {"output": final_result}
 ```
@@ -24806,15 +25029,16 @@ import fal
 from fal.distributed import DistributedRunner
 from fastapi.responses import StreamingResponse
 
+
 class MyApp(fal.App):
     num_gpus = 2
-    
+
     def setup(self):
         self.runner = DistributedRunner(
             worker_cls=StreamingWorker,
             world_size=self.num_gpus,
         )
-    
+
     @fal.endpoint("/stream")
     async def stream(self, request: MyRequest) -> StreamingResponse:
         """Endpoint that streams results"""
@@ -24864,7 +25088,7 @@ import fal_client
 
 for event in fal_client.stream(
     "username/app-name",
-    arguments={"prompt": "A sunset", "steps": 20}
+    arguments={"prompt": "A sunset", "steps": 20},
     # path="/stream"  # Optional: defaults to "/stream", change if your endpoint uses a different path
 ):
     print(f"Step {event['step']}: {event['progress'] * 100}%")
@@ -24884,7 +25108,7 @@ class MultiGPUStreamingWorker(DistributedWorker):
         for step in range(0, num_steps, 5):  # Stream every 5 steps
             # Generate intermediate result on this GPU
             intermediate = self.model.step(prompt)
-            
+
             # Gather from all workers
             if self.rank == 0:
                 gather_list = [
@@ -24893,21 +25117,24 @@ class MultiGPUStreamingWorker(DistributedWorker):
                 ]
             else:
                 gather_list = None
-            
+
             dist.gather(intermediate, gather_list, dst=0)
-            
+
             # Only rank 0 streams the combined result
             if self.rank == 0:
                 combined = self.combine_results(gather_list)
-                self.add_streaming_result({
-                    "step": step,
-                    "preview": combined,
-                    "num_gpus": self.world_size,
-                }, as_text_event=True)
-            
+                self.add_streaming_result(
+                    {
+                        "step": step,
+                        "preview": combined,
+                        "num_gpus": self.world_size,
+                    },
+                    as_text_event=True,
+                )
+
             # Synchronize before next step
             dist.barrier()
-        
+
         return {"final": final_result}
 ```
 
@@ -24948,10 +25175,12 @@ Stream minimal data for responsiveness:
 
 ```python theme={null}
 # Good: Small progress updates
-self.add_streaming_result({
-    "step": step,
-    "progress": 0.5,
-})
+self.add_streaming_result(
+    {
+        "step": step,
+        "progress": 0.5,
+    }
+)
 
 # Avoid: Large data in every update
 # self.add_streaming_result({"large_array": [...]})
@@ -24970,9 +25199,9 @@ buffer = io.BytesIO()
 image.save(buffer, format="JPEG")
 image_b64 = base64.b64encode(buffer.getvalue()).decode()
 
-self.add_streaming_result({
-    "preview": f"data:image/jpeg;base64,{image_b64}"
-}, as_text_event=True)
+self.add_streaming_result(
+    {"preview": f"data:image/jpeg;base64,{image_b64}"}, as_text_event=True
+)
 ```
 
 ## Complete Example
@@ -25105,6 +25334,7 @@ import subprocess
 import fal
 from fal.container import ContainerImage
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str("FROM your-existing-image:latest"),
     machine_type="GPU-A100",
@@ -25127,6 +25357,7 @@ If you have a Docker image with your model and dependencies baked in but not a f
 import fal
 from fal.container import ContainerImage
 
+
 class MyModel(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
@@ -25137,6 +25368,7 @@ class MyModel(fal.App):
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0"
         ).to("cuda")
@@ -25157,11 +25389,14 @@ If you are building from scratch, use a native `fal.App` with pip requirements. 
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     result: str
+
 
 class MyModel(fal.App):
     machine_type = "GPU-H100"
@@ -25169,6 +25404,7 @@ class MyModel(fal.App):
 
     def setup(self):
         from transformers import pipeline
+
         self.pipe = pipeline("text-generation", model="gpt2", device="cuda")
 
     @fal.endpoint("/")
@@ -25500,10 +25736,9 @@ Every delivery includes an `X-Fal-Signature` header containing an HMAC-SHA256 si
 import hmac
 import hashlib
 
+
 def verify_signature(body: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(
-        secret.encode(), body, hashlib.sha256
-    ).hexdigest()
+    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(signature, expected)
 ```
 
@@ -25687,6 +25922,7 @@ def setup_tracer(service_name: str):
 
 # App 1: ImagePipeline - validates and preprocesses the prompt, then calls TextToImageWorker
 
+
 class PipelineInput(BaseModel):
     prompt: str = Field(description="The prompt to generate an image from")
     worker_app: str = Field(description="Deployed app id of TextToImageWorker")
@@ -25706,7 +25942,9 @@ class ImagePipeline(fal.App):
     ]
 
     def setup(self):
-        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+        from opentelemetry.trace.propagation.tracecontext import (
+            TraceContextTextMapPropagator,
+        )
 
         self.tracer, self.tracer_provider = setup_tracer("image-pipeline")
         self._propagator = TraceContextTextMapPropagator()
@@ -25743,6 +25981,7 @@ class ImagePipeline(fal.App):
 
 # App 2: TextToImageWorker - receives context and runs SDXL inference
 
+
 class WorkerInput(BaseModel):
     prompt: str
     trace_context: dict  # W3C traceparent injected by ImagePipeline
@@ -25770,7 +26009,9 @@ class TextToImageWorker(fal.App):
 
         import torch
         from diffusers import StableDiffusionXLPipeline
-        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+        from opentelemetry.trace.propagation.tracecontext import (
+            TraceContextTextMapPropagator,
+        )
 
         self.tracer, self.tracer_provider = setup_tracer("text-to-image-worker")
         self._propagator = TraceContextTextMapPropagator()
@@ -25956,6 +26197,7 @@ import fal
 from fal.toolkit import Image
 from pydantic import BaseModel, Field
 
+
 def setup_tracer(service_name: str):
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
@@ -26030,7 +26272,9 @@ class ProductionApp(fal.App):
             root.set_attribute("model.name", "stable-diffusion-xl-base-1.0")
 
             with self.tracer.start_as_current_span("inference"):
-                result = self.pipe(input.prompt, num_inference_steps=input.num_inference_steps)
+                result = self.pipe(
+                    input.prompt, num_inference_steps=input.num_inference_steps
+                )
 
             with self.tracer.start_as_current_span("upload"):
                 image = Image.from_pil(result.images[0])
@@ -26634,9 +26878,10 @@ Add `FlashPackMixin` to your module for `save_flashpack` and `from_flashpack` me
 ```python theme={null}
 from flashpack import FlashPackMixin
 
+
 class MyModule(nn.Module, FlashPackMixin):
-    def __init__(self, some_arg: int = 4) -> None:
-        ...
+    def __init__(self, some_arg: int = 4) -> None: ...
+
 
 module = MyModule(some_arg=4)
 module.save_flashpack("model.flashpack")
@@ -26652,8 +26897,10 @@ Use `FlashPackDiffusersModelMixin` for diffusers models with `from_pretrained_fl
 from flashpack.integrations.diffusers import FlashPackDiffusersModelMixin
 from diffusers.models import AutoencoderKL
 
+
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
+
 
 # Load from original weights
 sdxl_vae = FlashPackAutoencoderKL.from_pretrained(
@@ -26684,8 +26931,10 @@ Works the same way with `FlashPackTransformersModelMixin`:
 from flashpack.integrations.transformers import FlashPackTransformersModelMixin
 from transformers import CLIPTextModel
 
+
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
+
 
 # Load, convert, and save
 clip = FlashPackCLIPTextModel.from_pretrained(
@@ -26727,20 +26976,25 @@ from transformers import (
     CLIPVisionModelWithProjection,
 )
 
+
 # Define FlashPack-enabled classes
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
+
 
 class FlashPackCLIPTextModelWithProjection(
     FlashPackTransformersModelMixin, CLIPTextModelWithProjection
 ):
     pass
 
+
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
 
+
 class FlashPackUNet2DConditionModel(FlashPackDiffusersModelMixin, UNet2DConditionModel):
     pass
+
 
 class FlashPackStableDiffusionXLPipeline(
     FlashPackDiffusionPipeline, StableDiffusionXLPipeline
@@ -26772,6 +27026,7 @@ class FlashPackStableDiffusionXLPipeline(
             add_watermarker=add_watermarker,
             force_zeros_for_empty_prompt=force_zeros_for_empty_prompt,
         )
+
 
 # Save entire pipeline as FlashPack
 pipeline = FlashPackStableDiffusionXLPipeline.from_pretrained(
@@ -26839,6 +27094,7 @@ Convert your model to FlashPack format, store it on `/data` or HuggingFace, and 
 import fal
 from flashpack import assign_from_file
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
     requirements = ["flashpack", "torch", "diffusers"]
@@ -26859,6 +27115,7 @@ Or with the Diffusers integration:
 
 ```python theme={null}
 import fal
+
 
 class SDXLApp(fal.App):
     machine_type = "GPU-A100"
@@ -27170,11 +27427,12 @@ The simplest way to use Inductor caching is with the `synchronized_inductor_cach
 ```python theme={null}
 from fal.toolkit import synchronized_inductor_cache
 
+
 class MyApp(fal.App):
     def setup(self):
         # Load model
         self.model = load_model()
-        
+
         # Wrap compilation + warmup in cache context
         with synchronized_inductor_cache("my-model/v1"):
             self.model = torch.compile(self.model)
@@ -27253,6 +27511,7 @@ import fal
 from fal.toolkit import Image, synchronized_inductor_cache
 from pydantic import BaseModel, Field
 
+
 class Input(BaseModel):
     prompt: str = Field(
         description="Text prompt for image generation",
@@ -27267,8 +27526,10 @@ class Input(BaseModel):
         description="Image height",
     )
 
+
 class Output(BaseModel):
     image: Image
+
 
 class SDTurbo(fal.App):
     machine_type = "GPU-H100"
@@ -27288,7 +27549,7 @@ class SDTurbo(fal.App):
         import ctypes
         import os
         from nvidia.cuda_nvrtc import lib as nvrtc_lib
-        
+
         nvrtc_lib_path = os.path.dirname(nvrtc_lib.__file__)
         nvrtc_lib_so = os.path.join(nvrtc_lib_path, "libnvrtc.so.12")
         ctypes.CDLL(nvrtc_lib_so, mode=ctypes.RTLD_GLOBAL)
@@ -27309,7 +27570,7 @@ class SDTurbo(fal.App):
             print("Compiling UNet with torch.compile()...")
             self.pipeline.unet = torch.compile(
                 self.pipeline.unet,
-                mode="default",  
+                mode="default",
                 dynamic=True,
             )
 
@@ -27324,7 +27585,7 @@ class SDTurbo(fal.App):
                     guidance_scale=0.0,  # SD-Turbo doesn't use guidance
                 )
             print("Warmup complete!")
-            
+
             # Prevent recompilation and CUDA graphs threading issues
             self.pipeline.unet.forward = torch._dynamo.run(self.pipeline.unet.forward)
 
@@ -27364,15 +27625,16 @@ For more control over cache loading and syncing, you can use the explicit API:
 ```python theme={null}
 from fal.toolkit import load_inductor_cache, sync_inductor_cache
 
+
 class MyApp(fal.App):
     def setup(self):
         # Load existing cache (if available)
         dir_hash = load_inductor_cache("my-model/v1")
-        
+
         # Compile and warmup
         self.model = torch.compile(self.model)
         self.warmup()
-        
+
         # Sync back any new kernels
         sync_inductor_cache("my-model/v1", dir_hash)
 ```
@@ -27490,13 +27752,13 @@ with synchronized_inductor_cache("model/v1"):
 ```python theme={null}
 # ❌ Without dynamic - compiles separately for each shape
 model = torch.compile(model, mode="max-autotune")
-warmup(512, 512)   # Compiles for 512x512
+warmup(512, 512)  # Compiles for 512x512
 # Later: different size triggers recompilation
 generate(768, 768)  # Recompiles for 768x768!
 
 # ✅ With dynamic - handles shape variations
 model = torch.compile(model, mode="max-autotune", dynamic=True)
-warmup(512, 512)   # Compiles with dynamic shapes
+warmup(512, 512)  # Compiles with dynamic shapes
 generate(768, 768)  # Uses cached kernels! ✓
 ```
 
@@ -27519,6 +27781,7 @@ Enable verbose logging to see what PyTorch is doing:
 
 ```python theme={null}
 import os
+
 os.environ["TORCH_LOGS"] = "recompiles"
 os.environ["TORCHINDUCTOR_VERBOSE"] = "1"
 
@@ -27589,8 +27852,7 @@ Runners that process one request at a time have idle gaps between sequential req
 `max_multiplexing` allows a single runner to process multiple requests concurrently, filling idle time while one request waits on I/O.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4):
-    ...
+class MyApp(fal.App, max_multiplexing=4): ...
 ```
 
 This is especially effective for workloads with I/O waits (network calls, file downloads) where the GPU would otherwise sit idle between operations.
@@ -27600,8 +27862,7 @@ This is especially effective for workloads with I/O waits (network calls, file d
 `concurrency_buffer` pre-warms runners before existing ones reach capacity. This reduces latency spikes but keeps more runners alive.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2):
-    ...
+class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2): ...
 ```
 
 Use conservatively — each buffered runner is billed while alive.
@@ -27710,8 +27971,7 @@ import subprocess
 MODEL_DIR = "/data/models/my-model"
 
 subprocess.check_call(
-    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-    shell=True
+    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null", shell=True
 )
 ```
 
@@ -27725,6 +27985,7 @@ Add the pre-read step at the beginning of your `setup()` method, before model lo
 import fal
 import subprocess
 
+
 class MyModel(fal.App):
     machine_type = "GPU-H100"
 
@@ -27737,7 +27998,7 @@ class MyModel(fal.App):
         # Pre-read all model files in parallel
         subprocess.check_call(
             f"find '{model_dir}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-            shell=True
+            shell=True,
         )
 
         # Now load the model -- files are already in page cache
@@ -27755,11 +28016,12 @@ For a cleaner approach, wrap it in a function:
 import subprocess
 from pathlib import Path
 
+
 def preload_files(directory: str, parallelism: int = 32):
     """Pre-read all files in a directory into the OS page cache."""
     subprocess.check_call(
         f"find '{directory}' -type f | xargs -P {parallelism} -I {{}} cat {{}} > /dev/null",
-        shell=True
+        shell=True,
     )
 ```
 
@@ -27914,12 +28176,8 @@ response.headers["x-fal-billable-units"] = str(input.num_images)
 Scale the charge with output resolution. Higher resolutions cost proportionally more:
 
 ```python theme={null}
-resolution_factor = math.ceil(
-    (image_size.width * image_size.height) / (1024 * 1024)
-)
-response.headers["x-fal-billable-units"] = str(
-    resolution_factor * input.num_images
-)
+resolution_factor = math.ceil((image_size.width * image_size.height) / (1024 * 1024))
+response.headers["x-fal-billable-units"] = str(resolution_factor * input.num_images)
 ```
 
 **Per video second**
@@ -27994,15 +28252,19 @@ Platform monitoring catches hardware-level failures, but it cannot detect applic
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         self.model = load_model()
         self.db = connect_to_database()
 
-    @fal.endpoint("/health", health_check=fal.HealthCheck(
-        failure_threshold=3,
-        call_regularly=True,
-    ))
+    @fal.endpoint(
+        "/health",
+        health_check=fal.HealthCheck(
+            failure_threshold=3,
+            call_regularly=True,
+        ),
+    )
     def health(self) -> dict:
         if not self.db.is_alive():
             raise RuntimeError("Database connection lost")
@@ -28018,10 +28280,13 @@ Health checks with `call_regularly=True` run in parallel with request processing
 For more thorough checks that need exclusive GPU access (e.g., running a test inference), set `call_regularly=False`. In this mode, the health check only runs when the gateway sends an `x-fal-runner-health-check` header, which happens between requests or after specific error conditions.
 
 ```python theme={null}
-@fal.endpoint("/health", health_check=fal.HealthCheck(
-    call_regularly=False,
-    timeout_seconds=10,
-))
+@fal.endpoint(
+    "/health",
+    health_check=fal.HealthCheck(
+        call_regularly=False,
+        timeout_seconds=10,
+    ),
+)
 def health(self) -> dict:
     test_result = self.model.run(self.test_input)
     if not validate(test_result):
@@ -28041,6 +28306,7 @@ def predict(self, input: dict) -> dict:
     except RuntimeError as e:
         if "out of memory" in str(e).lower() or "CUDA" in str(e):
             from fastapi.responses import JSONResponse
+
             return JSONResponse(status_code=503, content={"detail": "GPU error"})
         raise
 ```
@@ -28112,6 +28378,7 @@ The status code your endpoint returns determines what happens to the [runner](/d
 ```python theme={null}
 import fal
 from fastapi.responses import JSONResponse
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -28192,6 +28459,7 @@ Override the default retry behavior on a per-response basis by returning the `X-
 import fal
 from fastapi.responses import JSONResponse
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self, input: Input) -> Output:
@@ -28225,6 +28493,7 @@ Use this when you want to decouple retry behavior from runner termination. For e
 
 ```python theme={null}
 from fastapi.responses import JSONResponse
+
 
 @fal.endpoint("/")
 def predict(self, input: dict) -> dict:
@@ -28533,6 +28802,7 @@ Or configure it directly in code:
   # The client automatically reads FAL_KEY from environment
   # Or you can set it explicitly:
   import os
+
   os.environ["FAL_KEY"] = "your-api-key-here"
   ```
 
@@ -29189,9 +29459,7 @@ fal teams set my-team
 # Automatically uses your login-based identity (no FAL_KEY needed)
 import fal_client
 
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-    "prompt": "a sunset"
-})
+result = fal_client.subscribe("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
 ```
 
 If `FAL_KEY` is set, it takes priority over login tokens. To force login-based auth even when `FAL_KEY` is present, set `FAL_FORCE_AUTH_BY_USER=1`.
@@ -29233,8 +29501,12 @@ Team management happens on the [Members page](https://fal.ai/dashboard/members) 
 import fal_client
 
 # Switch models by changing one string
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"})
-result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"})
+result = fal_client.subscribe(
+    "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+)
+result = fal_client.subscribe(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 ```
 
 **Fastest inference for generative media.** Speed is where fal started and where it continues to invest the most. Proprietary optimizations, including custom CUDA kernels, optimized attention layers, and inference engine tuning, consistently deliver the fastest inference for diffusion and generative media workloads. Reliability matches the speed: 99.99% historical uptime, fault tolerance, and intelligent request queuing are built in.
@@ -29376,7 +29648,7 @@ fal auth login
   """,
           ],
           ui={
-              "field": "textarea", # Set the input field to textarea for better user experience
+              "field": "textarea",  # Set the input field to textarea for better user experience
           },
       )
       reference_audio_url: str = Field(
@@ -29386,7 +29658,9 @@ fal auth login
           examples=[
               "https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav",
           ],
-          ui={"important": True}, # Mark as important to not list it in the advanced options section
+          ui={
+              "important": True
+          },  # Mark as important to not list it in the advanced options section
       )
       style_prompt: str = Field(
           title="Style Prompt",
@@ -29476,6 +29750,7 @@ fal auth login
 
       return result
 
+
   # Custom Docker Image to install apt packages like espeak-ng
   DOCKER_STRING = """
   FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
@@ -29531,7 +29806,9 @@ fal auth login
       min_concurrency = 1
       max_concurrency = 2
       app_name = "diffrhythm"
-      image = fal.ContainerImage.from_dockerfile_str(DOCKER_STRING)  # Use the custom Docker image
+      image = fal.ContainerImage.from_dockerfile_str(
+          DOCKER_STRING
+      )  # Use the custom Docker image
       machine_type = "GPU-H100"
 
       def setup(self):
@@ -29558,7 +29835,7 @@ fal auth login
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/diffrhythm/g2p/sources/g2p_chinese_model/poly_bert_model.onnx",
               target_dir=f"{repo_path}/diffrhythm/g2p/sources/g2p_chinese_model",
           )
-          
+
           # Download eval model files required by prepare_model
           download_file(
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/pretrained/eval.yaml",
@@ -29568,13 +29845,13 @@ fal auth login
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/pretrained/eval.safetensors",
               target_dir=f"{repo_path}/pretrained",
           )
-          
+
           from diffrhythm.infer.infer_utils import prepare_model
 
           device = "cuda"
           # Load model with max_frames=6144 (supports both 95s and 285s durations)
-          self.cfm, self.tokenizer, self.muq, self.vae, self.eval_model, self.eval_muq = prepare_model(
-              max_frames=6144, device=device
+          self.cfm, self.tokenizer, self.muq, self.vae, self.eval_model, self.eval_muq = (
+              prepare_model(max_frames=6144, device=device)
           )
           # Compile the model for better performance
           self.cfm = torch.compile(self.cfm)
@@ -29660,13 +29937,19 @@ fal auth login
                       raise FieldException(
                           "style_prompt", "The style prompt could not be processed."
                       )
-              
+
               # Import and call get_negative_style_prompt
               from diffrhythm.infer.infer_utils import get_negative_style_prompt
+
               negative_style_prompt = get_negative_style_prompt("cuda")
 
               latent_prompt, pred_frames = get_reference_latent(
-                  "cuda", max_frames, edit=False, pred_segments=None, ref_song=ref_audio_path, vae_model=self.vae
+                  "cuda",
+                  max_frames,
+                  edit=False,
+                  pred_segments=None,
+                  ref_song=ref_audio_path,
+                  vae_model=self.vae,
               )
               batch_infer_num = 3  # Number of songs to generate for selection
               # inference returns (sample_rate, audio_array) when file_type='wav'
@@ -30113,6 +30396,7 @@ def _generate(self, input: TextToMusicInput, response: Response) -> Output:
 
         return Output(audio=File.from_path(output_path))
 
+
 @fal.endpoint("/")
 def generate(self, input: TextToMusicInput, response: Response) -> Output:
     return self._generate(input, response)
@@ -30157,10 +30441,7 @@ repo_path = clone_repository(
 
 ```python theme={null}
 # Download external files
-download_file(
-    "https://example.com/model.bin",
-    target_dir="/path/to/target"
-)
+download_file("https://example.com/model.bin", target_dir="/path/to/target")
 
 # Use temporary directories for processing
 with tempfile.TemporaryDirectory() as output_dir:
@@ -30226,7 +30507,7 @@ result = await fal_client.submit_async(
         "reference_audio_url": "https://example.com/reference.wav",
         "music_duration": "95s",
         "num_inference_steps": 32,
-    }
+    },
 )
 
 # Download the generated audio
@@ -30381,7 +30662,11 @@ fal auth login
 
 
   class JapaneseRequest(BaseModel):
-      prompt: str = Field(examples=["夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"])
+      prompt: str = Field(
+          examples=[
+              "夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"
+          ]
+      )
       voice: Literal[
           "jf_alpha",
           "jf_gongitsune",
@@ -30624,7 +30909,7 @@ class AmEnglishRequest(BaseModel):
         ],
     )
     voice: Literal[
-        "af_heart",    # American Female voices
+        "af_heart",  # American Female voices
         "af_alloy",
         "af_aoede",
         "af_bella",
@@ -30635,7 +30920,7 @@ class AmEnglishRequest(BaseModel):
         "af_river",
         "af_sarah",
         "af_sky",
-        "am_adam",     # American Male voices
+        "am_adam",  # American Male voices
         "am_echo",
         "am_eric",
         "am_fenrir",
@@ -30656,6 +30941,7 @@ class AmEnglishRequest(BaseModel):
         description="Speed of the generated audio. Default is 1.0.",
     )
 
+
 class BrEnglishRequest(BaseModel):
     prompt: str = Field(
         examples=[
@@ -30663,11 +30949,11 @@ class BrEnglishRequest(BaseModel):
         ]
     )
     voice: Literal[
-        "bf_alice",    # British Female voices
+        "bf_alice",  # British Female voices
         "bf_emma",
         "bf_isabella",
         "bf_lily",
-        "bm_daniel",   # British Male voices
+        "bm_daniel",  # British Male voices
         "bm_fable",
         "bm_george",
         "bm_lewis",
@@ -30682,16 +30968,19 @@ class BrEnglishRequest(BaseModel):
         description="Speed of the generated audio. Default is 1.0.",
     )
 
+
 class JapaneseRequest(BaseModel):
     prompt: str = Field(
-        examples=["夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"]
+        examples=[
+            "夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"
+        ]
     )
     voice: Literal[
-        "jf_alpha",    # Japanese Female voices
+        "jf_alpha",  # Japanese Female voices
         "jf_gongitsune",
         "jf_nezumi",
         "jf_tebukuro",
-        "jm_kumo",     # Japanese Male voices
+        "jm_kumo",  # Japanese Male voices
     ] = Field(
         examples=["jf_alpha"],
         description="Voice ID for the desired voice.",
@@ -30717,6 +31006,7 @@ class AmEngOutput(BaseModel):
         ],
     )
 
+
 class BrEngOutput(BaseModel):
     audio: File = Field(
         description="The generated audio",
@@ -30726,6 +31016,7 @@ class BrEngOutput(BaseModel):
             )
         ],
     )
+
 
 class JapaneseOutput(BaseModel):
     audio: File = Field(
@@ -30822,7 +31113,7 @@ async def _generate(
             audio=File.from_path(
                 f.name,
                 content_type="audio/wav",
-                repository="cdn"  # Upload to CDN for fast access
+                repository="cdn",  # Upload to CDN for fast access
             )
         )
 ```
@@ -30833,10 +31124,9 @@ Define language-specific endpoints using the shared generation logic:
 
 ```python theme={null}
 @fal.endpoint("/")
-async def generate(
-    self, request: AmEnglishRequest, response: Response
-) -> AmEngOutput:
+async def generate(self, request: AmEnglishRequest, response: Response) -> AmEngOutput:
     return await self._generate(request, response, language="American English")
+
 
 @fal.endpoint("/american-english")
 async def generate_am_english(
@@ -30844,11 +31134,13 @@ async def generate_am_english(
 ) -> AmEngOutput:
     return await self._generate(request, response, language="American English")
 
+
 @fal.endpoint("/british-english")
 async def generate_br_english(
     self, request: BrEnglishRequest, response: Response
 ) -> BrEngOutput:
     return await self._generate(request, response, language="British English")
+
 
 @fal.endpoint("/japanese")
 async def generate_japanese(
@@ -30901,7 +31193,7 @@ with tempfile.NamedTemporaryFile(suffix=".wav") as f:
         audio=File.from_path(
             f.name,
             content_type="audio/wav",
-            repository="cdn"  # Auto-upload to CDN
+            repository="cdn",  # Auto-upload to CDN
         )
     )
 ```
@@ -30923,14 +31215,22 @@ self.pipelines = {
 ```python theme={null}
 # American English voices
 voice: Literal[
-    "af_heart", "af_alloy", "af_aoede",  # Female
-    "am_adam", "am_echo", "am_eric",     # Male
+    "af_heart",
+    "af_alloy",
+    "af_aoede",  # Female
+    "am_adam",
+    "am_echo",
+    "am_eric",  # Male
 ]
 
 # British English voices
 voice: Literal[
-    "bf_alice", "bf_emma", "bf_lily",    # Female
-    "bm_daniel", "bm_george", "bm_lewis" # Male
+    "bf_alice",
+    "bf_emma",
+    "bf_lily",  # Female
+    "bm_daniel",
+    "bm_george",
+    "bm_lewis",  # Male
 ]
 ```
 
@@ -30988,8 +31288,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "Hello, this is a test of American English text-to-speech!",
         "voice": "af_heart",
-        "speed": 1.2
-    }
+        "speed": 1.2,
+    },
 )
 ```
 
@@ -31001,8 +31301,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "Cheerio! This is British English text-to-speech.",
         "voice": "bf_alice",
-        "speed": 1.0
-    }
+        "speed": 1.0,
+    },
 )
 ```
 
@@ -31014,8 +31314,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "こんにちは、これは日本語の音声合成です。",
         "voice": "jf_alpha",
-        "speed": 0.9
-    }
+        "speed": 0.9,
+    },
 )
 ```
 
@@ -31042,7 +31342,7 @@ for i, (gs, ps, audio) in enumerate(generator):
 
 ```python theme={null}
 machine_type = "L"  # CPU is sufficient and cost-effective
-keep_alive=3000     # Longer keep-alive reduces cold starts
+keep_alive = 3000  # Longer keep-alive reduces cold starts
 ```
 
 ## Key Takeaways
@@ -31147,7 +31447,9 @@ Alternatively, you can use a Dockerfile path to specify the Dockerfile location:
 
 ```python theme={null}
 import pathlib
+
 PWD = Path(__file__).resolve().parent
+
 
 class Test(fal.App):
     image = ContainerImage.from_dockerfile(f"{PWD}/Dockerfile")
@@ -31286,6 +31588,7 @@ WORKFLOW_URL = File.from_path(str(WORKFLOW_PATH), repository="cdn").url
 # PYDANTIC MODELS
 # =============================================================================
 
+
 class ImageRequest(BaseModel):
     prompt: str = Field(
         description="The text prompt describing the image to generate.",
@@ -31336,8 +31639,7 @@ RUN pip install --no-cache-dir boto3==1.35.74 protobuf==4.25.1 pydantic==2.10.6
 # =============================================================================
 
 MODELS = {
-    "checkpoints/sd_xl_turbo_1.0_fp16.safetensors": 
-        "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors",
+    "checkpoints/sd_xl_turbo_1.0_fp16.safetensors": "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors",
 }
 
 
@@ -31345,35 +31647,43 @@ MODELS = {
 # FAL APP
 # =============================================================================
 
+
 class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile_str(DOCKERFILE_STR)
-    
+
     COMFYUI_HOST = "127.0.0.1"
     COMFYUI_PORT = 8188
     COMFYUI_DIR = Path("/app/ComfyUI")
-    
+
     def setup(self):
         self.process = None
         self.workflow_template = None
-        
+
         # Download models to persistent /data storage
         self._download_models()
         self._link_models()
-        
+
         # Start ComfyUI server in background (non-blocking)
         self.process = subprocess.Popen(
-            ["python", "main.py", "--listen", self.COMFYUI_HOST, "--port", str(self.COMFYUI_PORT)],
+            [
+                "python",
+                "main.py",
+                "--listen",
+                self.COMFYUI_HOST,
+                "--port",
+                str(self.COMFYUI_PORT),
+            ],
             cwd=str(self.COMFYUI_DIR),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
         self._wait_for_server(timeout=120)
-        
+
         # Load workflow template
         with open("/app/workflow.json", encoding="utf-8") as f:
             self.workflow_template = json.load(f)
-    
+
     def _download_models(self):
         """Download models using fal toolkit (handles atomic writes automatically)."""
         self._downloaded_paths = {}
@@ -31381,7 +31691,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
             # download_model_weights handles caching and atomic writes
             downloaded_path = download_model_weights(url)
             self._downloaded_paths[model_path] = downloaded_path
-    
+
     def _link_models(self):
         """Symlink models from downloaded paths to ComfyUI's models directory."""
         for model_path in MODELS:
@@ -31391,19 +31701,22 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
             if comfy_path.exists() or comfy_path.is_symlink():
                 comfy_path.unlink()
             comfy_path.symlink_to(downloaded_path)
-    
+
     def _wait_for_server(self, timeout: int = 120):
         start = time.time()
         while time.time() - start < timeout:
             try:
-                resp = requests.get(f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/system_stats", timeout=5)
+                resp = requests.get(
+                    f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/system_stats",
+                    timeout=5,
+                )
                 if resp.status_code == 200:
                     return
             except requests.ConnectionError:
                 pass
             time.sleep(1)
         raise TimeoutError("ComfyUI server did not start")
-    
+
     def _build_workflow(self, request: ImageRequest) -> dict:
         workflow = deepcopy(self.workflow_template)
         workflow["6"]["inputs"]["text"] = request.prompt
@@ -31413,7 +31726,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
         workflow["13"]["inputs"]["noise_seed"] = request.seed
         workflow["22"]["inputs"]["steps"] = request.num_inference_steps
         return workflow
-    
+
     def _queue_prompt(self, prompt: dict) -> str:
         resp = requests.post(
             f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/prompt",
@@ -31422,7 +31735,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
         )
         resp.raise_for_status()
         return resp.json()["prompt_id"]
-    
+
     def _poll_for_completion(self, prompt_id: str, timeout: int = 120) -> dict:
         start = time.time()
         while time.time() - start < timeout:
@@ -31438,7 +31751,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
                     return prompt_history
             time.sleep(0.5)
         raise TimeoutError("Generation did not complete")
-    
+
     def _get_output_image(self, history: dict) -> str | None:
         for node_output in history.get("outputs", {}).values():
             if "images" in node_output and node_output["images"]:
@@ -31449,17 +31762,17 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
                         return f"{self.COMFYUI_DIR}/output/{subfolder}/{filename}"
                     return f"{self.COMFYUI_DIR}/output/{filename}"
         return None
-    
+
     @fal.endpoint("/generate")
     def generate_image(self, input: ImageRequest, request: Request) -> ImageResponse:
         workflow = self._build_workflow(input)
         prompt_id = self._queue_prompt(workflow)
         history = self._poll_for_completion(prompt_id)
-        
+
         image_path = self._get_output_image(history)
         if not image_path:
             raise RuntimeError("No image output found")
-        
+
         image = Image.from_path(image_path, request=request)
         return ImageResponse(image=image, seed=input.seed)
 ```
@@ -31528,6 +31841,7 @@ Large model weights are downloaded to `/data` (persistent storage) at runtime us
 
 ```python theme={null}
 from fal.toolkit import download_model_weights
+
 
 def _download_models(self):
     self._downloaded_paths = {}
@@ -31626,13 +31940,15 @@ When you export a workflow, each node has an ID. Update `_build_workflow()` to m
 ```python theme={null}
 def _build_workflow(self, request: ImageRequest) -> dict:
     workflow = deepcopy(self.workflow_template)
-    
+
     # Find the correct node IDs by inspecting your workflow JSON
-    workflow["6"]["inputs"]["text"] = request.prompt      # CLIP Text Encode (Positive)
-    workflow["7"]["inputs"]["text"] = request.negative_prompt  # CLIP Text Encode (Negative)
-    workflow["5"]["inputs"]["width"] = request.width      # EmptyLatentImage
+    workflow["6"]["inputs"]["text"] = request.prompt  # CLIP Text Encode (Positive)
+    workflow["7"]["inputs"]["text"] = (
+        request.negative_prompt
+    )  # CLIP Text Encode (Negative)
+    workflow["5"]["inputs"]["width"] = request.width  # EmptyLatentImage
     # ... etc
-    
+
     return workflow
 ```
 
@@ -31720,6 +32036,7 @@ fal auth login
   from fastapi import Response
   from pydantic import Field, BaseModel
 
+
   # Base Output Model, it can be reused for image endpoints
   class Output(BaseModel):
       images: list[Image] = Field(description="The generated image files info.")
@@ -31803,9 +32120,11 @@ fal auth login
           description="The format of the generated image.",
       )
 
+
   # For the base endpoint
   class TextToImageInput(BaseInput):
       pass
+
 
   # For the sprint endpoint, we can reuse the base input model and override the fields that we want to change
   class SprintInput(BaseInput):
@@ -31833,6 +32152,7 @@ fal auth login
           ],
       )
 
+
   class SanaSprintOutput(Output):
       images: list[Image] = Field(
           description="The generated image files info.",
@@ -31854,7 +32174,10 @@ fal auth login
       """
       Specify requirements as follows and make sure to pin the versions of packages and commit hashes to ensure reliability.
       """
-      keep_alive = 60  # The worker will be kept alive for 10 minutes after the last request
+
+      keep_alive = (
+          60  # The worker will be kept alive for 10 minutes after the last request
+      )
       min_concurrency = 0  # The minimum number of concurrent workers to keep alive, if set to 0, the app will startup when the first request is received
       max_concurrency = 2  # The maximum number of concurrent workers to acquire, it helps limit the number of concurrent requests to the app
       app_name = "sana"  # set the app name, the endpoint will be served at username/sana
@@ -31869,7 +32192,7 @@ fal auth login
           "--extra-index-url",
           "https://download.pytorch.org/whl/cu124",
       ]
-      machine_type = "GPU-H100" # Choose machine type from https://docs.fal.ai/private-serverless-models/resources/
+      machine_type = "GPU-H100"  # Choose machine type from https://docs.fal.ai/private-serverless-models/resources/
 
       def setup(self):
           """
@@ -31888,7 +32211,9 @@ fal auth login
 
           self.pipes["sprint"] = SanaSprintPipeline.from_pretrained(
               "Efficient-Large-Model/Sana_Sprint_1.6B_1024px_diffusers",
-              text_encoder=self.pipes["base"].text_encoder, # Reuse the text encoder from the base pipeline
+              text_encoder=self.pipes[
+                  "base"
+              ].text_encoder,  # Reuse the text encoder from the base pipeline
               torch_dtype=torch.bfloat16,
           ).to("cuda")
 
@@ -31924,19 +32249,17 @@ fal auth login
           if model_id == "sprint":
               # Negative prompt is not supported in the sprint pipeline
               model_input.pop("negative_prompt")
-          
 
           # Generate the images
           images = self.pipes[model_id](**model_input).images
 
-
           # Perform the safety check
           postprocessed_images = postprocess_images(
-                  images,
-                  input.enable_safety_checker,
-              )
+              images,
+              input.enable_safety_checker,
+          )
 
-          # Pricing 
+          # Pricing
           resolution_factor = math.ceil(
               (image_size.width * image_size.height) / (1024 * 1024)
           )
@@ -31959,25 +32282,28 @@ fal auth login
       @fal.endpoint("/")
       async def generate(
           self,
-          input: TextToImageInput, # This will be used to autgenerate the OpenAPI spec and the playground form
-          response: Response, # This is the response object that will be used to set the headers for setting the billing units
-      ) -> SanaOutput: # This is the output object that will be used to autgenerate the OpenAPI spec
+          input: TextToImageInput,  # This will be used to autgenerate the OpenAPI spec and the playground form
+          response: Response,  # This is the response object that will be used to set the headers for setting the billing units
+      ) -> (
+          SanaOutput
+      ):  # This is the output object that will be used to autgenerate the OpenAPI spec
           return await self._generate(input, response, "base")
 
       @fal.endpoint("/sprint")
       async def generate_sprint(
           self,
-          input: SprintInput, # Use a different input class for the sprint endpoint to change example values and remove the negative prompt
+          input: SprintInput,  # Use a different input class for the sprint endpoint to change example values and remove the negative prompt
           response: Response,
       ) -> SanaSprintOutput:
           return await self._generate(input, response, "sprint")
+
 
   # Run the app with:
   #   cd fal_demos/image
   #   fal run sana
   #
   # Or directly with:
-  #   fal run fal_demos/image/sana.py::Sana 
+  #   fal run fal_demos/image/sana.py::Sana
   #
   # The app will be served on an ephemeral URL, example: https://fal.ai/dashboard/sdk/fal-ai/9fe9b6fc-534d-4926-95b1-87b7f15a67de
   # Visit https://fal.ai/dashboard/sdk/fal-ai/9fe9b6fc-534d-4926-95b1-87b7f15a67de to test the root endpoint
@@ -32113,9 +32439,11 @@ class BaseInput(BaseModel):
         description="The format of the generated image.",
     )
 
+
 # Endpoint-specific input models
 class TextToImageInput(BaseInput):
     pass
+
 
 class SprintInput(BaseInput):
     # Override settings for the faster endpoint
@@ -32146,6 +32474,7 @@ class SanaOutput(Output):
             ],
         ],
     )
+
 
 class SanaSprintOutput(Output):
     images: list[Image] = Field(
@@ -32214,61 +32543,59 @@ class Sana(fal.App):
 Create a reusable generation method for both endpoints:
 
 ```python theme={null}
-    async def _generate(
-        self,
-        input: TextToImageInput,
-        response: Response,
-        model_id: str,
-    ) -> Output:
-        import torch
+async def _generate(
+    self,
+    input: TextToImageInput,
+    response: Response,
+    model_id: str,
+) -> Output:
+    import torch
 
-        # Preprocess input
-        image_size = get_image_size(input.image_size)
-        seed = input.seed or torch.seed()
-        generator = torch.Generator("cuda").manual_seed(seed)
+    # Preprocess input
+    image_size = get_image_size(input.image_size)
+    seed = input.seed or torch.seed()
+    generator = torch.Generator("cuda").manual_seed(seed)
 
-        # Prepare model input
-        model_input = {
-            "prompt": input.prompt,
-            "negative_prompt": input.negative_prompt,
-            "num_inference_steps": input.num_inference_steps,
-            "guidance_scale": input.guidance_scale,
-            "height": image_size.height,
-            "width": image_size.width,
-            "num_images_per_prompt": input.num_images,
-            "generator": generator,
-        }
+    # Prepare model input
+    model_input = {
+        "prompt": input.prompt,
+        "negative_prompt": input.negative_prompt,
+        "num_inference_steps": input.num_inference_steps,
+        "guidance_scale": input.guidance_scale,
+        "height": image_size.height,
+        "width": image_size.width,
+        "num_images_per_prompt": input.num_images,
+        "generator": generator,
+    }
 
-        # Handle model-specific differences
-        if model_id == "sprint":
-            model_input.pop("negative_prompt")  # Not supported in sprint
+    # Handle model-specific differences
+    if model_id == "sprint":
+        model_input.pop("negative_prompt")  # Not supported in sprint
 
-        # Generate images
-        images = self.pipes[model_id](**model_input).images
+    # Generate images
+    images = self.pipes[model_id](**model_input).images
 
-        # Apply safety checking
-        postprocessed_images = postprocess_images(
-            images,
-            input.enable_safety_checker,
-        )
+    # Apply safety checking
+    postprocessed_images = postprocess_images(
+        images,
+        input.enable_safety_checker,
+    )
 
-        # Calculate billing
-        resolution_factor = math.ceil(
-            (image_size.width * image_size.height) / (1024 * 1024)
-        )
-        response.headers["x-fal-billable-units"] = str(
-            resolution_factor * input.num_images
-        )
+    # Calculate billing
+    resolution_factor = math.ceil(
+        (image_size.width * image_size.height) / (1024 * 1024)
+    )
+    response.headers["x-fal-billable-units"] = str(resolution_factor * input.num_images)
 
-        return Output(
-            images=[
-                Image.from_pil(image, input.output_format)
-                for image in postprocessed_images["images"]
-            ],
-            seed=seed,
-            has_nsfw_concepts=postprocessed_images["has_nsfw_concepts"],
-            prompt=input.prompt,
-        )
+    return Output(
+        images=[
+            Image.from_pil(image, input.output_format)
+            for image in postprocessed_images["images"]
+        ],
+        seed=seed,
+        has_nsfw_concepts=postprocessed_images["has_nsfw_concepts"],
+        prompt=input.prompt,
+    )
 ```
 
 ## Endpoint Definitions
@@ -32276,21 +32603,22 @@ Create a reusable generation method for both endpoints:
 Define multiple endpoints using the shared generation logic:
 
 ```python theme={null}
-    @fal.endpoint("/")
-    async def generate(
-        self,
-        input: TextToImageInput,
-        response: Response,
-    ) -> SanaOutput:
-        return await self._generate(input, response, "base")
+@fal.endpoint("/")
+async def generate(
+    self,
+    input: TextToImageInput,
+    response: Response,
+) -> SanaOutput:
+    return await self._generate(input, response, "base")
 
-    @fal.endpoint("/sprint")
-    async def generate_sprint(
-        self,
-        input: SprintInput,
-        response: Response,
-    ) -> SanaSprintOutput:
-        return await self._generate(input, response, "sprint")
+
+@fal.endpoint("/sprint")
+async def generate_sprint(
+    self,
+    input: SprintInput,
+    response: Response,
+) -> SanaSprintOutput:
+    return await self._generate(input, response, "sprint")
 ```
 
 ## Running the Application
@@ -33192,6 +33520,7 @@ FROM your-base-image
 # ... your setup
 """
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(DOCKERFILE),
     machine_type="GPU-A100",
@@ -33242,9 +33571,11 @@ FROM your-base-image
 
 SERVER_PORT = 8000
 
+
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
-    
+
+
 class GenerateResponse(BaseModel):
     image: Image
 
@@ -33252,14 +33583,14 @@ class GenerateResponse(BaseModel):
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile_str(DOCKERFILE)
-    
+
     def setup(self):
         # Start server in background (non-blocking)
         self.process = subprocess.Popen(
             ["your-server", "--host", "127.0.0.1", "--port", str(SERVER_PORT)],
         )
         self._wait_for_server()
-    
+
     def _wait_for_server(self, timeout=120):
         start = time.time()
         while time.time() - start < timeout:
@@ -33270,7 +33601,7 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
                 pass
             time.sleep(1)
         raise TimeoutError("Server did not start")
-    
+
     @fal.endpoint("/generate")
     def generate(self, input: GenerateRequest, request: Request) -> GenerateResponse:
         # Call internal server
@@ -33280,7 +33611,7 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
             timeout=300,
         )
         resp.raise_for_status()
-        
+
         # Upload to fal CDN
         image = Image.from_path(resp.json()["path"], request=request)
         return GenerateResponse(image=image)
@@ -33350,11 +33681,14 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     app = modal.App()
     image = modal.Image.debian_slim().pip_install("torch", "transformers")
 
+
     @app.function(image=image, gpu="A100")
     def generate(prompt: str):
         from transformers import pipeline
+
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
+
 
     @app.local_entrypoint()
     def main():
@@ -33367,12 +33701,14 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     ```python theme={null}
     import fal
 
+
     @fal.function(
         requirements=["torch", "transformers"],
         machine_type="GPU-A100",
     )
     def generate(prompt: str):
         from transformers import pipeline
+
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
     ```
@@ -33391,10 +33727,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     import modal
 
     app = modal.App()
-    image = (
-        modal.Image.debian_slim()
-        .pip_install("torch", "diffusers", "transformers", "accelerate")
+    image = modal.Image.debian_slim().pip_install(
+        "torch", "diffusers", "transformers", "accelerate"
     )
+
 
     @app.cls(image=image, gpu="A100")
     class TextToImage:
@@ -33417,6 +33753,7 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
         def cleanup(self):
             del self.pipe
 
+
     @app.local_entrypoint()
     def main():
         result = TextToImage().generate.remote(prompt="a sunset")
@@ -33427,6 +33764,7 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     ```python theme={null}
     import fal
     from fal.toolkit import Image
+
 
     class TextToImage(fal.App):
         machine_type = "GPU-A100"
@@ -33470,9 +33808,10 @@ TextToImage().generate.remote(prompt="a sunset")
 
 # fal
 import fal_client
-result = fal_client.subscribe("your-username/text-to-image", arguments={
-    "prompt": "a sunset"
-})
+
+result = fal_client.subscribe(
+    "your-username/text-to-image", arguments={"prompt": "a sunset"}
+)
 ```
 
 ***
@@ -33503,17 +33842,18 @@ Modal chains image methods (`Image.debian_slim().pip_install(...).apt_install(..
 ```python theme={null}
 # Modal
 image = (
-    modal.Image.debian_slim()
-    .apt_install("ffmpeg")
-    .pip_install("torch", "diffusers")
+    modal.Image.debian_slim().apt_install("ffmpeg").pip_install("torch", "diffusers")
 )
+
 
 # fal (simple)
 class MyApp(fal.App):
     requirements = ["torch", "diffusers"]
 
+
 # fal (Dockerfile)
 from fal.container import ContainerImage
+
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -33531,9 +33871,10 @@ Modal uses named `Volume` objects mounted at specific paths. fal provides `/data
 # Modal
 volume = modal.Volume.from_name("model-cache")
 
+
 @app.cls(volumes={"/cache": volume})
-class MyModel:
-    ...
+class MyModel: ...
+
 
 # fal -- /data is always available, no configuration needed
 class MyModel(fal.App):
@@ -33808,11 +34149,13 @@ The most common pattern on RunPod is a handler function that loads a model at mo
         torch_dtype=torch.float16,
     ).to("cuda")
 
+
     def handler(job):
         prompt = job["input"]["prompt"]
         image = model(prompt).images[0]
         image.save("/tmp/output.png")
         return {"image_path": "/tmp/output.png"}
+
 
     runpod.serverless.start({"handler": handler})
     ```
@@ -33824,11 +34167,14 @@ The most common pattern on RunPod is a handler function that loads a model at mo
     from pydantic import BaseModel
     from fal.toolkit import Image
 
+
     class Input(BaseModel):
         prompt: str
 
+
     class Output(BaseModel):
         image: Image
+
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -33884,14 +34230,12 @@ RunPod exposes `/run` (async), `/runsync` (sync), and `/stream` endpoints. fal p
     import fal_client
 
     # Sync (subscribe polls automatically)
-    result = fal_client.subscribe("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    result = fal_client.subscribe(
+        "your-username/your-app", arguments={"prompt": "a sunset"}
+    )
 
     # Async
-    handler = fal_client.submit("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    handler = fal_client.submit("your-username/your-app", arguments={"prompt": "a sunset"})
     status = handler.status()
     result = handler.get()
     ```
@@ -33932,8 +34276,7 @@ On RunPod, the deployment unit is a Docker image. Your handler code lives inside
         machine_type = "GPU-A100"
         requirements = ["torch", "diffusers", "transformers"]
 
-        def setup(self):
-            ...
+        def setup(self): ...
     ```
 
     ```bash theme={null}
@@ -33961,6 +34304,7 @@ class MyApp(fal.App):
 ```python theme={null}
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
@@ -33976,9 +34320,11 @@ RunPod offers three approaches for model weights: Hugging Face cache, baked into
 ```python theme={null}
 def setup(self):
     import os
+
     os.environ["HF_HOME"] = "/data/.cache/huggingface"
 
     from diffusers import StableDiffusionXLPipeline
+
     self.model = StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0"
     ).to("cuda")
@@ -34583,6 +34929,7 @@ PORT = 8080
 PERSISTENCE_DIR = "/data/pushgateway"
 PERSISTENCE_FILE = f"{PERSISTENCE_DIR}/metrics.dat"
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(
         r"""
@@ -34791,6 +35138,7 @@ import fal
 from fal.container import ContainerImage
 from fastapi.responses import StreamingResponse
 
+
 class SAM3DStreamApp(
     fal.App,
     keep_alive=600,
@@ -34802,7 +35150,7 @@ class SAM3DStreamApp(
     def setup(self):
         # Download model weights and initialize pipeline
         from huggingface_hub import snapshot_download
-        
+
         snapshot_download(
             "jetjodh/sam-3d-objects",
             local_dir=str(CACHE_DIR),
@@ -34812,24 +35160,28 @@ class SAM3DStreamApp(
     @fal.endpoint("/stream")
     def stream_3d_reconstruction(self, input: SAM3DStreamInput, request: Request):
         """Stream 3D reconstruction with real-time voxel visualization."""
-        
+
         def geometry_callback(stage, step, total_steps, coords, **kwargs):
             # Encode and queue voxel data for streaming
             voxel_data = encode_voxels_binary(coords)
-            progress_queue.put({
-                "stage": "geometry",
-                "step": step,
-                "voxel_data": voxel_data,
-            })
+            progress_queue.put(
+                {
+                    "stage": "geometry",
+                    "step": step,
+                    "voxel_data": voxel_data,
+                }
+            )
 
         def appearance_callback(stage, step, total_steps, coords, colors, **kwargs):
             # Stream colored voxels during appearance diffusion
             voxel_data = encode_voxels_binary(coords, colors)
-            progress_queue.put({
-                "stage": "appearance",
-                "step": step,
-                "voxel_data": voxel_data,
-            })
+            progress_queue.put(
+                {
+                    "stage": "appearance",
+                    "step": step,
+                    "voxel_data": voxel_data,
+                }
+            )
 
         # Run pipeline with streaming callbacks
         outputs = self.pipeline.run(
@@ -34963,6 +35315,7 @@ RUN git clone https://github.com/rehan-remade/sam-3d-objects.git && \
 # Additional 3D libraries
 RUN pip install kaolin pytorch3d gsplat
 """
+
 
 class SAM3DStreamApp(
     fal.App,
@@ -35306,9 +35659,9 @@ fal auth login
           warmup_result = await self.runner.invoke(
               ExampleRequest(prompt="a cat wearing a hat").dict()
           )
-          assert (
-              "image" in warmup_result
-          ), "Warm-up failed, no image returned from the worker"
+          assert "image" in warmup_result, (
+              "Warm-up failed, no image returned from the worker"
+          )
 
       @fal.endpoint("/")
       async def run(self, request: ExampleRequest, response: Response) -> ExampleResponse:
@@ -35497,8 +35850,7 @@ def __call__(
     # Prepare gather list on rank 0
     if self.rank == 0:
         gather_list = [
-            torch.zeros_like(image, device=self.device)
-            for _ in range(self.world_size)
+            torch.zeros_like(image, device=self.device) for _ in range(self.world_size)
         ]
     else:
         gather_list = None
@@ -35551,8 +35903,7 @@ def pipeline_callback(
     # Gather previews from all workers
     if self.rank == 0:
         gather_list = [
-            torch.zeros_like(image, device=self.device)
-            for _ in range(self.world_size)
+            torch.zeros_like(image, device=self.device) for _ in range(self.world_size)
         ]
     else:
         gather_list = None
@@ -35656,6 +36007,7 @@ class ExampleRequest(BaseModel):
     width: int = Field(default=1024)
     height: int = Field(default=1024)
 
+
 class ExampleResponse(BaseModel):
     image: File = Field()
 ```
@@ -35703,8 +36055,8 @@ result = fal_client.submit(
     "username/app-name",  # Replace with your deployed app name
     arguments={
         "prompt": "A serene mountain landscape at sunset",
-        "num_inference_steps": 30
-    }
+        "num_inference_steps": 30,
+    },
 )
 
 # Get the result
@@ -35721,9 +36073,9 @@ for event in fal_client.stream(
     "username/app-name",  # Replace with your deployed app name
     arguments={
         "prompt": "A serene mountain landscape at sunset",
-        "num_inference_steps": 30
+        "num_inference_steps": 30,
     },
-    path="/stream"
+    path="/stream",
 ):
     print(f"Step {event['step']}: {event['progress'] * 100}%")
     if event.get("preview_image"):
@@ -36375,6 +36727,7 @@ class WanT2VRequest(BaseModel):
         description="Whether to enable prompt expansion.",
     )
 
+
 class WanT2VResponse(BaseModel):
     video: File = Field(
         description="The generated video file.",
@@ -36499,6 +36852,7 @@ def _is_nsfw_prompt(self, prompt: str) -> bool:
     else:
         return "yes" in response["output"].lower()
 
+
 def _is_nsfw_request(self, image: str) -> bool:
     """Multi-stage image NSFW detection."""
     import fal_client
@@ -36509,8 +36863,7 @@ def _is_nsfw_request(self, image: str) -> bool:
 
         # Primary check with specialized NSFW detector
         response = fal_client.subscribe(
-            "fal-ai/imageutils/nsfw",
-            {"image_url": image_url}
+            "fal-ai/imageutils/nsfw", {"image_url": image_url}
         )
     except Exception:
         return True
@@ -36555,6 +36908,7 @@ def _expand_prompt(self, prompt: str) -> str:
         )
     except Exception:
         import traceback
+
         traceback.print_exc()
         return prompt  # Return original if expansion fails
     else:
@@ -36611,10 +36965,7 @@ def generate_image_to_video(self, request: WanT2VRequest) -> WanT2VResponse:
             value_range=(-1, 1),
         )
 
-        return WanT2VResponse(
-            video=File.from_path(save_path),
-            seed=seed
-        )
+        return WanT2VResponse(video=File.from_path(save_path), seed=seed)
 ```
 
 ## Key Concepts and Best Practices
@@ -36638,10 +36989,7 @@ response = fal_client.subscribe(
 
 ```python theme={null}
 image_url = fal_client.upload_image(image)
-response = fal_client.subscribe(
-    "fal-ai/imageutils/nsfw",
-    {"image_url": image_url}
-)
+response = fal_client.subscribe("fal-ai/imageutils/nsfw", {"image_url": image_url})
 ```
 
 **Vision-Language Models:**
@@ -36736,8 +37084,8 @@ result = await fal_client.submit_async(
         "num_inference_steps": 30,
         "enable_safety_checker": True,
         "enable_prompt_expansion": True,
-        "seed": 42
-    }
+        "seed": 42,
+    },
 )
 
 # The response includes the video file and seed
@@ -36758,15 +37106,15 @@ seed_used = result["seed"]
 ### Memory Management
 
 ```python theme={null}
-offload_model=False  # Keep model in VRAM for better performance
-use_usp=False       # Optimize for single-user scenarios
+offload_model = False  # Keep model in VRAM for better performance
+use_usp = False  # Optimize for single-user scenarios
 ```
 
 ### Storage Efficiency
 
 ```python theme={null}
-local_dir_use_symlinks=True  # Avoid duplicate model weights
-FAL_MODEL_WEIGHTS_DIR       # Use managed storage location
+local_dir_use_symlinks = True  # Avoid duplicate model weights
+FAL_MODEL_WEIGHTS_DIR  # Use managed storage location
 ```
 
 ## Key Takeaways
@@ -36839,10 +37187,12 @@ To select a model, simply specify the model ID in the subscribe method as shown 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/hunyuan-3d/v3.1/part",
@@ -36955,10 +37305,12 @@ To select a model, simply specify the model ID in the subscribe method as shown 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/hunyuan-3d/v3.1/pro/image-to-3d",
@@ -37127,16 +37479,16 @@ To select a model, simply specify the model ID in the subscribe method as shown 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/hunyuan-3d/v3.1/pro/text-to-3d",
-          arguments={
-              "prompt": "A super cool space ship with details"
-          },
+          arguments={"prompt": "A super cool space ship with details"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -37310,10 +37662,12 @@ To select a model, simply specify the model ID in the subscribe method as shown 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/hunyuan-3d/v3.1/rapid/image-to-3d",
@@ -37467,10 +37821,12 @@ To select a model, simply specify the model ID in the subscribe method as shown 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/hunyuan-3d/v3.1/rapid/text-to-3d",
@@ -37644,10 +38000,12 @@ To select a model, simply specify the model ID in the subscribe method as shown 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/hunyuan-3d/v3.1/smart-topology",
@@ -37824,10 +38182,12 @@ Get started with **Trellis 2**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/trellis-2",
@@ -37889,10 +38249,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/trellis",
@@ -38032,10 +38394,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/trellis/multi",
@@ -38043,7 +38407,7 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/model_tests/video_models/front.png",
                   "https://storage.googleapis.com/falserverless/model_tests/video_models/back.png",
-                  "https://storage.googleapis.com/falserverless/model_tests/video_models/left.png"
+                  "https://storage.googleapis.com/falserverless/model_tests/video_models/left.png",
               ]
           },
           with_logs=True,
@@ -38247,9 +38611,9 @@ const result = await fal.subscribe("fal-ai/trellis", {
 Python:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/trellis", {
-    "image_url": "https://example.com/your-image.jpg"
-})
+result = fal_client.subscribe(
+    "fal-ai/trellis", {"image_url": "https://example.com/your-image.jpg"}
+)
 ```
 
 ### Advanced Features
@@ -38450,10 +38814,12 @@ Get started with Trellis today and experience the next generation of AI-powered 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/trellis-2",
@@ -38704,10 +39070,12 @@ Get started with Trellis today and experience the next generation of AI-powered 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/create-voice",
@@ -38803,16 +39171,16 @@ Get started with Trellis today and experience the next generation of AI-powered 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v1/tts",
-      arguments={
-          "text": "Hello world! Kling TTS is available on FAL!"
-      },
+      arguments={"text": "Hello world! Kling TTS is available on FAL!"},
       with_logs=True,
       on_queue_update=on_queue_update,
   )
@@ -38927,10 +39295,12 @@ Get started with Trellis today and experience the next generation of AI-powered 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/video-to-audio",
@@ -39087,10 +39457,12 @@ Get started with **Whisper**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/whisper",
@@ -39150,10 +39522,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/whisper",
@@ -39330,16 +39704,16 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "xai/tts/v1",
-      arguments={
-          "text": "Hello! This is xAI text to speech, brought to you by Fal AI."
-      },
+      arguments={"text": "Hello! This is xAI text to speech, brought to you by Fal AI."},
       with_logs=True,
       on_queue_update=on_queue_update,
   )
@@ -39453,10 +39827,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/birefnet",
@@ -39597,10 +39973,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/birefnet/v2",
@@ -39833,16 +40211,16 @@ BiRefNet's bilateral reference framework processes images through parallel pathw
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bria/background/remove",
-          arguments={
-              "image_url": "https://fal.media/files/panda/K5Rndvzmn1j-OI1VZXDVd.jpeg"
-          },
+          arguments={"image_url": "https://fal.media/files/panda/K5Rndvzmn1j-OI1VZXDVd.jpeg"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -39939,10 +40317,12 @@ BiRefNet's bilateral reference framework processes images through parallel pathw
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bria/background/replace",
@@ -40169,10 +40549,12 @@ RMBG 2.0 uses a **segmentation architecture** trained exclusively on licensed da
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bria/embed-product",
@@ -40326,16 +40708,18 @@ RMBG 2.0 uses a **segmentation architecture** trained exclusively on licensed da
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/eraser",
       arguments={
           "image_url": "https://storage.googleapis.com/falserverless/bria/bria_eraser_img.png",
-          "mask_url": "https://storage.googleapis.com/falserverless/bria/bria_eraser_mask.png"
+          "mask_url": "https://storage.googleapis.com/falserverless/bria/bria_eraser_mask.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -40477,19 +40861,18 @@ RMBG 2.0 uses a **segmentation architecture** trained exclusively on licensed da
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/expand",
       arguments={
           "image_url": "https://storage.googleapis.com/falserverless/model_tests/orange.png",
-          "canvas_size": [
-              1200,
-              674
-          ]
+          "canvas_size": [1200, 674],
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -40677,10 +41060,12 @@ RMBG 2.0 uses a **segmentation architecture** trained exclusively on licensed da
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bria/fibo/generate",
@@ -40885,10 +41270,12 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/edit",
@@ -41049,10 +41436,12 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/restore",
@@ -41153,17 +41542,19 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/relight",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/bria_result+-+2026-01-13T095546.173.png",
               "light_direction": "front",
-              "light_type": "soft overcast daylight lighting"
+              "light_type": "soft overcast daylight lighting",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41277,10 +41668,12 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/sketch_to_colored_image",
@@ -41381,16 +41774,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/erase_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/an_empty_table_in_living_room.png",
-              "object_name": "Table"
+              "object_name": "Table",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41493,16 +41888,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/colorize",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/png+-+2026-01-13T083840.113.png",
-              "color": "contemporary color"
+              "color": "contemporary color",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41607,16 +42004,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/restyle",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/high_camera_angle_warm_filter.png",
-              "style": "3D Render"
+              "style": "3D Render",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41721,16 +42120,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/rewrite_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/create_an_image_of_cake__with_text_on_it_saying___Hi_there__.png",
-              "new_text": "FIBO Edit!"
+              "new_text": "FIBO Edit!",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41833,16 +42234,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/add_object_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/an_empty_table_in_living_room.png",
-              "instruction": "Place a red vase with flowers on the table."
+              "instruction": "Place a red vase with flowers on the table.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -41945,16 +42348,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/blend",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/shirt.png",
-              "instruction": "Place the art on the shirt, keep the art exactly the same"
+              "instruction": "Place the art on the shirt, keep the art exactly the same",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -42057,16 +42462,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/replace_object_by_text",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/a_bowl_of_fruits__should_have_a_red_apple.png",
-              "instruction": "Replace the red apple with a green pear"
+              "instruction": "Replace the red apple with a green pear",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -42169,16 +42576,18 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/fibo-edit/reseason",
           arguments={
               "image_url": "https://bria-datasets.s3.us-east-1.amazonaws.com/Liza/create_a_realistic_image_of_a_green_field_in_the_spring__also_add_trees.png",
-              "season": "winter"
+              "season": "winter",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -42305,10 +42714,12 @@ Provide an image instead of text. FIBO’s vision-language model extracts a deta
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bria/fibo-lite/generate",
@@ -42519,17 +42930,19 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/genfill",
       arguments={
           "image_url": "https://storage.googleapis.com/falserverless/bria/bria_genfill_img.png",
           "mask_url": "https://storage.googleapis.com/falserverless/bria/bria_genfill_mask.png",
-          "prompt": "A red delicious cherry"
+          "prompt": "A red delicious cherry",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -42700,10 +43113,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/product-shot",
@@ -42891,16 +43306,16 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/reimagine",
-      arguments={
-          "prompt": "A 2d illustration of a dog in a vibrant park"
-      },
+      arguments={"prompt": "A 2d illustration of a dog in a vibrant park"},
       with_logs=True,
       on_queue_update=on_queue_update,
   )
@@ -43053,10 +43468,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bria/replace-background",
@@ -43206,10 +43623,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bria/text-to-image/hd",
@@ -43369,10 +43788,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bria/text-to-image/base",
@@ -43532,10 +43953,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bria/text-to-image/fast",
@@ -43730,10 +44153,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/dreamina/v3.1/text-to-image",
@@ -43877,10 +44302,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/seedream/v3/text-to-image",
@@ -44026,10 +44453,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4/edit",
@@ -44039,8 +44468,8 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_1.png",
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_2.png",
                   "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_3.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_4.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/seedream4_edit_input_4.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -44196,15 +44625,17 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4/text-to-image",
           arguments={
-              "prompt": "A trendy restaurant with a digital menu board displaying \"Seedream 4.0 is available on fal\" in elegant script, with diners enjoying their meals."
+              "prompt": 'A trendy restaurant with a digital menu board displaying "Seedream 4.0 is available on fal" in elegant script, with diners enjoying their meals.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -44364,10 +44795,12 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4.5/edit",
@@ -44376,8 +44809,8 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/seedreamv45/seedream_v45_edit_input_1.png",
                   "https://storage.googleapis.com/falserverless/example_inputs/seedreamv45/seedream_v45_edit_input_2.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/seedreamv45/seedream_v45_edit_input_3.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/seedreamv45/seedream_v45_edit_input_3.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -44515,15 +44948,17 @@ This is a two-stage distilled model for the [FIBO](https://huggingface.co/briaai
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v4.5/text-to-image",
           arguments={
-              "prompt": "A selfie of a cat, with the cat as the protagonist. The setting is twilight at the Eiffel Tower. The cat is happy, holding a piece of baklava in its paw. The photo has a slight motion blur and is slightly overexposed. From a selfie angle, with a bit of motion blur, the overall image presents a sense of calm madness. The text \"Seedream 4.5 is on fal\" should be written on the picture at the top in clearly visible font and crisp lettering. The image has a 4:3 aspect ratio"
+              "prompt": 'A selfie of a cat, with the cat as the protagonist. The setting is twilight at the Eiffel Tower. The cat is happy, holding a piece of baklava in its paw. The photo has a slight motion blur and is slightly overexposed. From a selfie angle, with a bit of motion blur, the overall image presents a sense of calm madness. The text "Seedream 4.5 is on fal" should be written on the picture at the top in clearly visible font and crisp lettering. The image has a 4:3 aspect ratio'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -44725,10 +45160,12 @@ Seedream 4.5 processes edits in approximately 60 seconds on [fal infrastructure]
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v5/lite/edit",
@@ -44737,8 +45174,8 @@ Seedream 4.5 processes edits in approximately 60 seconds on [fal infrastructure]
               "image_urls": [
                   "https://v3b.fal.media/files/b/0a8f9936/KOsb_qPB_W0ZJ0Ee2OsnU_586e2892841d46f09049ee7199b303d3.png",
                   "https://v3b.fal.media/files/b/0a8f994e/JroWTogO6jOTFk9b6B3XM_591ca38cef2f44bbba2843cbf80fb1b2.png",
-                  "https://v3b.fal.media/files/b/0a8f9960/Q6pzwXAiFaFPOpSScoE-D_0eca5db19e5242739f127efe49b38922.png"
-              ]
+                  "https://v3b.fal.media/files/b/0a8f9960/Q6pzwXAiFaFPOpSScoE-D_0eca5db19e5242739f127efe49b38922.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -44897,15 +45334,17 @@ Seedream 4.5 processes edits in approximately 60 seconds on [fal infrastructure]
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedream/v5/lite/text-to-image",
           arguments={
-              "prompt": "Realistic DSLR photograph of anthropomorphic Penkingese dog enjoying a bowl of ramen on the Great Wall of China with the words \"Seedream 5.0 Lite available on fal\" visible at the top."
+              "prompt": 'Realistic DSLR photograph of anthropomorphic Penkingese dog enjoying a bowl of ramen on the Great Wall of China with the words "Seedream 5.0 Lite available on fal" visible at the top.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -45103,10 +45542,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/object-detection",
@@ -45201,16 +45642,18 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/open-vocabulary-detection",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "text_input": ""
+              "text_input": "",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -45307,10 +45750,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/ocr-with-region",
@@ -45405,16 +45850,18 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/caption-to-phrase-grounding",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "text_input": ""
+              "text_input": "",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -45511,16 +45958,18 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/referring-expression-segmentation",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "text_input": ""
+              "text_input": "",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -45617,10 +46066,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/dense-region-caption",
@@ -45715,21 +46166,18 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-to-segmentation",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "region": {
-                  "x1": 100,
-                  "x2": 200,
-                  "y1": 100,
-                  "y2": 200
-              }
+              "region": {"x1": 100, "x2": 200, "y1": 100, "y2": 200},
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -45841,10 +46289,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-proposal",
@@ -45957,10 +46407,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-2-pro",
@@ -46088,10 +46540,12 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-2-pro/edit",
@@ -46099,7 +46553,7 @@ ByteDance's Seedream 5.0 Lite delivers fast, intelligent and high quality image 
               "prompt": "Place realistic flames emerging from the top of the coffee cup, dancing above the rim",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/flux2_pro_edit_input.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -46335,15 +46789,17 @@ The `@` syntax provides a natural way to reference multiple images without expli
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/dev",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -46522,16 +46978,18 @@ The `@` syntax provides a natural way to reference multiple images without expli
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/dev/image-to-image",
           arguments={
               "image_url": "https://fal.media/files/koala/Chls9L2ZnvuipUTEwlnJC.png",
-              "prompt": "A cat dressed as a wizard with a background of a mystic forest."
+              "prompt": "A cat dressed as a wizard with a background of a mystic forest.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -46717,10 +47175,12 @@ The `@` syntax provides a natural way to reference multiple images without expli
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/dev/redux",
@@ -47069,10 +47529,12 @@ Ready to transform your creative vision into reality? Get started at [https://fa
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/krea",
@@ -47238,16 +47700,18 @@ Ready to transform your creative vision into reality? Get started at [https://fa
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/krea/image-to-image",
           arguments={
               "image_url": "https://fal.media/files/koala/Chls9L2ZnvuipUTEwlnJC.png",
-              "prompt": "A cat dressed as a wizard with a background of a mystic forest."
+              "prompt": "A cat dressed as a wizard with a background of a mystic forest.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -47413,10 +47877,12 @@ Ready to transform your creative vision into reality? Get started at [https://fa
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/krea/redux",
@@ -47673,15 +48139,17 @@ FLUX.1 Krea \[dev] implements a 12 billion parameter flow transformer architectu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -47865,16 +48333,18 @@ FLUX.1 Krea \[dev] implements a 12 billion parameter flow transformer architectu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/image-to-image",
           arguments={
               "prompt": "A photo of a lion sitting on a stone bench",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -48071,17 +48541,19 @@ FLUX.1 Krea \[dev] implements a 12 billion parameter flow transformer architectu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/inpainting",
           arguments={
               "prompt": "A photo of a lion sitting on a stone bench",
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/dog.png",
-              "mask_url": "https://storage.googleapis.com/falserverless/example_inputs/dog_mask.png"
+              "mask_url": "https://storage.googleapis.com/falserverless/example_inputs/dog_mask.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -48265,15 +48737,17 @@ FLUX.1 Krea \[dev] implements a 12 billion parameter flow transformer architectu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-lora/stream",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -48619,16 +49093,18 @@ Ready to transform your creative workflow with FLUX LoRA? Sign up for an API key
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/flux-pro/kontext",
       arguments={
           "prompt": "Put a donut next to the flour.",
-          "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png"
+          "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -48749,10 +49225,13 @@ For Python:
 from fal_client import FalClient
 
 client = FalClient("YOUR_FAL_KEY")
-result = client.subscribe("fal-ai/flux-pro/kontext", {
-    "prompt": "Change the red car to blue while keeping everything else the same",
-    "image_url": "https://your-image-url.com/image.jpg"
-})
+result = client.subscribe(
+    "fal-ai/flux-pro/kontext",
+    {
+        "prompt": "Change the red car to blue while keeping everything else the same",
+        "image_url": "https://your-image-url.com/image.jpg",
+    },
+)
 ```
 
 ### Technical Specifications
@@ -49005,16 +49484,18 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max",
           arguments={
               "prompt": "Put a donut next to the flour.",
-              "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png"
+              "image_url": "https://v3.fal.media/files/rabbit/rmgBxhwGYb2d3pl3x9sKf_output.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -49193,10 +49674,12 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max/multi",
@@ -49204,8 +49687,8 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
               "prompt": "Put the little duckling on top of the woman's t-shirt.",
               "image_urls": [
                   "https://v3.fal.media/files/penguin/XoW0qavfF-ahg-jX4BMyL_image.webp",
-                  "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp"
-              ]
+                  "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -49372,15 +49855,17 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/kontext/max/text-to-image",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -49574,10 +50059,12 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/flux-pro/kontext/multi",
@@ -49585,8 +50072,8 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
           "prompt": "Put the little duckling on top of the woman's t-shirt.",
           "image_urls": [
               "https://v3.fal.media/files/penguin/XoW0qavfF-ahg-jX4BMyL_image.webp",
-              "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp"
-          ]
+              "https://v3.fal.media/files/tiger/bml6YA7DWJXOigadvxk75_image.webp",
+          ],
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -49784,15 +50271,17 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/flux-pro/kontext/text-to-image",
       arguments={
-          "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+          "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -49997,17 +50486,19 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1/fill",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
-              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg"
+              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -50158,18 +50649,20 @@ Ready to transform your images with intelligent editing? Sign up now at [https:/
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1/fill-finetuned",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
               "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
-              "finetune_id": ""
+              "finetune_id": "",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -50421,15 +50914,17 @@ FLUX.1 \[pro] Fill operates through mask-based editing rather than full image re
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1.1",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -50594,10 +51089,12 @@ FLUX.1 \[pro] Fill operates through mask-based editing rather than full image re
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1.1/redux",
@@ -50955,15 +51452,17 @@ Ready to transform your text into stunning images with the most advanced FLUX mo
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1.1-ultra",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -51123,10 +51622,12 @@ Ready to transform your text into stunning images with the most advanced FLUX mo
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-pro/v1.1-ultra/redux",
@@ -51378,16 +51879,18 @@ FLUX1.1 \[pro] ultra extends Black Forest Labs' architecture to 4-megapixel gene
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/flux-pro/v1.1-ultra-finetuned",
       arguments={
-          "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture.",
-          "finetune_id": ""
+          "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.',
+          "finetune_id": "",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -51601,15 +52104,17 @@ FLUX1.1 \[pro] ultra extends Black Forest Labs' architecture to 4-megapixel gene
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/schnell",
           arguments={
-              "prompt": "Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word \"FLUX\" is painted over it in big, white brush strokes with visible texture."
+              "prompt": 'Extreme close-up of a single tiger eye, direct frontal view. Detailed iris and pupil. Sharp focus on eye texture and color. Natural lighting to capture authentic eye shine and depth. The word "FLUX" is painted over it in big, white brush strokes with visible texture.'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -51788,10 +52293,12 @@ FLUX1.1 \[pro] ultra extends Black Forest Labs' architecture to 4-megapixel gene
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/schnell/redux",
@@ -52137,10 +52644,12 @@ Get started today and experience the fastest AI image generation available. Crea
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/srpo",
@@ -52306,16 +52815,18 @@ Get started today and experience the fastest AI image generation available. Crea
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux/srpo/image-to-image",
           arguments={
               "image_url": "https://fal.media/files/koala/Chls9L2ZnvuipUTEwlnJC.png",
-              "prompt": "A cat dressed as a wizard with a background of a mystic forest."
+              "prompt": "A cat dressed as a wizard with a background of a mystic forest.",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -52510,10 +53021,12 @@ Get started today and experience the fastest AI image generation available. Crea
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/gemini-3-pro-image-preview",
@@ -52663,10 +53176,12 @@ Get started today and experience the fastest AI image generation available. Crea
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/gemini-3-pro-image-preview/edit",
@@ -52674,8 +53189,8 @@ Get started today and experience the fastest AI image generation available. Crea
               "prompt": "make a photo of the man driving the car down the california coastline",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -52915,10 +53430,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/gpt-image-1.5",
@@ -53051,10 +53568,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/gpt-image-1.5/edit",
@@ -53062,7 +53581,7 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "prompt": "Same workers, same beam, same lunch boxes - but they're all on their phones now. One is taking a selfie. One is on a call looking annoyed. Same danger, new priorities. A hard hat has AirPods.",
               "image_urls": [
                   "https://v3b.fal.media/files/b/0a8691af/9Se_1_VX1wzTjjTOpWbs9_bb39c2eb-1a41-4749-b1d0-cf134abc8bbf.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -53241,10 +53760,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character",
@@ -53252,7 +53773,7 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "prompt": "Place the woman leisurely enjoying a cup of espresso while relaxing at a sunlit café table in Siena, Italy. The café setting showcases vintage wooden furniture with peeling white paint, aged brick flooring, and sun-bleached stone walls decorated with trailing ivy and vibrant potted geraniums that capture Siena's medieval character. Golden late-morning light streams through overhead, creating soft shadows that highlight the weathered architectural details. The composition appears slightly off-center, conveying the unguarded tranquility and personal intimacy of a peaceful moment savoring the Tuscan morning ambiance.",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -53415,10 +53936,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character/edit",
@@ -53428,7 +53951,7 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "mask_url": "https://v3.fal.media/files/panda/jVDAgSkpsZFDP080ceSZJ_woman_face_mask.png",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -53586,10 +54109,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/character/remix",
@@ -53598,7 +54123,7 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "image_url": "https://v3.fal.media/files/panda/mcxydS-_4ZjfBWFtgoo2z_XHLsl7khq6dC6Qp3cIdJl08rG0I.avif",
               "reference_image_urls": [
                   "https://v3.fal.media/files/kangaroo/0rinwnj_Kn9Fsu2dK-aKm_image.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -53800,16 +54325,16 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/upscale",
-      arguments={
-          "image_url": "https://fal.media/files/monkey/e6RtJf_ue0vyWzeiEmTby.png"
-      },
+      arguments={"image_url": "https://fal.media/files/monkey/e6RtJf_ue0vyWzeiEmTby.png"},
       with_logs=True,
       on_queue_update=on_queue_update,
   )
@@ -53954,15 +54479,17 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2",
       arguments={
-          "prompt": "A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says \"Just Waiting for Halloween with Ideogram 2.0 at fal.ai\""
+          "prompt": 'A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says "Just Waiting for Halloween with Ideogram 2.0 at fal.ai"'
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -54128,17 +54655,19 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2/edit",
       arguments={
-          "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+          "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
           "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
-          "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg"
+          "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -54288,16 +54817,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2/remix",
       arguments={
           "prompt": "An ice field in north atlantic",
-          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -54458,15 +54989,17 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo",
           arguments={
-              "prompt": "A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says \"Just Waiting for Halloween with Ideogram 2.0 at fal.ai\""
+              "prompt": 'A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says "Just Waiting for Halloween with Ideogram 2.0 at fal.ai"'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -54584,16 +55117,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo/remix",
           arguments={
               "prompt": "An ice field in north atlantic",
-              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -54722,17 +55257,19 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2/turbo/edit",
           arguments={
-              "prompt": "A knight in shining armour holding a greatshield with \"FAL\" on it",
+              "prompt": 'A knight in shining armour holding a greatshield with "FAL" on it',
               "image_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/knight.jpeg",
-              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg"
+              "mask_url": "https://storage.googleapis.com/falserverless/flux-lora/example-images/mask_knight.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -54876,15 +55413,17 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2a",
       arguments={
-          "prompt": "A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says \"Just Waiting for Halloween with Ideogram 2.0 at fal.ai\""
+          "prompt": 'A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says "Just Waiting for Halloween with Ideogram 2.0 at fal.ai"'
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -55025,16 +55564,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/ideogram/v2a/remix",
       arguments={
           "prompt": "An ice field in north atlantic",
-          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+          "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -55196,15 +55737,17 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2a/turbo",
           arguments={
-              "prompt": "A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says \"Just Waiting for Halloween with Ideogram 2.0 at fal.ai\""
+              "prompt": 'A comic style illustration of a skeleton sitting on a toilet in a bathroom. The bathroom has a Halloween decoration with a pumpkin jack-o-lantern and bats flying around. There is a text above the skeleton that says "Just Waiting for Halloween with Ideogram 2.0 at fal.ai"'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -55317,16 +55860,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v2a/turbo/remix",
           arguments={
               "prompt": "An ice field in north atlantic",
-              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png"
+              "image_url": "https://fal.media/files/lion/FHOx4y4a0ef7Sgmo-sOUR_image.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -55480,15 +56025,17 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3",
           arguments={
-              "prompt": "The Bone Forest stretched across the horizon, its trees fashioned from the ossified remains of ancient leviathans that once swam through the sky. Shamans with antlers growing from their shoulders and eyes that revealed the true nature of any being they beheld conducted rituals to commune with the spirits that still inhabited the calcified grove. In sky writes \"Ideogram V3 in fal.ai\""
+              "prompt": 'The Bone Forest stretched across the horizon, its trees fashioned from the ossified remains of ancient leviathans that once swam through the sky. Shamans with antlers growing from their shoulders and eyes that revealed the true nature of any being they beheld conducted rituals to commune with the spirits that still inhabited the calcified grove. In sky writes "Ideogram V3 in fal.ai"'
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -55637,16 +56184,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/reframe",
           arguments={
               "image_url": "https://v3.fal.media/files/lion/0qJs_qW8nz0wYsXhFa6Tk.png",
-              "image_size": "square_hd"
+              "image_size": "square_hd",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -55789,16 +56338,16 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/generate-transparent",
-          arguments={
-              "prompt": "A logo for Ideogram Coffee."
-          },
+          arguments={"prompt": "A logo for Ideogram Coffee."},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -55930,17 +56479,19 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/edit",
           arguments={
               "prompt": "black bag",
               "image_url": "https://v3.fal.media/files/panda/-LC_gNNV3wUHaGMQT3klE_output.png",
-              "mask_url": "https://v3.fal.media/files/kangaroo/1dd3zEL5MXQ3Kb4-mRi9d_indir%20(20).png"
+              "mask_url": "https://v3.fal.media/files/kangaroo/1dd3zEL5MXQ3Kb4-mRi9d_indir%20(20).png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -56087,10 +56638,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/layerize-text",
@@ -56257,16 +56810,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/remix",
           arguments={
               "prompt": "Old ancient city day light",
-              "image_url": "https://v3.fal.media/files/lion/9-Yt8JfTw4OxrAjiUzwP9_output.png"
+              "image_url": "https://v3.fal.media/files/lion/9-Yt8JfTw4OxrAjiUzwP9_output.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -56425,16 +56980,18 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/ideogram/v3/replace-background",
           arguments={
               "prompt": "A beautiful sunset over mountains that writes Ideogram v3 in fal.ai",
-              "image_url": "https://v3.fal.media/files/rabbit/F6dvKPFL9VzKiM8asJOgm_MJj6yUB6rGjTsv_1YHIcA_image.webp"
+              "image_url": "https://v3.fal.media/files/rabbit/F6dvKPFL9VzKiM8asJOgm_MJj6yUB6rGjTsv_1YHIcA_image.webp",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -56609,10 +57166,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/imageutils/rembg",
@@ -56714,10 +57273,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/imageutils/depth",
@@ -56824,10 +57385,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/imageutils/marigold-depth",
@@ -56965,10 +57528,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana",
@@ -57106,10 +57671,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana/edit",
@@ -57117,8 +57684,8 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "prompt": "make a photo of the man driving the car down the california coastline",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -57298,10 +57865,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana-2",
@@ -57457,10 +58026,12 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana-2/edit",
@@ -57468,8 +58039,8 @@ Gemini 3 Pro Image leverages Google's latest foundation model to interpret compl
               "prompt": "make a photo of the man driving the car down the california coastline",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -57712,10 +58283,12 @@ Built on Google's Gemini 3.1 Flash Image foundation, Nano Banana 2 reasons about
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana-pro",
@@ -57873,10 +58446,12 @@ Built on Google's Gemini 3.1 Flash Image foundation, Nano Banana 2 reasons about
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/nano-banana-pro/edit",
@@ -57884,8 +58459,8 @@ Built on Google's Gemini 3.1 Flash Image foundation, Nano Banana 2 reasons about
               "prompt": "make a photo of the man driving the car down the california coastline",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input.png",
-                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/nano-banana-edit-input-2.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -58286,10 +58861,12 @@ Get started with **Nano Banana 2**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
@@ -58351,10 +58928,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/seedvr/upscale/image",
@@ -58490,10 +59069,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/seedvr/upscale/image/seamless",
@@ -58659,10 +59240,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/topaz/upscale/image",
@@ -58878,10 +59461,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-image",
@@ -59008,10 +59593,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-image/edit",
@@ -59161,16 +59748,16 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/base",
-          arguments={
-              "prompt": "Grandmother knitting by a window, an empty chair by her"
-          },
+          arguments={"prompt": "Grandmother knitting by a window, an empty chair by her"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -59335,16 +59922,16 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/base/lora",
-          arguments={
-              "prompt": "Grandmother knitting by a window, an empty chair by her"
-          },
+          arguments={"prompt": "Grandmother knitting by a window, an empty chair by her"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -59542,10 +60129,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/z-image/turbo",
@@ -59803,16 +60392,18 @@ Z-Image Turbo optimizes for cost-per-image economics in production environments 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/controlnet",
           arguments={
               "prompt": "A single leopard, its spotted golden coat detailed with black rosettes, cautiously peeks its head through dense green foliage. The leopard’s eyes are alert and focused forward, ears perked, whiskers slightly visible. The bushes consist of thick, leafy shrubs with varying shades of green, some leaves partially obscuring the leopard’s muzzle and forehead. Soft natural daylight filters through the canopy above, casting dappled shadows across the animal’s fur and surrounding leaves. The composition is a medium close-up, centered on the leopard’s head emerging from the undergrowth, with shallow depth of field blurring the background vegetation.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -60006,16 +60597,18 @@ Z-Image Turbo optimizes for cost-per-image economics in production environments 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/controlnet/lora",
           arguments={
               "prompt": "A single leopard, its spotted golden coat detailed with black rosettes, cautiously peeks its head through dense green foliage. The leopard’s eyes are alert and focused forward, ears perked, whiskers slightly visible. The bushes consist of thick, leafy shrubs with varying shades of green, some leaves partially obscuring the leopard’s muzzle and forehead. Soft natural daylight filters through the canopy above, casting dappled shadows across the animal’s fur and surrounding leaves. The composition is a medium close-up, centered on the leopard’s head emerging from the undergrowth, with shallow depth of field blurring the background vegetation.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-controlnet-input.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -60302,16 +60895,18 @@ Z-Image Turbo routes your prompt through three parallel conditioning pathways: t
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/image-to-image",
           arguments={
               "prompt": "A young Asian woman with long, vibrant purple hair stands on a sunlit sandy beach, posing confidently with her left hand resting on her hip. She gazes directly at the camera with a neutral expression. A sleek black ribbon bow is tied neatly on the right side of her head, just above her ear. She wears a flowing white cotton dress with a fitted bodice and a flared skirt that reaches mid-calf, slightly lifted by a gentle sea breeze. The beach behind her features fine, pale golden sand with subtle footprints, leading to calm turquoise waves under a clear blue sky with soft, wispy clouds. The lighting is natural daylight, casting soft shadows to her left, indicating late afternoon sun. The horizon line is visible in the background, with a faint silhouette of distant dunes. Her skin tone is fair with a natural glow, and her facial features are delicately defined. The composition is centered on her figure, framed from mid-thigh up, with shallow depth of field blurring the distant waves slightly.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-i2i-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-i2i-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -60482,16 +61077,18 @@ Z-Image Turbo routes your prompt through three parallel conditioning pathways: t
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/image-to-image/lora",
           arguments={
               "prompt": "A young Asian woman with long, vibrant purple hair stands on a sunlit sandy beach, posing confidently with her left hand resting on her hip. She gazes directly at the camera with a neutral expression. A sleek black ribbon bow is tied neatly on the right side of her head, just above her ear. She wears a flowing white cotton dress with a fitted bodice and a flared skirt that reaches mid-calf, slightly lifted by a gentle sea breeze. The beach behind her features fine, pale golden sand with subtle footprints, leading to calm turquoise waves under a clear blue sky with soft, wispy clouds. The lighting is natural daylight, casting soft shadows to her left, indicating late afternoon sun. The horizon line is visible in the background, with a faint silhouette of distant dunes. Her skin tone is fair with a natural glow, and her facial features are delicately defined. The composition is centered on her figure, framed from mid-thigh up, with shallow depth of field blurring the distant waves slightly.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-i2i-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/z-image-turbo-i2i-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -60751,17 +61348,19 @@ Z-Image Turbo uses a diffusion-based architecture optimized for image-to-image c
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/inpaint",
           arguments={
               "prompt": "A young Asian woman with long, vibrant purple hair stands on a sunlit sandy beach, posing confidently with her left hand resting on her hip. She gazes directly at the camera with a neutral expression. A sleek black ribbon bow is tied neatly on the right side of her head, just above her ear. She wears a flowing white cotton dress with a fitted bodice and a flared skirt that reaches mid-calf, slightly lifted by a gentle sea breeze. The beach behind her features fine, pale golden sand with subtle footprints, leading to calm turquoise waves under a clear blue sky with soft, wispy clouds. The lighting is natural daylight, casting soft shadows to her left, indicating late afternoon sun. The horizon line is visible in the background, with a faint silhouette of distant dunes. Her skin tone is fair with a natural glow, and her facial features are delicately defined. The composition is centered on her figure, framed from mid-thigh up, with shallow depth of field blurring the distant waves slightly.",
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/inpaint-input.jpg",
-              "mask_image_url": "https://storage.googleapis.com/falserverless/whls/z-image-inpaint-mask.jpg"
+              "mask_image_url": "https://storage.googleapis.com/falserverless/whls/z-image-inpaint-mask.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -60960,17 +61559,19 @@ Z-Image Turbo uses a diffusion-based architecture optimized for image-to-image c
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/inpaint/lora",
           arguments={
               "prompt": "A young Asian woman with long, vibrant purple hair stands on a sunlit sandy beach, posing confidently with her left hand resting on her hip. She gazes directly at the camera with a neutral expression. A sleek black ribbon bow is tied neatly on the right side of her head, just above her ear. She wears a flowing white cotton dress with a fitted bodice and a flared skirt that reaches mid-calf, slightly lifted by a gentle sea breeze. The beach behind her features fine, pale golden sand with subtle footprints, leading to calm turquoise waves under a clear blue sky with soft, wispy clouds. The lighting is natural daylight, casting soft shadows to her left, indicating late afternoon sun. The horizon line is visible in the background, with a faint silhouette of distant dunes. Her skin tone is fair with a natural glow, and her facial features are delicately defined. The composition is centered on her figure, framed from mid-thigh up, with shallow depth of field blurring the distant waves slightly.",
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/inpaint-input.jpg",
-              "mask_image_url": "https://storage.googleapis.com/falserverless/whls/z-image-inpaint-mask.jpg"
+              "mask_image_url": "https://storage.googleapis.com/falserverless/whls/z-image-inpaint-mask.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -61204,10 +61805,12 @@ Z-Image Turbo uses a diffusion-based architecture optimized for image-to-image c
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/z-image/turbo/lora",
@@ -61474,10 +62077,12 @@ Z-Image Turbo LoRA adds minimal overhead to base model pricing while enabling cu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/tiling",
@@ -61675,10 +62280,12 @@ Z-Image Turbo LoRA adds minimal overhead to base model pricing while enabling cu
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/z-image/turbo/tiling/lora",
@@ -61983,10 +62590,12 @@ New to fal.ai? Check out these resources:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/birefnet/v2/video",
@@ -62169,10 +62778,12 @@ New to fal.ai? Check out these resources:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/video/background-removal",
@@ -62276,10 +62887,12 @@ New to fal.ai? Check out these resources:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bria/video/increase-resolution",
@@ -62413,16 +63026,18 @@ New to fal.ai? Check out these resources:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/dreamactor/v2",
       arguments={
           "image_url": "https://v3b.fal.media/files/b/0a8d6292/E9WNRJh8K8DF9lSV0bkXs_image.png",
-          "video_url": "https://v3b.fal.media/files/b/0a8d633f/u5Ye7jXL0Cfo0ijz5M6YY_input_example_dreamactor.mp4"
+          "video_url": "https://v3b.fal.media/files/b/0a8d633f/u5Ye7jXL0Cfo0ijz5M6YY_input_example_dreamactor.mp4",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -62527,16 +63142,18 @@ New to fal.ai? Check out these resources:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/omnihuman",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman.png",
-              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -62629,16 +63246,18 @@ New to fal.ai? Check out these resources:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/omnihuman/v1.5",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_image.png",
-              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/example_inputs/omnihuman_v15_input_audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -62822,10 +63441,12 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bytedance/seedance-2.0/fast/text-to-video",
@@ -62965,16 +63586,18 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bytedance/seedance-2.0/fast/image-to-video",
           arguments={
               "prompt": "An octopus finds a football in the ocean and excitedly calls its octopus friends to come and play. Cut scene to an octopus football game under the sea.",
-              "image_url": "https://v3b.fal.media/files/b/0a8eba37/Cqg-4Uwzyz4DELfceT1CF_a17e588773ec45b1a9e6f100a787b80b.jpg"
+              "image_url": "https://v3b.fal.media/files/b/0a8eba37/Cqg-4Uwzyz4DELfceT1CF_a17e588773ec45b1a9e6f100a787b80b.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -63116,10 +63739,12 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "bytedance/seedance-2.0/fast/reference-to-video",
@@ -63295,16 +63920,18 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bytedance/seedance-2.0/image-to-video",
       arguments={
           "prompt": "An octopus finds a football in the ocean and excitedly calls its octopus friends to come and play. Cut scene to an octopus football game under the sea.",
-          "image_url": "https://v3b.fal.media/files/b/0a8eba37/Cqg-4Uwzyz4DELfceT1CF_a17e588773ec45b1a9e6f100a787b80b.jpg"
+          "image_url": "https://v3b.fal.media/files/b/0a8eba37/Cqg-4Uwzyz4DELfceT1CF_a17e588773ec45b1a9e6f100a787b80b.jpg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -63478,10 +64105,12 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bytedance/seedance-2.0/reference-to-video",
@@ -63663,10 +64292,12 @@ OmniHuman flips the standard image-to-video workflow by making audio the **prima
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bytedance/seedance-2.0/text-to-video",
@@ -63790,7 +64421,7 @@ result = fal_client.subscribe(
         "duration": "5",
         "resolution": "720p",
         "aspect_ratio": "16:9",
-    }
+    },
 )
 
 print(result["video"]["url"])
@@ -64030,16 +64661,18 @@ Access the video URL at `result["video"]["url"]` (Python) or `result.data.video.
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/image-to-video",
           arguments={
               "prompt": "A little dog is running in the sunshine. The camera follows the dog as it plays in a garden.",
-              "image_url": "https://fal.media/files/koala/f_xmiodPjhiKjdBkFmTu1.png"
+              "image_url": "https://fal.media/files/koala/f_xmiodPjhiKjdBkFmTu1.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -64178,10 +64811,12 @@ Access the video URL at `result["video"]["url"]` (Python) or `result.data.video.
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/text-to-video",
@@ -64314,10 +64949,12 @@ Access the video URL at `result["video"]["url"]` (Python) or `result.data.video.
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/lite/reference-to-video",
@@ -64325,8 +64962,8 @@ Access the video URL at `result["video"]["url"]` (Python) or `result.data.video.
               "prompt": "The girl catches the puppy and hugs it.",
               "reference_image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference.jpeg",
-                  "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference_2.jpeg"
-              ]
+                  "https://storage.googleapis.com/falserverless/example_inputs/seedance_reference_2.jpeg",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -64758,16 +65395,18 @@ Ready to transform your ideas into compelling videos? Sign up at [fal.ai](https:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video",
           arguments={
               "prompt": "Bathed in a stark spotlight, a lone ballet dancer takes center stage. Her movements, precise and graceful, tell a story of passion and dedication against the velvet darkness. The scene evokes a sense of intimacy, highlighting the raw emotion and artistry of her performance.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_fast_i2v_input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_fast_i2v_input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -64902,10 +65541,12 @@ Ready to transform your ideas into compelling videos? Sign up at [fal.ai](https:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
@@ -65098,9 +65739,12 @@ For Python developers:
 from fal_client import FalClient
 
 client = FalClient("YOUR_FAL_KEY")
-result = client.subscribe("fal-ai/bytedance/seedance/v1/pro/fast/text-to-video", {
-    "prompt": "Inside a quiet dojo, a martial artist moves with precision and grace. The performance highlights the beauty and discipline inherent in the ancient practice. Each form unfolds clearly, a testament to dedication and skill."
-})
+result = client.subscribe(
+    "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
+    {
+        "prompt": "Inside a quiet dojo, a martial artist moves with precision and grace. The performance highlights the beauty and discipline inherent in the ancient practice. Each form unfolds clearly, a testament to dedication and skill."
+    },
+)
 
 # Access the generated video
 print(result["video"]["url"])
@@ -65255,16 +65899,18 @@ Ready to transform text into compelling video content? Sign up now at [https://f
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/seedance/v1/pro/image-to-video",
       arguments={
           "prompt": "A skier glides over fresh snow, joyously smiling while kicking up large clouds of snow as he turns. Accelerating gradually down the slope, the camera moves smoothly alongside.",
-          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_pro_i2v_img.jpg"
+          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_pro_i2v_img.jpg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -65549,10 +66195,12 @@ For detailed pricing information, visit [fal.ai/pricing](https://fal.ai/pricing)
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/seedance/v1/pro/text-to-video",
@@ -65720,16 +66368,18 @@ For detailed pricing information, visit [fal.ai/pricing](https://fal.ai/pricing)
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1.5/pro/image-to-video",
           arguments={
-              "prompt": "A man is crying and he says \"I shouldn't have done it. I regret everything\"",
-              "image_url": "https://v3b.fal.media/files/b/0a8773cd/REzCWn1BKUVuMFTxR-R3W_image_317.png"
+              "prompt": 'A man is crying and he says "I shouldn\'t have done it. I regret everything"',
+              "image_url": "https://v3b.fal.media/files/b/0a8773cd/REzCWn1BKUVuMFTxR-R3W_image_317.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -65867,10 +66517,12 @@ For detailed pricing information, visit [fal.ai/pricing](https://fal.ai/pricing)
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1.5/pro/text-to-video",
@@ -66121,16 +66773,18 @@ Your prompt guides what happens *between* the frames:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bytedance/video-stylize",
       arguments={
           "style": "Manga style",
-          "image_url": "https://v3.fal.media/files/kangaroo/-KmSPIcXeGA3Z_iiH4C75_tmph2ry_0_8.png"
+          "image_url": "https://v3.fal.media/files/kangaroo/-KmSPIcXeGA3Z_iiH4C75_tmph2ry_0_8.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -66220,16 +66874,18 @@ Your prompt guides what happens *between* the frames:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/ai-avatar/v2/pro",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_ai_avatar_input.jpg",
-              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3"
+              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -66327,16 +66983,18 @@ Your prompt guides what happens *between* the frames:
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/ai-avatar/v2/standard",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_ai_avatar_input.jpg",
-              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3"
+              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -66513,16 +67171,18 @@ Pricing scales linearly with output duration, making cost predictable for batch 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/lipsync/audio-to-video",
           arguments={
               "video_url": "https://fal.media/files/koala/8teUPbRRMtAUTORDvqy0l.mp4",
-              "audio_url": "https://storage.googleapis.com/falserverless/kling/kling-audio.mp3"
+              "audio_url": "https://storage.googleapis.com/falserverless/kling/kling-audio.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -66611,17 +67271,19 @@ Pricing scales linearly with output duration, making cost predictable for batch 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/lipsync/text-to-video",
           arguments={
               "video_url": "https://fal.media/files/koala/8teUPbRRMtAUTORDvqy0l.mp4",
               "text": "Mental health is as important as physical health, shaping our emotions, thoughts, and daily interactions.",
-              "voice_id": "genshin_klee2"
+              "voice_id": "genshin_klee2",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -66802,16 +67464,18 @@ Kling LipSync uses audio-driven facial animation architecture that generates mou
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o1/image-to-video",
       arguments={
           "prompt": "Create a magical timelapse transition. The snow melts rapidly to reveal green grass, and the tree branches burst into bloom with pink flowers in real-time. The lighting shifts from cold winter light to warm spring sunshine. The camera pushes in slowly towards the tree. Disney-style magical transformation, cinematic, 8k.",
-          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png"
+          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -66997,10 +67661,12 @@ Kling O1 operates within Kuaishou's broader Kling Video ecosystem, prioritizing 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o1/reference-to-video",
@@ -67217,16 +67883,18 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o1/standard/image-to-video",
       arguments={
           "prompt": "Create a magical timelapse transition. The snow melts rapidly to reveal green grass, and the tree branches burst into bloom with pink flowers in real-time. The lighting shifts from cold winter light to warm spring sunshine. The camera pushes in slowly towards the tree. Disney-style magical transformation, cinematic, 8k.",
-          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png"
+          "start_image_url": "https://v3b.fal.media/files/b/rabbit/NaslJIC7F2WodS6DFZRRJ.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -67359,10 +68027,12 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o1/standard/reference-to-video",
@@ -67524,16 +68194,18 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o1/standard/video-to-video/edit",
           arguments={
               "prompt": "Replace the character in the video with @Element1, maintaining the same movements and camera angles. Transform the landscape into @Image1",
-              "video_url": "https://v3b.fal.media/files/b/rabbit/ku8_Wdpf-oTbGRq4lB5DU_output.mp4"
+              "video_url": "https://v3b.fal.media/files/b/rabbit/ku8_Wdpf-oTbGRq4lB5DU_output.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -67652,16 +68324,18 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o1/standard/video-to-video/reference",
           arguments={
               "prompt": "Based on @Video1, generate the next shot. keep the style of the video",
-              "video_url": "https://v3b.fal.media/files/b/panda/oVdiICFXY03Vbam-08Aj8_output.mp4"
+              "video_url": "https://v3b.fal.media/files/b/panda/oVdiICFXY03Vbam-08Aj8_output.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -67817,16 +68491,18 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o1/video-to-video/edit",
           arguments={
               "prompt": "Replace the character in the video with @Element1, maintaining the same movements and camera angles. Transform the landscape into @Image1",
-              "video_url": "https://v3b.fal.media/files/b/rabbit/ku8_Wdpf-oTbGRq4lB5DU_output.mp4"
+              "video_url": "https://v3b.fal.media/files/b/rabbit/ku8_Wdpf-oTbGRq4lB5DU_output.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -67945,16 +68621,18 @@ Kling O1 Reference prioritizes multi-element consistency over generation speed, 
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o1/video-to-video/reference",
           arguments={
               "prompt": "Based on @Video1, generate the next shot. keep the style of the video",
-              "video_url": "https://v3b.fal.media/files/b/panda/oVdiICFXY03Vbam-08Aj8_output.mp4"
+              "video_url": "https://v3b.fal.media/files/b/panda/oVdiICFXY03Vbam-08Aj8_output.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -68165,10 +68843,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/pro/image-to-video",
@@ -68321,10 +69001,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/pro/reference-to-video",
@@ -68497,10 +69179,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/pro/text-to-video",
@@ -68644,16 +69328,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/pro/video-to-video/edit",
           arguments={
               "prompt": "Change environment to be fully snow as @Image1. Replace animal with @Element1",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-edit/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-edit/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -68774,16 +69460,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/pro/video-to-video/reference",
           arguments={
               "prompt": "Integrate @Element1 in the scene. Style video should be following watercolor style of @Image1",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-reference/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/pro-v2v-reference/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -68942,10 +69630,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/standard/image-to-video",
@@ -69092,10 +69782,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/standard/reference-to-video",
@@ -69271,10 +69963,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/o3/standard/text-to-video",
@@ -69418,16 +70112,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/standard/video-to-video/edit",
           arguments={
               "prompt": "change the main character to be Popeye from @Element1, dark lighting and rain, 3d character. make him sad, with rain dropping on him, dark light on the character.",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-edit/standard_video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-edit/standard_video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -69546,16 +70242,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/o3/standard/video-to-video/reference",
           arguments={
               "prompt": "Replace both character with @Element1 and @Element2",
-              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-reference/video_reference.mp4"
+              "video_url": "https://storage.googleapis.com/falserverless/example_inputs/kling-o3/standard-v2v-reference/video_reference.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -69717,16 +70415,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v1/pro/ai-avatar",
       arguments={
           "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_ai_avatar_input.jpg",
-          "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3"
+          "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -69842,16 +70542,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1/standard/image-to-video",
           arguments={
               "prompt": "Snowflakes fall as a car moves forward along the road.",
-              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg"
+              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -69988,10 +70690,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1/standard/text-to-video",
@@ -70113,16 +70817,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1/standard/ai-avatar",
           arguments={
               "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_ai_avatar_input.jpg",
-              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3"
+              "audio_url": "https://v3.fal.media/files/rabbit/9_0ZG_geiWjZOmn9yscO6_output.mp3",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -70220,16 +70926,16 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1/standard/effects",
-          arguments={
-              "effect_scene": "hug"
-          },
+          arguments={"effect_scene": "hug"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -70359,16 +71065,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.5/pro/image-to-video",
           arguments={
               "prompt": "Snowflakes fall as a car moves along the road.",
-              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg"
+              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -70508,10 +71216,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.5/pro/text-to-video",
@@ -70623,16 +71333,16 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.5/pro/effects",
-          arguments={
-              "effect_scene": "hug"
-          },
+          arguments={"effect_scene": "hug"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -70757,16 +71467,18 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/pro/image-to-video",
           arguments={
               "prompt": "Snowflakes fall as a car moves along the road.",
-              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg"
+              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -70882,10 +71594,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/pro/text-to-video",
@@ -70997,10 +71711,12 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/pro/elements",
@@ -71008,8 +71724,8 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
               "prompt": "A cute girl and a baby cow sleeping together on a bed",
               "input_image_urls": [
                   "https://storage.googleapis.com/falserverless/web-examples/kling-elements/first_image.jpeg",
-                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -71127,16 +71843,16 @@ Kling O1 Edit's per-second pricing model reflects the computational complexity o
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/pro/effects",
-          arguments={
-              "effect_scene": "hug"
-          },
+          arguments={"effect_scene": "hug"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -71449,16 +72165,18 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/image-to-video",
           arguments={
               "prompt": "Snowflakes fall as a car moves forward along the road.",
-              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg"
+              "image_url": "https://storage.googleapis.com/falserverless/kling/kling_input.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -71563,10 +72281,12 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/text-to-video",
@@ -71678,10 +72398,12 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/elements",
@@ -71689,8 +72411,8 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
               "prompt": "A cute girl and a baby cow sleeping together on a bed",
               "input_image_urls": [
                   "https://storage.googleapis.com/falserverless/web-examples/kling-elements/first_image.jpeg",
-                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png"
-              ]
+                  "https://storage.googleapis.com/falserverless/web-examples/kling-elements/second_image.png",
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -71808,16 +72530,16 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v1.6/standard/effects",
-          arguments={
-              "effect_scene": "hug"
-          },
+          arguments={"effect_scene": "hug"},
           with_logs=True,
           on_queue_update=on_queue_update,
       )
@@ -71943,16 +72665,18 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2/master/image-to-video",
           arguments={
               "prompt": "slow-motion sequence captures the catastrophic implosion of a skyscraper, dust and debris billowing outwards in a chaotic ballet of destruction, while a haunting, orchestral score underscores the sheer power and finality of the event.",
-              "image_url": "https://v3.fal.media/files/elephant/rkH-9qoXtXu3rAYTsx9V5_image.webp"
+              "image_url": "https://v3.fal.media/files/elephant/rkH-9qoXtXu3rAYTsx9V5_image.webp",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -72073,10 +72797,12 @@ Get started today by creating your API key at [fal.ai](https://fal.ai) and exper
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2/master/text-to-video",
@@ -72377,16 +73103,18 @@ Get started with Kling AI v2 Master today and experience professional-grade vide
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.1/master/image-to-video",
           arguments={
               "prompt": "Sunlight dapples through budding branches, illuminating a vibrant tapestry of greens and browns as a pair of robins meticulously weave twigs and mud into a cradle of life, their tiny forms a whirlwind of activity against a backdrop of blossoming spring.  The scene unfolds with a gentle, observational pace, allowing the viewer to fully appreciate the intricate details of nest construction, the soft textures of downy feathers contrasted against the rough bark of the branches, the delicate balance of strength and fragility in their creation.",
-              "image_url": "https://v3.fal.media/files/zebra/9Nrm22YyLojSTPJbZYNhh_image.webp"
+              "image_url": "https://v3.fal.media/files/zebra/9Nrm22YyLojSTPJbZYNhh_image.webp",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -72507,10 +73235,12 @@ Get started with Kling AI v2 Master today and experience professional-grade vide
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.1/master/text-to-video",
@@ -72659,16 +73389,18 @@ Get started with Kling AI v2 Master today and experience professional-grade vide
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.1/pro/image-to-video",
       arguments={
           "prompt": "Warm, incandescent streetlights paint the rain-slicked cobblestones in pools of amber light as a couple walks hand-in-hand, their silhouettes stark against the blurry backdrop of a city shrouded in a gentle downpour; the camera lingers on the subtle textures of their rain-soaked coats and the glistening reflections dancing on the wet pavement, creating a sense of intimate vulnerability and shared quietude.",
-          "image_url": "https://v3.fal.media/files/lion/_I_io6Gtk83c72d-afXf8_image.webp"
+          "image_url": "https://v3.fal.media/files/lion/_I_io6Gtk83c72d-afXf8_image.webp",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -72988,16 +73720,18 @@ Get started with Kling AI v2.1 Pro today by signing up at [fal.ai](https://fal.a
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.1/standard/image-to-video",
       arguments={
           "prompt": "As the sun dips below the horizon, painting the sky in fiery hues of orange and purple, powerful waves relentlessly crash against jagged, dark rocks, their white foam a stark contrast to the deepening twilight; the textured surface of the rocks, wet and glistening, reflects the vibrant colors, creating a mesmerizing spectacle of nature's raw power and breathtaking beauty",
-          "image_url": "https://storage.googleapis.com/falserverless/model_tests/kling/kling-image-to-video.jpg"
+          "image_url": "https://storage.googleapis.com/falserverless/model_tests/kling/kling-image-to-video.jpg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -73308,16 +74042,18 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
           arguments={
               "prompt": "A stark starting line divides two powerful cars, engines revving for the challenge ahead. They surge forward in the heat of competition, a blur of speed and chrome. The finish line looms as they vie for victory.",
-              "image_url": "https://v3.fal.media/files/panda/HnY2yf-BbzlrVQxR-qP6m_9912d0932988453aadf3912fc1901f52.jpg"
+              "image_url": "https://v3.fal.media/files/panda/HnY2yf-BbzlrVQxR-qP6m_9912d0932988453aadf3912fc1901f52.jpg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -73428,10 +74164,12 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.5-turbo/pro/text-to-video",
@@ -73565,16 +74303,18 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.5-turbo/standard/image-to-video",
       arguments={
           "prompt": "In a dimly lit room, a playful cat's eyes light up, fixated on a dancing red dot. With boundless energy, it pounces and leaps, chasing the elusive beam across the floor and up the walls. The simple joy of the hunt unfolds in clear, uncomplicated visuals.",
-          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_v25_std_i2v_input.png"
+          "image_url": "https://storage.googleapis.com/falserverless/example_inputs/kling_v25_std_i2v_input.png",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -73702,16 +74442,18 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/image-to-video",
           arguments={
-              "prompt": "A king walks slowly and says \"My people, here I am! I am here to save you all\"",
-              "start_image_url": "https://v3b.fal.media/files/b/0a84ab29/BSJXz9Ht-jgRgMf4IGxLU_upscaled.png"
+              "prompt": 'A king walks slowly and says "My people, here I am! I am here to save you all"',
+              "start_image_url": "https://v3b.fal.media/files/b/0a84ab29/BSJXz9Ht-jgRgMf4IGxLU_upscaled.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -73826,10 +74568,12 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/text-to-video",
@@ -73949,17 +74693,19 @@ Ready to get started? [Create your free account](https://fal.ai/login) and begin
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v2.6/pro/motion-control",
           arguments={
               "image_url": "https://v3b.fal.media/files/b/0a875302/8NaxQrQxDNHppHtqcchMm.png",
               "video_url": "https://v3b.fal.media/files/b/0a8752bc/2xrNS217ngQ3wzXqA7LXr_output.mp4",
-              "character_orientation": "video"
+              "character_orientation": "video",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -74148,17 +74894,19 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/kling-video/v2.6/standard/motion-control",
       arguments={
           "image_url": "https://v3b.fal.media/files/b/0a875302/8NaxQrQxDNHppHtqcchMm.png",
           "video_url": "https://v3b.fal.media/files/b/0a8752bc/2xrNS217ngQ3wzXqA7LXr_output.mp4",
-          "character_orientation": "video"
+          "character_orientation": "video",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -74288,10 +75036,12 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/pro/text-to-video",
@@ -74419,10 +75169,12 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/pro/image-to-video",
@@ -74583,17 +75335,19 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/pro/motion-control",
           arguments={
               "image_url": "https://v3b.fal.media/files/b/0a90ffa7/TNErq9yD7ZxGRATjfAqnh_EIgJSN67.png",
               "video_url": "https://v3b.fal.media/files/b/0a90ff92/hklvF__w53diz6Rve7f5__JuDW2xl0mr6sJ_Kjz3Vxe_vidoeook%20(1)_1.mp4",
-              "character_orientation": "image"
+              "character_orientation": "image",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -74730,10 +75484,12 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/image-to-video",
@@ -74882,10 +75638,12 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/text-to-video",
@@ -75013,17 +75771,19 @@ Kling 2.6 Pro prioritizes output quality and audio integration over generation s
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/kling-video/v3/standard/motion-control",
           arguments={
               "image_url": "https://v3b.fal.media/files/b/0a90ee31/VHtWK5BZMa-XoT6gahJKS_077.png",
               "video_url": "https://v3b.fal.media/files/b/0a90edae/3nvl30ic9g2otKRcOV5nO_output.mp4",
-              "character_orientation": "video"
+              "character_orientation": "video",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -75235,10 +75995,12 @@ Get started with **Bytedance Seedance 2.0 Text To Video**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "bytedance/seedance-2.0/text-to-video",
@@ -75298,10 +76060,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/seedvr/upscale/video",
@@ -75474,17 +76238,16 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/sora-2/characters",
-      arguments={
-          "video_url": "",
-          "name": ""
-      },
+      arguments={"video_url": "", "name": ""},
       with_logs=True,
       on_queue_update=on_queue_update,
   )
@@ -75596,16 +76359,18 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/image-to-video",
           arguments={
               "prompt": "Front-facing 'invisible' action-cam on a skydiver in freefall above bright clouds; camera locked on his face. He speaks over the wind with clear lipsync: 'This is insanely fun! You've got to try it—book a tandem and go!' Natural wind roar, voice close-mic'd and slightly compressed so it's intelligible. Midday sun, goggles and jumpsuit flutter, altimeter visible, parachute rig on shoulders. Energetic but stable framing with subtle shake; brief horizon roll. End on first tug of canopy and wind noise dropping.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -75750,16 +76515,18 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/image-to-video/pro",
           arguments={
               "prompt": "Front-facing 'invisible' action-cam on a skydiver in freefall above bright clouds; camera locked on his face. He speaks over the wind with clear lipsync: 'This is insanely fun! You've got to try it—book a tandem and go!' Natural wind roar, voice close-mic'd and slightly compressed so it's intelligible. Midday sun, goggles and jumpsuit flutter, altimeter visible, parachute rig on shoulders. Energetic but stable framing with subtle shake; brief horizon roll. End on first tug of canopy and wind noise dropping.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/sora-2-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -75922,10 +76689,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/text-to-video",
@@ -76066,10 +76835,12 @@ For detailed pricing information, see the [fal.ai pricing page](https://fal.ai/p
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/sora-2/text-to-video/pro",
@@ -76294,16 +77065,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/sora-2/video-to-video/remix",
       arguments={
           "video_id": "video_123",
-          "prompt": "Change the cat's fur color to purple."
+          "prompt": "Change the cat's fur color to purple.",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -76424,10 +77197,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/topaz/upscale/video",
@@ -76782,16 +77557,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/veo3.1/extend-video",
       arguments={
           "prompt": "Continue the scene naturally, maintaining the same style and motion.",
-          "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4"
+          "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -77249,17 +78026,19 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/fast/first-last-frame-to-video",
           arguments={
-              "prompt": "A woman looks into the camera, breathes in, then exclaims energetically, \"have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It's incredible!\"",
+              "prompt": 'A woman looks into the camera, breathes in, then exclaims energetically, "have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It\'s incredible!"',
               "first_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-1.jpeg",
-              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg"
+              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -77401,16 +78180,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/fast/extend-video",
           arguments={
               "prompt": "Continue the scene naturally, maintaining the same style and motion.",
-              "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4"
+              "video_url": "https://v3b.fal.media/files/b/0a8670fe/pY8UGl4_C452wOm9XUBYO_9ae04df8771c4f3f979fa5cabeca6ada.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -77568,17 +78349,19 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/veo3.1/first-last-frame-to-video",
       arguments={
-          "prompt": "A woman looks into the camera, breathes in, then exclaims energetically, \"have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It's incredible!\"",
+          "prompt": 'A woman looks into the camera, breathes in, then exclaims energetically, "have you guys checked out Veo3.1 First-Last-Frame-to-Video on Fal? It\'s incredible!"',
           "first_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-1.jpeg",
-          "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg"
+          "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -77941,10 +78724,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite",
@@ -78083,16 +78868,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite/image-to-video",
           arguments={
               "prompt": "The subject turns to face the camera and smiles warmly.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/veo3-i2v-input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/veo3-i2v-input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -78236,17 +79023,19 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/veo3.1/lite/first-last-frame-to-video",
           arguments={
               "prompt": "A smooth transition between the two frames with natural motion.",
               "first_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-1.jpeg",
-              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg"
+              "last_frame_url": "https://storage.googleapis.com/falserverless/example_inputs/veo31-flf2v-input-2.jpeg",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -78422,10 +79211,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/veo3.1/reference-to-video",
@@ -78434,8 +79225,8 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
           "image_urls": [
               "https://storage.googleapis.com/falserverless/example_inputs/veo31-r2v-input-1.png",
               "https://storage.googleapis.com/falserverless/example_inputs/veo31-r2v-input-2.png",
-              "https://storage.googleapis.com/falserverless/example_inputs/veo31-r2v-input-3.png"
-          ]
+              "https://storage.googleapis.com/falserverless/example_inputs/veo31-r2v-input-3.png",
+          ],
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -78605,16 +79396,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-video/image-to-video",
           arguments={
               "prompt": "Medieval knight in ornate armor walking through a mystical forest, bioluminescent plants pulsing with light, ancient stone ruins overgrown with glowing vines, over-the-shoulder camera, dark fantasy aesthetic, volumetric fog and Lumen lighting",
-              "image_url": "https://v3b.fal.media/files/b/0a8b90e0/BFLE9VDlZqsryU-UA3BoD_image_004.png"
+              "image_url": "https://v3b.fal.media/files/b/0a8b90e0/BFLE9VDlZqsryU-UA3BoD_image_004.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -78731,10 +79524,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-video/text-to-video",
@@ -78849,10 +79644,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-video/reference-to-video",
@@ -78860,7 +79657,7 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
               "prompt": "A @Image1 running through a sunlit meadow, cinematic slow motion",
               "reference_image_urls": [
                   "https://v3b.fal.media/files/b/0a8b90e0/BFLE9VDlZqsryU-UA3BoD_image_004.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -78993,16 +79790,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-video/edit-video",
           arguments={
               "prompt": "Colorize the video",
-              "video_url": "https://v3b.fal.media/files/b/0a8b9112/V5Z_NIPE3ppMDWivNo6_q_video_019.mp4"
+              "video_url": "https://v3b.fal.media/files/b/0a8b9112/V5Z_NIPE3ppMDWivNo6_q_video_019.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -79105,16 +79904,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "xai/grok-imagine-video/extend-video",
           arguments={
               "prompt": "The camera slowly zooms out to reveal the city skyline at sunset",
-              "video_url": "https://v3b.fal.media/files/b/0a8b9112/V5Z_NIPE3ppMDWivNo6_q_video_019.mp4"
+              "video_url": "https://v3b.fal.media/files/b/0a8b9112/V5Z_NIPE3ppMDWivNo6_q_video_019.mp4",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -79252,10 +80053,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/more-detailed-caption",
@@ -79340,10 +80143,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/detailed-caption",
@@ -79428,10 +80233,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/caption",
@@ -79516,10 +80323,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/ocr",
@@ -79604,21 +80413,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-to-description",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "region": {
-                  "x1": 100,
-                  "x2": 200,
-                  "y1": 100,
-                  "y2": 200
-              }
+              "region": {"x1": 100, "x2": 200, "y1": 100, "y2": 200},
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -79720,21 +80526,18 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-to-category",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "region": {
-                  "x1": 100,
-                  "x2": 200,
-                  "y1": 100,
-                  "y2": 200
-              }
+              "region": {"x1": 100, "x2": 200, "y1": 100, "y2": 200},
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -79852,10 +80655,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/imageutils/nsfw",
@@ -79941,10 +80746,12 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "openrouter/router/vision",
@@ -79953,7 +80760,7 @@ Sora 2 Pro breaks from traditional silent video generation by synthesizing audio
               "https://fal.media/files/tiger/4Ew1xYW6oZCs6STQVC7V8_86440216d0fe42e4b826d03a2121468e.jpg"
           ],
           "prompt": "Caption this image for a text-to-image model with as much detail as possible.",
-          "model": "google/gemini-2.5-flash"
+          "model": "google/gemini-2.5-flash",
       },
       with_logs=True,
       on_queue_update=on_queue_update,
@@ -80093,7 +80900,10 @@ response = client.chat.completions.create(
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "Caption this image for a text-to-image model with as much detail as possible."},
+                {
+                    "type": "text",
+                    "text": "Caption this image for a text-to-image model with as much detail as possible.",
+                },
                 {
                     "type": "image_url",
                     "image_url": "https://fal.media/files/tiger/4Ew1xYW6oZCs6STQVC7V8_86440216d0fe42e4b826d03a2121468e.jpg",
@@ -80131,7 +80941,10 @@ stream = client.chat.completions.create(
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "Caption this image for a text-to-image model with as much detail as possible."},
+                {
+                    "type": "text",
+                    "text": "Caption this image for a text-to-image model with as much detail as possible.",
+                },
                 {
                     "type": "image_url",
                     "image_url": "https://fal.media/files/tiger/4Ew1xYW6oZCs6STQVC7V8_86440216d0fe42e4b826d03a2121468e.jpg",
@@ -80212,10 +81025,12 @@ Get started with **OpenRouter \[Vision]**:
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "openrouter/router/vision",
@@ -80224,7 +81039,7 @@ Get started with **OpenRouter \[Vision]**:
               "https://fal.media/files/tiger/4Ew1xYW6oZCs6STQVC7V8_86440216d0fe42e4b826d03a2121468e.jpg"
           ],
           "prompt": "Caption this image for a text-to-image model with as much detail as possible.",
-          "model": "google/gemini-2.5-flash"
+          "model": "google/gemini-2.5-flash",
       },
       with_logs=True,
       on_queue_update=on_queue_update,

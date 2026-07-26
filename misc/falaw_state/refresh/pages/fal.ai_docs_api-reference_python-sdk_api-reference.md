@@ -192,9 +192,7 @@ client.apps.scale("my-app", max_concurrency=10)
   from datetime import datetime, timedelta
 
   runners = client.apps.runners("my-app")
-  recent = client.apps.runners(
-      "my-app", since=datetime.now() - timedelta(hours=1)
-  )
+  recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1))
   running = client.apps.runners("my-app", state=["running"])
   ```
 

@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/more-detailed-caption",
@@ -109,10 +111,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/detailed-caption",
@@ -197,10 +201,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/caption",
@@ -285,10 +291,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/ocr",
@@ -373,21 +381,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-to-description",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "region": {
-                  "x1": 100,
-                  "x2": 200,
-                  "y1": 100,
-                  "y2": 200
-              }
+              "region": {"x1": 100, "x2": 200, "y1": 100, "y2": 200},
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -489,21 +494,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/florence-2-large/region-to-category",
           arguments={
               "image_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg",
-              "region": {
-                  "x1": 100,
-                  "x2": 200,
-                  "y1": 100,
-                  "y2": 200
-              }
+              "region": {"x1": 100, "x2": 200, "y1": 100, "y2": 200},
           },
           with_logs=True,
           on_queue_update=on_queue_update,

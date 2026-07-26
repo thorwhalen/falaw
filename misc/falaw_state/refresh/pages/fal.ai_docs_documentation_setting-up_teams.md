@@ -93,9 +93,7 @@ fal teams set my-team
 # Automatically uses your login-based identity (no FAL_KEY needed)
 import fal_client
 
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-    "prompt": "a sunset"
-})
+result = fal_client.subscribe("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
 ```
 
 If `FAL_KEY` is set, it takes priority over login tokens. To force login-based auth even when `FAL_KEY` is present, set `FAL_FORCE_AUTH_BY_USER=1`.

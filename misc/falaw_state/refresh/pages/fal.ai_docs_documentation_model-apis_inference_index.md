@@ -31,9 +31,9 @@ The simplest way to call a model. Sends a direct HTTP request to `fal.run` and r
 ```python theme={null}
 import fal_client
 
-result = fal_client.run("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.run(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["images"][0]["url"])
 ```
 
@@ -56,9 +56,9 @@ Like `run`, but uses the queue under the hood. Submits a request, polls automati
 ```python theme={null}
 import fal_client
 
-result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["images"][0]["url"])
 ```
 
@@ -80,9 +80,9 @@ The recommended approach for production. Submit a request to the [queue](/docume
 import time
 import fal_client
 
-handler = fal_client.submit("fal-ai/nano-banana-2", arguments={
-    "prompt": "a sunset over mountains"
-})
+handler = fal_client.submit(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 
 while True:
     status = handler.status(with_logs=True)
@@ -119,9 +119,10 @@ In JavaScript, the equivalent types are `InQueueQueueStatus`, `InProgressQueueSt
 ```python theme={null}
 import fal_client
 
-handler = fal_client.submit("fal-ai/nano-banana-2",
+handler = fal_client.submit(
+    "fal-ai/nano-banana-2",
     arguments={"prompt": "a sunset over mountains"},
-    webhook_url="https://your-server.com/api/webhook"
+    webhook_url="https://your-server.com/api/webhook",
 )
 ```
 
@@ -140,9 +141,9 @@ For models that produce output progressively. Each event arrives as it is genera
 ```python theme={null}
 import fal_client
 
-for event in fal_client.stream("fal-ai/flux-kontext-lora", arguments={
-    "prompt": "a sunset over mountains"
-}):
+for event in fal_client.stream(
+    "fal-ai/flux-kontext-lora", arguments={"prompt": "a sunset over mountains"}
+):
     print(event)
 ```
 
@@ -164,10 +165,7 @@ For interactive applications that need the lowest possible latency. Opens a pers
 import fal_client
 
 with fal_client.realtime("fal-ai/fast-sdxl") as connection:
-    connection.send({
-        "prompt": "a sunset over mountains",
-        "num_inference_steps": 2
-    })
+    connection.send({"prompt": "a sunset over mountains", "num_inference_steps": 2})
     result = connection.recv()
     print(result)
 ```

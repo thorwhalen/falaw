@@ -455,6 +455,7 @@ class WanT2VRequest(BaseModel):
         description="Whether to enable prompt expansion.",
     )
 
+
 class WanT2VResponse(BaseModel):
     video: File = Field(
         description="The generated video file.",
@@ -579,6 +580,7 @@ def _is_nsfw_prompt(self, prompt: str) -> bool:
     else:
         return "yes" in response["output"].lower()
 
+
 def _is_nsfw_request(self, image: str) -> bool:
     """Multi-stage image NSFW detection."""
     import fal_client
@@ -589,8 +591,7 @@ def _is_nsfw_request(self, image: str) -> bool:
 
         # Primary check with specialized NSFW detector
         response = fal_client.subscribe(
-            "fal-ai/imageutils/nsfw",
-            {"image_url": image_url}
+            "fal-ai/imageutils/nsfw", {"image_url": image_url}
         )
     except Exception:
         return True
@@ -635,6 +636,7 @@ def _expand_prompt(self, prompt: str) -> str:
         )
     except Exception:
         import traceback
+
         traceback.print_exc()
         return prompt  # Return original if expansion fails
     else:
@@ -691,10 +693,7 @@ def generate_image_to_video(self, request: WanT2VRequest) -> WanT2VResponse:
             value_range=(-1, 1),
         )
 
-        return WanT2VResponse(
-            video=File.from_path(save_path),
-            seed=seed
-        )
+        return WanT2VResponse(video=File.from_path(save_path), seed=seed)
 ```
 
 ## Key Concepts and Best Practices
@@ -718,10 +717,7 @@ response = fal_client.subscribe(
 
 ```python theme={null}
 image_url = fal_client.upload_image(image)
-response = fal_client.subscribe(
-    "fal-ai/imageutils/nsfw",
-    {"image_url": image_url}
-)
+response = fal_client.subscribe("fal-ai/imageutils/nsfw", {"image_url": image_url})
 ```
 
 **Vision-Language Models:**
@@ -816,8 +812,8 @@ result = await fal_client.submit_async(
         "num_inference_steps": 30,
         "enable_safety_checker": True,
         "enable_prompt_expansion": True,
-        "seed": 42
-    }
+        "seed": 42,
+    },
 )
 
 # The response includes the video file and seed
@@ -838,15 +834,15 @@ seed_used = result["seed"]
 ### Memory Management
 
 ```python theme={null}
-offload_model=False  # Keep model in VRAM for better performance
-use_usp=False       # Optimize for single-user scenarios
+offload_model = False  # Keep model in VRAM for better performance
+use_usp = False  # Optimize for single-user scenarios
 ```
 
 ### Storage Efficiency
 
 ```python theme={null}
-local_dir_use_symlinks=True  # Avoid duplicate model weights
-FAL_MODEL_WEIGHTS_DIR       # Use managed storage location
+local_dir_use_symlinks = True  # Avoid duplicate model weights
+FAL_MODEL_WEIGHTS_DIR  # Use managed storage location
 ```
 
 ## Key Takeaways

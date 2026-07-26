@@ -53,6 +53,7 @@ Or configure it directly in code:
   # The client automatically reads FAL_KEY from environment
   # Or you can set it explicitly:
   import os
+
   os.environ["FAL_KEY"] = "your-api-key-here"
   ```
 

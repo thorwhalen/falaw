@@ -19,19 +19,18 @@
   ```python title="Python" theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
-             print(log["message"])
+              print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/bria/expand",
       arguments={
           "image_url": "https://storage.googleapis.com/falserverless/model_tests/orange.png",
-          "canvas_size": [
-              1200,
-              674
-          ]
+          "canvas_size": [1200, 674],
       },
       with_logs=True,
       on_queue_update=on_queue_update,

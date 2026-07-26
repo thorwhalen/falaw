@@ -14,6 +14,7 @@ These platform variables are separate from your own [secrets](/documentation/dev
 import os
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         app_name = os.getenv("FAL_APP_NAME")
@@ -34,12 +35,13 @@ The `FAL_KEY` variable is set automatically when your app runs with privileged a
 ```python theme={null}
 import fal_client
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self, prompt: str):
-        result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-            "prompt": prompt
-        })
+        result = fal_client.subscribe(
+            "fal-ai/flux/schnell", arguments={"prompt": prompt}
+        )
         return result
 ```
 
@@ -70,6 +72,7 @@ These are useful for structured logging, metrics tagging, and conditional logic.
 import os
 import logging
 
+
 class MyApp(fal.App):
     def setup(self):
         self.logger = logging.getLogger(os.getenv("FAL_APP_NAME", "app"))
@@ -90,6 +93,7 @@ fal sets this variable at each stage of the [runner lifecycle](/documentation/de
 
 ```python theme={null}
 import os
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -116,6 +120,7 @@ fal sets `HF_HOME` to a path on the [persistent /data filesystem](/documentation
 
 ```python theme={null}
 from transformers import AutoModel
+
 
 class MyApp(fal.App):
     def setup(self):

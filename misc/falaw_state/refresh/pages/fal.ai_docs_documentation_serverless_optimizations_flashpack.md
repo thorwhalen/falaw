@@ -51,9 +51,10 @@ Add `FlashPackMixin` to your module for `save_flashpack` and `from_flashpack` me
 ```python theme={null}
 from flashpack import FlashPackMixin
 
+
 class MyModule(nn.Module, FlashPackMixin):
-    def __init__(self, some_arg: int = 4) -> None:
-        ...
+    def __init__(self, some_arg: int = 4) -> None: ...
+
 
 module = MyModule(some_arg=4)
 module.save_flashpack("model.flashpack")
@@ -69,8 +70,10 @@ Use `FlashPackDiffusersModelMixin` for diffusers models with `from_pretrained_fl
 from flashpack.integrations.diffusers import FlashPackDiffusersModelMixin
 from diffusers.models import AutoencoderKL
 
+
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
+
 
 # Load from original weights
 sdxl_vae = FlashPackAutoencoderKL.from_pretrained(
@@ -101,8 +104,10 @@ Works the same way with `FlashPackTransformersModelMixin`:
 from flashpack.integrations.transformers import FlashPackTransformersModelMixin
 from transformers import CLIPTextModel
 
+
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
+
 
 # Load, convert, and save
 clip = FlashPackCLIPTextModel.from_pretrained(
@@ -144,20 +149,25 @@ from transformers import (
     CLIPVisionModelWithProjection,
 )
 
+
 # Define FlashPack-enabled classes
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
+
 
 class FlashPackCLIPTextModelWithProjection(
     FlashPackTransformersModelMixin, CLIPTextModelWithProjection
 ):
     pass
 
+
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
 
+
 class FlashPackUNet2DConditionModel(FlashPackDiffusersModelMixin, UNet2DConditionModel):
     pass
+
 
 class FlashPackStableDiffusionXLPipeline(
     FlashPackDiffusionPipeline, StableDiffusionXLPipeline
@@ -189,6 +199,7 @@ class FlashPackStableDiffusionXLPipeline(
             add_watermarker=add_watermarker,
             force_zeros_for_empty_prompt=force_zeros_for_empty_prompt,
         )
+
 
 # Save entire pipeline as FlashPack
 pipeline = FlashPackStableDiffusionXLPipeline.from_pretrained(
@@ -256,6 +267,7 @@ Convert your model to FlashPack format, store it on `/data` or HuggingFace, and 
 import fal
 from flashpack import assign_from_file
 
+
 class MyModel(fal.App):
     machine_type = "GPU-A100"
     requirements = ["flashpack", "torch", "diffusers"]
@@ -276,6 +288,7 @@ Or with the Diffusers integration:
 
 ```python theme={null}
 import fal
+
 
 class SDXLApp(fal.App):
     machine_type = "GPU-A100"

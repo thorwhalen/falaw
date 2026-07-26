@@ -20,9 +20,9 @@ Under the hood, `stream()` sends a direct HTTP request to `fal.run` using [Serve
   ```python Python theme={null}
   import fal_client
 
-  for event in fal_client.stream("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  }):
+  for event in fal_client.stream(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  ):
       print(event)
   ```
 
@@ -30,11 +30,13 @@ Under the hood, `stream()` sends a direct HTTP request to `fal.run` using [Serve
   import asyncio
   import fal_client
 
+
   async def main():
-      async for event in fal_client.stream_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      }):
+      async for event in fal_client.stream_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      ):
           print(event)
+
 
   asyncio.run(main())
   ```

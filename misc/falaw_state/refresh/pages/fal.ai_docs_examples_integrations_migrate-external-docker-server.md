@@ -32,6 +32,7 @@ FROM your-base-image
 # ... your setup
 """
 
+
 @fal.function(
     image=ContainerImage.from_dockerfile_str(DOCKERFILE),
     machine_type="GPU-A100",
@@ -82,9 +83,11 @@ FROM your-base-image
 
 SERVER_PORT = 8000
 
+
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
-    
+
+
 class GenerateResponse(BaseModel):
     image: Image
 
@@ -92,14 +95,14 @@ class GenerateResponse(BaseModel):
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile_str(DOCKERFILE)
-    
+
     def setup(self):
         # Start server in background (non-blocking)
         self.process = subprocess.Popen(
             ["your-server", "--host", "127.0.0.1", "--port", str(SERVER_PORT)],
         )
         self._wait_for_server()
-    
+
     def _wait_for_server(self, timeout=120):
         start = time.time()
         while time.time() - start < timeout:
@@ -110,7 +113,7 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
                 pass
             time.sleep(1)
         raise TimeoutError("Server did not start")
-    
+
     @fal.endpoint("/generate")
     def generate(self, input: GenerateRequest, request: Request) -> GenerateResponse:
         # Call internal server
@@ -120,7 +123,7 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
             timeout=300,
         )
         resp.raise_for_status()
-        
+
         # Upload to fal CDN
         image = Image.from_path(resp.json()["path"], request=request)
         return GenerateResponse(image=image)

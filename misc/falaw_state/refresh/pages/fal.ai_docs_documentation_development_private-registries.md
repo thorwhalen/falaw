@@ -71,20 +71,22 @@ import os
 import boto3
 import base64
 
+
 def get_ecr_token(region: str) -> str:
     ecr_client = boto3.client(
-        'ecr',
+        "ecr",
         aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name=region
+        region_name=region,
     )
     response = ecr_client.get_authorization_token()
-    auth_data = response['authorizationData'][0]
-    token = auth_data['authorizationToken']
+    auth_data = response["authorizationData"][0]
+    token = auth_data["authorizationToken"]
     # Decode from base64, format is "AWS:password"
-    decoded_token = base64.b64decode(token).decode('utf-8')
-    _, password = decoded_token.split(':', 1)
+    decoded_token = base64.b64decode(token).decode("utf-8")
+    _, password = decoded_token.split(":", 1)
     return password
+
 
 class MyModel(fal.App):
     image = fal.container.ContainerImage.from_dockerfile_str(

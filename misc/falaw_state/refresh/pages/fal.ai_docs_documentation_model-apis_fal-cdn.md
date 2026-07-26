@@ -48,10 +48,13 @@ Then pass the URL to any model:
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-      "prompt": "a cat wearing sunglasses",
-      "image_url": url  # CDN URL from upload
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/dev",
+      arguments={
+          "prompt": "a cat wearing sunglasses",
+          "image_url": url,  # CDN URL from upload
+      },
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -71,10 +74,13 @@ You don't have to use fal's CDN. If you already have files hosted elsewhere, pas
 **Presigned URLs** from S3, GCS, or R2 work because the auth credentials are embedded in the URL itself:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-    "prompt": "enhance this image",
-    "image_url": "https://your-bucket.s3.amazonaws.com/image.png?X-Amz-Signature=..."
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/dev",
+    arguments={
+        "prompt": "enhance this image",
+        "image_url": "https://your-bucket.s3.amazonaws.com/image.png?X-Amz-Signature=...",
+    },
+)
 ```
 
 **Public URLs** from any web server also work, as long as they return the file directly without requiring cookies or auth headers.
@@ -86,9 +92,9 @@ result = fal_client.subscribe("fal-ai/flux/dev", arguments={
 Models also accept base64-encoded data URIs:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/flux/dev", arguments={
-    "image_url": "data:image/png;base64,iVBORw0KGgo..."
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/dev", arguments={"image_url": "data:image/png;base64,iVBORw0KGgo..."}
+)
 ```
 
 <Warning>

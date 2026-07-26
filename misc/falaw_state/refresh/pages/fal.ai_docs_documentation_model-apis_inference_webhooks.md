@@ -14,7 +14,8 @@ Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a 
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit("fal-ai/flux/dev",
+  handler = fal_client.submit(
+      "fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -25,7 +26,8 @@ Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a 
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async("fal-ai/flux/dev",
+  handler = await fal_client.submit_async(
+      "fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -253,6 +255,7 @@ Below are simplified functions to verify webhook signatures by passing the heade
     _jwks_cache = None
     _jwks_cache_time = 0
 
+
     def fetch_jwks() -> list:
         """Fetch and cache JWKS, refreshing after 24 hours."""
         global _jwks_cache, _jwks_cache_time
@@ -264,12 +267,9 @@ Below are simplified functions to verify webhook signatures by passing the heade
             _jwks_cache_time = current_time
         return _jwks_cache
 
+
     def verify_webhook_signature(
-        request_id: str,
-        user_id: str,
-        timestamp: str,
-        signature_hex: str,
-        body: bytes
+        request_id: str, user_id: str, timestamp: str, signature_hex: str, body: bytes
     ) -> bool:
         """
         Verify a webhook signature using provided headers and body.
@@ -301,7 +301,7 @@ Below are simplified functions to verify webhook signatures by passing the heade
                 request_id,
                 user_id,
                 timestamp,
-                hashlib.sha256(body).hexdigest()
+                hashlib.sha256(body).hexdigest(),
             ]
             if any(part is None for part in message_parts):
                 print("Missing required header value.")

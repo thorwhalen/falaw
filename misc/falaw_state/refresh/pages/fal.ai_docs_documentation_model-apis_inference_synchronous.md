@@ -18,9 +18,9 @@ Both are good starting points for scripts, prototyping, and any situation where 
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.run("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  result = fal_client.run(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -29,11 +29,13 @@ Both are good starting points for scripts, prototyping, and any situation where 
   import asyncio
   import fal_client
 
+
   async def main():
-      result = await fal_client.run_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      result = await fal_client.run_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -57,9 +59,9 @@ Both are good starting points for scripts, prototyping, and any situation where 
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset over mountains"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -68,11 +70,13 @@ Both are good starting points for scripts, prototyping, and any situation where 
   import asyncio
   import fal_client
 
+
   async def main():
-      result = await fal_client.subscribe_async("fal-ai/flux/schnell", arguments={
-          "prompt": "a sunset over mountains"
-      })
+      result = await fal_client.subscribe_async(
+          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+      )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -96,22 +100,25 @@ Track progress while waiting for results:
   ```python Python theme={null}
   import fal_client
 
+
   def on_queue_update(update):
       if isinstance(update, fal_client.InProgress):
           for log in update.logs:
               print(log["message"])
 
+
   result = fal_client.subscribe(
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       with_logs=True,
-      on_queue_update=on_queue_update
+      on_queue_update=on_queue_update,
   )
   ```
 
   ```python Python (async) theme={null}
   import asyncio
   import fal_client
+
 
   async def main():
       def on_queue_update(update):
@@ -123,9 +130,10 @@ Track progress while waiting for results:
           "fal-ai/flux/schnell",
           arguments={"prompt": "a sunset over mountains"},
           with_logs=True,
-          on_queue_update=on_queue_update
+          on_queue_update=on_queue_update,
       )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```
@@ -157,7 +165,9 @@ Endpoint path appended to the model ID. Leave empty for the default root endpoin
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint")
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -200,7 +210,9 @@ Routing hint for session affinity -- routes requests to the same runner. See [`h
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc")
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc"
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -218,7 +230,9 @@ Additional HTTP headers for [platform-level controls](/documentation/model-apis/
 
 <CodeGroup>
   ```python Python theme={null}
-  result = fal_client.run("fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"})
+  result = fal_client.run(
+      "fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"}
+  )
   ```
 
   ```javascript JavaScript theme={null}
@@ -291,6 +305,7 @@ A callback function that fires once, immediately after the request enters the qu
   def save_request_id(request_id):
       print(f"Enqueued: {request_id}")
 
+
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
@@ -322,6 +337,7 @@ In Python, the status is one of three types: `Queued` (has `position`), `InProgr
       elif isinstance(update, fal_client.InProgress):
           for log in update.logs:
               print(log["message"])
+
 
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",

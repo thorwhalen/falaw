@@ -135,7 +135,7 @@ print(f"GPU count: {torch.cuda.device_count()}")
 
 if torch.cuda.is_available():
     # Create large tensors on GPU
-    device = torch.device('cuda')
+    device = torch.device("cuda")
 
     # Simple matrix multiplication test
     print("Running GPU compute test...")

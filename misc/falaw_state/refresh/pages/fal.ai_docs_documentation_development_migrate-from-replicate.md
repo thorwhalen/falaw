@@ -51,6 +51,7 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     import torch
     from diffusers import StableDiffusionXLPipeline
 
+
     class Predictor(BasePredictor):
         def setup(self):
             self.pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -72,11 +73,14 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     from pydantic import BaseModel, Field
     from fal.toolkit import Image
 
+
     class Input(BaseModel):
         prompt: str = Field(description="Text prompt")
 
+
     class Output(BaseModel):
         image: Image
+
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -123,6 +127,7 @@ Then reference the Dockerfile in your fal app:
 import fal
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile("Dockerfile")
@@ -159,9 +164,9 @@ fal deploy my_app.py::MyApp
 # Call your deployed app
 import fal_client
 
-result = fal_client.subscribe("your-username/my-app", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "your-username/my-app", arguments={"prompt": "a sunset over mountains"}
+)
 print(result["image"]["url"])
 ```
 

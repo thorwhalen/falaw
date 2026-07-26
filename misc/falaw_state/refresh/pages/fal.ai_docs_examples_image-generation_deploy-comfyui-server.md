@@ -118,6 +118,7 @@ WORKFLOW_URL = File.from_path(str(WORKFLOW_PATH), repository="cdn").url
 # PYDANTIC MODELS
 # =============================================================================
 
+
 class ImageRequest(BaseModel):
     prompt: str = Field(
         description="The text prompt describing the image to generate.",
@@ -168,8 +169,7 @@ RUN pip install --no-cache-dir boto3==1.35.74 protobuf==4.25.1 pydantic==2.10.6
 # =============================================================================
 
 MODELS = {
-    "checkpoints/sd_xl_turbo_1.0_fp16.safetensors": 
-        "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors",
+    "checkpoints/sd_xl_turbo_1.0_fp16.safetensors": "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors",
 }
 
 
@@ -177,35 +177,43 @@ MODELS = {
 # FAL APP
 # =============================================================================
 
+
 class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile_str(DOCKERFILE_STR)
-    
+
     COMFYUI_HOST = "127.0.0.1"
     COMFYUI_PORT = 8188
     COMFYUI_DIR = Path("/app/ComfyUI")
-    
+
     def setup(self):
         self.process = None
         self.workflow_template = None
-        
+
         # Download models to persistent /data storage
         self._download_models()
         self._link_models()
-        
+
         # Start ComfyUI server in background (non-blocking)
         self.process = subprocess.Popen(
-            ["python", "main.py", "--listen", self.COMFYUI_HOST, "--port", str(self.COMFYUI_PORT)],
+            [
+                "python",
+                "main.py",
+                "--listen",
+                self.COMFYUI_HOST,
+                "--port",
+                str(self.COMFYUI_PORT),
+            ],
             cwd=str(self.COMFYUI_DIR),
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
         self._wait_for_server(timeout=120)
-        
+
         # Load workflow template
         with open("/app/workflow.json", encoding="utf-8") as f:
             self.workflow_template = json.load(f)
-    
+
     def _download_models(self):
         """Download models using fal toolkit (handles atomic writes automatically)."""
         self._downloaded_paths = {}
@@ -213,7 +221,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
             # download_model_weights handles caching and atomic writes
             downloaded_path = download_model_weights(url)
             self._downloaded_paths[model_path] = downloaded_path
-    
+
     def _link_models(self):
         """Symlink models from downloaded paths to ComfyUI's models directory."""
         for model_path in MODELS:
@@ -223,19 +231,22 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
             if comfy_path.exists() or comfy_path.is_symlink():
                 comfy_path.unlink()
             comfy_path.symlink_to(downloaded_path)
-    
+
     def _wait_for_server(self, timeout: int = 120):
         start = time.time()
         while time.time() - start < timeout:
             try:
-                resp = requests.get(f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/system_stats", timeout=5)
+                resp = requests.get(
+                    f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/system_stats",
+                    timeout=5,
+                )
                 if resp.status_code == 200:
                     return
             except requests.ConnectionError:
                 pass
             time.sleep(1)
         raise TimeoutError("ComfyUI server did not start")
-    
+
     def _build_workflow(self, request: ImageRequest) -> dict:
         workflow = deepcopy(self.workflow_template)
         workflow["6"]["inputs"]["text"] = request.prompt
@@ -245,7 +256,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
         workflow["13"]["inputs"]["noise_seed"] = request.seed
         workflow["22"]["inputs"]["steps"] = request.num_inference_steps
         return workflow
-    
+
     def _queue_prompt(self, prompt: dict) -> str:
         resp = requests.post(
             f"http://{self.COMFYUI_HOST}:{self.COMFYUI_PORT}/prompt",
@@ -254,7 +265,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
         )
         resp.raise_for_status()
         return resp.json()["prompt_id"]
-    
+
     def _poll_for_completion(self, prompt_id: str, timeout: int = 120) -> dict:
         start = time.time()
         while time.time() - start < timeout:
@@ -270,7 +281,7 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
                     return prompt_history
             time.sleep(0.5)
         raise TimeoutError("Generation did not complete")
-    
+
     def _get_output_image(self, history: dict) -> str | None:
         for node_output in history.get("outputs", {}).values():
             if "images" in node_output and node_output["images"]:
@@ -281,17 +292,17 @@ class ComfyUISDXLTurbo(fal.App, keep_alive=300, max_concurrency=1):
                         return f"{self.COMFYUI_DIR}/output/{subfolder}/{filename}"
                     return f"{self.COMFYUI_DIR}/output/{filename}"
         return None
-    
+
     @fal.endpoint("/generate")
     def generate_image(self, input: ImageRequest, request: Request) -> ImageResponse:
         workflow = self._build_workflow(input)
         prompt_id = self._queue_prompt(workflow)
         history = self._poll_for_completion(prompt_id)
-        
+
         image_path = self._get_output_image(history)
         if not image_path:
             raise RuntimeError("No image output found")
-        
+
         image = Image.from_path(image_path, request=request)
         return ImageResponse(image=image, seed=input.seed)
 ```
@@ -360,6 +371,7 @@ Large model weights are downloaded to `/data` (persistent storage) at runtime us
 
 ```python theme={null}
 from fal.toolkit import download_model_weights
+
 
 def _download_models(self):
     self._downloaded_paths = {}
@@ -458,13 +470,15 @@ When you export a workflow, each node has an ID. Update `_build_workflow()` to m
 ```python theme={null}
 def _build_workflow(self, request: ImageRequest) -> dict:
     workflow = deepcopy(self.workflow_template)
-    
+
     # Find the correct node IDs by inspecting your workflow JSON
-    workflow["6"]["inputs"]["text"] = request.prompt      # CLIP Text Encode (Positive)
-    workflow["7"]["inputs"]["text"] = request.negative_prompt  # CLIP Text Encode (Negative)
-    workflow["5"]["inputs"]["width"] = request.width      # EmptyLatentImage
+    workflow["6"]["inputs"]["text"] = request.prompt  # CLIP Text Encode (Positive)
+    workflow["7"]["inputs"]["text"] = (
+        request.negative_prompt
+    )  # CLIP Text Encode (Negative)
+    workflow["5"]["inputs"]["width"] = request.width  # EmptyLatentImage
     # ... etc
-    
+
     return workflow
 ```
 

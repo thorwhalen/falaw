@@ -48,9 +48,11 @@ Secrets are available as standard environment variables inside your app. Use `os
 import os
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         import huggingface_hub
+
         huggingface_hub.login(token=os.getenv("HF_TOKEN"))
         self.pipe = load_gated_model()
 
@@ -73,10 +75,9 @@ Instead, use the `${}` substitution syntax in your `requirements` list. fal repl
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
-    requirements = [
-        "git+https://${GITHUB_TOKEN}@github.com/myorg/private-package"
-    ]
+    requirements = ["git+https://${GITHUB_TOKEN}@github.com/myorg/private-package"]
 ```
 
 This is the only way to use secrets during dependency installation. The substitution happens server-side before pip runs, and the token is not stored in the final image.

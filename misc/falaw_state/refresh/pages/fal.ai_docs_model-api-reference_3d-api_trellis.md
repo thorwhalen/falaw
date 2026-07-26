@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/trellis",
@@ -164,10 +166,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/trellis/multi",
@@ -175,7 +179,7 @@
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/model_tests/video_models/front.png",
                   "https://storage.googleapis.com/falserverless/model_tests/video_models/back.png",
-                  "https://storage.googleapis.com/falserverless/model_tests/video_models/left.png"
+                  "https://storage.googleapis.com/falserverless/model_tests/video_models/left.png",
               ]
           },
           with_logs=True,
@@ -379,9 +383,9 @@ const result = await fal.subscribe("fal-ai/trellis", {
 Python:
 
 ```python theme={null}
-result = fal_client.subscribe("fal-ai/trellis", {
-    "image_url": "https://example.com/your-image.jpg"
-})
+result = fal_client.subscribe(
+    "fal-ai/trellis", {"image_url": "https://example.com/your-image.jpg"}
+)
 ```
 
 ### Advanced Features

@@ -21,10 +21,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-2-pro",
@@ -152,10 +154,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/flux-2-pro/edit",
@@ -163,7 +167,7 @@
               "prompt": "Place realistic flames emerging from the top of the coffee cup, dancing above the rim",
               "image_urls": [
                   "https://storage.googleapis.com/falserverless/example_inputs/flux2_pro_edit_input.png"
-              ]
+              ],
           },
           with_logs=True,
           on_queue_update=on_queue_update,

@@ -21,16 +21,18 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/pro/fast/image-to-video",
           arguments={
               "prompt": "Bathed in a stark spotlight, a lone ballet dancer takes center stage. Her movements, precise and graceful, tell a story of passion and dedication against the velvet darkness. The scene evokes a sense of intimacy, highlighting the raw emotion and artistry of her performance.",
-              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_fast_i2v_input.png"
+              "image_url": "https://storage.googleapis.com/falserverless/example_inputs/seedance_fast_i2v_input.png",
           },
           with_logs=True,
           on_queue_update=on_queue_update,
@@ -165,10 +167,12 @@
       ```python title="Python" theme={null}
       import fal_client
 
+
       def on_queue_update(update):
           if isinstance(update, fal_client.InProgress):
               for log in update.logs:
-                 print(log["message"])
+                  print(log["message"])
+
 
       result = fal_client.subscribe(
           "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
@@ -361,9 +365,12 @@ For Python developers:
 from fal_client import FalClient
 
 client = FalClient("YOUR_FAL_KEY")
-result = client.subscribe("fal-ai/bytedance/seedance/v1/pro/fast/text-to-video", {
-    "prompt": "Inside a quiet dojo, a martial artist moves with precision and grace. The performance highlights the beauty and discipline inherent in the ancient practice. Each form unfolds clearly, a testament to dedication and skill."
-})
+result = client.subscribe(
+    "fal-ai/bytedance/seedance/v1/pro/fast/text-to-video",
+    {
+        "prompt": "Inside a quiet dojo, a martial artist moves with precision and grace. The performance highlights the beauty and discipline inherent in the ancient practice. Each form unfolds clearly, a testament to dedication and skill."
+    },
+)
 
 # Access the generated video
 print(result["video"]["url"])
