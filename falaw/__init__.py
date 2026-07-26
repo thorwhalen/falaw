@@ -98,6 +98,7 @@ from .plan import (
     execute as execute_plan,
     make_call_plan,
     plan_from_dict,
+    plan_hash,
     plan_to_dict,
 )
 from .refresh import refresh_full_docs, refresh_llms, refresh_state
@@ -154,6 +155,7 @@ __all__ = [
     "call_plan_from_dict",
     "call_plan_to_dict",
     "plan_from_dict",
+    "plan_hash",
     "plan_to_dict",
     "Result",
     "CostEstimate",

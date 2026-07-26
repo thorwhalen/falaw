@@ -285,6 +285,50 @@ def plan_from_dict(d: dict) -> Plan:
     return Plan(calls=tuple(call_plan_from_dict(c) for c in d.get("calls", ())))
 
 
+def plan_hash(plan: Plan) -> str:
+    """Stable, plan-scoped **structural idempotency key** for a whole :class:`Plan`.
+
+    Answers "does this whole plan match one I already ran?" — the handle a job
+    manager (its first customer, :mod:`nw.jobs`) uses to dedup double-submits and
+    to replay a resumed render for free. It is computed *before* execution and
+    with ``<from N>`` placeholders intact, so it is stable across re-plans of the
+    same structural request.
+
+    The digest canonicalizes each call over ``{app, args, tool}`` — matching
+    :func:`_synthetic_artifact`'s canonicalization, and deliberately **not** the
+    per-call content-addressed cache key (:func:`falaw.cache._key`, which keys on
+    ``{app, args}`` with no ``tool``). ``plan_hash`` and the per-call cache key
+    therefore key on *different* bytes and must not be assumed to agree
+    call-for-call; what is reused from the cache is only the canonicalization
+    *discipline* (``sort_keys=True`` / ``default=str``), which is all a
+    stable-across-re-plans dedup handle needs.
+
+    Two structurally-identical plans hash equal; changing any call's ``app``,
+    ``args``, or ``tool`` — or the *order* of calls — changes the hash.
+
+    >>> a = CallPlan(tool="generate_image", application="fal-ai/flux/dev",
+    ...              arguments={"prompt": "a tiger"}, output_kind="image")
+    >>> b = CallPlan(tool="image_to_video", application="fal-ai/svd",
+    ...              arguments={"image_url": "<from 0>"}, output_kind="video")
+    >>> plan_hash(Plan(calls=(a, b))) == plan_hash(Plan(calls=(a, b)))
+    True
+    >>> plan_hash(Plan(calls=(a, b))) == plan_hash(Plan(calls=(b, a)))
+    False
+    """
+    import hashlib
+    import json as _json
+
+    blob = _json.dumps(
+        [
+            {"app": c.application, "args": c.arguments, "tool": c.tool}
+            for c in plan.calls
+        ],
+        sort_keys=True,
+        default=str,
+    ).encode("utf-8")
+    return hashlib.sha256(blob).hexdigest()
+
+
 # --- planning helpers -------------------------------------------------------
 
 
