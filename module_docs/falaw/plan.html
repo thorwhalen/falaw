@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.20 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.21 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=056c92e6"></script>
+      <script src="../../_static/documentation_options.js?v=a11416ff"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -102,6 +102,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.execute"><code class="docutils literal notranslate"><span class="pre">execute()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.make_call_plan"><code class="docutils literal notranslate"><span class="pre">make_call_plan()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_from_dict"><code class="docutils literal notranslate"><span class="pre">plan_from_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_hash"><code class="docutils literal notranslate"><span class="pre">plan_hash()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_to_dict"><code class="docutils literal notranslate"><span class="pre">plan_to_dict()</span></code></a></li>
 </ul>
 </li>
@@ -413,6 +414,37 @@ run cost?” reporting), <code class="docutils literal notranslate"><span class=
 plan written by an incompatible future version should fail loudly, not
 silently lose calls. A missing <code class="docutils literal notranslate"><span class="pre">schema</span></code> is tolerated (treated as v1) so
 hand-written plans stay easy.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.plan.plan_hash">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">plan_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#plan_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.plan_hash" title="Link to this definition"></a></dt>
+<dd><p>Stable, plan-scoped <strong>structural idempotency key</strong> for a whole <a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plan</span></code></a>.</p>
+<p>Answers “does this whole plan match one I already ran?” — the handle a job
+manager (its first customer, <code class="xref py py-mod docutils literal notranslate"><span class="pre">nw.jobs</span></code>) uses to dedup double-submits and
+to replay a resumed render for free. It is computed <em>before</em> execution and
+with <code class="docutils literal notranslate"><span class="pre">&lt;from</span> <span class="pre">N&gt;</span></code> placeholders intact, so it is stable across re-plans of the
+same structural request.</p>
+<p>The digest canonicalizes each call over <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code> — matching
+<code class="xref py py-func docutils literal notranslate"><span class="pre">_synthetic_artifact()</span></code>’s canonicalization, and deliberately <strong>not</strong> the
+per-call content-addressed cache key (<code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache._key()</span></code>, which keys on
+<code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args}</span></code> with no <code class="docutils literal notranslate"><span class="pre">tool</span></code>). <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> and the per-call cache key
+therefore key on <em>different</em> bytes and must not be assumed to agree
+call-for-call; what is reused from the cache is only the canonicalization
+<em>discipline</em> (<code class="docutils literal notranslate"><span class="pre">sort_keys=True</span></code> / <code class="docutils literal notranslate"><span class="pre">default=str</span></code>), which is all a
+stable-across-re-plans dedup handle needs.</p>
+<p>Two structurally-identical plans hash equal; changing any call’s <code class="docutils literal notranslate"><span class="pre">app</span></code>,
+<code class="docutils literal notranslate"><span class="pre">args</span></code>, or <code class="docutils literal notranslate"><span class="pre">tool</span></code> — or the <em>order</em> of calls — changes the hash.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;a tiger&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/svd&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from 0&gt;&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span> <span class="o">==</span> <span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span> <span class="o">==</span> <span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)))</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
