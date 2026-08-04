@@ -121,7 +121,9 @@ delta for two films.** Track 1 outranks everything.
 
 - **Do not add a second execution backend before Track 2 lands.** A backend reachable through an
   `execute` override has no priceable `Plan`.
-- **Do not build a second blob store.** `lacing.ArtifactStore` exists and is unwired.
+- **Do not build a second blob store.** `lacing.ArtifactStore` exists, is content-addressed, and
+  is already wired in reelee (`reelee/storage_config.py`, `reelee/artifacts.py`). falaw is the
+  one tier that does not use it yet — that is the gap, not a missing store.
 - **Do not put a version in a backend or operation identifier.** Version belongs in a field that
   folds into the cache key, not in the id.
 - **Do not let a key-composition function degrade quietly.** `json.dumps(..., default=str)` must
