@@ -139,3 +139,20 @@ Writes `falaw/data/skills/falaw/SKILL.md` and `.claude/skills/falaw/SKILL.md`.
 ## Status
 
 v0 --- functional core, real Claude skill, stubs for MCP and HTTP service. The bridges share the same registry, so filling in the stubs is additive.
+
+## Roadmap
+
+See [`misc/docs/roadmap.md`](misc/docs/roadmap.md) for the ordered work and the standing
+constraints. In short, four tracks:
+
+1. **Content addressing** --- `Artifact.asset_id` and the per-call cache key are currently derived
+   from the fal CDN *URL*, not from the bytes. fal states that every upload gets a unique URL and
+   that expired files are permanently deleted, so today a byte-identical regeneration misses the
+   cache and a stored response decays into a dead link. The fix routes through
+   `lacing.ArtifactStore.put_blob`.
+2. **Backend-parametric `Plan`** --- `CallPlan.backend` + registry dispatch in `execute_plan`, so
+   a second execution backend is still priced, cached and dry-runnable.
+3. **Licence-and-terms ledger** --- per `(model, backend)`, queried at plan time, `unknown` means
+   refuse.
+4. **Cost data from the vendor** --- read fal's pricing API instead of hand-maintaining
+   `data/models.json` (19 of 40 records currently carry no structured price at all).
