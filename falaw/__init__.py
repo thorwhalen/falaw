@@ -26,9 +26,11 @@ from . import refresh as _refresh  # noqa: F401  (refresh registers tools too)
 from .account import AccountStatus, health_check
 from .base import CostEstimate, ModelRecord, ToolSpec
 from .cache import cached_call_fal, cache_get, cache_put, cache_stats, materialize_asset
+from .content import ContentRef, content_ref_for_url, default_content_store
 from .core import call_fal, current_fal_key, using_fal_credentials
 from .errors import (
     FalAccountLocked,
+    FalAssetFetchError,
     FalBadRequest,
     FalDurationOutOfRange,
     FalError,
@@ -137,8 +139,10 @@ __all__ = [
     "Beat",
     "CallPlan",
     "Character",
+    "ContentRef",
     "Environment",
     "FalAccountLocked",
+    "FalAssetFetchError",
     "FalBadRequest",
     "FalDurationOutOfRange",
     "FalError",
@@ -180,6 +184,8 @@ __all__ = [
     "cache_put",
     "cache_stats",
     "cached_call_fal",
+    "content_ref_for_url",
+    "default_content_store",
     "call_fal",
     "cast_character",
     "current_fal_key",

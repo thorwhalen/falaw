@@ -157,6 +157,23 @@ class FalDurationOutOfRange(FalError):
         self.valid_range = valid_range
 
 
+class FalAssetFetchError(FalError):
+    """The bytes behind a fal-served asset URL could not be retrieved.
+
+    Raised by :mod:`falaw.content` when content-addressing an artifact fails —
+    the URL 404s (fal deletes expired files permanently), the transfer errors,
+    or the response is empty. It is deliberately **loud**: returning an
+    Artifact whose ``asset_id`` is not the SHA-256 of any bytes would break
+    ``lacing.Artifact``'s content-hash contract and poison every downstream
+    cache key derived from it.
+    """
+
+    def __init__(self, message: str, *, url: str, cause: BaseException | None = None):
+        super().__init__(message)
+        self.url = url
+        self.cause = cause
+
+
 # --- Translation from fal_client errors --------------------------------------
 
 

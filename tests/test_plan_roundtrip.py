@@ -70,7 +70,7 @@ def _patch_fal(monkeypatch):
     return captured
 
 
-def test_two_step_render_plan_roundtrip(monkeypatch):
+def test_two_step_render_plan_roundtrip(monkeypatch, fake_assets):
     """The keystone test: plan → inspect → execute → verify Artifacts."""
     captured = _patch_fal(monkeypatch)
     from falaw import (
@@ -133,11 +133,22 @@ def test_two_step_render_plan_roundtrip(monkeypatch):
     # Captured exactly two fal calls.
     assert len(captured) == 2
 
+    # Artifacts are content-addressed: asset_id is the SHA-256 of the bytes,
+    # not of the URL they happened to be served from (falaw#14).
+    from lacing import hash_bytes
+
+    img_bytes = fake_assets.synthetic("http://x/img.png")
+    assert img_artifact.asset_id == hash_bytes(img_bytes)
+    assert img_artifact.bytes_size == len(img_bytes)
+    assert video_artifact.asset_id == hash_bytes(
+        fake_assets.synthetic("http://x/animated.mp4")
+    )
+
     # 4. Re-execute — cache should short-circuit, no new fal calls.
     captured.clear()
     artifacts_again = execute_plan(plan)
     assert len(captured) == 0, "second execute should hit the cache"
-    # Same content → same URLs → same Artifact asset_ids.
+    # Same bytes → same Artifact asset_ids.
     assert artifacts_again[0].asset_id == img_artifact.asset_id
     assert artifacts_again[1].asset_id == video_artifact.asset_id
 

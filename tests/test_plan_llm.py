@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from falaw import plan_llm_complete
-from falaw.plan import CallPlan, Plan, _default_artifact_converter, execute
+from falaw.plan import CallPlan, Plan, _artifact_from_response, execute
 
 
 @pytest.fixture(autouse=True)
@@ -98,7 +98,7 @@ def test_plan_llm_complete_extra_args_merge():
 def test_converter_materializes_json_response_to_a_file():
     cp = plan_llm_complete("Return JSON.", output_kind="json", consult_cache=False)
     raw = {"output": '{"logline": "a bell rings at midnight"}'}
-    art = _default_artifact_converter(raw, cp)
+    art = _artifact_from_response(raw, cp)
 
     assert art.kind == "json"
     assert art.url is None
@@ -114,7 +114,7 @@ def test_converter_unwraps_a_json_code_fence():
     even when the model wraps its answer in a ```json fence."""
     cp = plan_llm_complete("Return JSON.", output_kind="json", consult_cache=False)
     raw = {"output": '```json\n[{"name": "Alex"}]\n```'}
-    art = _default_artifact_converter(raw, cp)
+    art = _artifact_from_response(raw, cp)
     content = Path(art.path).read_text(encoding="utf-8")
     # The fence is gone — the artifact parses without any caller-side cleanup.
     assert json.loads(content) == [{"name": "Alex"}]
@@ -125,13 +125,13 @@ def test_converter_leaves_a_fence_in_text_output_alone():
     legitimate content in a ``text`` response."""
     cp = plan_llm_complete("Summarize.", output_kind="text", consult_cache=False)
     fenced = "```\nsome code\n```"
-    art = _default_artifact_converter({"output": fenced}, cp)
+    art = _artifact_from_response({"output": fenced}, cp)
     assert Path(art.path).read_text(encoding="utf-8") == fenced
 
 
 def test_converter_materializes_text_response_to_a_file():
     cp = plan_llm_complete("Summarize.", output_kind="text", consult_cache=False)
-    art = _default_artifact_converter({"output": "a terse summary"}, cp)
+    art = _artifact_from_response({"output": "a terse summary"}, cp)
     assert art.kind == "text"
     assert art.path is not None
     assert Path(art.path).read_text(encoding="utf-8") == "a terse summary"
@@ -141,35 +141,45 @@ def test_converter_materializes_text_response_to_a_file():
 def test_converter_text_materialization_is_content_addressed_and_idempotent():
     cp = plan_llm_complete("x", output_kind="json", consult_cache=False)
     raw = {"output": '{"k": "v"}'}
-    a1 = _default_artifact_converter(raw, cp)
-    a2 = _default_artifact_converter(raw, cp)
+    a1 = _artifact_from_response(raw, cp)
+    a2 = _artifact_from_response(raw, cp)
     assert a1.asset_id == a2.asset_id  # content-addressed
     assert a1.path == a2.path
 
     # Different content → different asset_id.
-    a3 = _default_artifact_converter({"output": '{"k": "other"}'}, cp)
+    a3 = _artifact_from_response({"output": '{"k": "other"}'}, cp)
     assert a3.asset_id != a1.asset_id
 
 
 def test_converter_handles_openai_shaped_llm_response():
     cp = plan_llm_complete("x", output_kind="text", consult_cache=False)
     raw = {"choices": [{"message": {"content": "nested content"}}]}
-    art = _default_artifact_converter(raw, cp)
+    art = _artifact_from_response(raw, cp)
     assert Path(art.path).read_text(encoding="utf-8") == "nested content"
 
 
-def test_converter_still_handles_media_responses_without_a_path():
-    """Regression: image/video responses keep going through the URL path."""
+def test_converter_media_response_without_bytes_keeps_the_url_only():
+    """``fetch_bytes=False``: media keeps its URL, gains no path, no content id.
+
+    The id must NOT be the SHA-256 of the URL (falaw#14) — that is what made
+    two byte-identical renders look different and put an expiring location in
+    downstream cache keys.
+    """
+    from lacing import hash_bytes
+
     img_call = CallPlan(
         tool="generate_image",
         application="fal-ai/flux/dev",
         arguments={"prompt": "x"},
         output_kind="image",
     )
-    art = _default_artifact_converter({"images": [{"url": "https://cdn/x.png"}]}, img_call)
+    raw = {"images": [{"url": "https://cdn/x.png"}]}
+    art = _artifact_from_response(raw, img_call, fetch_bytes=False)
     assert art.kind == "image"
     assert art.url == "https://cdn/x.png"
     assert art.path is None
+    assert art.bytes_size == 0
+    assert art.asset_id != hash_bytes(b"https://cdn/x.png")
 
 
 # --- execute() round-trip with a stubbed fal -------------------------------
