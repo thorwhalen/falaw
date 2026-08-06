@@ -25,6 +25,38 @@ from typing import Any, Iterable, Optional
 from ..base import ToolSpec
 from ..registry import list_tools
 
+#: Tag marking a tool that makes **no** vendor call — docs/registry upkeep only.
+#: Everything else reaches fal.ai or an LLM and therefore spends money.
+FREE_TAG = "maintenance"
+
+
+def costed_tools() -> tuple[str, ...]:
+    """Names of the falaw tools that spend money — the metering SSOT.
+
+    Every genre package in the federation exposes this so an aggregating
+    connector can gate spend from one source of truth per package
+    (``braidio.mcp.COSTED_TOOLS``, ``muvid.mcp.COSTED_TOOLS``). falaw had
+    none, so its 24 money-spending tools — the *raw* fal.ai operations,
+    including ``text_to_video`` and ``render_scene`` — reached an aggregating
+    connector completely unmetered (thorwhalen/reelee#265).
+
+    **Derived from the registry, not hand-listed**, matching this module's
+    existing contract that adding a falaw tool needs no edit here. The
+    consequence is the safe one: a newly-registered tool is **costed by
+    default** and must be explicitly tagged :data:`FREE_TAG` to be exempt.
+    Forgetting the tag over-meters a free tool (annoying); the inverse would
+    let a new money-spender through a credit cap (a billing hole).
+    """
+    return tuple(
+        sorted(t.name for t in list_tools() if FREE_TAG not in t.tags)
+    )
+
+
+#: Snapshot of :func:`costed_tools` for consumers that want a constant. Prefer
+#: the function when tools may be registered after import.
+COSTED_TOOLS = costed_tools()
+
+
 _INSTRUCTIONS = (
     "falaw generates and manages AI media (images, video, audio) via fal.ai. "
     "Every tool is content-addressed and cached, so re-running an unchanged "
