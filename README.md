@@ -119,6 +119,60 @@ same kind of thread pool (fal calls are HTTP-bound). Use
 `iter_render_scene(...)` to yield `(kind, result)` pairs as each unit completes
 — handy for live UI updates.
 
+## Testing code that uses falaw
+
+falaw content-addresses every media result, so `execute_plan` **reads the
+bytes** behind each result URL. A suite that stubs the fal *response* but not
+the *asset transport* is resolving its made-up URLs for real — and it passes
+while doing so, because a failed fetch degrades to a URL-only artifact with a
+`UserWarning` rather than raising.
+
+falaw ships the fake, so nobody has to write one. Three autouse fixtures, each
+re-exportable into a `conftest.py` in one line:
+
+```python
+# conftest.py
+from falaw.testing import (  # noqa: F401
+    fake_assets,           # url -> bytes, served from memory
+    isolated_falaw_cache,  # cache / content store / url-index under tmp_path
+    no_outbound_network,   # refuses AND records any non-loopback connection
+)
+```
+
+```python
+def test_two_urls_one_content_address(fake_assets):
+    shared = fake_assets.serve("http://cdn/a.png", b"identical bytes")
+    fake_assets.serve("http://cdn/b.png", shared)   # pin explicit bytes
+    fake_assets.fail("http://cdn/gone.png")         # 404, as an expired asset does
+    ...
+    assert fake_assets.fetched == [...]             # assert on the record
+```
+
+`fake_assets` installs itself through `falaw.content.using_url_fetcher`, the
+public transport seam, so it covers `execute_plan`, `execute_plan_isolated`,
+`materialize_asset` and `content_ref_for_url` at once — including calls your
+own public API makes, which have no `asset_fetcher=` argument to pass. An
+explicitly passed `fetcher=` still wins. `file://` URLs are *not* faked (they
+are not the network); pin one explicitly if you want it served from memory.
+
+`using_url_fetcher` is not test-only: it is also how you give falaw an
+authenticated, retrying, or mirrored transport in production, in one place
+instead of at every call site.
+
+Two rules that are easy to get wrong:
+
+- **Don't reach for `FALAW_FETCH_ARTIFACT_BYTES=0` to make a suite offline.**
+  It works by turning content addressing *off* — the suite goes hermetic and
+  stops testing the feature.
+- **Assert on the record, not on an exception.** falaw absorbs a failed fetch
+  by design, so a guard that only raises is invisible. That is why both the
+  fake and the network guard *record* every attempt, and why
+  `no_outbound_network` fails the test at **teardown**.
+
+Marker `live_api` opts a test back into the real transport and no network
+guard. A suite with different marker names builds its own fixtures from
+`make_fake_assets_fixture` / `make_no_outbound_network_fixture`.
+
 ## Architecture
 
 Single source of truth: a `ToolSpec` dataclass per tool. From it we derive every external surface:

@@ -644,19 +644,18 @@ def test_call_outcome_rejects_an_unknown_status():
 # --- per-call isolation of falaw's own warnings ------------------------------
 
 
-def test_deferred_degrade_warnings_collects_instead_of_emitting(fal, monkeypatch):
+def test_deferred_degrade_warnings_collects_instead_of_emitting(fal):
     """The mechanism, in isolation: inside the sink, nothing reaches ``warnings``."""
     import urllib.error
 
+    from falaw.content import using_url_fetcher
     from falaw.plan import _content_ref_or_none, _deferred_degrade_warnings
 
     def dead(url, *, chunk_size=1 << 16):
         raise urllib.error.HTTPError(url, 404, "gone", {}, None)  # type: ignore[arg-type]
         yield b""  # pragma: no cover - generator marker
 
-    monkeypatch.setattr("falaw.content._http_chunks", dead)
-
-    with warnings.catch_warnings(record=True) as recorded:
+    with using_url_fetcher(dead), warnings.catch_warnings(record=True) as recorded:
         warnings.simplefilter("always")
         with _deferred_degrade_warnings() as sink:
             ref, _ = _content_ref_or_none("http://x/dead.png", None, None)
@@ -669,9 +668,7 @@ def test_deferred_degrade_warnings_collects_instead_of_emitting(fal, monkeypatch
         assert len(recorded) == 1
 
 
-def test_a_speculative_cache_probe_does_not_swallow_a_concurrent_warning(
-    fal, monkeypatch
-):
+def test_a_speculative_cache_probe_does_not_swallow_a_concurrent_warning(fal):
     """The reason the sink is a ContextVar and not ``warnings.catch_warnings``.
 
     ``catch_warnings`` replaces process-global state, so under concurrency one
@@ -683,6 +680,7 @@ def test_a_speculative_cache_probe_does_not_swallow_a_concurrent_warning(
     import urllib.error
 
     from falaw.cache import cache_put
+    from falaw.content import using_url_fetcher
 
     dead_a, dead_b = "http://x/dead-a.png", "http://x/dead-b.png"
     probe_started = threading.Event()
@@ -701,8 +699,6 @@ def test_a_speculative_cache_probe_does_not_swallow_a_concurrent_warning(
             raise urllib.error.HTTPError(url, 404, "gone", {}, None)  # type: ignore[arg-type]
         yield b"good bytes"
 
-    monkeypatch.setattr("falaw.content._http_chunks", chunks)
-
     probe_call = _image("m/probe")
     # Seed a cache entry whose asset is gone: converting it degrades, the
     # degraded artifact is unusable, and the probe's complaints are discarded.
@@ -711,7 +707,9 @@ def test_a_speculative_cache_probe_does_not_swallow_a_concurrent_warning(
     fal.responds("m/fresh", {"images": [{"url": dead_a}]})
 
     plan = Plan(calls=(_image("m/fresh"), probe_call))
-    with warnings.catch_warnings(record=True) as captured:
+    # ``using_url_fetcher`` is a plain module global precisely so it reaches the
+    # pool threads this test runs the plan on.
+    with using_url_fetcher(chunks), warnings.catch_warnings(record=True) as captured:
         warnings.simplefilter("always")
         recorded = captured
         report = execute_plan_isolated(plan, concurrency=2)

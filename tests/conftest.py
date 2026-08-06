@@ -1,86 +1,64 @@
 """Shared fixtures for the falaw test suite.
 
-Two things nearly every offline test needs, and none should have to repeat:
+falaw ships its own offline fixtures as :mod:`falaw.testing` — the module that
+three repos' worth of hand-rolled copies became (thorwhalen/falaw#27) — so this
+file re-exports them rather than defining a fourth. Deliberate dogfooding: if
+the one-line re-export the README promises consumers ever stops working, it
+breaks here first.
 
-1. **An isolated cache root.** falaw's cache, content store and url-index all
-   hang off ``$FALAW_CACHE_DIR``. Without this fixture a test run writes into
-   the developer's real ``~/.config/falaw/cache`` and leaks state between runs.
+- ``isolated_falaw_cache`` — every falaw on-disk store under ``tmp_path``.
+- ``fake_assets`` — falaw's asset transport served from memory.
+- ``no_outbound_network`` — refuses *and records* any non-loopback connection.
 
-2. **A fake asset transport.** falaw content-addresses every media result, so
-   it reads the bytes behind a fal URL (see :mod:`falaw.content` — a URL is
-   neither unique-per-content nor durable, so it cannot be an identity).
-   Offline tests serve stubbed fal responses carrying made-up URLs, so the
-   HTTP fetcher is replaced by an in-memory map:
-
-   - an unregistered URL yields deterministic synthetic bytes derived from the
-     URL, so two different stub URLs behave like two genuinely different
-     renders;
-   - ``fake_assets.serve(url, data)`` pins explicit bytes — which is how a test
-     makes two *different* URLs serve the *same* bytes, the case content
-     addressing exists for;
-   - ``fake_assets.fail(url)`` makes the URL 404, as an expired fal asset does.
-
-A test marked ``live_api`` gets the real transport (and is skipped by default
-via ``-m "not live_api"``).
+All three are autouse and all three step aside for a test marked ``live_api``,
+which is *gated* below rather than merely conventional: the CI command is a
+bare ``pytest``, so a marker nobody enforces is a paid API call one commit
+away from running on every push.
 """
 
 from __future__ import annotations
 
-import urllib.error
-from typing import Iterator, Optional
+import os
 
 import pytest
 
+from falaw.testing import (  # noqa: F401  (autouse fixtures — imported for effect)
+    FakeAssets,
+    fake_assets,
+    isolated_falaw_cache,
+    no_outbound_network,
+)
 
-def _synthetic_bytes(url: str) -> bytes:
-    """Deterministic stand-in bytes for an unregistered URL."""
-    return f"falaw-test-asset::{url}".encode("utf-8")
-
-
-class FakeAssets:
-    """An in-memory ``url -> bytes`` transport standing in for the network."""
-
-    def __init__(self) -> None:
-        self.by_url: dict[str, Optional[bytes]] = {}
-        self.fetched: list[str] = []
-
-    @staticmethod
-    def synthetic(url: str) -> bytes:
-        """The bytes an unregistered ``url`` serves."""
-        return _synthetic_bytes(url)
-
-    def serve(self, url: str, data: bytes) -> bytes:
-        """Make ``url`` serve exactly ``data``."""
-        self.by_url[url] = data
-        return data
-
-    def fail(self, url: str) -> None:
-        """Make ``url`` 404, the way an expired fal asset does."""
-        self.by_url[url] = None
-
-    def chunks(self, url: str, *, chunk_size: int = 1 << 16) -> Iterator[bytes]:
-        self.fetched.append(url)
-        data = self.by_url.get(url, _synthetic_bytes(url))
-        if data is None:
-            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)  # type: ignore[arg-type]
-        for offset in range(0, len(data), chunk_size):
-            yield data[offset : offset + chunk_size]
+# ``pytester`` runs a nested pytest session, which is the only way to observe a
+# fixture that fails at *teardown* — see ``test_the_fixture_fails_the_test_at
+# _teardown``, the guard on the reporting half of the network backstop.
+pytest_plugins = ["pytester"]
 
 
-@pytest.fixture(autouse=True)
-def _isolated_falaw_cache(tmp_path, monkeypatch):
-    """Point every falaw on-disk store at a throwaway directory."""
-    monkeypatch.setenv("FALAW_DATA_DIR", str(tmp_path / "falaw-data"))
-    monkeypatch.setenv("FALAW_CACHE_DIR", str(tmp_path / "falaw-cache"))
-    yield
+def pytest_configure(config):
+    """Register the marker that opts a test out of the offline fixtures."""
+    config.addinivalue_line(
+        "markers",
+        "live_api: test calls the real fal.ai API. Gets the real asset "
+        "transport and no network guard; skipped in CI and without FAL_KEY.",
+    )
 
 
-@pytest.fixture(autouse=True)
-def fake_assets(request, monkeypatch):
-    """Replace :func:`falaw.content._http_chunks` with an in-memory transport."""
-    if request.node.get_closest_marker("live_api") is not None:
-        yield None
+def _live_api_skip_reason() -> str | None:
+    """Why ``live_api`` tests should not run here, or ``None`` to run them."""
+    if os.environ.get("CI"):
+        return "live_api tests never run in CI (would risk real spend)"
+    if not os.environ.get("FAL_KEY"):
+        return "live_api tests need FAL_KEY in the environment"
+    return None
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip ``live_api`` tests unless this machine is allowed to spend."""
+    reason = _live_api_skip_reason()
+    if reason is None:
         return
-    assets = FakeAssets()
-    monkeypatch.setattr("falaw.content._http_chunks", assets.chunks)
-    yield assets
+    skip = pytest.mark.skip(reason=reason)
+    for item in items:
+        if "live_api" in item.keywords:
+            item.add_marker(skip)

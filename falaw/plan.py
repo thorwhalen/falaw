@@ -408,10 +408,19 @@ downstream cache key.
 FETCH_BYTES_ENVVAR = "FALAW_FETCH_ARTIFACT_BYTES"
 """Env var overriding :data:`DFLT_FETCH_BYTES` process-wide.
 
-Set it to ``0`` for one legitimate case: an **offline test suite** whose
-stubbed fal responses carry URLs that resolve to nothing. It is not a
-production setting — see the ``fetch_bytes`` argument of :func:`execute` for
-what opting out costs. Read at call time, so a test can set it after import.
+Not a production setting — see the ``fetch_bytes`` argument of :func:`execute`
+for what opting out costs. Read at call time, so it can be set after import.
+
+**Do not reach for this to make a test suite offline.** It works, and that is
+the trap: it silences the network by turning content addressing **off**, so the
+suite becomes hermetic and simultaneously stops exercising the feature. Every
+``asset_id`` becomes a digest of the response rather than the SHA-256 of the
+bytes, chained calls key on URLs, and no test then covers the path production
+actually takes. Install a fake transport instead —
+:func:`falaw.testing.fake_assets` is one line in a ``conftest.py`` — and the
+suite stays offline *with* content addressing under test, on bytes it controls.
+Both consumers that hit this chose the fake for exactly that reason
+(thorwhalen/falaw#27).
 """
 
 
@@ -487,13 +496,16 @@ def execute(
             ``lacing.Artifact``'s contract. Use it only when you genuinely
             want URL-only artifacts and no reuse.
         asset_fetcher: Injected byte source (``url -> Iterable[bytes]``) used to
-            read media results; defaults to a ``urllib``-based fetcher. This is
-            the seam a **hermetic test suite** should use: a downstream suite
-            whose stubbed fal responses carry made-up URLs must inject a fake
-            transport here, or execution will reach for the network. (Setting
-            ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it
-            turns off content addressing altogether, so the suite stops
-            exercising the thing it is testing.)
+            read media results; defaults to
+            :func:`falaw.content.default_url_fetcher`. This is the per-call
+            transport seam. A **hermetic test suite** usually wants the
+            process-wide one instead — :func:`falaw.testing.fake_assets`, built
+            on :func:`falaw.content.using_url_fetcher` — because a suite
+            reaching falaw *through* its own public API has no ``execute``
+            call site to pass this to. Passing it here still wins over any
+            installed default. (``$FALAW_FETCH_ARTIFACT_BYTES=0`` also silences
+            the network, but by turning content addressing off — see
+            :data:`FETCH_BYTES_ENVVAR`.)
         concurrency: How many calls may be in flight at once. ``1``
             (:data:`DFLT_CONCURRENCY`) runs the Plan sequentially, on the
             calling thread, exactly as it always has. Above 1, independent calls
