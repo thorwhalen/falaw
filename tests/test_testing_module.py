@@ -36,7 +36,6 @@ from falaw.testing import (
     OutboundNetworkAttempt,
     blocked_outbound_network,
     is_network_url,
-    make_fake_assets_fixture,
     serving_fake_assets,
     synthetic_asset_bytes,
 )
