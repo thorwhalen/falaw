@@ -47,9 +47,7 @@ def costed_tools() -> tuple[str, ...]:
     Forgetting the tag over-meters a free tool (annoying); the inverse would
     let a new money-spender through a credit cap (a billing hole).
     """
-    return tuple(
-        sorted(t.name for t in list_tools() if FREE_TAG not in t.tags)
-    )
+    return tuple(sorted(t.name for t in list_tools() if FREE_TAG not in t.tags))
 
 
 #: Snapshot of :func:`costed_tools` for consumers that want a constant. Prefer
