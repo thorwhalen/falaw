@@ -86,13 +86,13 @@ from falaw import execute_plan_isolated
 
 report = execute_plan_isolated(plan, concurrency=8)
 
-for outcome in report.outcomes:          # always one per call, in plan order
+for outcome in report.outcomes:  # always one per call, in plan order
     if outcome.ok:
         save(outcome.artifact)
     elif outcome.status == "failed":
-        retry_later(outcome.call, outcome.error)   # retry this call verbatim
+        retry_later(outcome.call, outcome.error)  # retry this call verbatim
     else:
-        replan(outcome.call, outcome.reason)       # blocked: its input does not exist
+        replan(outcome.call, outcome.reason)  # blocked: its input does not exist
 
 report.estimated_spend_usd, report.has_unknown_costs, report.cache_hit_savings_usd
 ```
