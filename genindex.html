@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.22 documentation</title>
+  <title>Index &mdash; falaw 0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=96ec9c95"></script>
+      <script src="_static/documentation_options.js?v=3294188c"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cost.html">falaw.cost</a></li>
@@ -299,14 +300,14 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan">(class in falaw.plan)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.cast_character">cast_character() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.cast_character">(in module falaw.operations.preproduction)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.cast_voice">cast_voice() (in module falaw)</a>
 
       <ul>
@@ -333,6 +334,20 @@
       </ul></li>
       <li><a href="module_docs/falaw/local.html#falaw.local.concatenate_clips">concatenate_clips() (in module falaw.local)</a>
 </li>
+      <li><a href="module_docs/falaw.html#falaw.content_ref_for_url">content_ref_for_url() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/content.html#falaw.content.content_ref_for_url">(in module falaw.content)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/plan.html#falaw.plan.CONTENT_REF_PREFIX">CONTENT_REF_PREFIX (in module falaw.plan)</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.ContentRef">ContentRef (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/content.html#falaw.content.ContentRef">(class in falaw.content)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.CostEstimate">CostEstimate (class in falaw)</a>
 
       <ul>
@@ -369,6 +384,12 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.default_content_store">default_content_store() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/content.html#falaw.content.default_content_store">(in module falaw.content)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw/base.html#falaw.base.ModelRecord.default_negative_prompt">default_negative_prompt (falaw.base.ModelRecord attribute)</a>
 
       <ul>
@@ -383,6 +404,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/plan.html#falaw.plan.DFLT_FETCH_BYTES">DFLT_FETCH_BYTES (in module falaw.plan)</a>
+</li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.diff_against_previous">diff_against_previous() (in module falaw.refresh)</a>
 </li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.DocSource">DocSource (class in falaw.refresh)</a>
@@ -391,6 +414,12 @@
 
       <ul>
         <li><a href="module_docs/falaw/results.html#falaw.results.Asset.download">(falaw.results.Asset method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.drop_cache_entry">drop_cache_entry() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/cache.html#falaw.cache.drop_cache_entry">(in module falaw.cache)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -413,6 +442,8 @@
       </ul></li>
       <li><a href="module_docs/falaw/events.html#falaw.events.emit">emit() (in module falaw.events)</a>
 </li>
+      <li><a href="module_docs/falaw/cache.html#falaw.cache.emit_cache_hit">emit_cache_hit() (in module falaw.cache)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Environment">Environment (class in falaw)</a>
 
       <ul>
@@ -431,14 +462,14 @@
         <li><a href="module_docs/falaw/operations/preproduction.html#falaw.operations.preproduction.establish_environment">(in module falaw.operations.preproduction)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.estimate_call_cost">estimate_call_cost() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/cost.html#falaw.cost.estimate_call_cost">(in module falaw.cost)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.estimate_scene_cost">estimate_scene_cost() (in module falaw)</a>
 
       <ul>
@@ -476,6 +507,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.FalAccountLocked">FalAccountLocked</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalAccountLocked">[1]</a>
+</li>
+      <li><a href="module_docs/falaw.html#falaw.FalAssetFetchError">FalAssetFetchError</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalAssetFetchError">[1]</a>
 </li>
       <li>
     falaw
@@ -538,6 +571,13 @@
 
       <ul>
         <li><a href="module_docs/falaw/cache.html#module-falaw.cache">module</a>
+</li>
+      </ul></li>
+      <li>
+    falaw.content
+
+      <ul>
+        <li><a href="module_docs/falaw/content.html#module-falaw.content">module</a>
 </li>
       </ul></li>
       <li>
@@ -715,6 +755,8 @@
       <li><a href="module_docs/falaw.html#falaw.FalTimeout">FalTimeout</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalTimeout">[1]</a>
 </li>
       <li><a href="module_docs/falaw.html#falaw.FalUnauthorized">FalUnauthorized</a>, <a href="module_docs/falaw/errors.html#falaw.errors.FalUnauthorized">[1]</a>
+</li>
+      <li><a href="module_docs/falaw/plan.html#falaw.plan.FETCH_BYTES_ENVVAR">FETCH_BYTES_ENVVAR (in module falaw.plan)</a>
 </li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.fetch_if_changed">fetch_if_changed() (in module falaw.refresh)</a>
 </li>
@@ -907,6 +949,8 @@
         <li><a href="module_docs/falaw/bridges/skill.html#module-falaw.bridges.skill">falaw.bridges.skill</a>
 </li>
         <li><a href="module_docs/falaw/cache.html#module-falaw.cache">falaw.cache</a>
+</li>
+        <li><a href="module_docs/falaw/content.html#module-falaw.content">falaw.content</a>
 </li>
         <li><a href="module_docs/falaw/core.html#module-falaw.core">falaw.core</a>
 </li>
@@ -1143,9 +1187,11 @@
         <li><a href="module_docs/falaw/registry.html#falaw.registry.register_tool">(in module falaw.registry)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.register_tools">register_tools() (in module falaw.bridges.mcp)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.register_tools">register_tools() (in module falaw.bridges.mcp)</a>
+      <li><a href="module_docs/falaw/content.html#falaw.content.remembered_ref">remembered_ref() (in module falaw.content)</a>
 </li>
       <li><a href="module_docs/falaw.html#falaw.remove_background">remove_background() (in module falaw)</a>
 
@@ -1369,14 +1415,16 @@
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Scene.with_beat">(falaw.scene.Scene method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.Plan.with_call_replaced">with_call_replaced() (falaw.Plan method)</a>
 
       <ul>
         <li><a href="module_docs/falaw/plan.html#falaw.plan.Plan.with_call_replaced">(falaw.plan.Plan method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/content.html#falaw.content.write_blob_to_file">write_blob_to_file() (in module falaw.content)</a>
+</li>
       <li><a href="module_docs/falaw/bridges/skill.html#falaw.bridges.skill.write_skill_files">write_skill_files() (in module falaw.bridges.skill)</a>
 </li>
   </ul></td>

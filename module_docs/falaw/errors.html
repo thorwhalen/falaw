@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.errors &mdash; falaw 0.0.22 documentation</title>
+  <title>falaw.errors &mdash; falaw 0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=96ec9c95"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -58,11 +58,13 @@
 <li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.errors</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalAccountLocked"><code class="docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalAssetFetchError"><code class="docutils literal notranslate"><span class="pre">FalAssetFetchError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalBadRequest"><code class="docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalDurationOutOfRange"><code class="docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.errors.FalError"><code class="docutils literal notranslate"><span class="pre">FalError</span></code></a></li>
@@ -157,6 +159,18 @@ typed subclass — <a class="reference internal" href="core.html#falaw.core.call
 <p>Typical 403 with a body indicating the account is not in good standing.
 No amount of retrying or model-switching will fix this — the user has
 to act (verify email, top up billing, contact support).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalAssetFetchError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalAssetFetchError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseException</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/errors.html#FalAssetFetchError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalAssetFetchError" title="Link to this definition"></a></dt>
+<dd><p>The bytes behind a fal-served asset URL could not be retrieved.</p>
+<p>Raised by <a class="reference internal" href="content.html#module-falaw.content" title="falaw.content"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.content</span></code></a> when content-addressing an artifact fails —
+the URL 404s (fal deletes expired files permanently), the transfer errors,
+or the response is empty. It is deliberately <strong>loud</strong>: returning an
+Artifact whose <code class="docutils literal notranslate"><span class="pre">asset_id</span></code> is not the SHA-256 of any bytes would break
+<code class="docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>’s content-hash contract and poison every downstream
+cache key derived from it.</p>
 </dd></dl>
 
 <dl class="py exception">

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.22 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=96ec9c95"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -24,7 +24,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="falaw.core" href="core.html" />
+    <link rel="next" title="falaw.content" href="content.html" />
     <link rel="prev" title="falaw.bridges.skill" href="bridges/skill.html" /> 
 </head>
 
@@ -62,9 +62,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.cache.cache_put"><code class="docutils literal notranslate"><span class="pre">cache_put()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.cache.cache_stats"><code class="docutils literal notranslate"><span class="pre">cache_stats()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.cache.cached_call_fal"><code class="docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cache.drop_cache_entry"><code class="docutils literal notranslate"><span class="pre">drop_cache_entry()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.cache.emit_cache_hit"><code class="docutils literal notranslate"><span class="pre">emit_cache_hit()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.cache.materialize_asset"><code class="docutils literal notranslate"><span class="pre">materialize_asset()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
@@ -131,6 +134,14 @@ paths. We persist both the JSON manifest and the binary downloads.</p></li>
 <li><p>The cache is <em>per-process</em> aware via lru_cache for hot lookups;
 on-disk for persistence across runs.</p></li>
 </ul>
+<p><strong>The key arguments are not always the wire arguments.</strong> A chained plan
+(<code class="docutils literal notranslate"><span class="pre">generate_image</span></code> → <code class="docutils literal notranslate"><span class="pre">image_to_video</span></code>) sends fal a <em>URL</em> for the upstream
+image, but a URL is minted fresh per upload — so keying on it guarantees a
+miss the moment the upstream is genuinely re-executed, and the miss re-bills
+the expensive downstream call for unchanged work. <a class="reference internal" href="#falaw.cache.cached_call_fal" title="falaw.cache.cached_call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a>
+therefore takes an optional <code class="docutils literal notranslate"><span class="pre">key_arguments</span></code>: the same call with upstream
+references resolved to <strong>content hashes</strong> (<code class="docutils literal notranslate"><span class="pre">sha256:&lt;hex&gt;</span></code>) instead of URLs.
+See <a class="reference internal" href="content.html#module-falaw.content" title="falaw.content"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.content</span></code></a> for how those hashes are produced.</p>
 <p>Usage:</p>
 <blockquote>
 <div><p>from falaw.cache import cached_call_fal
@@ -146,8 +157,22 @@ the network when the (model_id, arguments) tuple was seen before.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.cache.cache_put">
-<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cache_put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cache_put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cache_put" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cache_put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wire_arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cache_put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cache_put" title="Link to this definition"></a></dt>
 <dd><p>Persist a fal response. Returns the entry directory path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> – fal model id.</p></li>
+<li><p><strong>arguments</strong> – the arguments the entry is <strong>keyed</strong> on.</p></li>
+<li><p><strong>raw</strong> – the fal response to store.</p></li>
+<li><p><strong>note</strong> – free-form label recorded in the manifest.</p></li>
+<li><p><strong>wire_arguments</strong> – the arguments actually sent to fal, when they differ
+from the key arguments (chained calls send URLs but are keyed on
+content hashes). Recorded for debugging only — it never affects
+the key.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -158,13 +183,18 @@ the network when the (model_id, arguments) tuple was seen before.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.cache.cached_call_fal">
-<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cached_call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cached_call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cached_call_fal" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cached_call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#cached_call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cached_call_fal" title="Link to this definition"></a></dt>
 <dd><p>Call a fal model, but reuse the cached response when present.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>application</strong> – fal model id.</p></li>
-<li><p><strong>arguments</strong> – model input dict.</p></li>
+<li><p><strong>arguments</strong> – model input dict — what is sent <strong>on the wire</strong>.</p></li>
+<li><p><strong>key_arguments</strong> – what the cache entry is <strong>keyed</strong> on, when that differs
+from what goes on the wire. Defaults to <code class="docutils literal notranslate"><span class="pre">arguments</span></code>. The split
+exists because a chained call must send fal an expiring URL for its
+upstream input while being keyed on that input’s <em>content hash</em>, so
+a byte-identical upstream regeneration hits instead of re-billing.</p></li>
 <li><p><strong>refresh</strong> – if True, bypass the cache and overwrite it with a fresh result.</p></li>
 <li><p><strong>on_event</strong> – Per-call subscriber for <a class="reference internal" href="events.html#falaw.events.ProgressEvent" title="falaw.events.ProgressEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.events.ProgressEvent</span></code></a>.
 On a cache hit, a synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> event is emitted so
@@ -178,11 +208,69 @@ UIs can show “skipped” instead of “running”.</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.drop_cache_entry">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">drop_cache_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#drop_cache_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.drop_cache_entry" title="Link to this definition"></a></dt>
+<dd><p>Delete the cache entry for <code class="docutils literal notranslate"><span class="pre">(application,</span> <span class="pre">arguments)</span></code>. Returns whether one existed.</p>
+<p>The counterpart to <a class="reference internal" href="#falaw.cache.cache_put" title="falaw.cache.cache_put"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_put()</span></code></a>, and the mechanism that keeps a cache
+from becoming a <em>trap</em>. An entry whose response can no longer be turned
+into a usable artifact — fal deleted the URL and the bytes are not in the
+content store — must be a <strong>miss</strong>, not a permanent failure: without this,
+the only escape is <code class="docutils literal notranslate"><span class="pre">use_cache=False</span></code>, which re-bills the whole plan
+rather than the one dead call. <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> calls it.</p>
+<p>Only the manifest is removed. Blobs in the content store are shared by
+content hash across entries and are never dropped from here.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.emit_cache_hit">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">emit_cache_hit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#emit_cache_hit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.emit_cache_hit" title="Link to this definition"></a></dt>
+<dd><p>Emit the synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> progress event for <code class="docutils literal notranslate"><span class="pre">application</span></code>.</p>
+<p>Shared by <a class="reference internal" href="#falaw.cache.cached_call_fal" title="falaw.cache.cached_call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a> and <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> (which
+drives the cache directly, because it must decide whether a hit is
+<em>usable</em> before committing to it) so a UI sees one event shape either way.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.cache.materialize_asset">
-<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">materialize_asset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#materialize_asset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.materialize_asset" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">materialize_asset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/cache.html#materialize_asset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.materialize_asset" title="Link to this definition"></a></dt>
 <dd><p>Download a remote asset to the cache and return the local path.</p>
-<p>The local filename is content-addressed by the URL, so calling this
-twice for the same URL is free.</p>
+<p>The local filename is content-addressed by the asset’s <strong>bytes</strong>, so two
+URLs serving identical bytes resolve to one file. The extension is a
+presentational hint for ffmpeg/PIL; the SHA-256 is the address.</p>
+<p>Repeat calls are free, in three widening circles — this is what makes it
+safe to call from a loop over 200 shots:</p>
+<ol class="arabic simple">
+<li><p>the file is already on disk here (no store lookup, no network);</p></li>
+<li><p>the bytes are in the content store (no network) — so it still works
+after fal has expired the URL;</p></li>
+<li><p>otherwise, one download.</p></li>
+</ol>
+<p>Circle 1 matters on its own: the content store is prunable, so an asset
+can survive as a materialized file after its blob is gone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – the remote asset URL. <code class="docutils literal notranslate"><span class="pre">file://</span></code> is supported and is used
+deliberately by downstream packages for locally-rendered media.</p></li>
+<li><p><strong>key_hint</strong> – optional human-readable filename prefix.</p></li>
+<li><p><strong>store</strong> – injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
+<a class="reference internal" href="content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>.</p></li>
+<li><p><strong>fetcher</strong> – injected byte source (<code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">Iterable[bytes]</span></code>); defaults to
+the <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based one. The seam for custom transport (auth
+headers, retries) and for a hermetic test suite.</p></li>
+<li><p><strong>refresh</strong> – re-fetch even when a remembered content hash exists. Pass this
+for a <strong>mutable</strong> URL — the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">hash</span></code> hint index assumes the
+URL is immutable, which is true of fal’s own but not of an
+arbitrary one.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="errors.html#falaw.errors.FalAssetFetchError" title="falaw.errors.FalAssetFetchError"><strong>falaw.errors.FalAssetFetchError</strong></a> – the bytes could not be retrieved.
+    Unlike a generated-media artifact (which degrades to URL-only —
+    see <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a>), there is nothing to degrade to
+    here: the caller asked for a local file.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -192,7 +280,7 @@ twice for the same URL is free.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="bridges/skill.html" class="btn btn-neutral float-left" title="falaw.bridges.skill" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="core.html" class="btn btn-neutral float-right" title="falaw.core" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="content.html" class="btn btn-neutral float-right" title="falaw.content" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

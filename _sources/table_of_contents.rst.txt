@@ -11,6 +11,7 @@
    module_docs/falaw/bridges/service
    module_docs/falaw/bridges/skill
    module_docs/falaw/cache
+   module_docs/falaw/content
    module_docs/falaw/core
    module_docs/falaw/corpus
    module_docs/falaw/cost

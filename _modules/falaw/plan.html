@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.22 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=96ec9c95"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
@@ -168,6 +169,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">replace</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -484,6 +486,14 @@
 
 <span class="sd">    When ``consult_cache=False`` (e.g. for unit tests or &quot;what would a fresh</span>
 <span class="sd">    run cost?&quot; reporting), ``cache_status`` is ``&quot;unknown&quot;``.</span>
+
+<span class="sd">    Known gap (falaw#15): the peek uses the *unresolved* arguments, so for a</span>
+<span class="sd">    chained call — one whose arguments still hold a ``&lt;from N&gt;`` placeholder —</span>
+<span class="sd">    it keys on the placeholder rather than on the upstream content ref</span>
+<span class="sd">    :func:`execute` will key on. ``cache_status`` is therefore not to be</span>
+<span class="sd">    trusted for chained calls, and a plan&#39;s reported cost can understate what</span>
+<span class="sd">    the run bills. Fixing it needs the upstream to have executed, which is a</span>
+<span class="sd">    planner-level change, not a converter-level one.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">CacheStatus</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="k">if</span> <span class="n">consult_cache</span><span class="p">:</span>
@@ -517,6 +527,34 @@
 <span class="n">ResultToArtifact</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">CallPlan</span><span class="p">],</span> <span class="s2">&quot;Artifact&quot;</span><span class="p">]</span>  <span class="c1"># noqa: F821</span>
 
 
+<span class="n">DFLT_FETCH_BYTES</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="sd">&quot;&quot;&quot;Whether :func:`execute` downloads media results to content-address them.</span>
+
+<span class="sd">True — an artifact whose ``asset_id`` is not the SHA-256 of its bytes breaks</span>
+<span class="sd">``lacing.Artifact``&#39;s contract and puts an expiring location into every</span>
+<span class="sd">downstream cache key.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">FETCH_BYTES_ENVVAR</span> <span class="o">=</span> <span class="s2">&quot;FALAW_FETCH_ARTIFACT_BYTES&quot;</span>
+<span class="sd">&quot;&quot;&quot;Env var overriding :data:`DFLT_FETCH_BYTES` process-wide.</span>
+
+<span class="sd">Set it to ``0`` for one legitimate case: an **offline test suite** whose</span>
+<span class="sd">stubbed fal responses carry URLs that resolve to nothing. It is not a</span>
+<span class="sd">production setting — see the ``fetch_bytes`` argument of :func:`execute` for</span>
+<span class="sd">what opting out costs. Read at call time, so a test can set it after import.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_bytes_default</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the effective ``fetch_bytes`` default from the environment.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">FETCH_BYTES_ENVVAR</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DFLT_FETCH_BYTES</span>
+    <span class="k">return</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;off&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="execute">
 <a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.execute">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
@@ -526,6 +564,9 @@
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">artifact_converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultToArtifact</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fetch_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">asset_fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a Plan, returning a list of materialized :class:`lacing.Artifact`s.</span>
 
@@ -540,16 +581,75 @@
 <span class="sd">        artifact_converter: Per-CallPlan converter from raw fal response to</span>
 <span class="sd">            :class:`lacing.Artifact`. When ``None`` (default), a built-in</span>
 <span class="sd">            converter handles the common shapes (``{images: [{url}]}``,</span>
-<span class="sd">            ``{video: {url}}``, ``{audio: {url}}``).</span>
+<span class="sd">            ``{video: {url}}``, ``{audio: {url}}``). Mutually exclusive with</span>
+<span class="sd">            ``content_store`` / ``fetch_bytes`` / ``asset_fetcher``, which</span>
+<span class="sd">            configure the built-in converter only — passing both raises, rather</span>
+<span class="sd">            than silently ignoring the ones a custom converter cannot honour.</span>
+<span class="sd">        content_store: Injected :class:`lacing.ArtifactStore` that media bytes</span>
+<span class="sd">            are materialized into. Defaults to</span>
+<span class="sd">            :func:`falaw.content.default_content_store` (a directory store</span>
+<span class="sd">            rooted in the falaw cache). Point this at an S3-backed store to</span>
+<span class="sd">            share content — and therefore cache hits — across machines.</span>
+<span class="sd">        fetch_bytes: Whether to download each media result so its ``asset_id``</span>
+<span class="sd">            is the SHA-256 of its bytes. Defaults to :data:`DFLT_FETCH_BYTES`</span>
+<span class="sd">            (true), overridable process-wide via :data:`FETCH_BYTES_ENVVAR`.</span>
+<span class="sd">            **Opting out forfeits caching for chained calls**: without bytes</span>
+<span class="sd">            there is no content hash, so downstream calls fall back to keying</span>
+<span class="sd">            on the upstream URL — which fal mints fresh per upload, so the</span>
+<span class="sd">            downstream entry can never be reused across runs or machines. It</span>
+<span class="sd">            also means ``asset_id`` is *not* a content hash, in violation of</span>
+<span class="sd">            ``lacing.Artifact``&#39;s contract. Use it only when you genuinely</span>
+<span class="sd">            want URL-only artifacts and no reuse.</span>
+<span class="sd">        asset_fetcher: Injected byte source (``url -&gt; Iterable[bytes]``) used to</span>
+<span class="sd">            read media results; defaults to a ``urllib``-based fetcher. This is</span>
+<span class="sd">            the seam a **hermetic test suite** should use: a downstream suite</span>
+<span class="sd">            whose stubbed fal responses carry made-up URLs must inject a fake</span>
+<span class="sd">            transport here, or execution will reach for the network. (Setting</span>
+<span class="sd">            ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it</span>
+<span class="sd">            turns off content addressing altogether, so the suite stops</span>
+<span class="sd">            exercising the thing it is testing.)</span>
 
-<span class="sd">    Placeholder resolution</span>
-<span class="sd">    ----------------------</span>
+<span class="sd">    Failure handling — a paid result is never discarded</span>
+<span class="sd">    ---------------------------------------------------</span>
+<span class="sd">    Two different things can go wrong when reading a result&#39;s bytes, and they</span>
+<span class="sd">    get two different answers:</span>
+
+<span class="sd">    - **A fresh call whose bytes cannot be fetched.** fal has already run — and</span>
+<span class="sd">      billed — the generation. Raising would throw away a result we paid for,</span>
+<span class="sd">      typically over a transient network failure. So the artifact **degrades**:</span>
+<span class="sd">      ``url`` is kept, ``bytes_size`` stays 0, ``asset_id`` is a digest of the</span>
+<span class="sd">      response and is *not* claimed to be a content hash, and a</span>
+<span class="sd">      :class:`UserWarning` is emitted. Downstream key resolution reads</span>
+<span class="sd">      ``bytes_size == 0`` and falls back to the URL — a guaranteed cache</span>
+<span class="sd">      *miss*, never a wrong hit.</span>
+<span class="sd">    - **A cache hit that cannot be materialized** — fal deleted the URL and the</span>
+<span class="sd">      bytes are not in the content store. The entry is unusable, so it is</span>
+<span class="sd">      treated as a **miss**: it is invalidated and the call re-executed once.</span>
+<span class="sd">      A cache must never become a trap whose only escape is re-billing the</span>
+<span class="sd">      whole plan with ``use_cache=False``.</span>
+
+<span class="sd">    Placeholder resolution — the wire/key split</span>
+<span class="sd">    -------------------------------------------</span>
 <span class="sd">    Any string argument equal to ``&quot;&lt;from N&gt;&quot;`` (for an integer ``N``) is</span>
-<span class="sd">    rewritten to ``artifacts[N].url`` *just before* the call is made — so</span>
-<span class="sd">    a multi-step plan (e.g. generate_image → image_to_video) can reference</span>
-<span class="sd">    the upstream output without the planner needing to know its URL. The</span>
-<span class="sd">    rewrite happens after the upstream call has executed; planning itself</span>
-<span class="sd">    is unaffected.</span>
+<span class="sd">    rewritten *just before* the call is made — so a multi-step plan (e.g.</span>
+<span class="sd">    generate_image → image_to_video) can reference the upstream output without</span>
+<span class="sd">    the planner needing to know its URL. The rewrite happens after the upstream</span>
+<span class="sd">    call has executed; planning itself is unaffected.</span>
+
+<span class="sd">    It happens **twice**, into two different argument sets, because the same</span>
+<span class="sd">    value cannot serve both jobs:</span>
+
+<span class="sd">    - the **wire** arguments get ``artifacts[N].url`` — what fal needs in order</span>
+<span class="sd">      to fetch the input;</span>
+<span class="sd">    - the **key** arguments get ``sha256:&lt;artifacts[N].asset_id&gt;`` — the</span>
+<span class="sd">      upstream&#39;s content hash, so a byte-identical upstream regeneration</span>
+<span class="sd">      produces a downstream cache *hit* instead of re-billing the expensive</span>
+<span class="sd">      call. Keying on the URL instead is the defect this split exists to fix</span>
+<span class="sd">      (falaw#14): fal mints a unique URL per upload, so a URL-keyed downstream</span>
+<span class="sd">      entry is unreachable the moment the upstream genuinely re-runs.</span>
+
+<span class="sd">    An upstream artifact with no materialized bytes has no content hash, so its</span>
+<span class="sd">    key ref falls back to the URL — a guaranteed miss, never a wrong hit.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,</span>
@@ -560,37 +660,241 @@
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
 
-    <span class="n">converter</span> <span class="o">=</span> <span class="n">artifact_converter</span> <span class="ow">or</span> <span class="n">_default_artifact_converter</span>
+    <span class="k">if</span> <span class="n">artifact_converter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_refuse_converter_configuration</span><span class="p">(</span><span class="n">content_store</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">)</span>
+        <span class="n">converter</span> <span class="o">=</span> <span class="n">artifact_converter</span>
+        <span class="c1"># A custom converter defines its own notion of a usable artifact, so we</span>
+        <span class="c1"># do not second-guess its cache hits.</span>
+        <span class="n">usable_from_cache</span> <span class="o">=</span> <span class="n">_always_usable</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wants_bytes</span> <span class="o">=</span> <span class="n">_fetch_bytes_default</span><span class="p">()</span> <span class="k">if</span> <span class="n">fetch_bytes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">fetch_bytes</span>
+        <span class="n">converter</span> <span class="o">=</span> <span class="n">_make_artifact_converter</span><span class="p">(</span>
+            <span class="n">content_store</span><span class="o">=</span><span class="n">content_store</span><span class="p">,</span>
+            <span class="n">fetch_bytes</span><span class="o">=</span><span class="n">wants_bytes</span><span class="p">,</span>
+            <span class="n">asset_fetcher</span><span class="o">=</span><span class="n">asset_fetcher</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">usable_from_cache</span> <span class="o">=</span> <span class="n">_make_usability_check</span><span class="p">(</span><span class="n">fetch_bytes</span><span class="o">=</span><span class="n">wants_bytes</span><span class="p">)</span>
 
     <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Artifact</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">:</span>
-        <span class="n">resolved_args</span> <span class="o">=</span> <span class="n">_resolve_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_call_fal</span>
-
-            <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">resolved_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_fal</span>
-
-            <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">resolved_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
-        <span class="n">artifacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">))</span>
+        <span class="n">wire_args</span> <span class="o">=</span> <span class="n">_resolve_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">_wire_ref</span><span class="p">)</span>
+        <span class="c1"># Only resolved when it will be used — the key ref is stricter than the</span>
+        <span class="c1"># wire ref (it needs bytes *or* a URL), and an uncached run must not</span>
+        <span class="c1"># inherit that stricter requirement.</span>
+        <span class="n">key_args</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_resolve_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">_key_ref</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">use_cache</span>
+            <span class="k">else</span> <span class="n">wire_args</span>
+        <span class="p">)</span>
+        <span class="n">artifacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">_execute_call</span><span class="p">(</span>
+                <span class="n">call</span><span class="p">,</span>
+                <span class="n">wire_args</span><span class="p">,</span>
+                <span class="n">key_args</span><span class="p">,</span>
+                <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
+                <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
+                <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+                <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">artifacts</span></div>
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_execute_call</span><span class="p">(</span>
+    <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span>
+    <span class="n">wire_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">key_args</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">converter</span><span class="p">:</span> <span class="s2">&quot;ResultToArtifact&quot;</span><span class="p">,</span>
+    <span class="n">usable_from_cache</span><span class="p">,</span>
+    <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">on_event</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run one :class:`CallPlan`, returning its Artifact. See :func:`execute`.</span>
+
+<span class="sd">    Split out of the loop because a cache hit is not unconditionally usable:</span>
+<span class="sd">    the response may name an asset fal has since deleted, whose bytes are not</span>
+<span class="sd">    in the content store. That entry can never become an artifact again, so it</span>
+<span class="sd">    is dropped and the call re-executed — the alternative is a cache entry that</span>
+<span class="sd">    fails forever and can only be escaped by re-billing the entire plan.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_call_fal</span><span class="p">,</span> <span class="n">drop_cache_entry</span><span class="p">,</span> <span class="n">emit_cache_hit</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_fal</span>
+
+    <span class="n">key_arguments</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">key_args</span> <span class="ow">is</span> <span class="n">wire_args</span> <span class="k">else</span> <span class="n">key_args</span>
+    <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_get</span>
+
+        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">key_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Speculative: the conversion may turn out to be unusable, in which</span>
+            <span class="c1"># case its own complaints are noise the caller must not see (we are</span>
+            <span class="c1"># about to discard the artifact and say something more useful). Any</span>
+            <span class="c1"># warning from a conversion we *keep* is replayed verbatim.</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">probe_warnings</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+                <span class="n">artifact</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">usable_from_cache</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">hit</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">probe_warnings</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn_explicit</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">lineno</span><span class="p">)</span>
+                <span class="n">emit_cache_hit</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">on_event</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">artifact</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dropping the falaw cache entry for </span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">!r}</span><span class="s2">: its &quot;</span>
+                <span class="s2">&quot;recorded result names an asset that can no longer be read &quot;</span>
+                <span class="s2">&quot;(fal-served URLs expire and are permanently deleted, and the &quot;</span>
+                <span class="s2">&quot;bytes are not in the content store). Re-executing the call — &quot;</span>
+                <span class="s2">&quot;this one costs money.&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">drop_cache_entry</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">key_args</span><span class="p">)</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span>
+            <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+            <span class="n">wire_args</span><span class="p">,</span>
+            <span class="n">key_arguments</span><span class="o">=</span><span class="n">key_arguments</span><span class="p">,</span>
+            <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">wire_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_content_ref_or_none</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_store</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(ContentRef | None, store)`` for ``url`` — ``None`` on a fetch failure.</span>
+
+<span class="sd">    fal has already run and **billed** the generation by the time we get here,</span>
+<span class="sd">    so a failure to read the bytes must not throw the result away: a transient</span>
+<span class="sd">    network error would turn a paid render into nothing at all. The caller</span>
+<span class="sd">    degrades to a URL-only artifact instead, and this function makes the</span>
+<span class="sd">    failure loud rather than silent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">content_ref_for_url</span><span class="p">,</span> <span class="n">default_content_store</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FalAssetFetchError</span>
+
+    <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">content_store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">content_store</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span><span class="o">=</span><span class="n">asset_fetcher</span><span class="p">),</span> <span class="n">store</span>
+    <span class="k">except</span> <span class="n">FalAssetFetchError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> Falling back to a URL-only artifact: `asset_id` is a digest &quot;</span>
+            <span class="s2">&quot;of the response, NOT a content hash, and `bytes_size` is 0. &quot;</span>
+            <span class="s2">&quot;Chained calls downstream of it cannot be cache-reused, and the &quot;</span>
+            <span class="s2">&quot;artifact dies with the URL.&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">store</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_always_usable</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_usability_check</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether a cache hit converted by the **built-in** converter is usable.</span>
+
+<span class="sd">    Unusable means exactly one thing: bytes were wanted, the recorded response</span>
+<span class="sd">    names an asset, and the artifact came back with none — so the bytes are</span>
+<span class="sd">    neither behind the URL nor in the content store, and no amount of retrying</span>
+<span class="sd">    the *cache* will produce them.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">usable</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fetch_bytes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">artifact</span><span class="o">.</span><span class="n">bytes_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">_extract_first_url</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">usable</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_refuse_converter_configuration</span><span class="p">(</span><span class="n">content_store</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reject ``artifact_converter=`` combined with built-in-converter knobs.</span>
+
+<span class="sd">    ``content_store`` / ``fetch_bytes`` / ``asset_fetcher`` configure the</span>
+<span class="sd">    built-in converter and are structurally unreachable from a custom one.</span>
+<span class="sd">    Accepting them silently is worse than useless: a caller pointing falaw at a</span>
+<span class="sd">    shared S3 content store *and* supplying a converter would get an empty</span>
+<span class="sd">    store and no indication why.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">supplied</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">name</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">&quot;content_store&quot;</span><span class="p">,</span> <span class="n">content_store</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;fetch_bytes&quot;</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;asset_fetcher&quot;</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">supplied</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;execute(artifact_converter=...) cannot be combined with &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supplied</span><span class="p">)</span><span class="si">}</span><span class="s2"> — those configure the built-in converter &quot;</span>
+            <span class="s2">&quot;and a custom converter cannot honour them. Configure your &quot;</span>
+            <span class="s2">&quot;converter directly (see falaw.plan._artifact_from_response for &quot;</span>
+            <span class="s2">&quot;the built-in one), or drop artifact_converter.&quot;</span>
+        <span class="p">)</span>
+
+
 <span class="n">_PLACEHOLDER_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;&lt;from &quot;</span>
 
+<span class="n">CONTENT_REF_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;sha256:&quot;</span>
+<span class="sd">&quot;&quot;&quot;Prefix marking a content hash where a cache key would otherwise hold a URL.</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_placeholders</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rewrite ``&lt;from N&gt;`` strings in ``arguments`` to ``artifacts[N].url``.</span>
+<span class="sd">Self-describing on purpose: a reader of a cache manifest can tell at a glance</span>
+<span class="sd">that an argument was keyed on *what the upstream produced* rather than *where</span>
+<span class="sd">it was served from*, and the prefixed form can never be confused with a</span>
+<span class="sd">literal URL argument.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<span class="sd">    Only top-level string values are rewritten; nested dicts/lists are</span>
-<span class="sd">    recursed into. ``arguments`` is not modified — a new dict is returned</span>
-<span class="sd">    when any rewrite happens, otherwise the original is returned.</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_wire_ref</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What a ``&lt;from N&gt;`` reference becomes **on the wire** — the upstream URL.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact[</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] but it has no URL.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_key_ref</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What a ``&lt;from N&gt;`` reference becomes **in the cache key**.</span>
+
+<span class="sd">    The upstream&#39;s content hash (``sha256:&lt;hex&gt;``) whenever its bytes were</span>
+<span class="sd">    materialized — that is what makes a byte-identical upstream regeneration</span>
+<span class="sd">    hit downstream. ``bytes_size &gt; 0`` is the signal that ``asset_id`` really</span>
+<span class="sd">    is the SHA-256 of those bytes; it holds for falaw&#39;s own converter and is</span>
+<span class="sd">    the contract a custom ``artifact_converter`` must honour.</span>
+
+<span class="sd">    With no bytes there is no content identity, so we fall back to the URL:</span>
+<span class="sd">    sound but unreusable (a fresh URL each upload ⇒ a guaranteed miss), which</span>
+<span class="sd">    is strictly better than inventing an id that could produce a *wrong* hit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">artifact</span><span class="o">.</span><span class="n">bytes_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">CONTENT_REF_PREFIX</span><span class="si">}{</span><span class="n">artifact</span><span class="o">.</span><span class="n">asset_id</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact[</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] but it has &quot;</span>
+        <span class="s2">&quot;neither materialized bytes nor a URL.&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_placeholders</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rewrite ``&lt;from N&gt;`` strings in ``arguments`` via ``ref(artifact, idx, ph)``.</span>
+
+<span class="sd">    Only string values are rewritten; nested dicts/lists/tuples are recursed</span>
+<span class="sd">    into. ``arguments`` is not modified — a new dict is returned when any</span>
+<span class="sd">    rewrite happens, otherwise the original object is returned (identity that</span>
+<span class="sd">    :func:`execute` uses to detect &quot;wire and key arguments are the same&quot;).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_placeholder</span><span class="p">(</span><span class="n">arguments</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">arguments</span>
-    <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_has_placeholder</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
@@ -603,20 +907,20 @@
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ref</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_lookup_artifact_url</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_lookup_artifact_ref</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_resolve</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_lookup_artifact_url</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse ``&quot;&lt;from N&gt;&quot;`` and return ``artifacts[N].url``.&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_lookup_artifact_ref</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse ``&quot;&lt;from N&gt;&quot;`` and return ``ref(artifacts[N], N, placeholder)``.&quot;&quot;&quot;</span>
     <span class="n">body</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
@@ -629,12 +933,7 @@
             <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;but only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">)</span><span class="si">}</span><span class="s2"> artifact(s) have been materialized.&quot;</span>
         <span class="p">)</span>
-    <span class="n">artifact</span> <span class="o">=</span> <span class="n">artifacts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact[</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">] but it has no URL.&quot;</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">artifact</span><span class="o">.</span><span class="n">url</span>
+    <span class="k">return</span> <span class="n">ref</span><span class="p">(</span><span class="n">artifacts</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">idx</span><span class="p">,</span> <span class="n">placeholder</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_synthetic_artifact</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
@@ -650,9 +949,9 @@
         <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-    <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
+    <span class="n">synthetic_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
-        <span class="n">asset_id</span><span class="o">=</span><span class="n">fake_id</span><span class="p">,</span>
+        <span class="n">asset_id</span><span class="o">=</span><span class="n">synthetic_id</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -661,7 +960,7 @@
         <span class="n">mime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">provenance</span><span class="o">=</span><span class="n">_dry_run_provenance</span><span class="p">(</span><span class="n">call</span><span class="p">),</span>
         <span class="n">cost_usd</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-        <span class="n">producer_call_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dry-run:</span><span class="si">{</span><span class="n">fake_id</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">producer_call_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dry-run:</span><span class="si">{</span><span class="n">synthetic_id</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -678,7 +977,38 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_default_artifact_converter</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_artifact_converter</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultToArtifact</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build the default raw-response → :class:`lacing.Artifact` converter.</span>
+
+<span class="sd">    A factory rather than a plain function because the conversion needs three</span>
+<span class="sd">    injected decisions — *which* content store the bytes land in, *how* they</span>
+<span class="sd">    are read, and whether to read them at all — while :data:`ResultToArtifact`</span>
+<span class="sd">    (the pluggable converter contract every caller may implement) stays a</span>
+<span class="sd">    two-argument callable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_artifact_from_response</span><span class="p">(</span>
+            <span class="n">raw</span><span class="p">,</span>
+            <span class="n">call</span><span class="p">,</span>
+            <span class="n">content_store</span><span class="o">=</span><span class="n">content_store</span><span class="p">,</span>
+            <span class="n">fetch_bytes</span><span class="o">=</span><span class="n">fetch_bytes</span><span class="p">,</span>
+            <span class="n">asset_fetcher</span><span class="o">=</span><span class="n">asset_fetcher</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">convert</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_artifact_from_response</span><span class="p">(</span>
+    <span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fetch_bytes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">asset_fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a fal response to an Artifact using the common response shapes.</span>
 
 <span class="sd">    Handles these patterns observed across fal models:</span>
@@ -694,15 +1024,40 @@
 <span class="sd">    with ``num_images &gt; 1``), only the first asset becomes an Artifact —</span>
 <span class="sd">    callers wanting all assets should provide their own converter.</span>
 
-<span class="sd">    For media calls the Artifact&#39;s ``asset_id`` is the SHA-256 of the URL and</span>
-<span class="sd">    ``bytes_size`` is 0 (we don&#39;t download by default). For ``json`` / ``text``</span>
-<span class="sd">    calls with **no URL** — the ``fal-ai/any-llm`` case — the textual response</span>
-<span class="sd">    is *materialized* to a content-addressed file in the falaw cache and</span>
-<span class="sd">    ``Artifact.path`` points at it (``asset_id`` is the SHA-256 of the</span>
-<span class="sd">    content). So ``execute`` returns a usable Artifact regardless of kind:</span>
-<span class="sd">    media via ``url``, LLM output via ``path``.</span>
+<span class="sd">    Every Artifact is **content-addressed**: ``asset_id`` is the SHA-256 of the</span>
+<span class="sd">    artifact&#39;s bytes, as ``lacing.Artifact`` contractually requires.</span>
+
+<span class="sd">    - Media calls: the bytes are streamed once into ``content_store`` (see</span>
+<span class="sd">      :mod:`falaw.content`), ``bytes_size`` is their real length, ``url`` is</span>
+<span class="sd">      kept as a *hint*, and the artifact survives fal deleting the URL because</span>
+<span class="sd">      the bytes are in the store. ``path`` is set when the store exposes a</span>
+<span class="sd">      local file for the blob (the directory-backed default does; an in-memory</span>
+<span class="sd">      or object-store one returns ``None`` — read those through</span>
+<span class="sd">      ``ArtifactStore.iter_blob(asset_id)``). Re-converting the same response</span>
+<span class="sd">      later is download-free (the ``url -&gt; content hash`` index).</span>
+<span class="sd">    - ``json`` / ``text`` calls with **no URL** — the ``fal-ai/any-llm`` case:</span>
+<span class="sd">      the textual response is materialized to a content-addressed file in the</span>
+<span class="sd">      falaw cache and ``Artifact.path`` points at it.</span>
+
+<span class="sd">    Degraded (URL-only) artifacts</span>
+<span class="sd">    -----------------------------</span>
+<span class="sd">    Two cases produce an Artifact whose ``asset_id`` is a digest of the whole</span>
+<span class="sd">    response rather than a content hash, with ``bytes_size == 0``: an explicit</span>
+<span class="sd">    ``fetch_bytes=False``, and a fetch that failed (which also emits a</span>
+<span class="sd">    :class:`UserWarning` — see :func:`execute` for why a *billed* result is</span>
+<span class="sd">    degraded rather than discarded).</span>
+
+<span class="sd">    The response digest is deliberately **not** the SHA-256 of the URL. Hashing</span>
+<span class="sd">    the URL is the falaw#14 defect: it looks like a content hash, so it makes</span>
+<span class="sd">    two byte-identical renders appear different while satisfying every check</span>
+<span class="sd">    that only tests &quot;is this 64 hex chars&quot;. ``bytes_size == 0`` is the honest</span>
+<span class="sd">    signal, and it is what downstream key resolution reads to fall back to the</span>
+<span class="sd">    URL rather than trust the id.</span>
+
+<span class="sd">    Note that ``path``/``url`` are location *hints*, machine-local in the</span>
+<span class="sd">    ``path`` case. Only ``asset_id`` + the content store are portable.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span><span class="p">,</span> <span class="n">hash_bytes</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.artifact</span><span class="w"> </span><span class="kn">import</span> <span class="n">_now_rt</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">lacing.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Provenance</span>
 
@@ -712,11 +1067,19 @@
     <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">bytes_size</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">if</span> <span class="n">url</span><span class="p">:</span>
-        <span class="c1"># asset_id from URL when we don&#39;t have bytes — stable across re-runs of</span>
-        <span class="c1"># the same fal response. When bytes are downloaded later, callers</span>
-        <span class="c1"># should re-hash and produce a new Artifact.</span>
-        <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="n">fetch_bytes</span><span class="p">:</span>
+        <span class="n">ref</span><span class="p">,</span> <span class="n">store</span> <span class="o">=</span> <span class="n">_content_ref_or_none</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">content_store</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># A degraded, honestly-labelled artifact — never a lost paid result.</span>
+            <span class="n">asset_id</span> <span class="o">=</span> <span class="n">_response_digest</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">asset_id</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span>
+            <span class="n">bytes_size</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">blob_path</span><span class="p">(</span><span class="n">asset_id</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">url</span><span class="p">:</span>
+        <span class="c1"># No bytes ⇒ no content identity. Digest the response rather than the</span>
+        <span class="c1"># URL so nothing pretends to be a content hash; see the docstring.</span>
+        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">_response_digest</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">):</span>
         <span class="c1"># LLM-style response: no URL, the content *is* the text. Materialize</span>
         <span class="c1"># it to a content-addressed cache file so the Artifact is usable.</span>
@@ -725,18 +1088,14 @@
             <span class="c1"># ``output_kind=&quot;json&quot;`` promises a parseable JSON artifact,</span>
             <span class="c1"># but real models wrap it in a ```json fence anyway.</span>
             <span class="n">content</span> <span class="o">=</span> <span class="n">_unwrap_json_fence</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
-        <span class="n">path</span><span class="p">,</span> <span class="n">fake_id</span> <span class="o">=</span> <span class="n">_materialize_text_to_cache</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">)</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">asset_id</span> <span class="o">=</span> <span class="n">_materialize_text_to_cache</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">)</span>
         <span class="n">bytes_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
         <span class="n">mime</span> <span class="o">=</span> <span class="n">mime</span> <span class="ow">or</span> <span class="p">(</span>
             <span class="s2">&quot;application/json&quot;</span> <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">output_kind</span> <span class="o">==</span> <span class="s2">&quot;json&quot;</span> <span class="k">else</span> <span class="s2">&quot;text/plain&quot;</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Last-resort: hash the response itself.</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
-
-        <span class="n">fake_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span>
-            <span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">_response_digest</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
 
     <span class="n">prov</span> <span class="o">=</span> <span class="n">Provenance</span><span class="p">(</span>
         <span class="n">was_generated_by</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;agent:fal@</span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -747,7 +1106,7 @@
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
-        <span class="n">asset_id</span><span class="o">=</span><span class="n">fake_id</span><span class="p">,</span>
+        <span class="n">asset_id</span><span class="o">=</span><span class="n">asset_id</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">output_kind</span><span class="p">,</span>
         <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
         <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
@@ -758,6 +1117,21 @@
         <span class="n">cost_usd</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">producer_call_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># set by orchestrators that thread through call_id</span>
     <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_response_digest</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SHA-256 of the canonicalized response — a last-resort, non-content id.</span>
+
+<span class="sd">    Used only where falaw has no bytes to hash. It is *not* a content hash and</span>
+<span class="sd">    must never be treated as one: it changes whenever any field of the response</span>
+<span class="sd">    changes (including a re-minted URL), which is exactly what makes it safe —</span>
+<span class="sd">    it can only ever cause a cache *miss*, never a wrong hit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">hash_bytes</span>
+
+    <span class="k">return</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_unwrap_json_fence</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

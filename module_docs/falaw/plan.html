@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.22 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.23 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=96ec9c95"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -58,6 +58,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
@@ -75,6 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.plan</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CONTENT_REF_PREFIX"><code class="docutils literal notranslate"><span class="pre">CONTENT_REF_PREFIX</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CacheStatus"><code class="docutils literal notranslate"><span class="pre">CacheStatus</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CallPlan"><code class="docutils literal notranslate"><span class="pre">CallPlan</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.application"><code class="docutils literal notranslate"><span class="pre">CallPlan.application</span></code></a></li>
@@ -88,6 +90,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.tool"><code class="docutils literal notranslate"><span class="pre">CallPlan.tool</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.DFLT_FETCH_BYTES"><code class="docutils literal notranslate"><span class="pre">DFLT_FETCH_BYTES</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.FETCH_BYTES_ENVVAR"><code class="docutils literal notranslate"><span class="pre">FETCH_BYTES_ENVVAR</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.OutputKind"><code class="docutils literal notranslate"><span class="pre">OutputKind</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.PLAN_DICT_SCHEMA"><code class="docutils literal notranslate"><span class="pre">PLAN_DICT_SCHEMA</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.Plan"><code class="docutils literal notranslate"><span class="pre">Plan</span></code></a><ul>
@@ -198,6 +202,16 @@ append it to a scene-level Plan:</p>
 </pre></div>
 </div>
 <dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.CONTENT_REF_PREFIX">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CONTENT_REF_PREFIX</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sha256:'</span></span><a class="headerlink" href="#falaw.plan.CONTENT_REF_PREFIX" title="Link to this definition"></a></dt>
+<dd><p>Prefix marking a content hash where a cache key would otherwise hold a URL.</p>
+<p>Self-describing on purpose: a reader of a cache manifest can tell at a glance
+that an argument was keyed on <em>what the upstream produced</em> rather than <em>where
+it was served from</em>, and the prefixed form can never be confused with a
+literal URL argument.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="falaw.plan.CacheStatus">
 <span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CacheStatus</span></span><a class="headerlink" href="#falaw.plan.CacheStatus" title="Link to this definition"></a></dt>
 <dd><p>Whether the cache will short-circuit this call.</p>
@@ -289,6 +303,25 @@ fal models depending on quality tier.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.DFLT_FETCH_BYTES">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">DFLT_FETCH_BYTES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#falaw.plan.DFLT_FETCH_BYTES" title="Link to this definition"></a></dt>
+<dd><p>Whether <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> downloads media results to content-address them.</p>
+<p>True — an artifact whose <code class="docutils literal notranslate"><span class="pre">asset_id</span></code> is not the SHA-256 of its bytes breaks
+<code class="docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>’s contract and puts an expiring location into every
+downstream cache key.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.FETCH_BYTES_ENVVAR">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">FETCH_BYTES_ENVVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FALAW_FETCH_ARTIFACT_BYTES'</span></span><a class="headerlink" href="#falaw.plan.FETCH_BYTES_ENVVAR" title="Link to this definition"></a></dt>
+<dd><p>Env var overriding <a class="reference internal" href="#falaw.plan.DFLT_FETCH_BYTES" title="falaw.plan.DFLT_FETCH_BYTES"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_FETCH_BYTES</span></code></a> process-wide.</p>
+<p>Set it to <code class="docutils literal notranslate"><span class="pre">0</span></code> for one legitimate case: an <strong>offline test suite</strong> whose
+stubbed fal responses carry URLs that resolve to nothing. It is not a
+production setting — see the <code class="docutils literal notranslate"><span class="pre">fetch_bytes</span></code> argument of <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> for
+what opting out costs. Read at call time, so a test can set it after import.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="falaw.plan.OutputKind">
 <span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">OutputKind</span></span><a class="headerlink" href="#falaw.plan.OutputKind" title="Link to this definition"></a></dt>
 <dd><p>Coarse class of what this call produces. Mirrors <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact.kind</span></code>
@@ -358,7 +391,7 @@ everything else is already JSON-native.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.plan.execute">
-<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute" title="Link to this definition"></a></dt>
 <dd><p>Execute a Plan, returning a list of materialized :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>lacing.Artifact`s.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -373,18 +406,77 @@ cache hits skip the network. When False, every call is fresh.</p></li>
 <li><p><strong>artifact_converter</strong> – Per-CallPlan converter from raw fal response to
 <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>. When <code class="docutils literal notranslate"><span class="pre">None</span></code> (default), a built-in
 converter handles the common shapes (<code class="docutils literal notranslate"><span class="pre">{images:</span> <span class="pre">[{url}]}</span></code>,
-<code class="docutils literal notranslate"><span class="pre">{video:</span> <span class="pre">{url}}</span></code>, <code class="docutils literal notranslate"><span class="pre">{audio:</span> <span class="pre">{url}}</span></code>).</p></li>
+<code class="docutils literal notranslate"><span class="pre">{video:</span> <span class="pre">{url}}</span></code>, <code class="docutils literal notranslate"><span class="pre">{audio:</span> <span class="pre">{url}}</span></code>). Mutually exclusive with
+<code class="docutils literal notranslate"><span class="pre">content_store</span></code> / <code class="docutils literal notranslate"><span class="pre">fetch_bytes</span></code> / <code class="docutils literal notranslate"><span class="pre">asset_fetcher</span></code>, which
+configure the built-in converter only — passing both raises, rather
+than silently ignoring the ones a custom converter cannot honour.</p></li>
+<li><p><strong>content_store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code> that media bytes
+are materialized into. Defaults to
+<a class="reference internal" href="content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a> (a directory store
+rooted in the falaw cache). Point this at an S3-backed store to
+share content — and therefore cache hits — across machines.</p></li>
+<li><p><strong>fetch_bytes</strong> – Whether to download each media result so its <code class="docutils literal notranslate"><span class="pre">asset_id</span></code>
+is the SHA-256 of its bytes. Defaults to <a class="reference internal" href="#falaw.plan.DFLT_FETCH_BYTES" title="falaw.plan.DFLT_FETCH_BYTES"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_FETCH_BYTES</span></code></a>
+(true), overridable process-wide via <a class="reference internal" href="#falaw.plan.FETCH_BYTES_ENVVAR" title="falaw.plan.FETCH_BYTES_ENVVAR"><code class="xref py py-data docutils literal notranslate"><span class="pre">FETCH_BYTES_ENVVAR</span></code></a>.
+<strong>Opting out forfeits caching for chained calls</strong>: without bytes
+there is no content hash, so downstream calls fall back to keying
+on the upstream URL — which fal mints fresh per upload, so the
+downstream entry can never be reused across runs or machines. It
+also means <code class="docutils literal notranslate"><span class="pre">asset_id</span></code> is <em>not</em> a content hash, in violation of
+<code class="docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>’s contract. Use it only when you genuinely
+want URL-only artifacts and no reuse.</p></li>
+<li><p><strong>asset_fetcher</strong> – Injected byte source (<code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">Iterable[bytes]</span></code>) used to
+read media results; defaults to a <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based fetcher. This is
+the seam a <strong>hermetic test suite</strong> should use: a downstream suite
+whose stubbed fal responses carry made-up URLs must inject a fake
+transport here, or execution will reach for the network. (Setting
+<code class="docutils literal notranslate"><span class="pre">$FALAW_FETCH_ARTIFACT_BYTES=0</span></code> also works but is blunter — it
+turns off content addressing altogether, so the suite stops
+exercising the thing it is testing.)</p></li>
 </ul>
 </dd>
 </dl>
-<section id="placeholder-resolution">
-<h2>Placeholder resolution<a class="headerlink" href="#placeholder-resolution" title="Link to this heading"></a></h2>
+<section id="failure-handling-a-paid-result-is-never-discarded">
+<h2>Failure handling — a paid result is never discarded<a class="headerlink" href="#failure-handling-a-paid-result-is-never-discarded" title="Link to this heading"></a></h2>
+<p>Two different things can go wrong when reading a result’s bytes, and they
+get two different answers:</p>
+<ul class="simple">
+<li><p><strong>A fresh call whose bytes cannot be fetched.</strong> fal has already run — and
+billed — the generation. Raising would throw away a result we paid for,
+typically over a transient network failure. So the artifact <strong>degrades</strong>:
+<code class="docutils literal notranslate"><span class="pre">url</span></code> is kept, <code class="docutils literal notranslate"><span class="pre">bytes_size</span></code> stays 0, <code class="docutils literal notranslate"><span class="pre">asset_id</span></code> is a digest of the
+response and is <em>not</em> claimed to be a content hash, and a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code> is emitted. Downstream key resolution reads
+<code class="docutils literal notranslate"><span class="pre">bytes_size</span> <span class="pre">==</span> <span class="pre">0</span></code> and falls back to the URL — a guaranteed cache
+<em>miss</em>, never a wrong hit.</p></li>
+<li><p><strong>A cache hit that cannot be materialized</strong> — fal deleted the URL and the
+bytes are not in the content store. The entry is unusable, so it is
+treated as a <strong>miss</strong>: it is invalidated and the call re-executed once.
+A cache must never become a trap whose only escape is re-billing the
+whole plan with <code class="docutils literal notranslate"><span class="pre">use_cache=False</span></code>.</p></li>
+</ul>
+</section>
+<section id="placeholder-resolution-the-wire-key-split">
+<h2>Placeholder resolution — the wire/key split<a class="headerlink" href="#placeholder-resolution-the-wire-key-split" title="Link to this heading"></a></h2>
 <p>Any string argument equal to <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code> (for an integer <code class="docutils literal notranslate"><span class="pre">N</span></code>) is
-rewritten to <code class="docutils literal notranslate"><span class="pre">artifacts[N].url</span></code> <em>just before</em> the call is made — so
-a multi-step plan (e.g. generate_image → image_to_video) can reference
-the upstream output without the planner needing to know its URL. The
-rewrite happens after the upstream call has executed; planning itself
-is unaffected.</p>
+rewritten <em>just before</em> the call is made — so a multi-step plan (e.g.
+generate_image → image_to_video) can reference the upstream output without
+the planner needing to know its URL. The rewrite happens after the upstream
+call has executed; planning itself is unaffected.</p>
+<p>It happens <strong>twice</strong>, into two different argument sets, because the same
+value cannot serve both jobs:</p>
+<ul class="simple">
+<li><p>the <strong>wire</strong> arguments get <code class="docutils literal notranslate"><span class="pre">artifacts[N].url</span></code> — what fal needs in order
+to fetch the input;</p></li>
+<li><p>the <strong>key</strong> arguments get <code class="docutils literal notranslate"><span class="pre">sha256:&lt;artifacts[N].asset_id&gt;</span></code> — the
+upstream’s content hash, so a byte-identical upstream regeneration
+produces a downstream cache <em>hit</em> instead of re-billing the expensive
+call. Keying on the URL instead is the defect this split exists to fix
+(falaw#14): fal mints a unique URL per upload, so a URL-keyed downstream
+entry is unreachable the moment the upstream genuinely re-runs.</p></li>
+</ul>
+<p>An upstream artifact with no materialized bytes has no content hash, so its
+key ref falls back to the URL — a guaranteed miss, never a wrong hit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>One <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact</span></code> per <a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallPlan</span></code></a> in <code class="docutils literal notranslate"><span class="pre">plan.calls</span></code>,
@@ -404,6 +496,13 @@ same key the eventual call would produce; <code class="docutils literal notransl
 <code class="docutils literal notranslate"><span class="pre">Plan.total_cost_usd</span></code> honest: a fully-cached Plan reports $0.</p>
 <p>When <code class="docutils literal notranslate"><span class="pre">consult_cache=False</span></code> (e.g. for unit tests or “what would a fresh
 run cost?” reporting), <code class="docutils literal notranslate"><span class="pre">cache_status</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p>
+<p>Known gap (falaw#15): the peek uses the <em>unresolved</em> arguments, so for a
+chained call — one whose arguments still hold a <code class="docutils literal notranslate"><span class="pre">&lt;from</span> <span class="pre">N&gt;</span></code> placeholder —
+it keys on the placeholder rather than on the upstream content ref
+<a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> will key on. <code class="docutils literal notranslate"><span class="pre">cache_status</span></code> is therefore not to be
+trusted for chained calls, and a plan’s reported cost can understate what
+the run bills. Fixing it needs the upstream to have executed, which is a
+planner-level change, not a converter-level one.</p>
 </dd></dl>
 
 <dl class="py function">

@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.content &mdash; falaw 0.0.23 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.core" href="core.html" />
+    <link rel="prev" title="falaw.cache" href="cache.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.content</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.ContentRef"><code class="docutils literal notranslate"><span class="pre">ContentRef</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.content_ref_for_url"><code class="docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.default_content_store"><code class="docutils literal notranslate"><span class="pre">default_content_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.remembered_ref"><code class="docutils literal notranslate"><span class="pre">remembered_ref()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.write_blob_to_file"><code class="docutils literal notranslate"><span class="pre">write_blob_to_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.content</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/content.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.content">
+<span id="falaw-content"></span><h1>falaw.content<a class="headerlink" href="#module-falaw.content" title="Link to this heading"></a></h1>
+<p>Content addressing for fal-produced media — identify a file by <em>what it is</em>.</p>
+<p>fal serves generated media from a CDN URL, and fal’s own documentation is
+explicit that a URL carries neither identity nor durability:</p>
+<blockquote>
+<div><p>“Each upload produces a unique URL with no shared namespace.”</p>
+<p>“Expired files are permanently deleted and cannot be recovered.”</p>
+</div></blockquote>
+<p>So a URL is the wrong handle for the two jobs falaw needs done:</p>
+<ol class="arabic simple">
+<li><p><strong>Naming an artifact.</strong> <code class="docutils literal notranslate"><span class="pre">lacing.Artifact.asset_id</span></code> is contractually the
+SHA-256 of the artifact’s <em>bytes</em> — “two artifacts with the same
+<code class="docutils literal notranslate"><span class="pre">asset_id</span></code> are byte-identical regardless of where they live”. Hashing the
+URL instead produces a different id for two byte-identical renders and
+silently breaks every consumer that trusts that contract.</p></li>
+<li><p><strong>Keying a cache.</strong> A byte-identical upstream regeneration must produce a
+downstream cache <strong>hit</strong>. With a URL in the key it produces a miss, and the
+miss re-bills a $0.35–$1.50 clip for work that did not change.</p></li>
+</ol>
+<p>This module is the single place falaw turns a URL into a content hash. It</p>
+<ul class="simple">
+<li><p>streams the bytes into a <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code> blob store — which is
+content-addressed, <code class="docutils literal notranslate"><span class="pre">dol</span></code>-backed and swappable (in-memory / directory /
+object store) — rather than growing a second blob store of its own;</p></li>
+<li><p>remembers <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">(content_hash,</span> <span class="pre">bytes_size)</span></code> in a small on-disk index, so
+re-executing an already-cached plan does <strong>not</strong> re-download anything. The
+index is a <em>hint</em>, never an identity, and it is only <strong>sound for immutable
+URLs</strong>. It is sound for fal’s own, because fal guarantees a URL is minted per
+upload and therefore never re-points at different bytes. It is <em>not</em> sound
+for an arbitrary caller-supplied URL reached through
+<a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a> — a mutable <code class="docutils literal notranslate"><span class="pre">https://…/reference.png</span></code>
+that changes behind our back keeps resolving to the old hash. Pass
+<code class="docutils literal notranslate"><span class="pre">refresh=True</span></code> when the URL is not known to be immutable
+(thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);</p></li>
+<li><p>serves the bytes from the store after the URL has expired, so a months-old
+cache hit still yields a usable artifact instead of a dead link.</p></li>
+</ul>
+<p>The blob store is <strong>injected</strong>, never constructed inline by callers:
+<a class="reference internal" href="#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a> is the falaw-cache-rooted default, and every
+public function here takes a <code class="docutils literal notranslate"><span class="pre">store</span></code> keyword so a caller can point falaw at
+an S3-backed store without touching any other code.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;https://fal.media/files/one.png&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;pretend-&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;png-bytes&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span>
+<span class="go">17</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;hashlib&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;pretend-png-bytes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The same bytes served at a <em>different</em> URL yield the same reference — which is
+the whole point:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;https://fal.media/files/two.png&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;pretend-png-bytes&quot;</span><span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.content.ContentRef">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">ContentRef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/content.html#ContentRef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.ContentRef" title="Link to this definition"></a></dt>
+<dd><p>A content-addressed handle on some bytes falaw has materialized.</p>
+<p><code class="docutils literal notranslate"><span class="pre">content_hash</span></code> is the SHA-256 hex digest of the bytes — the value
+<code class="docutils literal notranslate"><span class="pre">lacing.Artifact.asset_id</span></code> is contractually required to hold, and the
+value that goes into a downstream cache key in place of a URL.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.content_ref_for_url">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.content_ref_for_url" title="Link to this definition"></a></dt>
+<dd><p>Materialize <code class="docutils literal notranslate"><span class="pre">url</span></code>’s bytes into <code class="docutils literal notranslate"><span class="pre">store</span></code> and return their content hash.</p>
+<p>Idempotent and download-free on repeat: the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">ContentRef</span></code> index is
+consulted first, and a remembered reference whose blob is still present is
+returned without touching the network. That is what makes re-executing an
+already-cached plan free rather than re-downloading every clip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – The remote asset URL (typically fal’s CDN).</p></li>
+<li><p><strong>store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
+<a class="reference internal" href="#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a>.</p></li>
+<li><p><strong>fetcher</strong> – Injected byte source; defaults to <code class="xref py py-func docutils literal notranslate"><span class="pre">_http_chunks()</span></code>.</p></li>
+<li><p><strong>refresh</strong> – Ignore the remembered reference and re-fetch. Only useful when
+you suspect the index is wrong — fal URLs are per-upload, so the
+same URL never legitimately serves different bytes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="../falaw.html#falaw.FalAssetFetchError" title="falaw.FalAssetFetchError"><strong>FalAssetFetchError</strong></a> – the bytes could not be retrieved, or the response
+    was empty. Never returns a reference it could not back with bytes —
+    a silent zero-byte “artifact” is the failure mode this guards.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.default_content_store">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">default_content_store</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/content.html#default_content_store"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.default_content_store" title="Link to this definition"></a></dt>
+<dd><p>The falaw-cache-rooted <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>.</p>
+<p>Rooted at <code class="docutils literal notranslate"><span class="pre">&lt;falaw</span> <span class="pre">cache</span> <span class="pre">dir&gt;/content</span></code>, so it moves with
+<code class="docutils literal notranslate"><span class="pre">$FALAW_CACHE_DIR</span></code> / <code class="docutils literal notranslate"><span class="pre">$FALAW_DATA_DIR</span></code> like every other piece of falaw
+state. Constructed per call (the constructor only ensures directories
+exist) so a test that re-points the cache dir gets a fresh store.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.remembered_ref">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">remembered_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#remembered_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.remembered_ref" title="Link to this definition"></a></dt>
+<dd><p>The <a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentRef</span></code></a> previously recorded for <code class="docutils literal notranslate"><span class="pre">url</span></code>, if any.</p>
+<p>A <em>hint</em>, not a guarantee: it says “the last time falaw fetched this URL,
+the bytes hashed to this” and says nothing about whether those bytes are
+still in any store. Callers must verify (<code class="docutils literal notranslate"><span class="pre">store.has_blob(...)</span></code>, or an
+already-materialized file on disk) before trusting it.</p>
+<p>Public because it is the cheap pre-check that lets a caller answer “do I
+already have this?” without a network round-trip — see
+<a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.write_blob_to_file">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">write_blob_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#write_blob_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.write_blob_to_file" title="Link to this definition"></a></dt>
+<dd><p>Materialize the blob for <code class="docutils literal notranslate"><span class="pre">content_hash</span></code> as a <strong>copy</strong> at <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
+<p>Writes via a temporary file and an atomic rename, so a concurrent reader
+never sees a partial file.</p>
+<section id="why-a-copy-and-not-a-hard-link">
+<h2>Why a copy and not a hard link<a class="headerlink" href="#why-a-copy-and-not-a-hard-link" title="Link to this heading"></a></h2>
+<p>Hard-linking the store’s own blob file would be free, and an earlier cut of
+this function did exactly that — but a hard link makes the returned path
+and the content-store blob <strong>the same inode</strong>. Any consumer that writes
+through the returned path (ffmpeg writing in place, an accidental <code class="docutils literal notranslate"><span class="pre">open(p,</span>
+<span class="pre">&quot;ab&quot;)</span></code>) then leaves a blob whose SHA-256 no longer matches its own name,
+while <code class="docutils literal notranslate"><span class="pre">has_blob</span></code> keeps answering <code class="docutils literal notranslate"><span class="pre">True</span></code> — the store starts serving
+<em>wrong bytes under a correct content address</em>, which is precisely the
+failure class content addressing exists to eliminate. Making the link
+read-only instead is not an option either: the store’s backend writes blobs
+with <code class="docutils literal notranslate"><span class="pre">open(path,</span> <span class="pre">&quot;wb&quot;)</span></code>, so a read-only blob breaks re-putting identical
+bytes.</p>
+<p>A copy costs disk (and, on APFS/btrfs/XFS, <code class="docutils literal notranslate"><span class="pre">shutil.copyfile</span></code> gets
+copy-on-write for free). Immutability of the content store is worth it.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">raises KeyError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the store holds no blob for <code class="docutils literal notranslate"><span class="pre">content_hash</span></code>.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cache.html" class="btn btn-neutral float-left" title="falaw.cache" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="core.html" class="btn btn-neutral float-right" title="falaw.core" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.content &mdash; falaw 0.0.23 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3294188c"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.content</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.content</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Content addressing for fal-produced media — identify a file by *what it is*.</span>
+
+<span class="sd">fal serves generated media from a CDN URL, and fal&#39;s own documentation is</span>
+<span class="sd">explicit that a URL carries neither identity nor durability:</span>
+
+<span class="sd">    &quot;Each upload produces a unique URL with no shared namespace.&quot;</span>
+
+<span class="sd">    &quot;Expired files are permanently deleted and cannot be recovered.&quot;</span>
+
+<span class="sd">So a URL is the wrong handle for the two jobs falaw needs done:</span>
+
+<span class="sd">1. **Naming an artifact.** ``lacing.Artifact.asset_id`` is contractually the</span>
+<span class="sd">   SHA-256 of the artifact&#39;s *bytes* — &quot;two artifacts with the same</span>
+<span class="sd">   ``asset_id`` are byte-identical regardless of where they live&quot;. Hashing the</span>
+<span class="sd">   URL instead produces a different id for two byte-identical renders and</span>
+<span class="sd">   silently breaks every consumer that trusts that contract.</span>
+<span class="sd">2. **Keying a cache.** A byte-identical upstream regeneration must produce a</span>
+<span class="sd">   downstream cache **hit**. With a URL in the key it produces a miss, and the</span>
+<span class="sd">   miss re-bills a $0.35–$1.50 clip for work that did not change.</span>
+
+<span class="sd">This module is the single place falaw turns a URL into a content hash. It</span>
+
+<span class="sd">* streams the bytes into a :class:`lacing.ArtifactStore` blob store — which is</span>
+<span class="sd">  content-addressed, ``dol``-backed and swappable (in-memory / directory /</span>
+<span class="sd">  object store) — rather than growing a second blob store of its own;</span>
+<span class="sd">* remembers ``url -&gt; (content_hash, bytes_size)`` in a small on-disk index, so</span>
+<span class="sd">  re-executing an already-cached plan does **not** re-download anything. The</span>
+<span class="sd">  index is a *hint*, never an identity, and it is only **sound for immutable</span>
+<span class="sd">  URLs**. It is sound for fal&#39;s own, because fal guarantees a URL is minted per</span>
+<span class="sd">  upload and therefore never re-points at different bytes. It is *not* sound</span>
+<span class="sd">  for an arbitrary caller-supplied URL reached through</span>
+<span class="sd">  :func:`falaw.cache.materialize_asset` — a mutable ``https://…/reference.png``</span>
+<span class="sd">  that changes behind our back keeps resolving to the old hash. Pass</span>
+<span class="sd">  ``refresh=True`` when the URL is not known to be immutable</span>
+<span class="sd">  (thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);</span>
+<span class="sd">* serves the bytes from the store after the URL has expired, so a months-old</span>
+<span class="sd">  cache hit still yields a usable artifact instead of a dead link.</span>
+
+<span class="sd">The blob store is **injected**, never constructed inline by callers:</span>
+<span class="sd">:func:`default_content_store` is the falaw-cache-rooted default, and every</span>
+<span class="sd">public function here takes a ``store`` keyword so a caller can point falaw at</span>
+<span class="sd">an S3-backed store without touching any other code.</span>
+
+<span class="sd">Examples</span>
+<span class="sd">--------</span>
+
+<span class="sd">&gt;&gt;&gt; from lacing import ArtifactStore</span>
+<span class="sd">&gt;&gt;&gt; store = ArtifactStore.in_memory()</span>
+<span class="sd">&gt;&gt;&gt; ref = content_ref_for_url(</span>
+<span class="sd">...     &quot;https://fal.media/files/one.png&quot;,</span>
+<span class="sd">...     store=store,</span>
+<span class="sd">...     fetcher=lambda url: [b&quot;pretend-&quot;, b&quot;png-bytes&quot;],</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; ref.bytes_size</span>
+<span class="sd">17</span>
+<span class="sd">&gt;&gt;&gt; ref.content_hash == __import__(&quot;hashlib&quot;).sha256(b&quot;pretend-png-bytes&quot;).hexdigest()</span>
+<span class="sd">True</span>
+
+<span class="sd">The same bytes served at a *different* URL yield the same reference — which is</span>
+<span class="sd">the whole point:</span>
+
+<span class="sd">&gt;&gt;&gt; other = content_ref_for_url(</span>
+<span class="sd">...     &quot;https://fal.media/files/two.png&quot;,</span>
+<span class="sd">...     store=store,</span>
+<span class="sd">...     fetcher=lambda url: [b&quot;pretend-png-bytes&quot;],</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; other.content_hash == ref.content_hash</span>
+<span class="sd">True</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">_cache_dir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FalAssetFetchError</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;ContentRef&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;content_ref_for_url&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_content_store&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;remembered_ref&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;write_blob_to_file&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="n">DFLT_CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
+<span class="sd">&quot;&quot;&quot;Bytes per read when streaming a remote asset into the blob store.&quot;&quot;&quot;</span>
+
+<span class="n">CONTENT_STORE_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
+<span class="sd">&quot;&quot;&quot;Sub-directory of the falaw cache holding the default content store.&quot;&quot;&quot;</span>
+
+<span class="n">URL_INDEX_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;url_index&quot;</span>
+<span class="sd">&quot;&quot;&quot;Sub-directory of the falaw cache holding the ``url -&gt; ContentRef`` hints.&quot;&quot;&quot;</span>
+
+
+<span class="n">UrlFetcher</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]</span>
+<span class="sd">&quot;&quot;&quot;A callable that yields the bytes of a URL in chunks.</span>
+
+<span class="sd">The injection seam for tests and for callers that need custom transport</span>
+<span class="sd">(auth headers, retries, a local mirror). :func:`_http_chunks` is the default.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="ContentRef">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.ContentRef">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ContentRef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A content-addressed handle on some bytes falaw has materialized.</span>
+
+<span class="sd">    ``content_hash`` is the SHA-256 hex digest of the bytes — the value</span>
+<span class="sd">    ``lacing.Artifact.asset_id`` is contractually required to hold, and the</span>
+<span class="sd">    value that goes into a downstream cache key in place of a URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">bytes_size</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="default_content_store">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.default_content_store">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_content_store</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The falaw-cache-rooted :class:`lacing.ArtifactStore`.</span>
+
+<span class="sd">    Rooted at ``&lt;falaw cache dir&gt;/content``, so it moves with</span>
+<span class="sd">    ``$FALAW_CACHE_DIR`` / ``$FALAW_DATA_DIR`` like every other piece of falaw</span>
+<span class="sd">    state. Constructed per call (the constructor only ensures directories</span>
+<span class="sd">    exist) so a test that re-points the cache dir gets a fresh store.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
+
+    <span class="k">return</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="n">CONTENT_STORE_DIRNAME</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="content_ref_for_url">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.content_ref_for_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">content_ref_for_url</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fetcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UrlFetcher</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentRef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Materialize ``url``&#39;s bytes into ``store`` and return their content hash.</span>
+
+<span class="sd">    Idempotent and download-free on repeat: the ``url -&gt; ContentRef`` index is</span>
+<span class="sd">    consulted first, and a remembered reference whose blob is still present is</span>
+<span class="sd">    returned without touching the network. That is what makes re-executing an</span>
+<span class="sd">    already-cached plan free rather than re-downloading every clip.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url: The remote asset URL (typically fal&#39;s CDN).</span>
+<span class="sd">        store: Injected :class:`lacing.ArtifactStore`; defaults to</span>
+<span class="sd">            :func:`default_content_store`.</span>
+<span class="sd">        fetcher: Injected byte source; defaults to :func:`_http_chunks`.</span>
+<span class="sd">        refresh: Ignore the remembered reference and re-fetch. Only useful when</span>
+<span class="sd">            you suspect the index is wrong — fal URLs are per-upload, so the</span>
+<span class="sd">            same URL never legitimately serves different bytes.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FalAssetFetchError: the bytes could not be retrieved, or the response</span>
+<span class="sd">            was empty. Never returns a reference it could not back with bytes —</span>
+<span class="sd">            a silent zero-byte &quot;artifact&quot; is the failure mode this guards.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+        <span class="n">remembered</span> <span class="o">=</span> <span class="n">remembered_ref</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">remembered</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">store</span><span class="o">.</span><span class="n">has_blob</span><span class="p">(</span><span class="n">remembered</span><span class="o">.</span><span class="n">content_hash</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">remembered</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">_http_chunks</span><span class="p">)</span>
+    <span class="n">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ref</span></div>
+
+
+
+<div class="viewcode-block" id="remembered_ref">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.remembered_ref">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remembered_ref</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ContentRef</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The :class:`ContentRef` previously recorded for ``url``, if any.</span>
+
+<span class="sd">    A *hint*, not a guarantee: it says &quot;the last time falaw fetched this URL,</span>
+<span class="sd">    the bytes hashed to this&quot; and says nothing about whether those bytes are</span>
+<span class="sd">    still in any store. Callers must verify (``store.has_blob(...)``, or an</span>
+<span class="sd">    already-materialized file on disk) before trusting it.</span>
+
+<span class="sd">    Public because it is the cheap pre-check that lets a caller answer &quot;do I</span>
+<span class="sd">    already have this?&quot; without a network round-trip — see</span>
+<span class="sd">    :func:`falaw.cache.materialize_asset`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ContentRef</span><span class="p">(</span>
+            <span class="n">content_hash</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;content_hash&quot;</span><span class="p">],</span> <span class="n">bytes_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;bytes_size&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — a corrupt hint is a miss, never a failure</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="write_blob_to_file">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.write_blob_to_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_blob_to_file</span><span class="p">(</span><span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Materialize the blob for ``content_hash`` as a **copy** at ``path``.</span>
+
+<span class="sd">    Writes via a temporary file and an atomic rename, so a concurrent reader</span>
+<span class="sd">    never sees a partial file.</span>
+
+<span class="sd">    Why a copy and not a hard link</span>
+<span class="sd">    ------------------------------</span>
+<span class="sd">    Hard-linking the store&#39;s own blob file would be free, and an earlier cut of</span>
+<span class="sd">    this function did exactly that — but a hard link makes the returned path</span>
+<span class="sd">    and the content-store blob **the same inode**. Any consumer that writes</span>
+<span class="sd">    through the returned path (ffmpeg writing in place, an accidental ``open(p,</span>
+<span class="sd">    &quot;ab&quot;)``) then leaves a blob whose SHA-256 no longer matches its own name,</span>
+<span class="sd">    while ``has_blob`` keeps answering ``True`` — the store starts serving</span>
+<span class="sd">    *wrong bytes under a correct content address*, which is precisely the</span>
+<span class="sd">    failure class content addressing exists to eliminate. Making the link</span>
+<span class="sd">    read-only instead is not an option either: the store&#39;s backend writes blobs</span>
+<span class="sd">    with ``open(path, &quot;wb&quot;)``, so a read-only blob breaks re-putting identical</span>
+<span class="sd">    bytes.</span>
+
+<span class="sd">    A copy costs disk (and, on APFS/btrfs/XFS, ``shutil.copyfile`` gets</span>
+<span class="sd">    copy-on-write for free). Immutability of the content store is worth it.</span>
+
+<span class="sd">    Returns ``path``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        KeyError: the store holds no blob for ``content_hash``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.part&quot;</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">blob_path</span><span class="p">(</span><span class="n">content_hash</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="n">tmp</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">iter_blob</span><span class="p">(</span><span class="n">content_hash</span><span class="p">):</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="n">_unlink_quietly</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_unlink_quietly</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># --- fetching ---------------------------------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_http_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CHUNK_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield the bytes of ``url`` in ``chunk_size`` chunks. The default fetcher.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>  <span class="c1"># noqa: S310 (fal https URLs)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">yield</span> <span class="n">chunk</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentRef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream ``url`` through ``fetcher`` into ``store``; return the ContentRef.</span>
+
+<span class="sd">    The byte count is accumulated *during* the stream, so falaw itself never</span>
+<span class="sd">    holds the payload. Note that **peak process memory is still ~2x the asset**</span>
+<span class="sd">    today: ``lacing.ArtifactStore.put_blob_stream`` accumulates into a</span>
+<span class="sd">    ``bytearray`` and then copies it to ``bytes`` before writing (its own</span>
+<span class="sd">    docstring says so, and thorwhalen/lacing#25 tracks replacing it with</span>
+<span class="sd">    write-to-tempfile + atomic rename). Measured: a 64 MB asset peaks at</span>
+<span class="sd">    ~129 MB. That is a lacing-side fix; nothing here needs to change when it</span>
+<span class="sd">    lands.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">counted</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">chunk</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">content_hash</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">put_blob_stream</span><span class="p">(</span><span class="n">counted</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — re-raised as a typed falaw error</span>
+        <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Could not fetch asset bytes from </span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. falaw needs the &quot;</span>
+            <span class="s2">&quot;bytes to content-address the artifact, and fal-served URLs expire &quot;</span>
+            <span class="s2">&quot;and are then permanently deleted. If you are running an offline &quot;</span>
+            <span class="s2">&quot;test suite whose stubbed responses carry made-up URLs, inject a &quot;</span>
+            <span class="s2">&quot;transport (`asset_fetcher=` on falaw.execute_plan, or `fetcher=` &quot;</span>
+            <span class="s2">&quot;here) rather than reaching for the network.&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">cause</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Asset at </span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2"> returned zero bytes — refusing to record an &quot;</span>
+            <span class="s2">&quot;empty artifact as if it were valid media.&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ContentRef</span><span class="p">(</span><span class="n">content_hash</span><span class="o">=</span><span class="n">content_hash</span><span class="p">,</span> <span class="n">bytes_size</span><span class="o">=</span><span class="n">counter</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="c1"># --- the url -&gt; ContentRef hint index ---------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
+
+    <span class="n">digest</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="n">URL_INDEX_DIRNAME</span><span class="p">,</span> <span class="n">digest</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="n">ContentRef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.part&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                <span class="s2">&quot;content_hash&quot;</span><span class="p">:</span> <span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span><span class="p">,</span>
+                <span class="s2">&quot;bytes_size&quot;</span><span class="p">:</span> <span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">f</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
