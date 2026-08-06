@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.23 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3294188c"></script>
+      <script src="../../_static/documentation_options.js?v=f91d8841"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -72,6 +72,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
@@ -170,8 +171,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span><span class="p">,</span> <span class="n">copy_context</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">replace</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.outcomes</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallOutcome</span><span class="p">,</span> <span class="n">ExecutionReport</span>
 
 
 <span class="n">CacheStatus</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hit&quot;</span><span class="p">,</span> <span class="s2">&quot;miss&quot;</span><span class="p">,</span> <span class="s2">&quot;stale&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">]</span>
@@ -555,6 +560,16 @@
     <span class="k">return</span> <span class="n">raw</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;off&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
 
+<span class="n">DFLT_CONCURRENCY</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="sd">&quot;&quot;&quot;How many calls of a Plan run at once by default.</span>
+
+<span class="sd">One — a Plan executes sequentially unless the caller asks otherwise. Every call</span>
+<span class="sd">is a paid vendor request, so parallelism is opt-in: it is the caller who knows</span>
+<span class="sd">their rate limit, their budget, and whether they want 200 renders started at</span>
+<span class="sd">once. (:func:`falaw.render_scene` makes the same choice for the same reason.)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
 <div class="viewcode-block" id="execute">
 <a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.execute">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
@@ -567,8 +582,16 @@
     <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fetch_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">asset_fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CONCURRENCY</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a Plan, returning a list of materialized :class:`lacing.Artifact`s.</span>
+
+<span class="sd">    This is the **halt** policy: the first call that raises ends the run, and its</span>
+<span class="sd">    exception propagates unchanged (falaw&#39;s typed hierarchy — see</span>
+<span class="sd">    :mod:`falaw.errors` — is what a caller classifies on, so it is never</span>
+<span class="sd">    wrapped). Use :func:`execute_isolated` when one bad call must not discard</span>
+<span class="sd">    the rest of a fan-out; it returns an :class:`~falaw.ExecutionReport` with one</span>
+<span class="sd">    outcome per call instead of raising.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        plan: The Plan to execute.</span>
@@ -608,6 +631,18 @@
 <span class="sd">            ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it</span>
 <span class="sd">            turns off content addressing altogether, so the suite stops</span>
 <span class="sd">            exercising the thing it is testing.)</span>
+<span class="sd">        concurrency: How many calls may be in flight at once. ``1``</span>
+<span class="sd">            (:data:`DFLT_CONCURRENCY`) runs the Plan sequentially, on the</span>
+<span class="sd">            calling thread, exactly as it always has. Above 1, independent calls</span>
+<span class="sd">            run on a thread pool bounded by this number — a Plan is I/O-bound</span>
+<span class="sd">            (an HTTP request that fal takes tens of seconds to answer), so</span>
+<span class="sd">            threads are the right tool and the bound is what keeps a 200-call</span>
+<span class="sd">            fan-out from becoming 200 simultaneous paid requests. **Chained</span>
+<span class="sd">            calls are never parallelised with their producers**: a call holding</span>
+<span class="sd">            a ``&quot;&lt;from N&gt;&quot;`` placeholder waits for call ``N``. Two things to</span>
+<span class="sd">            weigh before raising it: the vendor&#39;s rate limit, and memory —</span>
+<span class="sd">            materializing a media result peaks at roughly twice the asset&#39;s size</span>
+<span class="sd">            (thorwhalen/lacing#25), so ``concurrency`` multiplies the peak.</span>
 
 <span class="sd">    Failure handling — a paid result is never discarded</span>
 <span class="sd">    ---------------------------------------------------</span>
@@ -655,10 +690,94 @@
 <span class="sd">        One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,</span>
 <span class="sd">        in the same order.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Artifact</span>
+    <span class="k">return</span> <span class="n">execute_isolated</span><span class="p">(</span>
+        <span class="n">plan</span><span class="p">,</span>
+        <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+        <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+        <span class="n">artifact_converter</span><span class="o">=</span><span class="n">artifact_converter</span><span class="p">,</span>
+        <span class="n">content_store</span><span class="o">=</span><span class="n">content_store</span><span class="p">,</span>
+        <span class="n">fetch_bytes</span><span class="o">=</span><span class="n">fetch_bytes</span><span class="p">,</span>
+        <span class="n">asset_fetcher</span><span class="o">=</span><span class="n">asset_fetcher</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+        <span class="n">halt_on_failure</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">artifacts_or_raise</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="execute_isolated">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.execute_isolated">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">execute_isolated</span><span class="p">(</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">artifact_converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultToArtifact</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">fetch_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">asset_fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CONCURRENCY</span><span class="p">,</span>
+    <span class="n">halt_on_failure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute a Plan with **per-call failure isolation**, returning a report.</span>
+
+<span class="sd">    The fan-out counterpart of :func:`execute`. Where ``execute`` raises on the</span>
+<span class="sd">    first failure — discarding every artifact produced before it, each of which</span>
+<span class="sd">    fal has already billed — this returns an :class:`~falaw.ExecutionReport`</span>
+<span class="sd">    carrying one :class:`~falaw.CallOutcome` per call: the successes with their</span>
+<span class="sd">    artifacts, the failures with their exceptions, and the calls that never ran</span>
+<span class="sd">    with the reason why.</span>
+
+<span class="sd">    ``len(report.outcomes) == len(plan.calls)`` always, so a caller that built</span>
+<span class="sd">    something per call can zip against ``report.outcomes`` and stay aligned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        halt_on_failure: When True, stop *submitting* work as soon as any call</span>
+<span class="sd">            fails; everything not yet started is reported ``blocked`` with a</span>
+<span class="sd">            run-level reason. This is what :func:`execute` uses, and at</span>
+<span class="sd">            ``concurrency=1`` it reproduces the historical sequential</span>
+<span class="sd">            behaviour exactly. Note that at ``concurrency &gt; 1`` calls already</span>
+<span class="sd">            in flight are **not** cancelled — a fal request cannot be recalled</span>
+<span class="sd">            once made, and pretending otherwise would discard results that were</span>
+<span class="sd">            billed anyway.</span>
+
+<span class="sd">        All other arguments are as :func:`execute`.</span>
+
+<span class="sd">    Three outcome states, not two</span>
+<span class="sd">    -----------------------------</span>
+<span class="sd">    ``failed`` and ``blocked`` are different questions for the caller. A failed</span>
+<span class="sd">    call can be retried verbatim. A blocked one cannot: its input does not</span>
+<span class="sd">    exist, so it has to be re-planned after its producer succeeds. Any call</span>
+<span class="sd">    holding a ``&quot;&lt;from N&gt;&quot;`` placeholder whose call ``N`` did not succeed is</span>
+<span class="sd">    blocked, transitively.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from falaw import CallPlan, Plan, execute_plan_isolated</span>
+<span class="sd">        &gt;&gt;&gt; plan = Plan(calls=(CallPlan(tool=&quot;t&quot;, application=&quot;m&quot;,</span>
+<span class="sd">        ...                             arguments={}, output_kind=&quot;image&quot;),))</span>
+<span class="sd">        &gt;&gt;&gt; report = execute_plan_isolated(plan, dry_run=True)</span>
+<span class="sd">        &gt;&gt;&gt; report.is_complete, len(report.outcomes)</span>
+<span class="sd">        (True, 1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">concurrency</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;concurrency must be at least 1, got </span><span class="si">{</span><span class="n">concurrency</span><span class="si">!r}</span><span class="s2">. &quot;</span>
+            <span class="s2">&quot;It bounds how many calls are in flight at once; 1 is sequential.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ExecutionReport</span><span class="p">(</span>
+            <span class="n">outcomes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span>
+                <span class="n">CallOutcome</span><span class="p">(</span>
+                    <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                    <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;succeeded&quot;</span><span class="p">,</span>
+                    <span class="n">artifact</span><span class="o">=</span><span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">call</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">call</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">artifact_converter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_refuse_converter_configuration</span><span class="p">(</span><span class="n">content_store</span><span class="p">,</span> <span class="n">fetch_bytes</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">)</span>
@@ -675,8 +794,74 @@
         <span class="p">)</span>
         <span class="n">usable_from_cache</span> <span class="o">=</span> <span class="n">_make_usability_check</span><span class="p">(</span><span class="n">fetch_bytes</span><span class="o">=</span><span class="n">wants_bytes</span><span class="p">)</span>
 
-    <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Artifact</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">call</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_run_plan</span><span class="p">(</span>
+        <span class="n">plan</span><span class="p">,</span>
+        <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
+        <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
+        <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+        <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
+        <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
+        <span class="n">halt_on_failure</span><span class="o">=</span><span class="n">halt_on_failure</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># --- the scheduler ----------------------------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_plan</span><span class="p">(</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">converter</span><span class="p">:</span> <span class="s2">&quot;ResultToArtifact&quot;</span><span class="p">,</span>
+    <span class="n">usable_from_cache</span><span class="p">,</span>
+    <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">on_event</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">halt_on_failure</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExecutionReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run every call of ``plan``, honouring its ``&lt;from N&gt;`` dependencies.</span>
+
+<span class="sd">    The Plan is a DAG whose only edges are ``&quot;&lt;from N&gt;&quot;`` placeholders, and</span>
+<span class="sd">    :func:`plan_dependencies` has already proved every edge points *backwards*.</span>
+<span class="sd">    So the schedule is: a call is runnable once all its producers have</span>
+<span class="sd">    succeeded, blocked once any of them has not, and at most ``concurrency``</span>
+<span class="sd">    calls are ever in flight.</span>
+
+<span class="sd">    Termination, since a scheduler that can wedge is worse than a slow one: let</span>
+<span class="sd">    ``m`` be the lowest still-pending index. Every dependency of ``m`` is</span>
+<span class="sd">    ``&lt; m``, hence already resolved or in flight. If one did not succeed, ``m``</span>
+<span class="sd">    is marked blocked; if all succeeded, ``m`` is submitted (or the in-flight</span>
+<span class="sd">    bound is saturated, so there is something to wait for); if one is still in</span>
+<span class="sd">    flight, there is something to wait for. Every iteration therefore resolves a</span>
+<span class="sd">    call, starts a call, or waits on one — and ``concurrency &gt;= 1`` is validated</span>
+<span class="sd">    by the caller, so &quot;starts a call&quot; is always eventually possible.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">deps</span> <span class="o">=</span> <span class="n">plan_dependencies</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+    <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">outcomes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">CallOutcome</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">succeeded</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">unusable</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># failed or blocked — nothing downstream may run</span>
+    <span class="n">pending</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+    <span class="n">halted</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="n">CallOutcome</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">outcomes</span><span class="p">[</span><span class="n">outcome</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">outcome</span>
+        <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span><span class="p">:</span>
+            <span class="n">succeeded</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">artifacts</span><span class="p">[</span><span class="n">outcome</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">.</span><span class="n">artifact</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">unusable</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">outcome</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">unit</span><span class="p">(</span><span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The whole per-call job: resolve this call&#39;s inputs, then run it.</span>
+
+<span class="sd">        Placeholder resolution lives *inside* the isolated unit on purpose. It</span>
+<span class="sd">        can fail at run time even on a well-formed plan — an upstream that</span>
+<span class="sd">        succeeded but produced no URL — and that is this call&#39;s failure, not the</span>
+<span class="sd">        run&#39;s.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
         <span class="n">wire_args</span> <span class="o">=</span> <span class="n">_resolve_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">,</span> <span class="n">ref</span><span class="o">=</span><span class="n">_wire_ref</span><span class="p">)</span>
         <span class="c1"># Only resolved when it will be used — the key ref is stricter than the</span>
         <span class="c1"># wire ref (it needs bytes *or* a URL), and an uncached run must not</span>
@@ -686,19 +871,152 @@
             <span class="k">if</span> <span class="n">use_cache</span>
             <span class="k">else</span> <span class="n">wire_args</span>
         <span class="p">)</span>
-        <span class="n">artifacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_execute_call</span><span class="p">(</span>
-                <span class="n">call</span><span class="p">,</span>
-                <span class="n">wire_args</span><span class="p">,</span>
-                <span class="n">key_args</span><span class="p">,</span>
-                <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
-                <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
-                <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
-                <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_execute_call</span><span class="p">(</span>
+            <span class="n">call</span><span class="p">,</span>
+            <span class="n">wire_args</span><span class="p">,</span>
+            <span class="n">key_args</span><span class="p">,</span>
+            <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
+            <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
+            <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+            <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">artifacts</span></div>
 
+    <span class="k">with</span> <span class="n">_bounded_executor</span><span class="p">(</span><span class="n">concurrency</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">in_flight</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">while</span> <span class="n">pending</span> <span class="ow">or</span> <span class="n">in_flight</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pending</span><span class="p">):</span>
+                <span class="n">blockers</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">deps</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">unusable</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">blockers</span><span class="p">:</span>
+                    <span class="n">pending</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">record</span><span class="p">(</span><span class="n">_blocked_outcome</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="p">,</span> <span class="n">blockers</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="n">halted</span><span class="p">:</span>
+                    <span class="n">pending</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">record</span><span class="p">(</span><span class="n">_halted_outcome</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pending</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_flight</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">concurrency</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">deps</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">succeeded</span><span class="p">:</span>
+                    <span class="n">pending</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">in_flight</span><span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">copy_context</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">index</span><span class="p">)]</span> <span class="o">=</span> <span class="n">index</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">in_flight</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pending</span><span class="p">:</span>
+                    <span class="k">break</span>  <span class="c1"># the last calls all resolved without running</span>
+                <span class="c1"># Unreachable given the termination argument above; a wedged</span>
+                <span class="c1"># scheduler must be loud rather than a silent hang.</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;falaw scheduler stalled with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pending</span><span class="p">)</span><span class="si">}</span><span class="s2"> call(s) &quot;</span>
+                    <span class="s2">&quot;pending and none runnable. This is a falaw bug — please &quot;</span>
+                    <span class="s2">&quot;report the Plan that produced it.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_wait_first</span><span class="p">(</span><span class="n">in_flight</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">in_flight</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
+                <span class="n">record</span><span class="p">(</span><span class="n">_outcome_from_future</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="p">,</span> <span class="n">future</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">outcomes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span> <span class="ow">and</span> <span class="n">halt_on_failure</span><span class="p">:</span>
+                    <span class="n">halted</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">ExecutionReport</span><span class="p">(</span><span class="n">outcomes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">outcomes</span><span class="p">))</span>  <span class="c1"># type: ignore[arg-type]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_outcome_from_future</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">future</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn one finished unit of work into its :class:`CallOutcome`.</span>
+
+<span class="sd">    A ``BaseException`` that is not an ``Exception`` — ``KeyboardInterrupt``,</span>
+<span class="sd">    ``SystemExit``, a test framework&#39;s abort — is **not** a call failure and is</span>
+<span class="sd">    re-raised. Isolating it would mean carrying on and billing the rest of the</span>
+<span class="sd">    plan after the operator asked the process to stop.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">error</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">exception</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">error</span>
+        <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">artifact</span><span class="p">,</span> <span class="n">cache_hit</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;succeeded&quot;</span><span class="p">,</span>
+        <span class="n">artifact</span><span class="o">=</span><span class="n">artifact</span><span class="p">,</span>
+        <span class="n">cache_hit</span><span class="o">=</span><span class="n">cache_hit</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_blocked_outcome</span><span class="p">(</span>
+    <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">blockers</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
+    <span class="n">listed</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blockers</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;blocked&quot;</span><span class="p">,</span>
+        <span class="n">blocked_by</span><span class="o">=</span><span class="n">blockers</span><span class="p">,</span>
+        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;depends on call(s) </span><span class="si">{</span><span class="n">listed</span><span class="si">}</span><span class="s2"> via a &#39;&lt;from N&gt;&#39; placeholder, and &quot;</span>
+            <span class="s2">&quot;they did not succeed — this call must be re-planned once they do, &quot;</span>
+            <span class="s2">&quot;not retried as-is&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_halted_outcome</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">&quot;blocked&quot;</span><span class="p">,</span>
+        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;never started: an earlier call failed and the run was halted &quot;</span>
+            <span class="s2">&quot;(halt_on_failure=True)&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_InlineExecutor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A ``submit``/``Future`` surface that runs the work immediately, inline.</span>
+
+<span class="sd">    The ``concurrency=1`` path. A ``ThreadPoolExecutor(max_workers=1)`` would</span>
+<span class="sd">    also serialise the calls, but it would move them off the calling thread —</span>
+<span class="sd">    changing where exceptions are raised from, which thread holds the fal</span>
+<span class="sd">    client, and what a debugger sees. The default execution path should be the</span>
+<span class="sd">    plain one, so it is.</span>
+
+<span class="sd">    It captures ``BaseException`` because that is exactly what</span>
+<span class="sd">    ``ThreadPoolExecutor`` does. Emulating the pool faithfully is the whole job:</span>
+<span class="sd">    the moment the two executors differ, the sequential and concurrent paths</span>
+<span class="sd">    diverge in behaviour, and only one of them is covered by any given test.</span>
+<span class="sd">    Which exceptions are *call failures* rather than run-level aborts is decided</span>
+<span class="sd">    in one place — :func:`_outcome_from_future` — for both.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">Future</span>
+
+        <span class="n">future</span><span class="p">:</span> <span class="s2">&quot;Future&quot;</span> <span class="o">=</span> <span class="n">Future</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">future</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — classified by _outcome_from_future</span>
+            <span class="n">future</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">future</span>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bounded_executor</span><span class="p">(</span><span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield an executor bounded to ``concurrency`` in-flight calls.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">concurrency</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">_InlineExecutor</span><span class="p">()</span>
+        <span class="k">return</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span>
+        <span class="n">max_workers</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span> <span class="n">thread_name_prefix</span><span class="o">=</span><span class="s2">&quot;falaw-plan&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">pool</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_wait_first</span><span class="p">(</span><span class="n">in_flight</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Block until at least one future in ``in_flight`` is done.&quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIRST_COMPLETED</span><span class="p">,</span> <span class="n">wait</span>
+
+    <span class="k">return</span> <span class="n">wait</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">in_flight</span><span class="p">),</span> <span class="n">return_when</span><span class="o">=</span><span class="n">FIRST_COMPLETED</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_execute_call</span><span class="p">(</span>
@@ -710,8 +1028,13 @@
     <span class="n">usable_from_cache</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">on_event</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run one :class:`CallPlan`, returning its Artifact. See :func:`execute`.</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run one :class:`CallPlan`, returning ``(artifact, cache_hit)``.</span>
+
+<span class="sd">    ``cache_hit`` is *observed*, not predicted: it says this call was served</span>
+<span class="sd">    from a cache entry that proved usable, which is what run-level cost</span>
+<span class="sd">    accounting must be based on (a plan-time ``cache_status`` can be wrong in</span>
+<span class="sd">    both directions).</span>
 
 <span class="sd">    Split out of the loop because a cache hit is not unconditionally usable:</span>
 <span class="sd">    the response may name an asset fal has since deleted, whose bytes are not</span>
@@ -731,15 +1054,14 @@
             <span class="c1"># Speculative: the conversion may turn out to be unusable, in which</span>
             <span class="c1"># case its own complaints are noise the caller must not see (we are</span>
             <span class="c1"># about to discard the artifact and say something more useful). Any</span>
-            <span class="c1"># warning from a conversion we *keep* is replayed verbatim.</span>
-            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">probe_warnings</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+            <span class="c1"># warning from a conversion we *keep* is replayed.</span>
+            <span class="k">with</span> <span class="n">_deferred_degrade_warnings</span><span class="p">()</span> <span class="k">as</span> <span class="n">deferred</span><span class="p">:</span>
                 <span class="n">artifact</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">hit</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">usable_from_cache</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">hit</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">probe_warnings</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn_explicit</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">w</span><span class="o">.</span><span class="n">lineno</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
                 <span class="n">emit_cache_hit</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">on_event</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">artifact</span>
+                <span class="k">return</span> <span class="n">artifact</span><span class="p">,</span> <span class="kc">True</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dropping the falaw cache entry for </span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">!r}</span><span class="s2">: its &quot;</span>
                 <span class="s2">&quot;recorded result names an asset that can no longer be read &quot;</span>
@@ -759,7 +1081,32 @@
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">wire_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">),</span> <span class="kc">False</span>
+
+
+<span class="n">_DEGRADE_WARNING_SINK</span><span class="p">:</span> <span class="s2">&quot;ContextVar[Optional[list]]&quot;</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">&quot;falaw_degrade_warning_sink&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Where :func:`_content_ref_or_none` sends its complaint instead of warning.</span>
+
+<span class="sd">A :class:`~contextvars.ContextVar` and **not** ``warnings.catch_warnings``,</span>
+<span class="sd">which mutates process-global filter state and is documented as not thread-safe:</span>
+<span class="sd">under ``concurrency &gt; 1`` one call&#39;s speculative cache probe would suppress</span>
+<span class="sd">another call&#39;s genuine warning, at random. A ContextVar set inside a unit of</span>
+<span class="sd">work is visible only to that unit — each pool task runs in its own context copy</span>
+<span class="sd">(see ``copy_context().run`` in :func:`_run_plan`).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_deferred_degrade_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect falaw&#39;s own degrade warnings instead of emitting them.&quot;&quot;&quot;</span>
+    <span class="n">sink</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">sink</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_content_ref_or_none</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_store</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">):</span>
@@ -778,14 +1125,17 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span><span class="o">=</span><span class="n">asset_fetcher</span><span class="p">),</span> <span class="n">store</span>
     <span class="k">except</span> <span class="n">FalAssetFetchError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> Falling back to a URL-only artifact: `asset_id` is a digest &quot;</span>
             <span class="s2">&quot;of the response, NOT a content hash, and `bytes_size` is 0. &quot;</span>
             <span class="s2">&quot;Chained calls downstream of it cannot be cache-reused, and the &quot;</span>
-            <span class="s2">&quot;artifact dies with the URL.&quot;</span><span class="p">,</span>
-            <span class="ne">UserWarning</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="s2">&quot;artifact dies with the URL.&quot;</span>
         <span class="p">)</span>
+        <span class="n">sink</span> <span class="o">=</span> <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sink</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sink</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">store</span>
 
 
@@ -884,6 +1234,89 @@
     <span class="p">)</span>
 
 
+<div class="viewcode-block" id="plan_dependencies">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.plan_dependencies">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plan_dependencies</span><span class="p">(</span><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Per-call set of the call indices it references via ``&quot;&lt;from N&gt;&quot;``.</span>
+
+<span class="sd">    The Plan&#39;s dependency DAG, read straight off the placeholders — one</span>
+<span class="sd">    ``frozenset`` per call, in plan order, so ``deps[3] == {1}`` means call 3</span>
+<span class="sd">    consumes call 1&#39;s output. An empty set means the call is **independent** and</span>
+<span class="sd">    may run concurrently with any other independent call, which is what</span>
+<span class="sd">    :func:`execute_isolated` schedules on.</span>
+
+<span class="sd">    Also the plan&#39;s structural validator, and it runs **before a cent is</span>
+<span class="sd">    spent**: a malformed reference used to surface only when execution reached</span>
+<span class="sd">    the offending call, i.e. after every call before it had been billed.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: a placeholder that is not ``&quot;&lt;from N&gt;&quot;`` for an integer</span>
+<span class="sd">            ``N``; an ``N`` outside the plan; or an ``N`` that does not run</span>
+<span class="sd">            *before* the referencing call (including a self-reference) — the</span>
+<span class="sd">            output would not exist yet, so it can only ever be a bug.</span>
+
+<span class="sd">    &gt;&gt;&gt; a = CallPlan(tool=&quot;t&quot;, application=&quot;m&quot;, arguments={}, output_kind=&quot;image&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; b = CallPlan(tool=&quot;t&quot;, application=&quot;m&quot;,</span>
+<span class="sd">    ...              arguments={&quot;image_url&quot;: &quot;&lt;from 0&gt;&quot;}, output_kind=&quot;video&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; plan_dependencies(Plan(calls=(a, b)))</span>
+<span class="sd">    (frozenset(), frozenset({0}))</span>
+<span class="sd">    &gt;&gt;&gt; plan_dependencies(Plan(calls=(b,)))</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">    ValueError: Placeholder &#39;&lt;from 0&gt;&#39; in call 0 references call 0, which does not run before it. ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+    <span class="n">dependencies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">frozenset</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">call</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">):</span>
+        <span class="n">referenced</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">placeholder</span> <span class="ow">in</span> <span class="n">_iter_placeholders</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">_parse_placeholder_index</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">total</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> in call </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2"> references &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;artifact index </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">, but the plan has only </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2"> call(s).&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">position</span><span class="p">:</span>
+                <span class="n">reachable</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;it is the first call, so it can reference nothing&quot;</span>
+                    <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;it may only reference calls 0..</span><span class="si">{</span><span class="n">position</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> in call </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2"> references &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;call </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">, which does not run before it. A &#39;&lt;from N&gt;&#39; &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;placeholder consumes an earlier call&#39;s output — </span><span class="si">{</span><span class="n">reachable</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">referenced</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">dependencies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">frozenset</span><span class="p">(</span><span class="n">referenced</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">dependencies</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_iter_placeholders</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield every ``&quot;&lt;from ...&gt;&quot;`` string anywhere inside ``value``.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">yield from</span> <span class="n">_iter_placeholders</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">_iter_placeholders</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_placeholder_index</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``&quot;&lt;from 3&gt;&quot;`` -&gt; ``3``. Raises ``ValueError`` on anything else.&quot;&quot;&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Bad placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> — expected &#39;&lt;from N&gt;&#39; where N is an integer.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_placeholders</span><span class="p">(</span><span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rewrite ``&lt;from N&gt;`` strings in ``arguments`` via ``ref(artifact, idx, ph)``.</span>
 
@@ -920,18 +1353,22 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_lookup_artifact_ref</span><span class="p">(</span><span class="n">placeholder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">artifacts</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse ``&quot;&lt;from N&gt;&quot;`` and return ``ref(artifacts[N], N, placeholder)``.&quot;&quot;&quot;</span>
-    <span class="n">body</span> <span class="o">=</span> <span class="n">placeholder</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">_PLACEHOLDER_PREFIX</span><span class="p">)</span> <span class="p">:]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Bad placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> — expected &#39;&lt;from N&gt;&#39; where N is an integer.&quot;</span>
-        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse ``&quot;&lt;from N&gt;&quot;`` and return ``ref(artifacts[N], N, placeholder)``.</span>
+
+<span class="sd">    ``artifacts`` is a slot list the length of the Plan, so a slot may be</span>
+<span class="sd">    ``None`` — the call that fills it has not run, or did not succeed. That is</span>
+<span class="sd">    an error here rather than an ``AttributeError`` three frames down.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">_parse_placeholder_index</span><span class="p">(</span><span class="n">placeholder</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;but only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">)</span><span class="si">}</span><span class="s2"> artifact(s) have been materialized.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;but only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">artifacts</span><span class="p">)</span><span class="si">}</span><span class="s2"> artifact slot(s) exist.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">artifacts</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Placeholder </span><span class="si">{</span><span class="n">placeholder</span><span class="si">!r}</span><span class="s2"> references artifact index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="s2">&quot;which has not been produced.&quot;</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">ref</span><span class="p">(</span><span class="n">artifacts</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">idx</span><span class="p">,</span> <span class="n">placeholder</span><span class="p">)</span>
 

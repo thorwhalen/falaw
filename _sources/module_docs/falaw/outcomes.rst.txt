@@ -1,0 +1,4 @@
+falaw.outcomes
+==============
+.. automodule:: falaw.outcomes
+   :members:

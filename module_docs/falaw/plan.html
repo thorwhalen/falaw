@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.23 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.24 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=3294188c"></script>
+      <script src="../../_static/documentation_options.js?v=f91d8841"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="falaw.refresh" href="refresh.html" />
-    <link rel="prev" title="falaw.operations.video" href="operations/video.html" /> 
+    <link rel="prev" title="falaw.outcomes" href="outcomes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -75,6 +75,7 @@
 <li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outcomes.html">falaw.outcomes</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.plan</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CONTENT_REF_PREFIX"><code class="docutils literal notranslate"><span class="pre">CONTENT_REF_PREFIX</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.CacheStatus"><code class="docutils literal notranslate"><span class="pre">CacheStatus</span></code></a></li>
@@ -90,6 +91,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.tool"><code class="docutils literal notranslate"><span class="pre">CallPlan.tool</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.DFLT_CONCURRENCY"><code class="docutils literal notranslate"><span class="pre">DFLT_CONCURRENCY</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.DFLT_FETCH_BYTES"><code class="docutils literal notranslate"><span class="pre">DFLT_FETCH_BYTES</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.FETCH_BYTES_ENVVAR"><code class="docutils literal notranslate"><span class="pre">FETCH_BYTES_ENVVAR</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.OutputKind"><code class="docutils literal notranslate"><span class="pre">OutputKind</span></code></a></li>
@@ -104,7 +106,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.call_plan_from_dict"><code class="docutils literal notranslate"><span class="pre">call_plan_from_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.call_plan_to_dict"><code class="docutils literal notranslate"><span class="pre">call_plan_to_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.execute"><code class="docutils literal notranslate"><span class="pre">execute()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.execute_isolated"><code class="docutils literal notranslate"><span class="pre">execute_isolated()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.make_call_plan"><code class="docutils literal notranslate"><span class="pre">make_call_plan()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_dependencies"><code class="docutils literal notranslate"><span class="pre">plan_dependencies()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_from_dict"><code class="docutils literal notranslate"><span class="pre">plan_from_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_hash"><code class="docutils literal notranslate"><span class="pre">plan_hash()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.plan.plan_to_dict"><code class="docutils literal notranslate"><span class="pre">plan_to_dict()</span></code></a></li>
@@ -303,6 +307,16 @@ fal models depending on quality tier.</p>
 </dd></dl>
 
 <dl class="py data">
+<dt class="sig sig-object py" id="falaw.plan.DFLT_CONCURRENCY">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">DFLT_CONCURRENCY</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></span><a class="headerlink" href="#falaw.plan.DFLT_CONCURRENCY" title="Link to this definition"></a></dt>
+<dd><p>How many calls of a Plan run at once by default.</p>
+<p>One — a Plan executes sequentially unless the caller asks otherwise. Every call
+is a paid vendor request, so parallelism is opt-in: it is the caller who knows
+their rate limit, their budget, and whether they want 200 renders started at
+once. (<a class="reference internal" href="../falaw.html#falaw.render_scene" title="falaw.render_scene"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.render_scene()</span></code></a> makes the same choice for the same reason.)</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="falaw.plan.DFLT_FETCH_BYTES">
 <span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">DFLT_FETCH_BYTES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></span><a class="headerlink" href="#falaw.plan.DFLT_FETCH_BYTES" title="Link to this definition"></a></dt>
 <dd><p>Whether <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> downloads media results to content-address them.</p>
@@ -391,8 +405,14 @@ everything else is already JSON-native.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.plan.execute">
-<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concurrency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute" title="Link to this definition"></a></dt>
 <dd><p>Execute a Plan, returning a list of materialized :class:<a href="#id1"><span class="problematic" id="id2">`</span></a>lacing.Artifact`s.</p>
+<p>This is the <strong>halt</strong> policy: the first call that raises ends the run, and its
+exception propagates unchanged (falaw’s typed hierarchy — see
+<a class="reference internal" href="errors.html#module-falaw.errors" title="falaw.errors"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.errors</span></code></a> — is what a caller classifies on, so it is never
+wrapped). Use <a class="reference internal" href="#falaw.plan.execute_isolated" title="falaw.plan.execute_isolated"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute_isolated()</span></code></a> when one bad call must not discard
+the rest of a fan-out; it returns an <a class="reference internal" href="../falaw.html#falaw.ExecutionReport" title="falaw.ExecutionReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecutionReport</span></code></a> with one
+outcome per call instead of raising.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -433,6 +453,18 @@ transport here, or execution will reach for the network. (Setting
 <code class="docutils literal notranslate"><span class="pre">$FALAW_FETCH_ARTIFACT_BYTES=0</span></code> also works but is blunter — it
 turns off content addressing altogether, so the suite stops
 exercising the thing it is testing.)</p></li>
+<li><p><strong>concurrency</strong> – How many calls may be in flight at once. <code class="docutils literal notranslate"><span class="pre">1</span></code>
+(<a class="reference internal" href="#falaw.plan.DFLT_CONCURRENCY" title="falaw.plan.DFLT_CONCURRENCY"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_CONCURRENCY</span></code></a>) runs the Plan sequentially, on the
+calling thread, exactly as it always has. Above 1, independent calls
+run on a thread pool bounded by this number — a Plan is I/O-bound
+(an HTTP request that fal takes tens of seconds to answer), so
+threads are the right tool and the bound is what keeps a 200-call
+fan-out from becoming 200 simultaneous paid requests. <strong>Chained
+calls are never parallelised with their producers</strong>: a call holding
+a <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code> placeholder waits for call <code class="docutils literal notranslate"><span class="pre">N</span></code>. Two things to
+weigh before raising it: the vendor’s rate limit, and memory —
+materializing a media result peaks at roughly twice the asset’s size
+(thorwhalen/lacing#25), so <code class="docutils literal notranslate"><span class="pre">concurrency</span></code> multiplies the peak.</p></li>
 </ul>
 </dd>
 </dl>
@@ -487,6 +519,50 @@ in the same order.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.plan.execute_isolated">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">execute_isolated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">artifact_converter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ResultToArtifact</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concurrency</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">halt_on_failure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../falaw.html#falaw.ExecutionReport" title="falaw.ExecutionReport"><span class="pre">ExecutionReport</span></a></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#execute_isolated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.execute_isolated" title="Link to this definition"></a></dt>
+<dd><p>Execute a Plan with <strong>per-call failure isolation</strong>, returning a report.</p>
+<p>The fan-out counterpart of <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a>. Where <code class="docutils literal notranslate"><span class="pre">execute</span></code> raises on the
+first failure — discarding every artifact produced before it, each of which
+fal has already billed — this returns an <a class="reference internal" href="../falaw.html#falaw.ExecutionReport" title="falaw.ExecutionReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExecutionReport</span></code></a>
+carrying one <a class="reference internal" href="../falaw.html#falaw.CallOutcome" title="falaw.CallOutcome"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallOutcome</span></code></a> per call: the successes with their
+artifacts, the failures with their exceptions, and the calls that never ran
+with the reason why.</p>
+<p><code class="docutils literal notranslate"><span class="pre">len(report.outcomes)</span> <span class="pre">==</span> <span class="pre">len(plan.calls)</span></code> always, so a caller that built
+something per call can zip against <code class="docutils literal notranslate"><span class="pre">report.outcomes</span></code> and stay aligned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>halt_on_failure</strong> – When True, stop <em>submitting</em> work as soon as any call
+fails; everything not yet started is reported <code class="docutils literal notranslate"><span class="pre">blocked</span></code> with a
+run-level reason. This is what <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> uses, and at
+<code class="docutils literal notranslate"><span class="pre">concurrency=1</span></code> it reproduces the historical sequential
+behaviour exactly. Note that at <code class="docutils literal notranslate"><span class="pre">concurrency</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> calls already
+in flight are <strong>not</strong> cancelled — a fal request cannot be recalled
+once made, and pretending otherwise would discard results that were
+billed anyway.</p>
+</dd>
+</dl>
+<p>:param All other arguments are as <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a>.:</p>
+<section id="three-outcome-states-not-two">
+<h2>Three outcome states, not two<a class="headerlink" href="#three-outcome-states-not-two" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">failed</span></code> and <code class="docutils literal notranslate"><span class="pre">blocked</span></code> are different questions for the caller. A failed
+call can be retried verbatim. A blocked one cannot: its input does not
+exist, so it has to be re-planned after its producer succeeds. Any call
+holding a <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code> placeholder whose call <code class="docutils literal notranslate"><span class="pre">N</span></code> did not succeed is
+blocked, transitively.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">execute_plan_isolated</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">),))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">execute_plan_isolated</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">is_complete</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">outcomes</span><span class="p">)</span>
+<span class="go">(True, 1)</span>
+</pre></div>
+</div>
+</section>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.plan.make_call_plan">
 <span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">make_call_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'image'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'video'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'audio'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'json'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'text'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'binary'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cost_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_duration_s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consult_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#make_call_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.make_call_plan" title="Link to this definition"></a></dt>
 <dd><p>Build a <a class="reference internal" href="#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallPlan</span></code></a> and (optionally) check the cache.</p>
@@ -503,6 +579,39 @@ it keys on the placeholder rather than on the upstream content ref
 trusted for chained calls, and a plan’s reported cost can understate what
 the run bills. Fixing it needs the upstream to have executed, which is a
 planner-level change, not a converter-level one.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.plan.plan_dependencies">
+<span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">plan_dependencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/plan.html#plan_dependencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.plan_dependencies" title="Link to this definition"></a></dt>
+<dd><p>Per-call set of the call indices it references via <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code>.</p>
+<p>The Plan’s dependency DAG, read straight off the placeholders — one
+<code class="docutils literal notranslate"><span class="pre">frozenset</span></code> per call, in plan order, so <code class="docutils literal notranslate"><span class="pre">deps[3]</span> <span class="pre">==</span> <span class="pre">{1}</span></code> means call 3
+consumes call 1’s output. An empty set means the call is <strong>independent</strong> and
+may run concurrently with any other independent call, which is what
+<a class="reference internal" href="#falaw.plan.execute_isolated" title="falaw.plan.execute_isolated"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute_isolated()</span></code></a> schedules on.</p>
+<p>Also the plan’s structural validator, and it runs <strong>before a cent is
+spent</strong>: a malformed reference used to surface only when execution reached
+the offending call, i.e. after every call before it had been billed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – a placeholder that is not <code class="docutils literal notranslate"><span class="pre">&quot;&lt;from</span> <span class="pre">N&gt;&quot;</span></code> for an integer
+    <code class="docutils literal notranslate"><span class="pre">N</span></code>; an <code class="docutils literal notranslate"><span class="pre">N</span></code> outside the plan; or an <code class="docutils literal notranslate"><span class="pre">N</span></code> that does not run
+    <em>before</em> the referencing call (including a self-reference) — the
+    output would not exist yet, so it can only ever be a bug.</p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from 0&gt;&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan_dependencies</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span>
+<span class="go">(frozenset(), frozenset({0}))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan_dependencies</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="p">,)))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">ValueError</span>: <span class="n">Placeholder &#39;&lt;from 0&gt;&#39; in call 0 references call 0, which does not run before it. ...</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -563,7 +672,7 @@ so a future breaking change is detectable.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="operations/video.html" class="btn btn-neutral float-left" title="falaw.operations.video" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="outcomes.html" class="btn btn-neutral float-left" title="falaw.outcomes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="refresh.html" class="btn btn-neutral float-right" title="falaw.refresh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
