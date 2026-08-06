@@ -366,14 +366,17 @@ def blocked_outbound_network() -> Iterator[list]:
     Blind spot worth knowing: a subprocess opens its own sockets in its own
     process, where this has no reach. ffmpeg is the one that matters.
 
+    (``.invalid`` is reserved by RFC 2606 and can never resolve, so even a
+    broken guard cannot turn this example into real traffic.)
+
     >>> import socket
     >>> with blocked_outbound_network() as attempts:
     ...     try:
-    ...         socket.getaddrinfo("example.com", 443)
+    ...         socket.getaddrinfo("nowhere.invalid", 443)
     ...     except OutboundNetworkAttempt:
     ...         pass
     >>> attempts
-    ["a DNS lookup for 'example.com'"]
+    ["a DNS lookup for 'nowhere.invalid'"]
     """
     attempts: list = []
     real_getaddrinfo = socket.getaddrinfo

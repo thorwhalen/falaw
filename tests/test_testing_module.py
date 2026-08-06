@@ -311,12 +311,16 @@ def test_the_guard_refuses_and_records_a_dns_lookup():
 
 
 def test_the_guard_records_even_when_the_refusal_is_swallowed():
-    """A caller with a bare ``except BaseException`` must not be able to hide it."""
+    """A caller with a bare ``except BaseException`` must not be able to hide it.
+
+    ``192.0.2.1`` is TEST-NET-1 (RFC 5737) and is guaranteed unroutable, so a
+    broken guard cannot turn this into real traffic either.
+    """
     import socket
 
     with blocked_outbound_network() as attempts:
         try:
-            socket.socket().connect(("93.184.216.34", 443))
+            socket.socket().connect(("192.0.2.1", 443))
         except BaseException:  # noqa: BLE001 — exactly what falaw does
             pass
     assert attempts, "the swallowed refusal left no evidence"
