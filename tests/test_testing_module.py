@@ -84,13 +84,13 @@ def fal(monkeypatch) -> FakeFal:
     return stub
 
 
-def _image_plan() -> Plan:
+def _image_plan(application: str = "m/img") -> Plan:
     return Plan(
         calls=(
             CallPlan(
                 tool="generate_image",
-                application="m/img",
-                arguments={"prompt": "x"},
+                application=application,
+                arguments={"prompt": application},
                 output_kind="image",
             ),
         )
@@ -145,25 +145,33 @@ def test_the_fake_covers_every_entry_point_that_reads_bytes(fal, fake_assets):
     did ``from falaw import execute_plan`` at import time holds a binding that
     patching the name ``falaw.execute_plan`` never replaces — so the calls below
     go through the **import-time bindings** on purpose.
-    """
-    fal.responds("m/img", {"images": [{"url": "http://cdn/from-plan.png"}]})
 
-    (artifact,) = _bound_execute_plan(_image_plan())
-    report = execute_plan_isolated(_image_plan(), use_cache=False)
+    Each entry point is given its **own** URL. Sharing one would let the
+    ``url -> ContentRef`` hint index answer the second call without fetching,
+    and the test would then pass while that entry point bypassed the fake
+    entirely.
+    """
+    fal.responds("m/plan", {"images": [{"url": "http://cdn/from-plan.png"}]})
+    fal.responds("m/iso", {"images": [{"url": "http://cdn/from-isolated.png"}]})
+
+    (artifact,) = _bound_execute_plan(_image_plan("m/plan"))
+    report = execute_plan_isolated(_image_plan("m/iso"))
     path = _bound_materialize_asset("http://cdn/materialized.png")
     ref = content_ref_for_url("http://cdn/direct.png")
 
     assert artifact.bytes_size == len(synthetic_asset_bytes("http://cdn/from-plan.png"))
-    assert report.is_complete
-    assert open(path, "rb").read() == synthetic_asset_bytes(
-        "http://cdn/materialized.png"
+    assert report.outcomes[0].artifact.bytes_size == len(
+        synthetic_asset_bytes("http://cdn/from-isolated.png")
     )
+    with open(path, "rb") as f:
+        assert f.read() == synthetic_asset_bytes("http://cdn/materialized.png")
     assert ref.bytes_size > 0
-    assert set(fake_assets.fetched) == {
+    assert fake_assets.fetched == [
         "http://cdn/from-plan.png",
+        "http://cdn/from-isolated.png",
         "http://cdn/materialized.png",
         "http://cdn/direct.png",
-    }, "an entry point escaped the fake and would have hit the network"
+    ], "an entry point escaped the fake and would have hit the network"
 
 
 def test_the_fake_reaches_a_thread_the_installer_did_not_create(fake_assets):
