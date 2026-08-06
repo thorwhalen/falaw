@@ -9,10 +9,15 @@ that a naive shared helper would quietly lose (thorwhalen/falaw#27):
 * an explicit ``fetcher=`` must still win;
 * ``file://`` must not be faked;
 * and — the one that keeps biting — **refusing is not reporting**: falaw
-  degrades a failed fetch to a warning and ``execute_isolated`` catches
-  ``BaseException``, so a guard that only raises leaves the suite green with
-  the regression back in place. Both the fake and the network guard therefore
-  *record*, and the recording is what is asserted.
+  funnels a failed fetch through ``except Exception`` and *degrades* it to a
+  URL-only artifact with a warning, so a guard that only raises leaves the
+  suite green with the regression back in place. Both the fake and the network
+  guard therefore *record*, and the recording is what is asserted.
+
+Note the issue's claim that ``execute_isolated`` catches ``BaseException`` into
+an outcome is **wrong** — ``_outcome_from_future`` re-raises a non-``Exception``
+deliberately. The two tests at the bottom pin down what actually happens in
+each case, so neither belief has to be taken on trust again.
 """
 
 import sys
