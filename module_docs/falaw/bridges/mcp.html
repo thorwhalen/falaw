@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.mcp &mdash; falaw 0.0.24 documentation</title>
+  <title>falaw.bridges.mcp &mdash; falaw 0.0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=f91d8841"></script>
+      <script src="../../../_static/documentation_options.js?v=5d650c58"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -55,7 +55,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.bridges.mcp</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.COSTED_TOOLS"><code class="docutils literal notranslate"><span class="pre">COSTED_TOOLS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.FREE_TAG"><code class="docutils literal notranslate"><span class="pre">FREE_TAG</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.build_mcp_server"><code class="docutils literal notranslate"><span class="pre">build_mcp_server()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.costed_tools"><code class="docutils literal notranslate"><span class="pre">costed_tools()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.register_tools"><code class="docutils literal notranslate"><span class="pre">register_tools()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.bridges.mcp.serve"><code class="docutils literal notranslate"><span class="pre">serve()</span></code></a></li>
 </ul>
@@ -129,11 +132,43 @@ composes falaw + nw + artful + lacing) calls.</p></li>
 just falaw. <a class="reference internal" href="#falaw.bridges.mcp.serve" title="falaw.bridges.mcp.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">serve()</span></code></a> runs it over stdio.</p></li>
 </ul>
 <p><code class="docutils literal notranslate"><span class="pre">fastmcp</span></code> is an optional dependency: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">falaw[mcp]</span></code>.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.bridges.mcp.COSTED_TOOLS">
+<span class="sig-prename descclassname"><span class="pre">falaw.bridges.mcp.</span></span><span class="sig-name descname"><span class="pre">COSTED_TOOLS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('animate_face',</span> <span class="pre">'apply_note_to_beat',</span> <span class="pre">'apply_note_to_scene',</span> <span class="pre">'cast_character',</span> <span class="pre">'cast_voice',</span> <span class="pre">'composite_character_in_environment',</span> <span class="pre">'edit_image',</span> <span class="pre">'establish_environment',</span> <span class="pre">'generate_image',</span> <span class="pre">'generate_image_with_refs',</span> <span class="pre">'image_to_video',</span> <span class="pre">'lipsync',</span> <span class="pre">'llm_complete',</span> <span class="pre">'parse_screenplay',</span> <span class="pre">'remove_background',</span> <span class="pre">'render_beat',</span> <span class="pre">'render_scene',</span> <span class="pre">'render_shot',</span> <span class="pre">'storyboard_shot',</span> <span class="pre">'talking_avatar_from_text',</span> <span class="pre">'text_to_speech',</span> <span class="pre">'text_to_video',</span> <span class="pre">'upscale_image',</span> <span class="pre">'voice_clone')</span></span><a class="headerlink" href="#falaw.bridges.mcp.COSTED_TOOLS" title="Link to this definition"></a></dt>
+<dd><p>Snapshot of <a class="reference internal" href="#falaw.bridges.mcp.costed_tools" title="falaw.bridges.mcp.costed_tools"><code class="xref py py-func docutils literal notranslate"><span class="pre">costed_tools()</span></code></a> for consumers that want a constant. Prefer
+the function when tools may be registered after import.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.bridges.mcp.FREE_TAG">
+<span class="sig-prename descclassname"><span class="pre">falaw.bridges.mcp.</span></span><span class="sig-name descname"><span class="pre">FREE_TAG</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'maintenance'</span></span><a class="headerlink" href="#falaw.bridges.mcp.FREE_TAG" title="Link to this definition"></a></dt>
+<dd><p>Tag marking a tool that makes <strong>no</strong> vendor call — docs/registry upkeep only.
+Everything else reaches fal.ai or an LLM and therefore spends money.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.bridges.mcp.build_mcp_server">
 <span class="sig-prename descclassname"><span class="pre">falaw.bridges.mcp.</span></span><span class="sig-name descname"><span class="pre">build_mcp_server</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'falaw'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tools</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../base.html#falaw.base.ToolSpec" title="falaw.base.ToolSpec"><span class="pre">ToolSpec</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/falaw/bridges/mcp.html#build_mcp_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.bridges.mcp.build_mcp_server" title="Link to this definition"></a></dt>
 <dd><p>Build a standalone <code class="docutils literal notranslate"><span class="pre">FastMCP</span></code> server exposing every falaw tool.</p>
 <p>Raises <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> with an install hint if <code class="docutils literal notranslate"><span class="pre">fastmcp</span></code> is missing.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.bridges.mcp.costed_tools">
+<span class="sig-prename descclassname"><span class="pre">falaw.bridges.mcp.</span></span><span class="sig-name descname"><span class="pre">costed_tools</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/falaw/bridges/mcp.html#costed_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.bridges.mcp.costed_tools" title="Link to this definition"></a></dt>
+<dd><p>Names of the falaw tools that spend money — the metering SSOT.</p>
+<p>Every genre package in the federation exposes this so an aggregating
+connector can gate spend from one source of truth per package
+(<code class="docutils literal notranslate"><span class="pre">braidio.mcp.COSTED_TOOLS</span></code>, <code class="docutils literal notranslate"><span class="pre">muvid.mcp.COSTED_TOOLS</span></code>). falaw had
+none, so its 24 money-spending tools — the <em>raw</em> fal.ai operations,
+including <code class="docutils literal notranslate"><span class="pre">text_to_video</span></code> and <code class="docutils literal notranslate"><span class="pre">render_scene</span></code> — reached an aggregating
+connector completely unmetered (thorwhalen/reelee#265).</p>
+<p><strong>Derived from the registry, not hand-listed</strong>, matching this module’s
+existing contract that adding a falaw tool needs no edit here. The
+consequence is the safe one: a newly-registered tool is <strong>costed by
+default</strong> and must be explicitly tagged <a class="reference internal" href="#falaw.bridges.mcp.FREE_TAG" title="falaw.bridges.mcp.FREE_TAG"><code class="xref py py-data docutils literal notranslate"><span class="pre">FREE_TAG</span></code></a> to be exempt.
+Forgetting the tag over-meters a free tool (annoying); the inverse would
+let a new money-spender through a credit cap (a billing hole).</p>
 </dd></dl>
 
 <dl class="py function">

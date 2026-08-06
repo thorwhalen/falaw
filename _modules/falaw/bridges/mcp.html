@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.mcp &mdash; falaw 0.0.24 documentation</title>
+  <title>falaw.bridges.mcp &mdash; falaw 0.0.25 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=f91d8841"></script>
+      <script src="../../../_static/documentation_options.js?v=5d650c58"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -132,6 +132,41 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolSpec</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_tools</span>
+
+<span class="c1">#: Tag marking a tool that makes **no** vendor call — docs/registry upkeep only.</span>
+<span class="c1">#: Everything else reaches fal.ai or an LLM and therefore spends money.</span>
+<span class="n">FREE_TAG</span> <span class="o">=</span> <span class="s2">&quot;maintenance&quot;</span>
+
+
+<div class="viewcode-block" id="costed_tools">
+<a class="viewcode-back" href="../../../module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.costed_tools">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">costed_tools</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Names of the falaw tools that spend money — the metering SSOT.</span>
+
+<span class="sd">    Every genre package in the federation exposes this so an aggregating</span>
+<span class="sd">    connector can gate spend from one source of truth per package</span>
+<span class="sd">    (``braidio.mcp.COSTED_TOOLS``, ``muvid.mcp.COSTED_TOOLS``). falaw had</span>
+<span class="sd">    none, so its 24 money-spending tools — the *raw* fal.ai operations,</span>
+<span class="sd">    including ``text_to_video`` and ``render_scene`` — reached an aggregating</span>
+<span class="sd">    connector completely unmetered (thorwhalen/reelee#265).</span>
+
+<span class="sd">    **Derived from the registry, not hand-listed**, matching this module&#39;s</span>
+<span class="sd">    existing contract that adding a falaw tool needs no edit here. The</span>
+<span class="sd">    consequence is the safe one: a newly-registered tool is **costed by</span>
+<span class="sd">    default** and must be explicitly tagged :data:`FREE_TAG` to be exempt.</span>
+<span class="sd">    Forgetting the tag over-meters a free tool (annoying); the inverse would</span>
+<span class="sd">    let a new money-spender through a credit cap (a billing hole).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
+        <span class="nb">sorted</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">list_tools</span><span class="p">()</span> <span class="k">if</span> <span class="n">FREE_TAG</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1">#: Snapshot of :func:`costed_tools` for consumers that want a constant. Prefer</span>
+<span class="c1">#: the function when tools may be registered after import.</span>
+<span class="n">COSTED_TOOLS</span> <span class="o">=</span> <span class="n">costed_tools</span><span class="p">()</span>
+
 
 <span class="n">_INSTRUCTIONS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;falaw generates and manages AI media (images, video, audio) via fal.ai. &quot;</span>
