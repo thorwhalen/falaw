@@ -42,6 +42,9 @@ export FAL_KEY="your-fal-api-key"
 | `pick_model(*, category, quality_tier)` | Pick a sensible default. |
 | `call_fal(application, arguments, *, on_event)` | Escape hatch to any fal model. Emits `ProgressEvent`s + auto-journals on error. |
 | `cached_call_fal(...)` | Same, plus content-addressed cache; emits `cache_hit` events on reuse. |
+| `execute_plan(plan, *, concurrency=N)` | Run a `Plan` → `list[Artifact]`. Raises on the first failure, unwrapped. |
+| `execute_plan_isolated(plan, *, concurrency=N)` | Run a `Plan` → `ExecutionReport`: one outcome per call, so one bad call does not discard the rest. |
+| `plan_dependencies(plan)` | The Plan's `"<from N>"` dependency DAG, and its structural validator. |
 | `render_scene(scene, *, concurrency=N)` / `iter_render_scene(...)` | Render every shot+beat; thread-pooled, with yield-as-done iterator. |
 | `estimate_scene_cost(scene)` | Walk a Scene, return a `CostRollup` with per-line USD breakdown. |
 | `subscribe(callback)` | Attach a global subscriber to the `ProgressEvent` bus. |
@@ -72,13 +75,49 @@ sums per-call costs and returns a `CostRollup` with per-line
 breakdown. Models without a populated `cost_estimate` appear in the
 rollup's `skipped` list so audits surface drift.
 
-### Concurrency
+### Fan-out: partial results, bounded concurrency, per-call isolation
 
-`render_scene(..., concurrency=4)` runs shots and beats in parallel
-through a thread pool (fal calls are HTTP-bound). Default
-`concurrency=1` preserves serial behavior. Use `iter_render_scene(...)`
-to yield `(kind, result)` pairs as each unit completes — handy for
-live UI updates.
+A `Plan` is a fan-out — 200 panels is 200 `CallPlan`s in one Plan — so
+`execute_plan`'s `list[Artifact]` has no room to say *"call 7 failed, here are
+the other 199"*. `execute_plan_isolated` does:
+
+```python
+from falaw import execute_plan_isolated
+
+report = execute_plan_isolated(plan, concurrency=8)
+
+for outcome in report.outcomes:          # always one per call, in plan order
+    if outcome.ok:
+        save(outcome.artifact)
+    elif outcome.status == "failed":
+        retry_later(outcome.call, outcome.error)   # retry this call verbatim
+    else:
+        replan(outcome.call, outcome.reason)       # blocked: its input does not exist
+
+report.estimated_spend_usd, report.has_unknown_costs, report.cache_hit_savings_usd
+```
+
+Three states, not two. **Failed** means the call raised and can be retried as
+it is. **Blocked** means it never ran — a `"<from N>"` placeholder whose
+producer did not succeed — so it has to be re-planned, not retried. A caller
+that cannot tell them apart retries a call whose input does not exist.
+
+`concurrency` bounds how many calls are in flight; independent calls run in
+parallel, and a call is never started beside the producer it consumes. It
+defaults to `1` (sequential) everywhere, here and in `render_scene`, because
+every call is a paid request: parallelism is opt-in. Weigh the vendor's rate
+limit and memory — materializing a media result peaks at roughly twice the
+asset's size, and `concurrency` multiplies that.
+
+`execute_plan` keeps the plain `list[Artifact]` contract and re-raises the
+first failure **unwrapped**, so falaw's typed error hierarchy still reaches the
+caller. It is `execute_plan_isolated(...).artifacts_or_raise()` — one engine,
+two policies.
+
+`render_scene(..., concurrency=4)` runs shots and beats in parallel through the
+same kind of thread pool (fal calls are HTTP-bound). Use
+`iter_render_scene(...)` to yield `(kind, result)` pairs as each unit completes
+— handy for live UI updates.
 
 ## Architecture
 
@@ -145,11 +184,12 @@ v0 --- functional core, real Claude skill, stubs for MCP and HTTP service. The b
 See [`misc/docs/roadmap.md`](misc/docs/roadmap.md) for the ordered work and the standing
 constraints. In short, four tracks:
 
-1. **Content addressing** --- `Artifact.asset_id` and the per-call cache key are currently derived
-   from the fal CDN *URL*, not from the bytes. fal states that every upload gets a unique URL and
-   that expired files are permanently deleted, so today a byte-identical regeneration misses the
-   cache and a stored response decays into a dead link. The fix routes through
-   `lacing.ArtifactStore.put_blob`.
+1. **Content addressing** --- *landed* (falaw#14). `Artifact.asset_id` is the SHA-256 of the
+   artifact's bytes and the per-call cache key holds upstream *content* hashes, not fal CDN URLs.
+   fal states that every upload gets a unique URL and that expired files are permanently deleted,
+   so URL-keying meant a byte-identical regeneration missed the cache and a stored response decayed
+   into a dead link. Bytes now route through `lacing.ArtifactStore.put_blob_stream`. Still open:
+   the plan-time cache peek keys on *unresolved* arguments (D2), which lands with track 2.
 2. **Backend-parametric `Plan`** --- `CallPlan.backend` + registry dispatch in `execute_plan`, so
    a second execution backend is still priced, cached and dry-runnable.
 3. **Licence-and-terms ledger** --- per `(model, backend)`, queried at plan time, `unknown` means

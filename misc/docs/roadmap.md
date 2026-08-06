@@ -28,9 +28,15 @@ currently isn't.
 
 ---
 
-## Track 1 — Content addressing (highest value; blocks all fan-out)
+## Track 1 — Content addressing (highest value; blocks all fan-out) — **D1 + D3 landed**
 
-falaw addresses generated media by *where it is*, not by *what it is*. fal's own documentation
+> **Status 2026-08-06.** D1 and D3 landed in falaw#14 (published 0.0.24): `asset_id` is the
+> SHA-256 of the bytes, and a `<from N>` reference enters the cache key as `sha256:<hex>` rather
+> than a URL. **D2 is still open** (falaw#15) — the plan-time peek keys on *unresolved* arguments
+> while `execute` looks up with resolved ones, so a chained call's reported `cache_status` can
+> still be wrong. The paragraphs below are kept as the statement of the original defect.
+
+falaw addressed generated media by *where it is*, not by *what it is*. fal's own documentation
 says **"Each upload produces a unique URL with no shared namespace"** and that expired CDN files
 are **"permanently deleted and cannot be recovered"** (both mirrored in this repo at
 `misc/docs/fal_ai_docs_full.md`, lines 17794 and 22058). So a URL identifies neither content nor
@@ -104,11 +110,21 @@ model) into a real quote.
 ```
 Track 2 (backend + D2) ──┐
                          ├──> a second execution backend
-Track 1: D3 ──> D1 ──────┤
+Track 1: D3 ──> D1 ──────┤   [landed, falaw#14]
                          └──> fan-out of any size
+Track 5: execute_plan fan-out ──┘   [landed, falaw#20]
 Track 3 (ledger) ── independent, land before any third-party tenancy
 Track 4 (pricing) ── independent, cheapest, unblocks gated (vs forced) approval
 ```
+
+**Track 5 — the executor itself (landed, falaw#20).** Content addressing made a re-run cheap;
+this made a *failed* run survivable. `execute_plan_isolated` returns one `CallOutcome` per call
+(succeeded / failed / **blocked**) instead of discarding every already-billed artifact when one
+call raises, and `concurrency=N` runs independent calls under a bound while never starting a
+chained call beside its producer. `execute_plan` is unchanged for its callers: same
+`list[Artifact]`, same unwrapped exception. It unblocks thorwhalen/nw#25 (per-branch failure
+isolation) and thorwhalen/nw#26 (PDG-shaped fan-out work items), both of which named it as their
+prerequisite.
 
 **Rule of thumb from the research:** on a 150-shot short film (total $114–$123 depending on
 hosting), hosted-model spend is ~86% of the bill and hosting choice moves ~7.7%. **One cache hit
@@ -130,6 +146,13 @@ delta for two films.** Track 1 outranks everything.
   raise, not stringify (see the cache-key issue).
 - **Do not price an unknown as free.** `estimate_call_cost` already returns `None` correctly
   (`falaw/cost.py:59-107`) — keep it, and keep `has_unknown_costs` fail-closed.
+- **Do not make `concurrency > 1` the default.** Every call is a paid vendor request; only the
+  caller knows their rate limit and their budget. Sequential is the default here and in
+  `render_scene`, for the same reason.
+- **Do not use `warnings.catch_warnings` anywhere reachable from `execute_plan`.** It mutates
+  process-global filter state and is documented as not thread-safe, so under `concurrency > 1`
+  one call's speculative cache probe silently eats another call's genuine warning. Use the
+  ContextVar sink in `falaw/plan.py` instead.
 - **Do not "fix" `plan_hash` by resolving `<from N>` placeholders.** It hashes with placeholders
   intact *on purpose*, so it stays stable across re-plans of the same structural request
   (`falaw/plan.py:288-317`). D2 is fixed in `make_call_plan`, not there.
