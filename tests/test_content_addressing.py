@@ -25,6 +25,7 @@ The load-bearing tests here are:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -48,9 +49,12 @@ class FakeFal:
         self.calls: list[dict] = []
         self.next_image_url = "http://cdn/img-1.png"
         self.next_video_url = "http://cdn/clip-1.mp4"
+        self.raise_on_call: BaseException | None = None
 
     def subscribe(self, application, *, arguments, with_logs, on_queue_update):
         self.calls.append({"application": application, "arguments": dict(arguments)})
+        if self.raise_on_call is not None:
+            raise self.raise_on_call
         if "svd" in application or "image-to-video" in application:
             return {
                 "video": {
@@ -353,26 +357,125 @@ def test_stored_bytes_survive_an_expired_url(fal, fake_assets):
     assert again.bytes_size == len(IMG_A)
 
 
-def test_a_cached_response_whose_url_is_gone_raises(fal, fake_assets):
-    """Never silently return an artifact we cannot back with bytes."""
+def _strand_the_cache_entry(fal, fake_assets, *, drop_url_index=True):
+    """Leave a cache entry whose recorded asset can no longer be read.
+
+    The exact shape of a cassette recorded months ago: the fal response is
+    still on disk, but this machine has no blob for it and fal has deleted the
+    URL. Returns the stranded URL.
+    """
     from falaw import execute_plan
     from falaw.cache import _cache_dir
     from falaw.content import CONTENT_STORE_DIRNAME, URL_INDEX_DIRNAME
-    from falaw.errors import FalAssetFetchError
+
+    url = fal.next_image_url
+    fake_assets.serve(url, IMG_A)
+    execute_plan(_image_plan())
+
+    shutil.rmtree(os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME))
+    if drop_url_index:
+        shutil.rmtree(os.path.join(_cache_dir(), URL_INDEX_DIRNAME))
+    fake_assets.fail(url)
+    return url
+
+
+def test_an_unreadable_cache_entry_is_dropped_and_the_call_re_executed(
+    fal, fake_assets
+):
+    """A cache must never become a trap.
+
+    An entry whose recorded asset can no longer be read is *unusable*, and no
+    number of retries against the cache will change that. Treating it as a hard
+    failure leaves the caller only one escape — ``use_cache=False``, which
+    re-bills the whole plan instead of the one dead call. So: drop it, warn,
+    re-execute. (Regression guard for the adversarial review of falaw#14.)
+    """
+    from falaw import execute_plan
+
+    fal.next_image_url = "http://cdn/ephemeral.png"
+    _strand_the_cache_entry(fal, fake_assets)
+    calls_before = len(fal.calls)
+
+    # The re-execution mints a fresh, live URL — as a real fal re-run does.
+    fal.next_image_url = "http://cdn/reborn.png"
+    fake_assets.serve("http://cdn/reborn.png", IMG_A)
+
+    with pytest.warns(UserWarning, match="Dropping the falaw cache entry"):
+        (again,) = execute_plan(_image_plan())
+
+    assert len(fal.calls) == calls_before + 1, "the dead entry must force a re-run"
+    assert again.bytes_size == len(IMG_A)
+    assert again.asset_id == hashlib.sha256(IMG_A).hexdigest()
+
+
+def test_a_dropped_cache_entry_stays_dropped(fal, fake_assets):
+    """The self-heal must actually heal: the third run is a hit again.
+
+    Without :func:`falaw.cache.drop_cache_entry` actually removing the
+    manifest, every subsequent run would re-pay — a silent, permanent leak that
+    a single-run test cannot see.
+    """
+    from falaw import execute_plan
+
+    fal.next_image_url = "http://cdn/ephemeral.png"
+    _strand_the_cache_entry(fal, fake_assets)
+
+    fal.next_image_url = "http://cdn/reborn.png"
+    fake_assets.serve("http://cdn/reborn.png", IMG_A)
+    with pytest.warns(UserWarning):
+        execute_plan(_image_plan())
+    calls_after_heal = len(fal.calls)
+
+    execute_plan(_image_plan())
+
+    assert len(fal.calls) == calls_after_heal, "the healed entry must now hit"
+
+
+def test_a_dropped_entry_is_gone_even_when_the_re_execution_fails(fal, fake_assets):
+    """The drop must be a real deletion, not a no-op masked by the rewrite.
+
+    On the happy path the re-execution immediately re-writes the manifest under
+    the same key, so removing it is invisible — a ``drop_cache_entry`` that
+    only *pretends* to delete passes every other test here. It becomes visible
+    exactly when the re-execution **fails**: without a real deletion the
+    poisoned entry survives, and the next run replays the same dead response
+    instead of starting from a clean miss.
+    """
+    from falaw import execute_plan
+    from falaw.cache import cache_get
+
+    fal.next_image_url = "http://cdn/ephemeral.png"
+    _strand_the_cache_entry(fal, fake_assets)
+
+    boom = RuntimeError("fal is down")
+    fal.raise_on_call = boom
+
+    with pytest.warns(UserWarning, match="Dropping the falaw cache entry"):
+        with pytest.raises(RuntimeError):
+            execute_plan(_image_plan())
+
+    assert cache_get("fal-ai/flux/dev", _image_plan().calls[0].arguments) is None, (
+        "the unusable entry must be gone, not merely re-warned about"
+    )
+
+
+def test_a_usable_cache_entry_is_never_dropped(fal, fake_assets):
+    """The inverse guard: stored bytes mean the entry is fine, dead URL or not.
+
+    Without this, "drop unreadable entries" could degenerate into "drop every
+    entry", which would re-bill everything while still looking green.
+    """
+    from falaw import execute_plan
 
     fal.next_image_url = "http://cdn/ephemeral.png"
     fake_assets.serve("http://cdn/ephemeral.png", IMG_A)
     execute_plan(_image_plan())
+    calls_before = len(fal.calls)
 
-    # The fal response stays cached, but the bytes are gone from this machine
-    # and fal has deleted the URL.
-    shutil.rmtree(os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME))
-    shutil.rmtree(os.path.join(_cache_dir(), URL_INDEX_DIRNAME))
-    fake_assets.fail("http://cdn/ephemeral.png")
+    fake_assets.fail("http://cdn/ephemeral.png")  # URL dead, blob still here
+    execute_plan(_image_plan())
 
-    with pytest.raises(FalAssetFetchError) as exc:
-        execute_plan(_image_plan())
-    assert exc.value.url == "http://cdn/ephemeral.png"
+    assert len(fal.calls) == calls_before, "a materializable entry must still hit"
 
 
 def test_a_remembered_hash_without_its_blob_is_refetched(fal, fake_assets):
@@ -401,32 +504,99 @@ def test_a_remembered_hash_without_its_blob_is_refetched(fal, fake_assets):
     assert open(again.path, "rb").read() == IMG_A
 
 
-def test_a_remembered_hash_with_neither_blob_nor_live_url_raises(fal, fake_assets):
+def test_a_remembered_hash_with_neither_blob_nor_live_url_is_not_trusted(
+    fal, fake_assets
+):
+    """A hint whose blob is gone and whose URL is dead must not become an id.
+
+    The remembered hash is *right* — but nothing can produce those bytes, so
+    handing it out would be a content address that addresses no content.
+    """
     from falaw import execute_plan
     from falaw.cache import _cache_dir
     from falaw.content import CONTENT_STORE_DIRNAME
-    from falaw.errors import FalAssetFetchError
 
     fal.next_image_url = "http://cdn/x.png"
     fake_assets.serve("http://cdn/x.png", IMG_A)
-    execute_plan(_image_plan())
+    (first,) = execute_plan(_image_plan())
 
     shutil.rmtree(os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME))
     fake_assets.fail("http://cdn/x.png")
 
-    with pytest.raises(FalAssetFetchError):
-        execute_plan(_image_plan())
+    with pytest.warns(UserWarning):
+        (again,) = execute_plan(_image_plan())
+
+    assert again.bytes_size == 0
+    assert again.asset_id != first.asset_id, (
+        "a hash with no bytes behind it must not be presented as the content id"
+    )
 
 
-def test_an_empty_asset_is_refused(fal, fake_assets):
+def test_a_fresh_result_whose_bytes_are_unreadable_degrades_loudly(fal, fake_assets):
+    """fal already billed this render — never discard it over a failed download.
+
+    Raising here would turn a transient network blip into a lost paid result.
+    The honest answer is a URL-only artifact that *says* it has no content
+    identity (``bytes_size == 0``), plus a warning.
+    """
+    from falaw import execute_plan
+
+    fal.next_image_url = "http://cdn/unreachable.png"
+    fake_assets.fail("http://cdn/unreachable.png")
+
+    with pytest.warns(UserWarning, match="URL-only artifact"):
+        (art,) = execute_plan(_image_plan(), use_cache=False)
+
+    assert art.url == "http://cdn/unreachable.png"
+    assert art.bytes_size == 0
+    assert art.path is None
+
+
+def test_a_degraded_artifact_never_claims_a_url_hash_as_its_content_id(
+    fal, fake_assets
+):
+    """The degraded id must not be ``sha256(url)`` — that is the D3 defect.
+
+    A URL hash is 64 hex chars, so it satisfies every structural check while
+    being exactly the wrong value; the failure has to be visible in the
+    *value*, not just the shape.
+    """
+    from lacing import hash_bytes
+
+    from falaw import execute_plan
+
+    fal.next_image_url = "http://cdn/unreachable.png"
+    fake_assets.fail("http://cdn/unreachable.png")
+
+    with pytest.warns(UserWarning):
+        (art,) = execute_plan(_image_plan(), use_cache=False)
+
+    assert art.asset_id != hash_bytes(b"http://cdn/unreachable.png")
+
+
+def test_an_empty_asset_is_never_recorded_as_valid_media(fal, fake_assets):
+    """Zero bytes is not "some bytes" — it must not become a content hash.
+
+    ``sha256(b"")`` is a perfectly well-formed digest, which is what makes this
+    dangerous: it would silently unify every empty response into one artifact.
+    """
     from falaw import execute_plan
     from falaw.errors import FalAssetFetchError
 
     fal.next_image_url = "http://cdn/empty.png"
     fake_assets.serve("http://cdn/empty.png", b"")
 
+    with pytest.warns(UserWarning):
+        (art,) = execute_plan(_image_plan(), use_cache=False)
+
+    assert art.bytes_size == 0
+    assert art.asset_id != hashlib.sha256(b"").hexdigest()
+
+    # The bytes-level API has nothing to degrade to, so it still raises.
+    from falaw.content import content_ref_for_url
+
     with pytest.raises(FalAssetFetchError):
-        execute_plan(_image_plan())
+        content_ref_for_url("http://cdn/empty.png")
 
 
 # --- the documented opt-out -------------------------------------------------
@@ -501,6 +671,107 @@ def test_materialize_asset_does_not_refetch_stored_bytes(fake_assets):
     assert fake_assets.fetched == []
 
 
+def test_materialized_files_cannot_corrupt_the_content_store(fake_assets):
+    """The returned path must not be the store blob's own inode.
+
+    A hard link would make them one file, so any consumer writing through the
+    returned path (ffmpeg in place, a stray ``open(p, "ab")``) leaves a blob
+    whose SHA-256 no longer matches its name — while ``has_blob`` keeps saying
+    ``True``. The store would then serve *wrong bytes under a correct content
+    address*, which is the exact failure content addressing exists to prevent.
+    """
+    from lacing import hash_bytes
+
+    from falaw import materialize_asset
+    from falaw.content import default_content_store
+
+    fake_assets.serve("http://cdn/clip.mp4", IMG_A)
+    path = materialize_asset("http://cdn/clip.mp4")
+
+    store = default_content_store()
+    blob = store.blob_path(hash_bytes(IMG_A))
+    assert blob is not None
+    assert os.stat(path).st_ino != os.stat(blob).st_ino, "must be a copy, not a link"
+
+    with open(path, "ab") as f:
+        f.write(b"CORRUPTED-DOWNSTREAM")
+
+    assert store.get_blob(hash_bytes(IMG_A)) == IMG_A, (
+        "the content store must be unaffected by writes through a materialized file"
+    )
+
+
+def test_materialize_asset_short_circuits_on_an_existing_local_file(fake_assets):
+    """Circle 1: the file is here, so neither store nor network is consulted.
+
+    The content store is prunable and fal URLs expire, so a materialized file
+    can easily outlive both. Requiring the hash to be *re-derivable* before
+    returning a file that is sitting right there turns a free call into a
+    failure.
+    """
+    import shutil as _shutil
+
+    from falaw import materialize_asset
+    from falaw.cache import _cache_dir
+    from falaw.content import CONTENT_STORE_DIRNAME
+
+    fake_assets.serve("http://cdn/clip.mp4", IMG_A)
+    first = materialize_asset("http://cdn/clip.mp4")
+
+    _shutil.rmtree(os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME))  # pruned
+    fake_assets.fail("http://cdn/clip.mp4")  # expired
+    fake_assets.fetched.clear()
+
+    again = materialize_asset("http://cdn/clip.mp4")
+
+    assert again == first
+    assert open(again, "rb").read() == IMG_A
+    assert fake_assets.fetched == []
+
+
+def test_materialize_asset_refresh_re_reads_a_mutable_url(fake_assets):
+    """``refresh=True`` is the escape hatch for a URL that is not immutable."""
+    from lacing import hash_bytes
+
+    from falaw import materialize_asset
+
+    fake_assets.serve("http://host/reference.png", IMG_A)
+    materialize_asset("http://host/reference.png")
+
+    fake_assets.serve("http://host/reference.png", IMG_B)  # changed behind us
+    stale = materialize_asset("http://host/reference.png")
+    fresh = materialize_asset("http://host/reference.png", refresh=True)
+
+    assert open(stale, "rb").read() == IMG_A, "the hint index is trusted by default"
+    assert os.path.basename(fresh).startswith(hash_bytes(IMG_B))
+    assert open(fresh, "rb").read() == IMG_B
+
+
+def test_materialize_asset_uses_its_injected_fetcher(fake_assets):
+    """The transport seam must reach ``materialize_asset`` too.
+
+    It is the entry point downstream packages call directly (for ffmpeg /
+    PIL input), so an injection that only works through ``execute`` leaves
+    the most-used path stuck on the network.
+    """
+    from lacing import hash_bytes
+
+    from falaw import materialize_asset
+
+    seen = []
+
+    def fetcher(url):
+        seen.append(url)
+        return [IMG_B]
+
+    path = materialize_asset("http://cdn/only-via-fetcher.png", fetcher=fetcher)
+
+    assert seen == ["http://cdn/only-via-fetcher.png"]
+    assert fake_assets.fetched == []
+    assert os.path.basename(path) == f"{hash_bytes(IMG_B)}.png"
+    assert open(path, "rb").read() == IMG_B
+
+
 def test_materialize_asset_keeps_the_key_hint_prefix(fake_assets):
     from lacing import hash_bytes
 
@@ -509,6 +780,73 @@ def test_materialize_asset_keeps_the_key_hint_prefix(fake_assets):
     fake_assets.serve("http://cdn/one.png", IMG_A)
     path = materialize_asset("http://cdn/one.png", key_hint="ref")
     assert os.path.basename(path) == f"ref-{hash_bytes(IMG_A)}.png"
+
+
+# --- injection seams: they must work, or be refused -------------------------
+
+
+def test_a_custom_converter_refuses_built_in_converter_knobs(fal, fake_assets):
+    """Accepting a knob a custom converter cannot honour is worse than useless.
+
+    ``content_store`` / ``fetch_bytes`` / ``asset_fetcher`` configure the
+    built-in converter. Silently ignoring them means a caller who points falaw
+    at a shared S3 content store *and* supplies a converter gets an empty store
+    and no clue why.
+    """
+    from lacing import ArtifactStore
+
+    from falaw import execute_plan
+
+    def conv(raw, call):
+        raise AssertionError("must never be reached")
+
+    for kwargs in (
+        {"content_store": ArtifactStore.in_memory()},
+        {"fetch_bytes": True},
+        {"asset_fetcher": lambda url: [b"x"]},
+    ):
+        with pytest.raises(ValueError, match="cannot be combined with"):
+            execute_plan(_image_plan(), artifact_converter=conv, **kwargs)
+
+
+def test_the_asset_fetcher_seam_replaces_the_network(fal, fake_assets):
+    """The public seam a hermetic downstream suite is meant to use.
+
+    Without it, the only ways to keep an offline suite offline are patching a
+    private (``falaw.content._http_chunks``) or turning content addressing off
+    entirely — so the suite stops exercising the thing under test.
+    """
+    from lacing import hash_bytes
+
+    from falaw import execute_plan
+
+    seen = []
+
+    def fetcher(url):
+        seen.append(url)
+        return [IMG_B]
+
+    fal.next_image_url = "http://cdn/whatever.png"
+    (art,) = execute_plan(_image_plan(), asset_fetcher=fetcher)
+
+    assert seen == ["http://cdn/whatever.png"]
+    assert fake_assets.fetched == [], "the injected fetcher must be the only transport"
+    assert art.asset_id == hash_bytes(IMG_B)
+
+
+def test_an_injected_content_store_actually_receives_the_bytes(fal, fake_assets):
+    from lacing import ArtifactStore, hash_bytes
+
+    from falaw import execute_plan
+
+    store = ArtifactStore.in_memory()
+    fal.next_image_url = "http://cdn/into-store.png"
+    fake_assets.serve("http://cdn/into-store.png", IMG_A)
+
+    (art,) = execute_plan(_image_plan(), content_store=store)
+
+    assert store.has_blob(hash_bytes(IMG_A))
+    assert art.asset_id == hash_bytes(IMG_A)
 
 
 # --- the module's own examples must run -------------------------------------

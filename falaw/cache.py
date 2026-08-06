@@ -131,6 +131,47 @@ def cache_put(
     return d
 
 
+def drop_cache_entry(application: str, arguments: Mapping[str, Any]) -> bool:
+    """Delete the cache entry for ``(application, arguments)``. Returns whether one existed.
+
+    The counterpart to :func:`cache_put`, and the mechanism that keeps a cache
+    from becoming a *trap*. An entry whose response can no longer be turned
+    into a usable artifact — fal deleted the URL and the bytes are not in the
+    content store — must be a **miss**, not a permanent failure: without this,
+    the only escape is ``use_cache=False``, which re-bills the whole plan
+    rather than the one dead call. :func:`falaw.plan.execute` calls it.
+
+    Only the manifest is removed. Blobs in the content store are shared by
+    content hash across entries and are never dropped from here.
+    """
+    path = _manifest_path(_key(application, arguments))
+    if not os.path.exists(path):
+        return False
+    os.remove(path)
+    return True
+
+
+def emit_cache_hit(application: str, on_event=None) -> None:
+    """Emit the synthetic ``cache_hit`` progress event for ``application``.
+
+    Shared by :func:`cached_call_fal` and :func:`falaw.plan.execute` (which
+    drives the cache directly, because it must decide whether a hit is
+    *usable* before committing to it) so a UI sees one event shape either way.
+    """
+    import uuid as _uuid
+
+    from .events import ProgressEvent, emit
+
+    emit(
+        ProgressEvent(
+            kind="cache_hit",
+            application=application,
+            call_id=_uuid.uuid4().hex[:12],
+        ),
+        also=(on_event,) if on_event else (),
+    )
+
+
 def cached_call_fal(
     application: str,
     arguments: Mapping[str, Any],
@@ -161,18 +202,7 @@ def cached_call_fal(
     if not refresh:
         hit = cache_get(application, key_args)
         if hit is not None:
-            import uuid as _uuid
-
-            from .events import ProgressEvent, emit
-
-            emit(
-                ProgressEvent(
-                    kind="cache_hit",
-                    application=application,
-                    call_id=_uuid.uuid4().hex[:12],
-                ),
-                also=(on_event,) if on_event else (),
-            )
+            emit_cache_hit(application, on_event)
             return hit
     raw = call_fal(application, arguments, on_event=on_event)
     cache_put(
@@ -184,35 +214,73 @@ def cached_call_fal(
     return raw
 
 
-def materialize_asset(url: str, *, key_hint: str = "", store=None) -> str:
+def materialize_asset(
+    url: str,
+    *,
+    key_hint: str = "",
+    store=None,
+    fetcher=None,
+    refresh: bool = False,
+) -> str:
     """Download a remote asset to the cache and return the local path.
 
     The local filename is content-addressed by the asset's **bytes**, so two
-    URLs serving identical bytes resolve to one file, and re-downloading is
-    skipped whenever those bytes are already in the content store — even after
-    fal has expired the URL. The extension is a presentational hint for
-    ffmpeg/PIL; the SHA-256 is the address.
+    URLs serving identical bytes resolve to one file. The extension is a
+    presentational hint for ffmpeg/PIL; the SHA-256 is the address.
+
+    Repeat calls are free, in three widening circles — this is what makes it
+    safe to call from a loop over 200 shots:
+
+    1. the file is already on disk here (no store lookup, no network);
+    2. the bytes are in the content store (no network) — so it still works
+       after fal has expired the URL;
+    3. otherwise, one download.
+
+    Circle 1 matters on its own: the content store is prunable, so an asset
+    can survive as a materialized file after its blob is gone.
 
     Args:
-        url: the remote asset URL.
+        url: the remote asset URL. ``file://`` is supported and is used
+            deliberately by downstream packages for locally-rendered media.
         key_hint: optional human-readable filename prefix.
         store: injected :class:`lacing.ArtifactStore`; defaults to
             :func:`falaw.content.default_content_store`.
+        fetcher: injected byte source (``url -> Iterable[bytes]``); defaults to
+            the ``urllib``-based one. The seam for custom transport (auth
+            headers, retries) and for a hermetic test suite.
+        refresh: re-fetch even when a remembered content hash exists. Pass this
+            for a **mutable** URL — the ``url -> hash`` hint index assumes the
+            URL is immutable, which is true of fal's own but not of an
+            arbitrary one.
 
     Raises:
         falaw.errors.FalAssetFetchError: the bytes could not be retrieved.
+            Unlike a generated-media artifact (which degrades to URL-only —
+            see :func:`falaw.plan.execute`), there is nothing to degrade to
+            here: the caller asked for a local file.
     """
     # Local import: ``falaw.content`` imports ``_cache_dir`` from this module,
     # so importing it at module scope would be a cycle.
-    from .content import content_ref_for_url, write_blob_to_file
+    from .content import content_ref_for_url, remembered_ref, write_blob_to_file
 
-    ref = content_ref_for_url(url, store=store)
-    ext = _infer_ext_from_url(url)
-    fname = f"{key_hint + '-' if key_hint else ''}{ref.content_hash}{ext}"
-    path = os.path.join(_cache_dir(), "assets", fname)
+    if not refresh:
+        hint = remembered_ref(url)
+        if hint is not None:
+            path = _asset_path(url, key_hint, hint.content_hash)
+            if os.path.exists(path):
+                return path
+    ref = content_ref_for_url(url, store=store, fetcher=fetcher, refresh=refresh)
+    path = _asset_path(url, key_hint, ref.content_hash)
     if os.path.exists(path):
         return path
     return write_blob_to_file(ref.content_hash, path, store=store)
+
+
+def _asset_path(url: str, key_hint: str, content_hash: str) -> str:
+    """Where :func:`materialize_asset` puts the bytes for ``content_hash``."""
+    ext = _infer_ext_from_url(url)
+    fname = f"{key_hint + '-' if key_hint else ''}{content_hash}{ext}"
+    return os.path.join(_cache_dir(), "assets", fname)
 
 
 def _infer_ext_from_url(url: str) -> str:

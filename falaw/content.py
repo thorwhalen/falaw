@@ -25,8 +25,14 @@ This module is the single place falaw turns a URL into a content hash. It
   object store) — rather than growing a second blob store of its own;
 * remembers ``url -> (content_hash, bytes_size)`` in a small on-disk index, so
   re-executing an already-cached plan does **not** re-download anything. The
-  index is a *hint*, never an identity: it is sound because fal guarantees a
-  URL is minted per upload and therefore never re-points at different bytes;
+  index is a *hint*, never an identity, and it is only **sound for immutable
+  URLs**. It is sound for fal's own, because fal guarantees a URL is minted per
+  upload and therefore never re-points at different bytes. It is *not* sound
+  for an arbitrary caller-supplied URL reached through
+  :func:`falaw.cache.materialize_asset` — a mutable ``https://…/reference.png``
+  that changes behind our back keeps resolving to the old hash. Pass
+  ``refresh=True`` when the URL is not known to be immutable
+  (thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);
 * serves the bytes from the store after the URL has expired, so a months-old
   cache hit still yields a usable artifact instead of a dead link.
 
@@ -66,6 +72,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import urllib.request
 import uuid
 from dataclasses import dataclass
@@ -79,6 +86,7 @@ __all__ = [
     "ContentRef",
     "content_ref_for_url",
     "default_content_store",
+    "remembered_ref",
     "write_blob_to_file",
 ]
 
@@ -159,7 +167,7 @@ def content_ref_for_url(
     """
     store = default_content_store() if store is None else store
     if not refresh:
-        remembered = _remembered_ref(url)
+        remembered = remembered_ref(url)
         if remembered is not None and store.has_blob(remembered.content_hash):
             return remembered
     ref = _fetch_into_store(url, store, fetcher or _http_chunks)
@@ -167,13 +175,53 @@ def content_ref_for_url(
     return ref
 
 
-def write_blob_to_file(content_hash: str, path: str, *, store=None) -> str:
-    """Materialize the blob for ``content_hash`` as a file at ``path``.
+def remembered_ref(url: str) -> Optional[ContentRef]:
+    """The :class:`ContentRef` previously recorded for ``url``, if any.
 
-    Hard-links from the store's own file when the backend exposes one (free,
-    no second copy on disk); otherwise streams the bytes out. Writes via a
-    temporary file and an atomic rename so a concurrent reader never sees a
-    partial file.
+    A *hint*, not a guarantee: it says "the last time falaw fetched this URL,
+    the bytes hashed to this" and says nothing about whether those bytes are
+    still in any store. Callers must verify (``store.has_blob(...)``, or an
+    already-materialized file on disk) before trusting it.
+
+    Public because it is the cheap pre-check that lets a caller answer "do I
+    already have this?" without a network round-trip — see
+    :func:`falaw.cache.materialize_asset`.
+    """
+    path = _url_index_path(url)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path) as f:
+            record = json.load(f)
+        return ContentRef(
+            content_hash=record["content_hash"], bytes_size=int(record["bytes_size"])
+        )
+    except Exception:  # noqa: BLE001 — a corrupt hint is a miss, never a failure
+        return None
+
+
+def write_blob_to_file(content_hash: str, path: str, *, store=None) -> str:
+    """Materialize the blob for ``content_hash`` as a **copy** at ``path``.
+
+    Writes via a temporary file and an atomic rename, so a concurrent reader
+    never sees a partial file.
+
+    Why a copy and not a hard link
+    ------------------------------
+    Hard-linking the store's own blob file would be free, and an earlier cut of
+    this function did exactly that — but a hard link makes the returned path
+    and the content-store blob **the same inode**. Any consumer that writes
+    through the returned path (ffmpeg writing in place, an accidental ``open(p,
+    "ab")``) then leaves a blob whose SHA-256 no longer matches its own name,
+    while ``has_blob`` keeps answering ``True`` — the store starts serving
+    *wrong bytes under a correct content address*, which is precisely the
+    failure class content addressing exists to eliminate. Making the link
+    read-only instead is not an option either: the store's backend writes blobs
+    with ``open(path, "wb")``, so a read-only blob breaks re-putting identical
+    bytes.
+
+    A copy costs disk (and, on APFS/btrfs/XFS, ``shutil.copyfile`` gets
+    copy-on-write for free). Immutability of the content store is worth it.
 
     Returns ``path``.
 
@@ -184,18 +232,25 @@ def write_blob_to_file(content_hash: str, path: str, *, store=None) -> str:
     os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
     tmp = f"{path}.{uuid.uuid4().hex[:8]}.part"
     source = store.blob_path(content_hash)
-    if source is not None:
-        try:
-            os.link(str(source), tmp)
-        except OSError:
-            # Cross-device, or a filesystem without hard links — fall back.
-            source = None
-    if source is None:
-        with open(tmp, "wb") as f:
-            for chunk in store.iter_blob(content_hash):
-                f.write(chunk)
-    os.replace(tmp, path)
+    try:
+        if source is not None:
+            shutil.copyfile(str(source), tmp)
+        else:
+            with open(tmp, "wb") as f:
+                for chunk in store.iter_blob(content_hash):
+                    f.write(chunk)
+        os.replace(tmp, path)
+    except BaseException:
+        _unlink_quietly(tmp)
+        raise
     return path
+
+
+def _unlink_quietly(path: str) -> None:
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
 
 
 # --- fetching ---------------------------------------------------------------
@@ -214,13 +269,15 @@ def _http_chunks(url: str, *, chunk_size: int = DFLT_CHUNK_SIZE) -> Iterator[byt
 def _fetch_into_store(url: str, store, fetcher: UrlFetcher) -> ContentRef:
     """Stream ``url`` through ``fetcher`` into ``store``; return the ContentRef.
 
-    The byte count is accumulated *during* the stream rather than by
-    re-reading the blob afterwards, so a large video is never held twice.
+    The byte count is accumulated *during* the stream, so falaw itself never
+    holds the payload. Note that **peak process memory is still ~2x the asset**
+    today: ``lacing.ArtifactStore.put_blob_stream`` accumulates into a
+    ``bytearray`` and then copies it to ``bytes`` before writing (its own
+    docstring says so, and thorwhalen/lacing#25 tracks replacing it with
+    write-to-tempfile + atomic rename). Measured: a 64 MB asset peaks at
+    ~129 MB. That is a lacing-side fix; nothing here needs to change when it
+    lands.
     """
-    # Local import: ``falaw.plan`` owns the ``fetch_bytes`` knob this message
-    # points the reader at, and imports this module from inside its converter.
-    from .plan import FETCH_BYTES_ENVVAR
-
     counter = [0]
 
     def counted() -> Iterator[bytes]:
@@ -232,13 +289,12 @@ def _fetch_into_store(url: str, store, fetcher: UrlFetcher) -> ContentRef:
         content_hash = store.put_blob_stream(counted())
     except Exception as e:  # noqa: BLE001 — re-raised as a typed falaw error
         raise FalAssetFetchError(
-            f"Could not fetch asset bytes from {url!r}: {e}. "
-            "fal-served URLs expire and are permanently deleted; falaw needs "
-            "the bytes to content-address the artifact. Pass "
-            "`fetch_bytes=False` to falaw.execute_plan (or set "
-            f"${FETCH_BYTES_ENVVAR}=0 for an offline test suite) if you "
-            "deliberately want URL-only artifacts — this forfeits cross-run "
-            "caching for chained calls.",
+            f"Could not fetch asset bytes from {url!r}: {e}. falaw needs the "
+            "bytes to content-address the artifact, and fal-served URLs expire "
+            "and are then permanently deleted. If you are running an offline "
+            "test suite whose stubbed responses carry made-up URLs, inject a "
+            "transport (`asset_fetcher=` on falaw.execute_plan, or `fetcher=` "
+            "here) rather than reaching for the network.",
             url=url,
             cause=e,
         ) from e
@@ -261,20 +317,6 @@ def _url_index_path(url: str) -> str:
     d = os.path.join(_cache_dir(), URL_INDEX_DIRNAME, digest[:2])
     os.makedirs(d, exist_ok=True)
     return os.path.join(d, f"{digest}.json")
-
-
-def _remembered_ref(url: str) -> Optional[ContentRef]:
-    path = _url_index_path(url)
-    if not os.path.exists(path):
-        return None
-    try:
-        with open(path) as f:
-            record = json.load(f)
-        return ContentRef(
-            content_hash=record["content_hash"], bytes_size=int(record["bytes_size"])
-        )
-    except Exception:  # noqa: BLE001 — a corrupt hint is a miss, never a failure
-        return None
 
 
 def _remember_ref(url: str, ref: ContentRef) -> None:
