@@ -33,7 +33,13 @@ from .cache import (
     drop_cache_entry,
     materialize_asset,
 )
-from .content import ContentRef, content_ref_for_url, default_content_store
+from .content import (
+    ContentRef,
+    content_ref_for_url,
+    default_content_store,
+    default_url_fetcher,
+    using_url_fetcher,
+)
 from .core import call_fal, current_fal_key, using_fal_credentials
 from .errors import (
     FalAccountLocked,
@@ -200,6 +206,8 @@ __all__ = [
     "cached_call_fal",
     "content_ref_for_url",
     "default_content_store",
+    "default_url_fetcher",
+    "using_url_fetcher",
     "call_fal",
     "cast_character",
     "current_fal_key",

@@ -41,6 +41,17 @@ The blob store is **injected**, never constructed inline by callers:
 public function here takes a ``store`` keyword so a caller can point falaw at
 an S3-backed store without touching any other code.
 
+So is the **transport**. Per call it is the ``fetcher=`` / ``asset_fetcher=``
+argument; for a whole process it is :func:`using_url_fetcher`, which covers
+:func:`content_ref_for_url`, :func:`falaw.materialize_asset`,
+:func:`falaw.execute_plan` and :func:`falaw.execute_plan_isolated` in one
+place. That matters most to *downstream* test suites: falaw content-addresses
+every media result, so a suite that stubs the fal response but not the
+transport resolves its made-up URLs for real — and stays green while doing it,
+because a failed fetch degrades to a URL-only artifact with a warning rather
+than raising. :mod:`falaw.testing` ships the fake so no consumer has to write
+one.
+
 Examples
 --------
 
@@ -75,6 +86,7 @@ import os
 import shutil
 import urllib.request
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Callable, Iterable, Iterator, Optional
 
@@ -84,9 +96,12 @@ from .errors import FalAssetFetchError
 
 __all__ = [
     "ContentRef",
+    "UrlFetcher",
     "content_ref_for_url",
     "default_content_store",
+    "default_url_fetcher",
     "remembered_ref",
+    "using_url_fetcher",
     "write_blob_to_file",
 ]
 
@@ -105,8 +120,80 @@ UrlFetcher = Callable[[str], Iterable[bytes]]
 """A callable that yields the bytes of a URL in chunks.
 
 The injection seam for tests and for callers that need custom transport
-(auth headers, retries, a local mirror). :func:`_http_chunks` is the default.
+(auth headers, retries, a local mirror). :func:`default_url_fetcher` resolves
+the one in force; :func:`using_url_fetcher` installs another.
 """
+
+
+_DEFAULT_FETCHER: Optional[UrlFetcher] = None
+"""Process-wide override of the transport, or ``None`` for the built-in one.
+
+A plain module global rather than a :class:`~contextvars.ContextVar`, and the
+difference is load-bearing. This value has to be visible from **every** thread,
+including threads the installer never created: a downstream job runner executes
+falaw calls on its own worker pool, and a per-context override set on the main
+thread would silently not apply there — leaving a suite that believes it is
+hermetic quietly reaching for the network. (Contrast
+``falaw.plan._DEGRADE_WARNING_SINK``, which *is* a ContextVar precisely because
+it must **not** be shared between concurrently executing calls.)
+
+Consequence to accept: two different fetchers cannot be in force at once in one
+process. That is the right trade for what this is — deployment/test
+configuration, not per-call state. Per-call transport already has a better
+mechanism: the ``fetcher=`` / ``asset_fetcher=`` argument, which always wins.
+"""
+
+
+def default_url_fetcher() -> UrlFetcher:
+    """The transport used when no ``fetcher=`` argument is given.
+
+    :func:`using_url_fetcher`'s installed fetcher if there is one, else the
+    built-in ``urllib``-based one. Resolved at call time, so every falaw entry
+    point that reads asset bytes — :func:`content_ref_for_url`,
+    :func:`falaw.materialize_asset`, :func:`falaw.execute_plan` and
+    :func:`falaw.execute_plan_isolated` — honours an override installed after
+    they were imported.
+    """
+    return _http_chunks if _DEFAULT_FETCHER is None else _DEFAULT_FETCHER
+
+
+@contextmanager
+def using_url_fetcher(fetcher: UrlFetcher) -> Iterator[UrlFetcher]:
+    """Make ``fetcher`` falaw's default asset transport for the duration.
+
+    The **public seam** for replacing falaw's network transport wholesale —
+    with an authenticated client, a retrying one, a local mirror, or (the
+    common case) an in-memory fake in a test suite.
+
+    Prefer this to reaching for the module's private default: it covers every
+    entry point in one place, it needs no ``monkeypatch``, and it cannot be
+    invalidated by an internal rename. It is also the only mechanism that
+    reaches a call falaw makes from a thread you did not create — see
+    :data:`_DEFAULT_FETCHER` for why that matters.
+
+    An explicitly passed ``fetcher=`` / ``asset_fetcher=`` still wins: this
+    changes the *default*, never an explicit choice.
+
+    Nests and restores, so an inner block cannot leak over an outer one:
+
+    >>> from lacing import ArtifactStore
+    >>> store = ArtifactStore.in_memory()
+    >>> before = default_url_fetcher()
+    >>> with using_url_fetcher(lambda url: [b"faked"]):
+    ...     content_ref_for_url("https://fal.media/x.png", store=store).bytes_size
+    5
+    >>> default_url_fetcher() is before
+    True
+
+    For a ready-made fake with pinned bytes and 404s, see :mod:`falaw.testing`.
+    """
+    global _DEFAULT_FETCHER
+    previous = _DEFAULT_FETCHER
+    _DEFAULT_FETCHER = fetcher
+    try:
+        yield fetcher
+    finally:
+        _DEFAULT_FETCHER = previous
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,7 +242,9 @@ def content_ref_for_url(
         url: The remote asset URL (typically fal's CDN).
         store: Injected :class:`lacing.ArtifactStore`; defaults to
             :func:`default_content_store`.
-        fetcher: Injected byte source; defaults to :func:`_http_chunks`.
+        fetcher: Injected byte source; defaults to :func:`default_url_fetcher`
+            (the built-in ``urllib`` transport unless :func:`using_url_fetcher`
+            has installed another).
         refresh: Ignore the remembered reference and re-fetch. Only useful when
             you suspect the index is wrong — fal URLs are per-upload, so the
             same URL never legitimately serves different bytes.
@@ -170,7 +259,7 @@ def content_ref_for_url(
         remembered = remembered_ref(url)
         if remembered is not None and store.has_blob(remembered.content_hash):
             return remembered
-    ref = _fetch_into_store(url, store, fetcher or _http_chunks)
+    ref = _fetch_into_store(url, store, fetcher or default_url_fetcher())
     _remember_ref(url, ref)
     return ref
 
@@ -257,7 +346,12 @@ def _unlink_quietly(path: str) -> None:
 
 
 def _http_chunks(url: str, *, chunk_size: int = DFLT_CHUNK_SIZE) -> Iterator[bytes]:
-    """Yield the bytes of ``url`` in ``chunk_size`` chunks. The default fetcher."""
+    """Yield the bytes of ``url`` in ``chunk_size`` chunks. The built-in fetcher.
+
+    Private on purpose: it is an *implementation* of :data:`UrlFetcher`, and
+    replacing it is done through :func:`using_url_fetcher`, never by rebinding
+    this name.
+    """
     with urllib.request.urlopen(url) as resp:  # noqa: S310 (fal https URLs)
         while True:
             chunk = resp.read(chunk_size)
@@ -292,9 +386,10 @@ def _fetch_into_store(url: str, store, fetcher: UrlFetcher) -> ContentRef:
             f"Could not fetch asset bytes from {url!r}: {e}. falaw needs the "
             "bytes to content-address the artifact, and fal-served URLs expire "
             "and are then permanently deleted. If you are running an offline "
-            "test suite whose stubbed responses carry made-up URLs, inject a "
-            "transport (`asset_fetcher=` on falaw.execute_plan, or `fetcher=` "
-            "here) rather than reaching for the network.",
+            "test suite whose stubbed responses carry made-up URLs, install a "
+            "fake transport (`falaw.testing.fake_assets`, or "
+            "`falaw.content.using_url_fetcher`) rather than reaching for the "
+            "network.",
             url=url,
             cause=e,
         ) from e
