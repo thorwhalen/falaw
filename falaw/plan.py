@@ -63,8 +63,12 @@ append it to a scene-level Plan:
 from __future__ import annotations
 
 import warnings
+from contextlib import contextmanager
+from contextvars import ContextVar, copy_context
 from dataclasses import dataclass, field, replace
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Callable, Iterator, Literal, Optional
+
+from .outcomes import CallOutcome, ExecutionReport
 
 
 CacheStatus = Literal["hit", "miss", "stale", "unknown"]
@@ -421,6 +425,16 @@ def _fetch_bytes_default() -> bool:
     return raw.strip().lower() not in ("0", "false", "no", "off", "")
 
 
+DFLT_CONCURRENCY = 1
+"""How many calls of a Plan run at once by default.
+
+One — a Plan executes sequentially unless the caller asks otherwise. Every call
+is a paid vendor request, so parallelism is opt-in: it is the caller who knows
+their rate limit, their budget, and whether they want 200 renders started at
+once. (:func:`falaw.render_scene` makes the same choice for the same reason.)
+"""
+
+
 def execute(
     plan: Plan,
     *,
@@ -431,8 +445,16 @@ def execute(
     content_store=None,
     fetch_bytes: Optional[bool] = None,
     asset_fetcher=None,
+    concurrency: int = DFLT_CONCURRENCY,
 ) -> list:
     """Execute a Plan, returning a list of materialized :class:`lacing.Artifact`s.
+
+    This is the **halt** policy: the first call that raises ends the run, and its
+    exception propagates unchanged (falaw's typed hierarchy — see
+    :mod:`falaw.errors` — is what a caller classifies on, so it is never
+    wrapped). Use :func:`execute_isolated` when one bad call must not discard
+    the rest of a fan-out; it returns an :class:`~falaw.ExecutionReport` with one
+    outcome per call instead of raising.
 
     Args:
         plan: The Plan to execute.
@@ -472,6 +494,18 @@ def execute(
             ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it
             turns off content addressing altogether, so the suite stops
             exercising the thing it is testing.)
+        concurrency: How many calls may be in flight at once. ``1``
+            (:data:`DFLT_CONCURRENCY`) runs the Plan sequentially, on the
+            calling thread, exactly as it always has. Above 1, independent calls
+            run on a thread pool bounded by this number — a Plan is I/O-bound
+            (an HTTP request that fal takes tens of seconds to answer), so
+            threads are the right tool and the bound is what keeps a 200-call
+            fan-out from becoming 200 simultaneous paid requests. **Chained
+            calls are never parallelised with their producers**: a call holding
+            a ``"<from N>"`` placeholder waits for call ``N``. Two things to
+            weigh before raising it: the vendor's rate limit, and memory —
+            materializing a media result peaks at roughly twice the asset's size
+            (thorwhalen/lacing#25), so ``concurrency`` multiplies the peak.
 
     Failure handling — a paid result is never discarded
     ---------------------------------------------------
@@ -519,10 +553,91 @@ def execute(
         One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,
         in the same order.
     """
-    from lacing import Artifact
+    return execute_isolated(
+        plan,
+        on_event=on_event,
+        dry_run=dry_run,
+        use_cache=use_cache,
+        artifact_converter=artifact_converter,
+        content_store=content_store,
+        fetch_bytes=fetch_bytes,
+        asset_fetcher=asset_fetcher,
+        concurrency=concurrency,
+        halt_on_failure=True,
+    ).artifacts_or_raise()
+
+
+def execute_isolated(
+    plan: Plan,
+    *,
+    on_event: Optional[Callable] = None,
+    dry_run: bool = False,
+    use_cache: bool = True,
+    artifact_converter: Optional[ResultToArtifact] = None,
+    content_store=None,
+    fetch_bytes: Optional[bool] = None,
+    asset_fetcher=None,
+    concurrency: int = DFLT_CONCURRENCY,
+    halt_on_failure: bool = False,
+) -> ExecutionReport:
+    """Execute a Plan with **per-call failure isolation**, returning a report.
+
+    The fan-out counterpart of :func:`execute`. Where ``execute`` raises on the
+    first failure — discarding every artifact produced before it, each of which
+    fal has already billed — this returns an :class:`~falaw.ExecutionReport`
+    carrying one :class:`~falaw.CallOutcome` per call: the successes with their
+    artifacts, the failures with their exceptions, and the calls that never ran
+    with the reason why.
+
+    ``len(report.outcomes) == len(plan.calls)`` always, so a caller that built
+    something per call can zip against ``report.outcomes`` and stay aligned.
+
+    Args:
+        halt_on_failure: When True, stop *submitting* work as soon as any call
+            fails; everything not yet started is reported ``blocked`` with a
+            run-level reason. This is what :func:`execute` uses, and at
+            ``concurrency=1`` it reproduces the historical sequential
+            behaviour exactly. Note that at ``concurrency > 1`` calls already
+            in flight are **not** cancelled — a fal request cannot be recalled
+            once made, and pretending otherwise would discard results that were
+            billed anyway.
+
+        All other arguments are as :func:`execute`.
+
+    Three outcome states, not two
+    -----------------------------
+    ``failed`` and ``blocked`` are different questions for the caller. A failed
+    call can be retried verbatim. A blocked one cannot: its input does not
+    exist, so it has to be re-planned after its producer succeeds. Any call
+    holding a ``"<from N>"`` placeholder whose call ``N`` did not succeed is
+    blocked, transitively.
+
+    Examples:
+        >>> from falaw import CallPlan, Plan, execute_plan_isolated
+        >>> plan = Plan(calls=(CallPlan(tool="t", application="m",
+        ...                             arguments={}, output_kind="image"),))
+        >>> report = execute_plan_isolated(plan, dry_run=True)
+        >>> report.is_complete, len(report.outcomes)
+        (True, 1)
+    """
+    if concurrency < 1:
+        raise ValueError(
+            f"concurrency must be at least 1, got {concurrency!r}. "
+            "It bounds how many calls are in flight at once; 1 is sequential."
+        )
 
     if dry_run:
-        return [_synthetic_artifact(c) for c in plan.calls]
+        return ExecutionReport(
+            outcomes=tuple(
+                CallOutcome(
+                    index=i,
+                    call=call,
+                    status="succeeded",
+                    artifact=_synthetic_artifact(call),
+                )
+                for i, call in enumerate(plan.calls)
+            )
+        )
 
     if artifact_converter is not None:
         _refuse_converter_configuration(content_store, fetch_bytes, asset_fetcher)
@@ -539,8 +654,73 @@ def execute(
         )
         usable_from_cache = _make_usability_check(fetch_bytes=wants_bytes)
 
-    artifacts: list[Artifact] = []
-    for call in plan.calls:
+    return _run_plan(
+        plan,
+        converter=converter,
+        usable_from_cache=usable_from_cache,
+        use_cache=use_cache,
+        on_event=on_event,
+        concurrency=concurrency,
+        halt_on_failure=halt_on_failure,
+    )
+
+
+# --- the scheduler ----------------------------------------------------------
+
+
+def _run_plan(
+    plan: Plan,
+    *,
+    converter: "ResultToArtifact",
+    usable_from_cache,
+    use_cache: bool,
+    on_event,
+    concurrency: int,
+    halt_on_failure: bool,
+) -> ExecutionReport:
+    """Run every call of ``plan``, honouring its ``<from N>`` dependencies.
+
+    The Plan is a DAG whose only edges are ``"<from N>"`` placeholders, and
+    :func:`plan_dependencies` has already proved every edge points *backwards*.
+    So the schedule is: a call is runnable once all its producers have
+    succeeded, blocked once any of them has not, and at most ``concurrency``
+    calls are ever in flight.
+
+    Termination, since a scheduler that can wedge is worse than a slow one: let
+    ``m`` be the lowest still-pending index. Every dependency of ``m`` is
+    ``< m``, hence already resolved or in flight. If one did not succeed, ``m``
+    is marked blocked; if all succeeded, ``m`` is submitted (or the in-flight
+    bound is saturated, so there is something to wait for); if one is still in
+    flight, there is something to wait for. Every iteration therefore resolves a
+    call, starts a call, or waits on one — and ``concurrency >= 1`` is validated
+    by the caller, so "starts a call" is always eventually possible.
+    """
+    deps = plan_dependencies(plan)
+    n = len(plan.calls)
+    artifacts: list = [None] * n
+    outcomes: list[Optional[CallOutcome]] = [None] * n
+    succeeded: set[int] = set()
+    unusable: set[int] = set()  # failed or blocked — nothing downstream may run
+    pending: set[int] = set(range(n))
+    halted = False
+
+    def record(outcome: CallOutcome) -> None:
+        outcomes[outcome.index] = outcome
+        if outcome.status == "succeeded":
+            succeeded.add(outcome.index)
+            artifacts[outcome.index] = outcome.artifact
+        else:
+            unusable.add(outcome.index)
+
+    def unit(index: int):
+        """The whole per-call job: resolve this call's inputs, then run it.
+
+        Placeholder resolution lives *inside* the isolated unit on purpose. It
+        can fail at run time even on a well-formed plan — an upstream that
+        succeeded but produced no URL — and that is this call's failure, not the
+        run's.
+        """
+        call = plan.calls[index]
         wire_args = _resolve_placeholders(call.arguments, artifacts, ref=_wire_ref)
         # Only resolved when it will be used — the key ref is stricter than the
         # wire ref (it needs bytes *or* a URL), and an uncached run must not
@@ -550,18 +730,152 @@ def execute(
             if use_cache
             else wire_args
         )
-        artifacts.append(
-            _execute_call(
-                call,
-                wire_args,
-                key_args,
-                converter=converter,
-                usable_from_cache=usable_from_cache,
-                use_cache=use_cache,
-                on_event=on_event,
-            )
+        return _execute_call(
+            call,
+            wire_args,
+            key_args,
+            converter=converter,
+            usable_from_cache=usable_from_cache,
+            use_cache=use_cache,
+            on_event=on_event,
         )
-    return artifacts
+
+    with _bounded_executor(concurrency) as pool:
+        in_flight: dict = {}
+        while pending or in_flight:
+            for index in sorted(pending):
+                blockers = tuple(d for d in sorted(deps[index]) if d in unusable)
+                if blockers:
+                    pending.discard(index)
+                    record(_blocked_outcome(plan.calls[index], index, blockers))
+                elif halted:
+                    pending.discard(index)
+                    record(_halted_outcome(plan.calls[index], index))
+            for index in sorted(pending):
+                if len(in_flight) >= concurrency:
+                    break
+                if deps[index] <= succeeded:
+                    pending.discard(index)
+                    in_flight[pool.submit(copy_context().run, unit, index)] = index
+            if not in_flight:
+                if not pending:
+                    break  # the last calls all resolved without running
+                # Unreachable given the termination argument above; a wedged
+                # scheduler must be loud rather than a silent hang.
+                raise RuntimeError(
+                    f"falaw scheduler stalled with {len(pending)} call(s) "
+                    "pending and none runnable. This is a falaw bug — please "
+                    "report the Plan that produced it."
+                )
+            done, _ = _wait_first(in_flight)
+            for future in done:
+                index = in_flight.pop(future)
+                record(_outcome_from_future(plan.calls[index], index, future))
+                if outcomes[index].status == "failed" and halt_on_failure:
+                    halted = True
+
+    return ExecutionReport(outcomes=tuple(outcomes))  # type: ignore[arg-type]
+
+
+def _outcome_from_future(call: CallPlan, index: int, future) -> CallOutcome:
+    """Turn one finished unit of work into its :class:`CallOutcome`.
+
+    A ``BaseException`` that is not an ``Exception`` — ``KeyboardInterrupt``,
+    ``SystemExit``, a test framework's abort — is **not** a call failure and is
+    re-raised. Isolating it would mean carrying on and billing the rest of the
+    plan after the operator asked the process to stop.
+    """
+    error = future.exception()
+    if error is not None:
+        if not isinstance(error, Exception):
+            raise error
+        return CallOutcome(index=index, call=call, status="failed", error=error)
+    artifact, cache_hit = future.result()
+    return CallOutcome(
+        index=index,
+        call=call,
+        status="succeeded",
+        artifact=artifact,
+        cache_hit=cache_hit,
+    )
+
+
+def _blocked_outcome(
+    call: CallPlan, index: int, blockers: tuple[int, ...]
+) -> CallOutcome:
+    listed = ", ".join(str(b) for b in blockers)
+    return CallOutcome(
+        index=index,
+        call=call,
+        status="blocked",
+        blocked_by=blockers,
+        reason=(
+            f"depends on call(s) {listed} via a '<from N>' placeholder, and "
+            "they did not succeed — this call must be re-planned once they do, "
+            "not retried as-is"
+        ),
+    )
+
+
+def _halted_outcome(call: CallPlan, index: int) -> CallOutcome:
+    return CallOutcome(
+        index=index,
+        call=call,
+        status="blocked",
+        reason=(
+            "never started: an earlier call failed and the run was halted "
+            "(halt_on_failure=True)"
+        ),
+    )
+
+
+class _InlineExecutor:
+    """A ``submit``/``Future`` surface that runs the work immediately, inline.
+
+    The ``concurrency=1`` path. A ``ThreadPoolExecutor(max_workers=1)`` would
+    also serialise the calls, but it would move them off the calling thread —
+    changing where exceptions are raised from, which thread holds the fal
+    client, and what a debugger sees. The default execution path should be the
+    plain one, so it is.
+
+    It captures ``BaseException`` because that is exactly what
+    ``ThreadPoolExecutor`` does. Emulating the pool faithfully is the whole job:
+    the moment the two executors differ, the sequential and concurrent paths
+    diverge in behaviour, and only one of them is covered by any given test.
+    Which exceptions are *call failures* rather than run-level aborts is decided
+    in one place — :func:`_outcome_from_future` — for both.
+    """
+
+    def submit(self, fn, *args, **kwargs):
+        from concurrent.futures import Future
+
+        future: "Future" = Future()
+        try:
+            future.set_result(fn(*args, **kwargs))
+        except BaseException as e:  # noqa: BLE001 — classified by _outcome_from_future
+            future.set_exception(e)
+        return future
+
+
+@contextmanager
+def _bounded_executor(concurrency: int) -> Iterator[Any]:
+    """Yield an executor bounded to ``concurrency`` in-flight calls."""
+    if concurrency == 1:
+        yield _InlineExecutor()
+        return
+    from concurrent.futures import ThreadPoolExecutor
+
+    with ThreadPoolExecutor(
+        max_workers=concurrency, thread_name_prefix="falaw-plan"
+    ) as pool:
+        yield pool
+
+
+def _wait_first(in_flight: dict):
+    """Block until at least one future in ``in_flight`` is done."""
+    from concurrent.futures import FIRST_COMPLETED, wait
+
+    return wait(list(in_flight), return_when=FIRST_COMPLETED)
 
 
 def _execute_call(
@@ -573,8 +887,13 @@ def _execute_call(
     usable_from_cache,
     use_cache: bool,
     on_event,
-):
-    """Run one :class:`CallPlan`, returning its Artifact. See :func:`execute`.
+) -> tuple:
+    """Run one :class:`CallPlan`, returning ``(artifact, cache_hit)``.
+
+    ``cache_hit`` is *observed*, not predicted: it says this call was served
+    from a cache entry that proved usable, which is what run-level cost
+    accounting must be based on (a plan-time ``cache_status`` can be wrong in
+    both directions).
 
     Split out of the loop because a cache hit is not unconditionally usable:
     the response may name an asset fal has since deleted, whose bytes are not
@@ -594,15 +913,14 @@ def _execute_call(
             # Speculative: the conversion may turn out to be unusable, in which
             # case its own complaints are noise the caller must not see (we are
             # about to discard the artifact and say something more useful). Any
-            # warning from a conversion we *keep* is replayed verbatim.
-            with warnings.catch_warnings(record=True) as probe_warnings:
-                warnings.simplefilter("always")
+            # warning from a conversion we *keep* is replayed.
+            with _deferred_degrade_warnings() as deferred:
                 artifact = converter(hit, call)
             if usable_from_cache(artifact, hit):
-                for w in probe_warnings:
-                    warnings.warn_explicit(w.message, w.category, w.filename, w.lineno)
+                for message in deferred:
+                    warnings.warn(message, UserWarning, stacklevel=3)
                 emit_cache_hit(call.application, on_event)
-                return artifact
+                return artifact, True
             warnings.warn(
                 f"Dropping the falaw cache entry for {call.application!r}: its "
                 "recorded result names an asset that can no longer be read "
@@ -622,7 +940,32 @@ def _execute_call(
         )
     else:
         raw = call_fal(call.application, wire_args, on_event=on_event)
-    return converter(raw, call)
+    return converter(raw, call), False
+
+
+_DEGRADE_WARNING_SINK: "ContextVar[Optional[list]]" = ContextVar(
+    "falaw_degrade_warning_sink", default=None
+)
+"""Where :func:`_content_ref_or_none` sends its complaint instead of warning.
+
+A :class:`~contextvars.ContextVar` and **not** ``warnings.catch_warnings``,
+which mutates process-global filter state and is documented as not thread-safe:
+under ``concurrency > 1`` one call's speculative cache probe would suppress
+another call's genuine warning, at random. A ContextVar set inside a unit of
+work is visible only to that unit — each pool task runs in its own context copy
+(see ``copy_context().run`` in :func:`_run_plan`).
+"""
+
+
+@contextmanager
+def _deferred_degrade_warnings() -> Iterator[list]:
+    """Collect falaw's own degrade warnings instead of emitting them."""
+    sink: list = []
+    token = _DEGRADE_WARNING_SINK.set(sink)
+    try:
+        yield sink
+    finally:
+        _DEGRADE_WARNING_SINK.reset(token)
 
 
 def _content_ref_or_none(url: str, content_store, asset_fetcher):
@@ -641,14 +984,17 @@ def _content_ref_or_none(url: str, content_store, asset_fetcher):
     try:
         return content_ref_for_url(url, store=store, fetcher=asset_fetcher), store
     except FalAssetFetchError as e:
-        warnings.warn(
+        message = (
             f"{e} Falling back to a URL-only artifact: `asset_id` is a digest "
             "of the response, NOT a content hash, and `bytes_size` is 0. "
             "Chained calls downstream of it cannot be cache-reused, and the "
-            "artifact dies with the URL.",
-            UserWarning,
-            stacklevel=4,
+            "artifact dies with the URL."
         )
+        sink = _DEGRADE_WARNING_SINK.get()
+        if sink is None:
+            warnings.warn(message, UserWarning, stacklevel=4)
+        else:
+            sink.append(message)
         return None, store
 
 
@@ -747,6 +1093,86 @@ def _key_ref(artifact, idx: int, placeholder: str) -> str:
     )
 
 
+def plan_dependencies(plan: Plan) -> tuple[frozenset[int], ...]:
+    """Per-call set of the call indices it references via ``"<from N>"``.
+
+    The Plan's dependency DAG, read straight off the placeholders — one
+    ``frozenset`` per call, in plan order, so ``deps[3] == {1}`` means call 3
+    consumes call 1's output. An empty set means the call is **independent** and
+    may run concurrently with any other independent call, which is what
+    :func:`execute_isolated` schedules on.
+
+    Also the plan's structural validator, and it runs **before a cent is
+    spent**: a malformed reference used to surface only when execution reached
+    the offending call, i.e. after every call before it had been billed.
+
+    Raises:
+        ValueError: a placeholder that is not ``"<from N>"`` for an integer
+            ``N``; an ``N`` outside the plan; or an ``N`` that does not run
+            *before* the referencing call (including a self-reference) — the
+            output would not exist yet, so it can only ever be a bug.
+
+    >>> a = CallPlan(tool="t", application="m", arguments={}, output_kind="image")
+    >>> b = CallPlan(tool="t", application="m",
+    ...              arguments={"image_url": "<from 0>"}, output_kind="video")
+    >>> plan_dependencies(Plan(calls=(a, b)))
+    (frozenset(), frozenset({0}))
+    >>> plan_dependencies(Plan(calls=(b,)))
+    Traceback (most recent call last):
+        ...
+    ValueError: Placeholder '<from 0>' in call 0 references call 0, which does not run before it. ...
+    """
+    total = len(plan.calls)
+    dependencies: list[frozenset[int]] = []
+    for position, call in enumerate(plan.calls):
+        referenced: set[int] = set()
+        for placeholder in _iter_placeholders(call.arguments):
+            index = _parse_placeholder_index(placeholder)
+            if index < 0 or index >= total:
+                raise ValueError(
+                    f"Placeholder {placeholder!r} in call {position} references "
+                    f"artifact index {index}, but the plan has only {total} call(s)."
+                )
+            if index >= position:
+                reachable = (
+                    "it is the first call, so it can reference nothing"
+                    if position == 0
+                    else f"it may only reference calls 0..{position - 1}"
+                )
+                raise ValueError(
+                    f"Placeholder {placeholder!r} in call {position} references "
+                    f"call {index}, which does not run before it. A '<from N>' "
+                    f"placeholder consumes an earlier call's output — {reachable}."
+                )
+            referenced.add(index)
+        dependencies.append(frozenset(referenced))
+    return tuple(dependencies)
+
+
+def _iter_placeholders(value) -> Iterator[str]:
+    """Yield every ``"<from ...>"`` string anywhere inside ``value``."""
+    if isinstance(value, str):
+        if value.startswith(_PLACEHOLDER_PREFIX):
+            yield value
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _iter_placeholders(item)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            yield from _iter_placeholders(item)
+
+
+def _parse_placeholder_index(placeholder: str) -> int:
+    """``"<from 3>"`` -> ``3``. Raises ``ValueError`` on anything else."""
+    body = placeholder[len(_PLACEHOLDER_PREFIX) :].rstrip(">").strip()
+    try:
+        return int(body)
+    except ValueError as e:
+        raise ValueError(
+            f"Bad placeholder {placeholder!r} — expected '<from N>' where N is an integer."
+        ) from e
+
+
 def _resolve_placeholders(arguments: dict, artifacts: list, *, ref) -> dict:
     """Rewrite ``<from N>`` strings in ``arguments`` via ``ref(artifact, idx, ph)``.
 
@@ -783,18 +1209,22 @@ def _resolve(value, artifacts: list, ref):
 
 
 def _lookup_artifact_ref(placeholder: str, artifacts: list, ref) -> str:
-    """Parse ``"<from N>"`` and return ``ref(artifacts[N], N, placeholder)``."""
-    body = placeholder[len(_PLACEHOLDER_PREFIX) :].rstrip(">").strip()
-    try:
-        idx = int(body)
-    except ValueError as e:
-        raise ValueError(
-            f"Bad placeholder {placeholder!r} — expected '<from N>' where N is an integer."
-        ) from e
+    """Parse ``"<from N>"`` and return ``ref(artifacts[N], N, placeholder)``.
+
+    ``artifacts`` is a slot list the length of the Plan, so a slot may be
+    ``None`` — the call that fills it has not run, or did not succeed. That is
+    an error here rather than an ``AttributeError`` three frames down.
+    """
+    idx = _parse_placeholder_index(placeholder)
     if idx < 0 or idx >= len(artifacts):
         raise ValueError(
             f"Placeholder {placeholder!r} references artifact index {idx}, "
-            f"but only {len(artifacts)} artifact(s) have been materialized."
+            f"but only {len(artifacts)} artifact slot(s) exist."
+        )
+    if artifacts[idx] is None:
+        raise ValueError(
+            f"Placeholder {placeholder!r} references artifact index {idx}, "
+            "which has not been produced."
         )
     return ref(artifacts[idx], idx, placeholder)
 

@@ -40,6 +40,7 @@ import hashlib
 import json
 import os
 import time
+import uuid
 from typing import Any, Mapping, Optional
 
 from .core import call_fal
@@ -113,6 +114,13 @@ def cache_put(
             from the key arguments (chained calls send URLs but are keyed on
             content hashes). Recorded for debugging only — it never affects
             the key.
+
+    The manifest is written to a temporary file and moved into place with
+    :func:`os.replace`, so a reader never sees a half-written entry. That is not
+    hypothetical since ``execute_plan(concurrency=N)``: two calls of one Plan
+    that are structurally identical land on the same key, and an interleaved
+    ``json.dump`` would leave a permanently unparseable entry — a cache that
+    poisons itself under exactly the fan-out it exists to make cheap.
     """
     key = _key(application, arguments)
     d = _entry_dir(key)
@@ -126,9 +134,23 @@ def cache_put(
     }
     if wire_arguments is not None:
         manifest["wire_arguments"] = dict(wire_arguments)
-    with open(_manifest_path(key), "w") as f:
-        json.dump(manifest, f, indent=2, default=str)
+    path = _manifest_path(key)
+    tmp = f"{path}.{uuid.uuid4().hex[:8]}.part"
+    try:
+        with open(tmp, "w") as f:
+            json.dump(manifest, f, indent=2, default=str)
+        os.replace(tmp, path)
+    except BaseException:
+        _unlink_quietly(tmp)
+        raise
     return d
+
+
+def _unlink_quietly(path: str) -> None:
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
 
 
 def drop_cache_entry(application: str, arguments: Mapping[str, Any]) -> bool:
