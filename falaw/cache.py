@@ -16,6 +16,15 @@ Design:
 * The cache is *per-process* aware via lru_cache for hot lookups;
   on-disk for persistence across runs.
 
+**The key arguments are not always the wire arguments.** A chained plan
+(``generate_image`` → ``image_to_video``) sends fal a *URL* for the upstream
+image, but a URL is minted fresh per upload — so keying on it guarantees a
+miss the moment the upstream is genuinely re-executed, and the miss re-bills
+the expensive downstream call for unchanged work. :func:`cached_call_fal`
+therefore takes an optional ``key_arguments``: the same call with upstream
+references resolved to **content hashes** (``sha256:<hex>``) instead of URLs.
+See :mod:`falaw.content` for how those hashes are produced.
+
 Usage:
 
     from falaw.cache import cached_call_fal
@@ -31,7 +40,6 @@ import hashlib
 import json
 import os
 import time
-import urllib.request
 from typing import Any, Mapping, Optional
 
 from .core import call_fal
@@ -92,8 +100,20 @@ def cache_put(
     raw: dict,
     *,
     note: str = "",
+    wire_arguments: Optional[Mapping[str, Any]] = None,
 ) -> str:
-    """Persist a fal response. Returns the entry directory path."""
+    """Persist a fal response. Returns the entry directory path.
+
+    Args:
+        application: fal model id.
+        arguments: the arguments the entry is **keyed** on.
+        raw: the fal response to store.
+        note: free-form label recorded in the manifest.
+        wire_arguments: the arguments actually sent to fal, when they differ
+            from the key arguments (chained calls send URLs but are keyed on
+            content hashes). Recorded for debugging only — it never affects
+            the key.
+    """
     key = _key(application, arguments)
     d = _entry_dir(key)
     manifest = {
@@ -104,15 +124,59 @@ def cache_put(
         "note": note,
         "stored_at": time.time(),
     }
+    if wire_arguments is not None:
+        manifest["wire_arguments"] = dict(wire_arguments)
     with open(_manifest_path(key), "w") as f:
         json.dump(manifest, f, indent=2, default=str)
     return d
+
+
+def drop_cache_entry(application: str, arguments: Mapping[str, Any]) -> bool:
+    """Delete the cache entry for ``(application, arguments)``. Returns whether one existed.
+
+    The counterpart to :func:`cache_put`, and the mechanism that keeps a cache
+    from becoming a *trap*. An entry whose response can no longer be turned
+    into a usable artifact — fal deleted the URL and the bytes are not in the
+    content store — must be a **miss**, not a permanent failure: without this,
+    the only escape is ``use_cache=False``, which re-bills the whole plan
+    rather than the one dead call. :func:`falaw.plan.execute` calls it.
+
+    Only the manifest is removed. Blobs in the content store are shared by
+    content hash across entries and are never dropped from here.
+    """
+    path = _manifest_path(_key(application, arguments))
+    if not os.path.exists(path):
+        return False
+    os.remove(path)
+    return True
+
+
+def emit_cache_hit(application: str, on_event=None) -> None:
+    """Emit the synthetic ``cache_hit`` progress event for ``application``.
+
+    Shared by :func:`cached_call_fal` and :func:`falaw.plan.execute` (which
+    drives the cache directly, because it must decide whether a hit is
+    *usable* before committing to it) so a UI sees one event shape either way.
+    """
+    import uuid as _uuid
+
+    from .events import ProgressEvent, emit
+
+    emit(
+        ProgressEvent(
+            kind="cache_hit",
+            application=application,
+            call_id=_uuid.uuid4().hex[:12],
+        ),
+        also=(on_event,) if on_event else (),
+    )
 
 
 def cached_call_fal(
     application: str,
     arguments: Mapping[str, Any],
     *,
+    key_arguments: Optional[Mapping[str, Any]] = None,
     refresh: bool = False,
     on_event=None,
 ) -> dict:
@@ -120,7 +184,12 @@ def cached_call_fal(
 
     Args:
         application: fal model id.
-        arguments: model input dict.
+        arguments: model input dict — what is sent **on the wire**.
+        key_arguments: what the cache entry is **keyed** on, when that differs
+            from what goes on the wire. Defaults to ``arguments``. The split
+            exists because a chained call must send fal an expiring URL for its
+            upstream input while being keyed on that input's *content hash*, so
+            a byte-identical upstream regeneration hits instead of re-billing.
         refresh: if True, bypass the cache and overwrite it with a fresh result.
         on_event: Per-call subscriber for :class:`falaw.events.ProgressEvent`.
             On a cache hit, a synthetic ``cache_hit`` event is emitted so
@@ -129,42 +198,89 @@ def cached_call_fal(
     Returns:
         Raw fal response (whether from cache or network).
     """
+    key_args = arguments if key_arguments is None else key_arguments
     if not refresh:
-        hit = cache_get(application, arguments)
+        hit = cache_get(application, key_args)
         if hit is not None:
-            import uuid as _uuid
-
-            from .events import ProgressEvent, emit
-
-            emit(
-                ProgressEvent(
-                    kind="cache_hit",
-                    application=application,
-                    call_id=_uuid.uuid4().hex[:12],
-                ),
-                also=(on_event,) if on_event else (),
-            )
+            emit_cache_hit(application, on_event)
             return hit
     raw = call_fal(application, arguments, on_event=on_event)
-    cache_put(application, arguments, raw)
+    cache_put(
+        application,
+        key_args,
+        raw,
+        wire_arguments=None if key_arguments is None else arguments,
+    )
     return raw
 
 
-def materialize_asset(url: str, *, key_hint: str = "") -> str:
+def materialize_asset(
+    url: str,
+    *,
+    key_hint: str = "",
+    store=None,
+    fetcher=None,
+    refresh: bool = False,
+) -> str:
     """Download a remote asset to the cache and return the local path.
 
-    The local filename is content-addressed by the URL, so calling this
-    twice for the same URL is free.
+    The local filename is content-addressed by the asset's **bytes**, so two
+    URLs serving identical bytes resolve to one file. The extension is a
+    presentational hint for ffmpeg/PIL; the SHA-256 is the address.
+
+    Repeat calls are free, in three widening circles — this is what makes it
+    safe to call from a loop over 200 shots:
+
+    1. the file is already on disk here (no store lookup, no network);
+    2. the bytes are in the content store (no network) — so it still works
+       after fal has expired the URL;
+    3. otherwise, one download.
+
+    Circle 1 matters on its own: the content store is prunable, so an asset
+    can survive as a materialized file after its blob is gone.
+
+    Args:
+        url: the remote asset URL. ``file://`` is supported and is used
+            deliberately by downstream packages for locally-rendered media.
+        key_hint: optional human-readable filename prefix.
+        store: injected :class:`lacing.ArtifactStore`; defaults to
+            :func:`falaw.content.default_content_store`.
+        fetcher: injected byte source (``url -> Iterable[bytes]``); defaults to
+            the ``urllib``-based one. The seam for custom transport (auth
+            headers, retries) and for a hermetic test suite.
+        refresh: re-fetch even when a remembered content hash exists. Pass this
+            for a **mutable** URL — the ``url -> hash`` hint index assumes the
+            URL is immutable, which is true of fal's own but not of an
+            arbitrary one.
+
+    Raises:
+        falaw.errors.FalAssetFetchError: the bytes could not be retrieved.
+            Unlike a generated-media artifact (which degrades to URL-only —
+            see :func:`falaw.plan.execute`), there is nothing to degrade to
+            here: the caller asked for a local file.
     """
-    h = hashlib.sha256(url.encode("utf-8")).hexdigest()[:16]
-    ext = _infer_ext_from_url(url)
-    fname = f"{key_hint + '-' if key_hint else ''}{h}{ext}"
-    path = os.path.join(_cache_dir(), "assets", fname)
+    # Local import: ``falaw.content`` imports ``_cache_dir`` from this module,
+    # so importing it at module scope would be a cycle.
+    from .content import content_ref_for_url, remembered_ref, write_blob_to_file
+
+    if not refresh:
+        hint = remembered_ref(url)
+        if hint is not None:
+            path = _asset_path(url, key_hint, hint.content_hash)
+            if os.path.exists(path):
+                return path
+    ref = content_ref_for_url(url, store=store, fetcher=fetcher, refresh=refresh)
+    path = _asset_path(url, key_hint, ref.content_hash)
     if os.path.exists(path):
         return path
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    urllib.request.urlretrieve(url, path)
-    return path
+    return write_blob_to_file(ref.content_hash, path, store=store)
+
+
+def _asset_path(url: str, key_hint: str, content_hash: str) -> str:
+    """Where :func:`materialize_asset` puts the bytes for ``content_hash``."""
+    ext = _infer_ext_from_url(url)
+    fname = f"{key_hint + '-' if key_hint else ''}{content_hash}{ext}"
+    return os.path.join(_cache_dir(), "assets", fname)
 
 
 def _infer_ext_from_url(url: str) -> str:

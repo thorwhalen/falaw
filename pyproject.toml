@@ -16,7 +16,7 @@ authors = [
 ]
 dependencies = [
     "fal-client>=0.5",
-    "lacing>=0.0.15",
+    "lacing>=0.0.22",
 ]
 
 [tool.hatch.build.targets.wheel]

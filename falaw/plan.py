@@ -62,6 +62,7 @@ append it to a scene-level Plan:
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Literal, Optional
 
@@ -352,6 +353,14 @@ def make_call_plan(
 
     When ``consult_cache=False`` (e.g. for unit tests or "what would a fresh
     run cost?" reporting), ``cache_status`` is ``"unknown"``.
+
+    Known gap (falaw#15): the peek uses the *unresolved* arguments, so for a
+    chained call — one whose arguments still hold a ``<from N>`` placeholder —
+    it keys on the placeholder rather than on the upstream content ref
+    :func:`execute` will key on. ``cache_status`` is therefore not to be
+    trusted for chained calls, and a plan's reported cost can understate what
+    the run bills. Fixing it needs the upstream to have executed, which is a
+    planner-level change, not a converter-level one.
     """
     status: CacheStatus = "unknown"
     if consult_cache:
@@ -384,6 +393,34 @@ def make_call_plan(
 ResultToArtifact = Callable[[dict, CallPlan], "Artifact"]  # noqa: F821
 
 
+DFLT_FETCH_BYTES = True
+"""Whether :func:`execute` downloads media results to content-address them.
+
+True — an artifact whose ``asset_id`` is not the SHA-256 of its bytes breaks
+``lacing.Artifact``'s contract and puts an expiring location into every
+downstream cache key.
+"""
+
+FETCH_BYTES_ENVVAR = "FALAW_FETCH_ARTIFACT_BYTES"
+"""Env var overriding :data:`DFLT_FETCH_BYTES` process-wide.
+
+Set it to ``0`` for one legitimate case: an **offline test suite** whose
+stubbed fal responses carry URLs that resolve to nothing. It is not a
+production setting — see the ``fetch_bytes`` argument of :func:`execute` for
+what opting out costs. Read at call time, so a test can set it after import.
+"""
+
+
+def _fetch_bytes_default() -> bool:
+    """Resolve the effective ``fetch_bytes`` default from the environment."""
+    import os
+
+    raw = os.environ.get(FETCH_BYTES_ENVVAR)
+    if raw is None:
+        return DFLT_FETCH_BYTES
+    return raw.strip().lower() not in ("0", "false", "no", "off", "")
+
+
 def execute(
     plan: Plan,
     *,
@@ -391,6 +428,9 @@ def execute(
     dry_run: bool = False,
     use_cache: bool = True,
     artifact_converter: Optional[ResultToArtifact] = None,
+    content_store=None,
+    fetch_bytes: Optional[bool] = None,
+    asset_fetcher=None,
 ) -> list:
     """Execute a Plan, returning a list of materialized :class:`lacing.Artifact`s.
 
@@ -405,16 +445,75 @@ def execute(
         artifact_converter: Per-CallPlan converter from raw fal response to
             :class:`lacing.Artifact`. When ``None`` (default), a built-in
             converter handles the common shapes (``{images: [{url}]}``,
-            ``{video: {url}}``, ``{audio: {url}}``).
+            ``{video: {url}}``, ``{audio: {url}}``). Mutually exclusive with
+            ``content_store`` / ``fetch_bytes`` / ``asset_fetcher``, which
+            configure the built-in converter only — passing both raises, rather
+            than silently ignoring the ones a custom converter cannot honour.
+        content_store: Injected :class:`lacing.ArtifactStore` that media bytes
+            are materialized into. Defaults to
+            :func:`falaw.content.default_content_store` (a directory store
+            rooted in the falaw cache). Point this at an S3-backed store to
+            share content — and therefore cache hits — across machines.
+        fetch_bytes: Whether to download each media result so its ``asset_id``
+            is the SHA-256 of its bytes. Defaults to :data:`DFLT_FETCH_BYTES`
+            (true), overridable process-wide via :data:`FETCH_BYTES_ENVVAR`.
+            **Opting out forfeits caching for chained calls**: without bytes
+            there is no content hash, so downstream calls fall back to keying
+            on the upstream URL — which fal mints fresh per upload, so the
+            downstream entry can never be reused across runs or machines. It
+            also means ``asset_id`` is *not* a content hash, in violation of
+            ``lacing.Artifact``'s contract. Use it only when you genuinely
+            want URL-only artifacts and no reuse.
+        asset_fetcher: Injected byte source (``url -> Iterable[bytes]``) used to
+            read media results; defaults to a ``urllib``-based fetcher. This is
+            the seam a **hermetic test suite** should use: a downstream suite
+            whose stubbed fal responses carry made-up URLs must inject a fake
+            transport here, or execution will reach for the network. (Setting
+            ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it
+            turns off content addressing altogether, so the suite stops
+            exercising the thing it is testing.)
 
-    Placeholder resolution
-    ----------------------
+    Failure handling — a paid result is never discarded
+    ---------------------------------------------------
+    Two different things can go wrong when reading a result's bytes, and they
+    get two different answers:
+
+    - **A fresh call whose bytes cannot be fetched.** fal has already run — and
+      billed — the generation. Raising would throw away a result we paid for,
+      typically over a transient network failure. So the artifact **degrades**:
+      ``url`` is kept, ``bytes_size`` stays 0, ``asset_id`` is a digest of the
+      response and is *not* claimed to be a content hash, and a
+      :class:`UserWarning` is emitted. Downstream key resolution reads
+      ``bytes_size == 0`` and falls back to the URL — a guaranteed cache
+      *miss*, never a wrong hit.
+    - **A cache hit that cannot be materialized** — fal deleted the URL and the
+      bytes are not in the content store. The entry is unusable, so it is
+      treated as a **miss**: it is invalidated and the call re-executed once.
+      A cache must never become a trap whose only escape is re-billing the
+      whole plan with ``use_cache=False``.
+
+    Placeholder resolution — the wire/key split
+    -------------------------------------------
     Any string argument equal to ``"<from N>"`` (for an integer ``N``) is
-    rewritten to ``artifacts[N].url`` *just before* the call is made — so
-    a multi-step plan (e.g. generate_image → image_to_video) can reference
-    the upstream output without the planner needing to know its URL. The
-    rewrite happens after the upstream call has executed; planning itself
-    is unaffected.
+    rewritten *just before* the call is made — so a multi-step plan (e.g.
+    generate_image → image_to_video) can reference the upstream output without
+    the planner needing to know its URL. The rewrite happens after the upstream
+    call has executed; planning itself is unaffected.
+
+    It happens **twice**, into two different argument sets, because the same
+    value cannot serve both jobs:
+
+    - the **wire** arguments get ``artifacts[N].url`` — what fal needs in order
+      to fetch the input;
+    - the **key** arguments get ``sha256:<artifacts[N].asset_id>`` — the
+      upstream's content hash, so a byte-identical upstream regeneration
+      produces a downstream cache *hit* instead of re-billing the expensive
+      call. Keying on the URL instead is the defect this split exists to fix
+      (falaw#14): fal mints a unique URL per upload, so a URL-keyed downstream
+      entry is unreachable the moment the upstream genuinely re-runs.
+
+    An upstream artifact with no materialized bytes has no content hash, so its
+    key ref falls back to the URL — a guaranteed miss, never a wrong hit.
 
     Returns:
         One :class:`lacing.Artifact` per :class:`CallPlan` in ``plan.calls``,
@@ -425,36 +524,240 @@ def execute(
     if dry_run:
         return [_synthetic_artifact(c) for c in plan.calls]
 
-    converter = artifact_converter or _default_artifact_converter
+    if artifact_converter is not None:
+        _refuse_converter_configuration(content_store, fetch_bytes, asset_fetcher)
+        converter = artifact_converter
+        # A custom converter defines its own notion of a usable artifact, so we
+        # do not second-guess its cache hits.
+        usable_from_cache = _always_usable
+    else:
+        wants_bytes = _fetch_bytes_default() if fetch_bytes is None else fetch_bytes
+        converter = _make_artifact_converter(
+            content_store=content_store,
+            fetch_bytes=wants_bytes,
+            asset_fetcher=asset_fetcher,
+        )
+        usable_from_cache = _make_usability_check(fetch_bytes=wants_bytes)
 
     artifacts: list[Artifact] = []
     for call in plan.calls:
-        resolved_args = _resolve_placeholders(call.arguments, artifacts)
-        if use_cache:
-            from .cache import cached_call_fal
-
-            raw = cached_call_fal(call.application, resolved_args, on_event=on_event)
-        else:
-            from .core import call_fal
-
-            raw = call_fal(call.application, resolved_args, on_event=on_event)
-        artifacts.append(converter(raw, call))
+        wire_args = _resolve_placeholders(call.arguments, artifacts, ref=_wire_ref)
+        # Only resolved when it will be used — the key ref is stricter than the
+        # wire ref (it needs bytes *or* a URL), and an uncached run must not
+        # inherit that stricter requirement.
+        key_args = (
+            _resolve_placeholders(call.arguments, artifacts, ref=_key_ref)
+            if use_cache
+            else wire_args
+        )
+        artifacts.append(
+            _execute_call(
+                call,
+                wire_args,
+                key_args,
+                converter=converter,
+                usable_from_cache=usable_from_cache,
+                use_cache=use_cache,
+                on_event=on_event,
+            )
+        )
     return artifacts
+
+
+def _execute_call(
+    call: CallPlan,
+    wire_args: dict,
+    key_args: dict,
+    *,
+    converter: "ResultToArtifact",
+    usable_from_cache,
+    use_cache: bool,
+    on_event,
+):
+    """Run one :class:`CallPlan`, returning its Artifact. See :func:`execute`.
+
+    Split out of the loop because a cache hit is not unconditionally usable:
+    the response may name an asset fal has since deleted, whose bytes are not
+    in the content store. That entry can never become an artifact again, so it
+    is dropped and the call re-executed — the alternative is a cache entry that
+    fails forever and can only be escaped by re-billing the entire plan.
+    """
+    from .cache import cached_call_fal, drop_cache_entry, emit_cache_hit
+    from .core import call_fal
+
+    key_arguments = None if key_args is wire_args else key_args
+    if use_cache:
+        from .cache import cache_get
+
+        hit = cache_get(call.application, key_args)
+        if hit is not None:
+            # Speculative: the conversion may turn out to be unusable, in which
+            # case its own complaints are noise the caller must not see (we are
+            # about to discard the artifact and say something more useful). Any
+            # warning from a conversion we *keep* is replayed verbatim.
+            with warnings.catch_warnings(record=True) as probe_warnings:
+                warnings.simplefilter("always")
+                artifact = converter(hit, call)
+            if usable_from_cache(artifact, hit):
+                for w in probe_warnings:
+                    warnings.warn_explicit(w.message, w.category, w.filename, w.lineno)
+                emit_cache_hit(call.application, on_event)
+                return artifact
+            warnings.warn(
+                f"Dropping the falaw cache entry for {call.application!r}: its "
+                "recorded result names an asset that can no longer be read "
+                "(fal-served URLs expire and are permanently deleted, and the "
+                "bytes are not in the content store). Re-executing the call — "
+                "this one costs money.",
+                UserWarning,
+                stacklevel=3,
+            )
+            drop_cache_entry(call.application, key_args)
+        raw = cached_call_fal(
+            call.application,
+            wire_args,
+            key_arguments=key_arguments,
+            refresh=True,
+            on_event=on_event,
+        )
+    else:
+        raw = call_fal(call.application, wire_args, on_event=on_event)
+    return converter(raw, call)
+
+
+def _content_ref_or_none(url: str, content_store, asset_fetcher):
+    """``(ContentRef | None, store)`` for ``url`` — ``None`` on a fetch failure.
+
+    fal has already run and **billed** the generation by the time we get here,
+    so a failure to read the bytes must not throw the result away: a transient
+    network error would turn a paid render into nothing at all. The caller
+    degrades to a URL-only artifact instead, and this function makes the
+    failure loud rather than silent.
+    """
+    from .content import content_ref_for_url, default_content_store
+    from .errors import FalAssetFetchError
+
+    store = default_content_store() if content_store is None else content_store
+    try:
+        return content_ref_for_url(url, store=store, fetcher=asset_fetcher), store
+    except FalAssetFetchError as e:
+        warnings.warn(
+            f"{e} Falling back to a URL-only artifact: `asset_id` is a digest "
+            "of the response, NOT a content hash, and `bytes_size` is 0. "
+            "Chained calls downstream of it cannot be cache-reused, and the "
+            "artifact dies with the URL.",
+            UserWarning,
+            stacklevel=4,
+        )
+        return None, store
+
+
+def _always_usable(artifact, raw: dict) -> bool:
+    return True
+
+
+def _make_usability_check(*, fetch_bytes: bool):
+    """Whether a cache hit converted by the **built-in** converter is usable.
+
+    Unusable means exactly one thing: bytes were wanted, the recorded response
+    names an asset, and the artifact came back with none — so the bytes are
+    neither behind the URL nor in the content store, and no amount of retrying
+    the *cache* will produce them.
+    """
+
+    def usable(artifact, raw: dict) -> bool:
+        if not fetch_bytes:
+            return True
+        if artifact.bytes_size > 0:
+            return True
+        return _extract_first_url(raw) is None
+
+    return usable
+
+
+def _refuse_converter_configuration(content_store, fetch_bytes, asset_fetcher) -> None:
+    """Reject ``artifact_converter=`` combined with built-in-converter knobs.
+
+    ``content_store`` / ``fetch_bytes`` / ``asset_fetcher`` configure the
+    built-in converter and are structurally unreachable from a custom one.
+    Accepting them silently is worse than useless: a caller pointing falaw at a
+    shared S3 content store *and* supplying a converter would get an empty
+    store and no indication why.
+    """
+    supplied = [
+        name
+        for name, value in (
+            ("content_store", content_store),
+            ("fetch_bytes", fetch_bytes),
+            ("asset_fetcher", asset_fetcher),
+        )
+        if value is not None
+    ]
+    if supplied:
+        raise ValueError(
+            f"execute(artifact_converter=...) cannot be combined with "
+            f"{', '.join(supplied)} — those configure the built-in converter "
+            "and a custom converter cannot honour them. Configure your "
+            "converter directly (see falaw.plan._artifact_from_response for "
+            "the built-in one), or drop artifact_converter."
+        )
 
 
 _PLACEHOLDER_PREFIX = "<from "
 
+CONTENT_REF_PREFIX = "sha256:"
+"""Prefix marking a content hash where a cache key would otherwise hold a URL.
 
-def _resolve_placeholders(arguments: dict, artifacts: list) -> dict:
-    """Rewrite ``<from N>`` strings in ``arguments`` to ``artifacts[N].url``.
+Self-describing on purpose: a reader of a cache manifest can tell at a glance
+that an argument was keyed on *what the upstream produced* rather than *where
+it was served from*, and the prefixed form can never be confused with a
+literal URL argument.
+"""
 
-    Only top-level string values are rewritten; nested dicts/lists are
-    recursed into. ``arguments`` is not modified — a new dict is returned
-    when any rewrite happens, otherwise the original is returned.
+
+def _wire_ref(artifact, idx: int, placeholder: str) -> str:
+    """What a ``<from N>`` reference becomes **on the wire** — the upstream URL."""
+    if not artifact.url:
+        raise ValueError(
+            f"Placeholder {placeholder!r} references artifact[{idx}] but it has no URL."
+        )
+    return artifact.url
+
+
+def _key_ref(artifact, idx: int, placeholder: str) -> str:
+    """What a ``<from N>`` reference becomes **in the cache key**.
+
+    The upstream's content hash (``sha256:<hex>``) whenever its bytes were
+    materialized — that is what makes a byte-identical upstream regeneration
+    hit downstream. ``bytes_size > 0`` is the signal that ``asset_id`` really
+    is the SHA-256 of those bytes; it holds for falaw's own converter and is
+    the contract a custom ``artifact_converter`` must honour.
+
+    With no bytes there is no content identity, so we fall back to the URL:
+    sound but unreusable (a fresh URL each upload ⇒ a guaranteed miss), which
+    is strictly better than inventing an id that could produce a *wrong* hit.
+    """
+    if artifact.bytes_size > 0:
+        return f"{CONTENT_REF_PREFIX}{artifact.asset_id}"
+    if artifact.url:
+        return artifact.url
+    raise ValueError(
+        f"Placeholder {placeholder!r} references artifact[{idx}] but it has "
+        "neither materialized bytes nor a URL."
+    )
+
+
+def _resolve_placeholders(arguments: dict, artifacts: list, *, ref) -> dict:
+    """Rewrite ``<from N>`` strings in ``arguments`` via ``ref(artifact, idx, ph)``.
+
+    Only string values are rewritten; nested dicts/lists/tuples are recursed
+    into. ``arguments`` is not modified — a new dict is returned when any
+    rewrite happens, otherwise the original object is returned (identity that
+    :func:`execute` uses to detect "wire and key arguments are the same").
     """
     if not _has_placeholder(arguments):
         return arguments
-    return _resolve(arguments, artifacts)
+    return _resolve(arguments, artifacts, ref)
 
 
 def _has_placeholder(value) -> bool:
@@ -467,20 +770,20 @@ def _has_placeholder(value) -> bool:
     return False
 
 
-def _resolve(value, artifacts: list):
+def _resolve(value, artifacts: list, ref):
     if isinstance(value, str) and value.startswith(_PLACEHOLDER_PREFIX):
-        return _lookup_artifact_url(value, artifacts)
+        return _lookup_artifact_ref(value, artifacts, ref)
     if isinstance(value, dict):
-        return {k: _resolve(v, artifacts) for k, v in value.items()}
+        return {k: _resolve(v, artifacts, ref) for k, v in value.items()}
     if isinstance(value, list):
-        return [_resolve(v, artifacts) for v in value]
+        return [_resolve(v, artifacts, ref) for v in value]
     if isinstance(value, tuple):
-        return tuple(_resolve(v, artifacts) for v in value)
+        return tuple(_resolve(v, artifacts, ref) for v in value)
     return value
 
 
-def _lookup_artifact_url(placeholder: str, artifacts: list) -> str:
-    """Parse ``"<from N>"`` and return ``artifacts[N].url``."""
+def _lookup_artifact_ref(placeholder: str, artifacts: list, ref) -> str:
+    """Parse ``"<from N>"`` and return ``ref(artifacts[N], N, placeholder)``."""
     body = placeholder[len(_PLACEHOLDER_PREFIX) :].rstrip(">").strip()
     try:
         idx = int(body)
@@ -493,12 +796,7 @@ def _lookup_artifact_url(placeholder: str, artifacts: list) -> str:
             f"Placeholder {placeholder!r} references artifact index {idx}, "
             f"but only {len(artifacts)} artifact(s) have been materialized."
         )
-    artifact = artifacts[idx]
-    if not artifact.url:
-        raise ValueError(
-            f"Placeholder {placeholder!r} references artifact[{idx}] but it has no URL."
-        )
-    return artifact.url
+    return ref(artifacts[idx], idx, placeholder)
 
 
 def _synthetic_artifact(call: CallPlan):
@@ -514,9 +812,9 @@ def _synthetic_artifact(call: CallPlan):
         sort_keys=True,
         default=str,
     ).encode("utf-8")
-    fake_id = hash_bytes(blob)
+    synthetic_id = hash_bytes(blob)
     return Artifact(
-        asset_id=fake_id,
+        asset_id=synthetic_id,
         kind=call.output_kind,
         path=None,
         url=None,
@@ -525,7 +823,7 @@ def _synthetic_artifact(call: CallPlan):
         mime=None,
         provenance=_dry_run_provenance(call),
         cost_usd=0.0,
-        producer_call_id=f"dry-run:{fake_id[:12]}",
+        producer_call_id=f"dry-run:{synthetic_id[:12]}",
     )
 
 
@@ -542,7 +840,38 @@ def _dry_run_provenance(call: CallPlan):
     )
 
 
-def _default_artifact_converter(raw: dict, call: CallPlan):
+def _make_artifact_converter(
+    *, content_store=None, fetch_bytes: bool = True, asset_fetcher=None
+) -> ResultToArtifact:
+    """Build the default raw-response → :class:`lacing.Artifact` converter.
+
+    A factory rather than a plain function because the conversion needs three
+    injected decisions — *which* content store the bytes land in, *how* they
+    are read, and whether to read them at all — while :data:`ResultToArtifact`
+    (the pluggable converter contract every caller may implement) stays a
+    two-argument callable.
+    """
+
+    def convert(raw: dict, call: CallPlan):
+        return _artifact_from_response(
+            raw,
+            call,
+            content_store=content_store,
+            fetch_bytes=fetch_bytes,
+            asset_fetcher=asset_fetcher,
+        )
+
+    return convert
+
+
+def _artifact_from_response(
+    raw: dict,
+    call: CallPlan,
+    *,
+    content_store=None,
+    fetch_bytes: bool = True,
+    asset_fetcher=None,
+):
     """Convert a fal response to an Artifact using the common response shapes.
 
     Handles these patterns observed across fal models:
@@ -558,15 +887,40 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
     with ``num_images > 1``), only the first asset becomes an Artifact —
     callers wanting all assets should provide their own converter.
 
-    For media calls the Artifact's ``asset_id`` is the SHA-256 of the URL and
-    ``bytes_size`` is 0 (we don't download by default). For ``json`` / ``text``
-    calls with **no URL** — the ``fal-ai/any-llm`` case — the textual response
-    is *materialized* to a content-addressed file in the falaw cache and
-    ``Artifact.path`` points at it (``asset_id`` is the SHA-256 of the
-    content). So ``execute`` returns a usable Artifact regardless of kind:
-    media via ``url``, LLM output via ``path``.
+    Every Artifact is **content-addressed**: ``asset_id`` is the SHA-256 of the
+    artifact's bytes, as ``lacing.Artifact`` contractually requires.
+
+    - Media calls: the bytes are streamed once into ``content_store`` (see
+      :mod:`falaw.content`), ``bytes_size`` is their real length, ``url`` is
+      kept as a *hint*, and the artifact survives fal deleting the URL because
+      the bytes are in the store. ``path`` is set when the store exposes a
+      local file for the blob (the directory-backed default does; an in-memory
+      or object-store one returns ``None`` — read those through
+      ``ArtifactStore.iter_blob(asset_id)``). Re-converting the same response
+      later is download-free (the ``url -> content hash`` index).
+    - ``json`` / ``text`` calls with **no URL** — the ``fal-ai/any-llm`` case:
+      the textual response is materialized to a content-addressed file in the
+      falaw cache and ``Artifact.path`` points at it.
+
+    Degraded (URL-only) artifacts
+    -----------------------------
+    Two cases produce an Artifact whose ``asset_id`` is a digest of the whole
+    response rather than a content hash, with ``bytes_size == 0``: an explicit
+    ``fetch_bytes=False``, and a fetch that failed (which also emits a
+    :class:`UserWarning` — see :func:`execute` for why a *billed* result is
+    degraded rather than discarded).
+
+    The response digest is deliberately **not** the SHA-256 of the URL. Hashing
+    the URL is the falaw#14 defect: it looks like a content hash, so it makes
+    two byte-identical renders appear different while satisfying every check
+    that only tests "is this 64 hex chars". ``bytes_size == 0`` is the honest
+    signal, and it is what downstream key resolution reads to fall back to the
+    URL rather than trust the id.
+
+    Note that ``path``/``url`` are location *hints*, machine-local in the
+    ``path`` case. Only ``asset_id`` + the content store are portable.
     """
-    from lacing import Artifact, hash_bytes
+    from lacing import Artifact
     from lacing.artifact import _now_rt
     from lacing.model import Provenance
 
@@ -576,11 +930,19 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
     path = None
     bytes_size = 0
 
-    if url:
-        # asset_id from URL when we don't have bytes — stable across re-runs of
-        # the same fal response. When bytes are downloaded later, callers
-        # should re-hash and produce a new Artifact.
-        fake_id = hash_bytes(url.encode("utf-8"))
+    if url and fetch_bytes:
+        ref, store = _content_ref_or_none(url, content_store, asset_fetcher)
+        if ref is None:
+            # A degraded, honestly-labelled artifact — never a lost paid result.
+            asset_id = _response_digest(raw)
+        else:
+            asset_id = ref.content_hash
+            bytes_size = ref.bytes_size
+            path = store.blob_path(asset_id)
+    elif url:
+        # No bytes ⇒ no content identity. Digest the response rather than the
+        # URL so nothing pretends to be a content hash; see the docstring.
+        asset_id = _response_digest(raw)
     elif call.output_kind in ("json", "text"):
         # LLM-style response: no URL, the content *is* the text. Materialize
         # it to a content-addressed cache file so the Artifact is usable.
@@ -589,18 +951,14 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
             # ``output_kind="json"`` promises a parseable JSON artifact,
             # but real models wrap it in a ```json fence anyway.
             content = _unwrap_json_fence(content)
-        path, fake_id = _materialize_text_to_cache(content, call.output_kind)
+        path, asset_id = _materialize_text_to_cache(content, call.output_kind)
         bytes_size = len(content.encode("utf-8"))
         mime = mime or (
             "application/json" if call.output_kind == "json" else "text/plain"
         )
     else:
         # Last-resort: hash the response itself.
-        import json as _json
-
-        fake_id = hash_bytes(
-            _json.dumps(raw, sort_keys=True, default=str).encode("utf-8")
-        )
+        asset_id = _response_digest(raw)
 
     prov = Provenance(
         was_generated_by=f"agent:fal@{call.application}",
@@ -611,7 +969,7 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
     )
 
     return Artifact(
-        asset_id=fake_id,
+        asset_id=asset_id,
         kind=call.output_kind,
         path=path,
         url=url,
@@ -622,6 +980,21 @@ def _default_artifact_converter(raw: dict, call: CallPlan):
         cost_usd=call.billable_cost_usd or None,
         producer_call_id=None,  # set by orchestrators that thread through call_id
     )
+
+
+def _response_digest(raw) -> str:
+    """SHA-256 of the canonicalized response — a last-resort, non-content id.
+
+    Used only where falaw has no bytes to hash. It is *not* a content hash and
+    must never be treated as one: it changes whenever any field of the response
+    changes (including a re-minted URL), which is exactly what makes it safe —
+    it can only ever cause a cache *miss*, never a wrong hit.
+    """
+    import json as _json
+
+    from lacing import hash_bytes
+
+    return hash_bytes(_json.dumps(raw, sort_keys=True, default=str).encode("utf-8"))
 
 
 def _unwrap_json_fence(text: str) -> str:

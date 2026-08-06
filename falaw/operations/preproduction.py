@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import Optional
 
-from ..cache import cached_call_fal, materialize_asset
+from ..cache import cached_call_fal
 from ..registry import pick_model, register_tool
 from ..results import Result, parse_response
 from ..scene import Character, Environment, Shot, Voice
