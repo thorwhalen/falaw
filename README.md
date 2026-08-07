@@ -133,19 +133,19 @@ re-exportable into a `conftest.py` in one line:
 ```python
 # conftest.py
 from falaw.testing import (  # noqa: F401
-    fake_assets,           # url -> bytes, served from memory
+    fake_assets,  # url -> bytes, served from memory
     isolated_falaw_cache,  # cache / content store / url-index under tmp_path
-    no_outbound_network,   # refuses AND records any non-loopback connection
+    no_outbound_network,  # refuses AND records any non-loopback connection
 )
 ```
 
 ```python
 def test_two_urls_one_content_address(fake_assets):
     shared = fake_assets.serve("http://cdn/a.png", b"identical bytes")
-    fake_assets.serve("http://cdn/b.png", shared)   # pin explicit bytes
-    fake_assets.fail("http://cdn/gone.png")         # 404, as an expired asset does
+    fake_assets.serve("http://cdn/b.png", shared)  # pin explicit bytes
+    fake_assets.fail("http://cdn/gone.png")  # 404, as an expired asset does
     ...
-    assert fake_assets.fetched == [...]             # assert on the record
+    assert fake_assets.fetched == [...]  # assert on the record
 ```
 
 `fake_assets` installs itself through `falaw.content.using_url_fetcher`, the
