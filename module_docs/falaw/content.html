@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.content &mdash; falaw 0.0.25 documentation</title>
+  <title>falaw.content &mdash; falaw 0.0.26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5d650c58"></script>
+      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -60,9 +60,12 @@
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.content</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.ContentRef"><code class="docutils literal notranslate"><span class="pre">ContentRef</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.UrlFetcher"><code class="docutils literal notranslate"><span class="pre">UrlFetcher</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.content_ref_for_url"><code class="docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.default_content_store"><code class="docutils literal notranslate"><span class="pre">default_content_store()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.default_url_fetcher"><code class="docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.remembered_ref"><code class="docutils literal notranslate"><span class="pre">remembered_ref()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.using_url_fetcher"><code class="docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.write_blob_to_file"><code class="docutils literal notranslate"><span class="pre">write_blob_to_file()</span></code></a></li>
 </ul>
 </li>
@@ -89,6 +92,7 @@
 <li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
 </ul>
 
         </div>
@@ -157,6 +161,16 @@ cache hit still yields a usable artifact instead of a dead link.</p></li>
 <a class="reference internal" href="#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a> is the falaw-cache-rooted default, and every
 public function here takes a <code class="docutils literal notranslate"><span class="pre">store</span></code> keyword so a caller can point falaw at
 an S3-backed store without touching any other code.</p>
+<p>So is the <strong>transport</strong>. Per call it is the <code class="docutils literal notranslate"><span class="pre">fetcher=</span></code> / <code class="docutils literal notranslate"><span class="pre">asset_fetcher=</span></code>
+argument; for a whole process it is <a class="reference internal" href="#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a>, which covers
+<a class="reference internal" href="#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a>, <a class="reference internal" href="../falaw.html#falaw.materialize_asset" title="falaw.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.materialize_asset()</span></code></a>,
+<a class="reference internal" href="../falaw.html#falaw.execute_plan" title="falaw.execute_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.execute_plan()</span></code></a> and <a class="reference internal" href="../falaw.html#falaw.execute_plan_isolated" title="falaw.execute_plan_isolated"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.execute_plan_isolated()</span></code></a> in one
+place. That matters most to <em>downstream</em> test suites: falaw content-addresses
+every media result, so a suite that stubs the fal response but not the
+transport resolves its made-up URLs for real — and stays green while doing it,
+because a failed fetch degrades to a URL-only artifact with a warning rather
+than raising. <a class="reference internal" href="testing.html#module-falaw.testing" title="falaw.testing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.testing</span></code></a> ships the fake so no consumer has to write
+one.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
@@ -191,6 +205,16 @@ the whole point:</p>
 value that goes into a downstream cache key in place of a URL.</p>
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.content.UrlFetcher">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">UrlFetcher</span></span><a class="headerlink" href="#falaw.content.UrlFetcher" title="Link to this definition"></a></dt>
+<dd><p>A callable that yields the bytes of a URL in chunks.</p>
+<p>The injection seam for tests and for callers that need custom transport
+(auth headers, retries, a local mirror). <a class="reference internal" href="#falaw.content.default_url_fetcher" title="falaw.content.default_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a> resolves
+the one in force; <a class="reference internal" href="#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a> installs another.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]]</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.content.content_ref_for_url">
 <span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.content_ref_for_url" title="Link to this definition"></a></dt>
@@ -205,7 +229,9 @@ already-cached plan free rather than re-downloading every clip.</p>
 <li><p><strong>url</strong> – The remote asset URL (typically fal’s CDN).</p></li>
 <li><p><strong>store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
 <a class="reference internal" href="#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a>.</p></li>
-<li><p><strong>fetcher</strong> – Injected byte source; defaults to <code class="xref py py-func docutils literal notranslate"><span class="pre">_http_chunks()</span></code>.</p></li>
+<li><p><strong>fetcher</strong> – Injected byte source; defaults to <a class="reference internal" href="#falaw.content.default_url_fetcher" title="falaw.content.default_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a>
+(the built-in <code class="docutils literal notranslate"><span class="pre">urllib</span></code> transport unless <a class="reference internal" href="#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a>
+has installed another).</p></li>
 <li><p><strong>refresh</strong> – Ignore the remembered reference and re-fetch. Only useful when
 you suspect the index is wrong — fal URLs are per-upload, so the
 same URL never legitimately serves different bytes.</p></li>
@@ -230,6 +256,18 @@ exist) so a test that re-points the cache dir gets a fresh store.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.default_url_fetcher">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">default_url_fetcher</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#default_url_fetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.default_url_fetcher" title="Link to this definition"></a></dt>
+<dd><p>The transport used when no <code class="docutils literal notranslate"><span class="pre">fetcher=</span></code> argument is given.</p>
+<p><a class="reference internal" href="#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a>’s installed fetcher if there is one, else the
+built-in <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based one. Resolved at call time, so every falaw entry
+point that reads asset bytes — <a class="reference internal" href="#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a>,
+<a class="reference internal" href="../falaw.html#falaw.materialize_asset" title="falaw.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.materialize_asset()</span></code></a>, <a class="reference internal" href="../falaw.html#falaw.execute_plan" title="falaw.execute_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.execute_plan()</span></code></a> and
+<a class="reference internal" href="../falaw.html#falaw.execute_plan_isolated" title="falaw.execute_plan_isolated"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.execute_plan_isolated()</span></code></a> — honours an override installed after
+they were imported.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.content.remembered_ref">
 <span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">remembered_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#remembered_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.remembered_ref" title="Link to this definition"></a></dt>
 <dd><p>The <a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentRef</span></code></a> previously recorded for <code class="docutils literal notranslate"><span class="pre">url</span></code>, if any.</p>
@@ -240,6 +278,34 @@ already-materialized file on disk) before trusting it.</p>
 <p>Public because it is the cheap pre-check that lets a caller answer “do I
 already have this?” without a network round-trip — see
 <a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.using_url_fetcher">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">using_url_fetcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#using_url_fetcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.using_url_fetcher" title="Link to this definition"></a></dt>
+<dd><p>Make <code class="docutils literal notranslate"><span class="pre">fetcher</span></code> falaw’s default asset transport for the duration.</p>
+<p>The <strong>public seam</strong> for replacing falaw’s network transport wholesale —
+with an authenticated client, a retrying one, a local mirror, or (the
+common case) an in-memory fake in a test suite.</p>
+<p>Prefer this to reaching for the module’s private default: it covers every
+entry point in one place, it needs no <code class="docutils literal notranslate"><span class="pre">monkeypatch</span></code>, and it cannot be
+invalidated by an internal rename. It is also the only mechanism that
+reaches a call falaw makes from a thread you did not create — see
+<code class="xref py py-data docutils literal notranslate"><span class="pre">_DEFAULT_FETCHER</span></code> for why that matters.</p>
+<p>An explicitly passed <code class="docutils literal notranslate"><span class="pre">fetcher=</span></code> / <code class="docutils literal notranslate"><span class="pre">asset_fetcher=</span></code> still wins: this
+changes the <em>default</em>, never an explicit choice.</p>
+<p>Nests and restores, so an inner block cannot leak over an outer one:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">before</span> <span class="o">=</span> <span class="n">default_url_fetcher</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">using_url_fetcher</span><span class="p">(</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;faked&quot;</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span><span class="o">.</span><span class="n">bytes_size</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_url_fetcher</span><span class="p">()</span> <span class="ow">is</span> <span class="n">before</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>For a ready-made fake with pinned bytes and 404s, see <a class="reference internal" href="testing.html#module-falaw.testing" title="falaw.testing"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.testing</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py function">

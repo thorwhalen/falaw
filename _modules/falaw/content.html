@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.content &mdash; falaw 0.0.25 documentation</title>
+  <title>falaw.content &mdash; falaw 0.0.26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5d650c58"></script>
+      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -79,6 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
 </ul>
 
         </div>
@@ -149,6 +150,17 @@
 <span class="sd">public function here takes a ``store`` keyword so a caller can point falaw at</span>
 <span class="sd">an S3-backed store without touching any other code.</span>
 
+<span class="sd">So is the **transport**. Per call it is the ``fetcher=`` / ``asset_fetcher=``</span>
+<span class="sd">argument; for a whole process it is :func:`using_url_fetcher`, which covers</span>
+<span class="sd">:func:`content_ref_for_url`, :func:`falaw.materialize_asset`,</span>
+<span class="sd">:func:`falaw.execute_plan` and :func:`falaw.execute_plan_isolated` in one</span>
+<span class="sd">place. That matters most to *downstream* test suites: falaw content-addresses</span>
+<span class="sd">every media result, so a suite that stubs the fal response but not the</span>
+<span class="sd">transport resolves its made-up URLs for real — and stays green while doing it,</span>
+<span class="sd">because a failed fetch degrades to a URL-only artifact with a warning rather</span>
+<span class="sd">than raising. :mod:`falaw.testing` ships the fake so no consumer has to write</span>
+<span class="sd">one.</span>
+
 <span class="sd">Examples</span>
 <span class="sd">--------</span>
 
@@ -183,6 +195,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -192,9 +205,12 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;ContentRef&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UrlFetcher&quot;</span><span class="p">,</span>
     <span class="s2">&quot;content_ref_for_url&quot;</span><span class="p">,</span>
     <span class="s2">&quot;default_content_store&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default_url_fetcher&quot;</span><span class="p">,</span>
     <span class="s2">&quot;remembered_ref&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;using_url_fetcher&quot;</span><span class="p">,</span>
     <span class="s2">&quot;write_blob_to_file&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
@@ -213,8 +229,86 @@
 <span class="sd">&quot;&quot;&quot;A callable that yields the bytes of a URL in chunks.</span>
 
 <span class="sd">The injection seam for tests and for callers that need custom transport</span>
-<span class="sd">(auth headers, retries, a local mirror). :func:`_http_chunks` is the default.</span>
+<span class="sd">(auth headers, retries, a local mirror). :func:`default_url_fetcher` resolves</span>
+<span class="sd">the one in force; :func:`using_url_fetcher` installs another.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="n">_DEFAULT_FETCHER</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UrlFetcher</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="sd">&quot;&quot;&quot;Process-wide override of the transport, or ``None`` for the built-in one.</span>
+
+<span class="sd">A plain module global rather than a :class:`~contextvars.ContextVar`, and the</span>
+<span class="sd">difference is load-bearing. This value has to be visible from **every** thread,</span>
+<span class="sd">including threads the installer never created: a downstream job runner executes</span>
+<span class="sd">falaw calls on its own worker pool, and a per-context override set on the main</span>
+<span class="sd">thread would silently not apply there — leaving a suite that believes it is</span>
+<span class="sd">hermetic quietly reaching for the network. (Contrast</span>
+<span class="sd">``falaw.plan._DEGRADE_WARNING_SINK``, which *is* a ContextVar precisely because</span>
+<span class="sd">it must **not** be shared between concurrently executing calls.)</span>
+
+<span class="sd">Consequence to accept: two different fetchers cannot be in force at once in one</span>
+<span class="sd">process. That is the right trade for what this is — deployment/test</span>
+<span class="sd">configuration, not per-call state. Per-call transport already has a better</span>
+<span class="sd">mechanism: the ``fetcher=`` / ``asset_fetcher=`` argument, which always wins.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="default_url_fetcher">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.default_url_fetcher">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_url_fetcher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">UrlFetcher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The transport used when no ``fetcher=`` argument is given.</span>
+
+<span class="sd">    :func:`using_url_fetcher`&#39;s installed fetcher if there is one, else the</span>
+<span class="sd">    built-in ``urllib``-based one. Resolved at call time, so every falaw entry</span>
+<span class="sd">    point that reads asset bytes — :func:`content_ref_for_url`,</span>
+<span class="sd">    :func:`falaw.materialize_asset`, :func:`falaw.execute_plan` and</span>
+<span class="sd">    :func:`falaw.execute_plan_isolated` — honours an override installed after</span>
+<span class="sd">    they were imported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_http_chunks</span> <span class="k">if</span> <span class="n">_DEFAULT_FETCHER</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_DEFAULT_FETCHER</span></div>
+
+
+
+<div class="viewcode-block" id="using_url_fetcher">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.using_url_fetcher">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">using_url_fetcher</span><span class="p">(</span><span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">UrlFetcher</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make ``fetcher`` falaw&#39;s default asset transport for the duration.</span>
+
+<span class="sd">    The **public seam** for replacing falaw&#39;s network transport wholesale —</span>
+<span class="sd">    with an authenticated client, a retrying one, a local mirror, or (the</span>
+<span class="sd">    common case) an in-memory fake in a test suite.</span>
+
+<span class="sd">    Prefer this to reaching for the module&#39;s private default: it covers every</span>
+<span class="sd">    entry point in one place, it needs no ``monkeypatch``, and it cannot be</span>
+<span class="sd">    invalidated by an internal rename. It is also the only mechanism that</span>
+<span class="sd">    reaches a call falaw makes from a thread you did not create — see</span>
+<span class="sd">    :data:`_DEFAULT_FETCHER` for why that matters.</span>
+
+<span class="sd">    An explicitly passed ``fetcher=`` / ``asset_fetcher=`` still wins: this</span>
+<span class="sd">    changes the *default*, never an explicit choice.</span>
+
+<span class="sd">    Nests and restores, so an inner block cannot leak over an outer one:</span>
+
+<span class="sd">    &gt;&gt;&gt; from lacing import ArtifactStore</span>
+<span class="sd">    &gt;&gt;&gt; store = ArtifactStore.in_memory()</span>
+<span class="sd">    &gt;&gt;&gt; before = default_url_fetcher()</span>
+<span class="sd">    &gt;&gt;&gt; with using_url_fetcher(lambda url: [b&quot;faked&quot;]):</span>
+<span class="sd">    ...     content_ref_for_url(&quot;https://fal.media/x.png&quot;, store=store).bytes_size</span>
+<span class="sd">    5</span>
+<span class="sd">    &gt;&gt;&gt; default_url_fetcher() is before</span>
+<span class="sd">    True</span>
+
+<span class="sd">    For a ready-made fake with pinned bytes and 404s, see :mod:`falaw.testing`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_DEFAULT_FETCHER</span>
+    <span class="n">previous</span> <span class="o">=</span> <span class="n">_DEFAULT_FETCHER</span>
+    <span class="n">_DEFAULT_FETCHER</span> <span class="o">=</span> <span class="n">fetcher</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">fetcher</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">_DEFAULT_FETCHER</span> <span class="o">=</span> <span class="n">previous</span></div>
+
 
 
 <div class="viewcode-block" id="ContentRef">
@@ -271,7 +365,9 @@
 <span class="sd">        url: The remote asset URL (typically fal&#39;s CDN).</span>
 <span class="sd">        store: Injected :class:`lacing.ArtifactStore`; defaults to</span>
 <span class="sd">            :func:`default_content_store`.</span>
-<span class="sd">        fetcher: Injected byte source; defaults to :func:`_http_chunks`.</span>
+<span class="sd">        fetcher: Injected byte source; defaults to :func:`default_url_fetcher`</span>
+<span class="sd">            (the built-in ``urllib`` transport unless :func:`using_url_fetcher`</span>
+<span class="sd">            has installed another).</span>
 <span class="sd">        refresh: Ignore the remembered reference and re-fetch. Only useful when</span>
 <span class="sd">            you suspect the index is wrong — fal URLs are per-upload, so the</span>
 <span class="sd">            same URL never legitimately serves different bytes.</span>
@@ -286,7 +382,7 @@
         <span class="n">remembered</span> <span class="o">=</span> <span class="n">remembered_ref</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">remembered</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">store</span><span class="o">.</span><span class="n">has_blob</span><span class="p">(</span><span class="n">remembered</span><span class="o">.</span><span class="n">content_hash</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">remembered</span>
-    <span class="n">ref</span> <span class="o">=</span> <span class="n">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">_http_chunks</span><span class="p">)</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_url_fetcher</span><span class="p">())</span>
     <span class="n">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ref</span></div>
 
@@ -380,7 +476,12 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_http_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CHUNK_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield the bytes of ``url`` in ``chunk_size`` chunks. The default fetcher.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield the bytes of ``url`` in ``chunk_size`` chunks. The built-in fetcher.</span>
+
+<span class="sd">    Private on purpose: it is an *implementation* of :data:`UrlFetcher`, and</span>
+<span class="sd">    replacing it is done through :func:`using_url_fetcher`, never by rebinding</span>
+<span class="sd">    this name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">as</span> <span class="n">resp</span><span class="p">:</span>  <span class="c1"># noqa: S310 (fal https URLs)</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">chunk</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
@@ -415,9 +516,10 @@
             <span class="sa">f</span><span class="s2">&quot;Could not fetch asset bytes from </span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. falaw needs the &quot;</span>
             <span class="s2">&quot;bytes to content-address the artifact, and fal-served URLs expire &quot;</span>
             <span class="s2">&quot;and are then permanently deleted. If you are running an offline &quot;</span>
-            <span class="s2">&quot;test suite whose stubbed responses carry made-up URLs, inject a &quot;</span>
-            <span class="s2">&quot;transport (`asset_fetcher=` on falaw.execute_plan, or `fetcher=` &quot;</span>
-            <span class="s2">&quot;here) rather than reaching for the network.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;test suite whose stubbed responses carry made-up URLs, install a &quot;</span>
+            <span class="s2">&quot;fake transport (`falaw.testing.fake_assets`, or &quot;</span>
+            <span class="s2">&quot;`falaw.content.using_url_fetcher`) rather than reaching for the &quot;</span>
+            <span class="s2">&quot;network.&quot;</span><span class="p">,</span>
             <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
             <span class="n">cause</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>

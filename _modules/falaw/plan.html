@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.25 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5d650c58"></script>
+      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -79,6 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
 </ul>
 
         </div>
@@ -543,10 +544,19 @@
 <span class="n">FETCH_BYTES_ENVVAR</span> <span class="o">=</span> <span class="s2">&quot;FALAW_FETCH_ARTIFACT_BYTES&quot;</span>
 <span class="sd">&quot;&quot;&quot;Env var overriding :data:`DFLT_FETCH_BYTES` process-wide.</span>
 
-<span class="sd">Set it to ``0`` for one legitimate case: an **offline test suite** whose</span>
-<span class="sd">stubbed fal responses carry URLs that resolve to nothing. It is not a</span>
-<span class="sd">production setting — see the ``fetch_bytes`` argument of :func:`execute` for</span>
-<span class="sd">what opting out costs. Read at call time, so a test can set it after import.</span>
+<span class="sd">Not a production setting — see the ``fetch_bytes`` argument of :func:`execute`</span>
+<span class="sd">for what opting out costs. Read at call time, so it can be set after import.</span>
+
+<span class="sd">**Do not reach for this to make a test suite offline.** It works, and that is</span>
+<span class="sd">the trap: it silences the network by turning content addressing **off**, so the</span>
+<span class="sd">suite becomes hermetic and simultaneously stops exercising the feature. Every</span>
+<span class="sd">``asset_id`` becomes a digest of the response rather than the SHA-256 of the</span>
+<span class="sd">bytes, chained calls key on URLs, and no test then covers the path production</span>
+<span class="sd">actually takes. Install a fake transport instead —</span>
+<span class="sd">:func:`falaw.testing.fake_assets` is one line in a ``conftest.py`` — and the</span>
+<span class="sd">suite stays offline *with* content addressing under test, on bytes it controls.</span>
+<span class="sd">Both consumers that hit this chose the fake for exactly that reason</span>
+<span class="sd">(thorwhalen/falaw#27).</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
@@ -624,13 +634,16 @@
 <span class="sd">            ``lacing.Artifact``&#39;s contract. Use it only when you genuinely</span>
 <span class="sd">            want URL-only artifacts and no reuse.</span>
 <span class="sd">        asset_fetcher: Injected byte source (``url -&gt; Iterable[bytes]``) used to</span>
-<span class="sd">            read media results; defaults to a ``urllib``-based fetcher. This is</span>
-<span class="sd">            the seam a **hermetic test suite** should use: a downstream suite</span>
-<span class="sd">            whose stubbed fal responses carry made-up URLs must inject a fake</span>
-<span class="sd">            transport here, or execution will reach for the network. (Setting</span>
-<span class="sd">            ``$FALAW_FETCH_ARTIFACT_BYTES=0`` also works but is blunter — it</span>
-<span class="sd">            turns off content addressing altogether, so the suite stops</span>
-<span class="sd">            exercising the thing it is testing.)</span>
+<span class="sd">            read media results; defaults to</span>
+<span class="sd">            :func:`falaw.content.default_url_fetcher`. This is the per-call</span>
+<span class="sd">            transport seam. A **hermetic test suite** usually wants the</span>
+<span class="sd">            process-wide one instead — :func:`falaw.testing.fake_assets`, built</span>
+<span class="sd">            on :func:`falaw.content.using_url_fetcher` — because a suite</span>
+<span class="sd">            reaching falaw *through* its own public API has no ``execute``</span>
+<span class="sd">            call site to pass this to. Passing it here still wins over any</span>
+<span class="sd">            installed default. (``$FALAW_FETCH_ARTIFACT_BYTES=0`` also silences</span>
+<span class="sd">            the network, but by turning content addressing off — see</span>
+<span class="sd">            :data:`FETCH_BYTES_ENVVAR`.)</span>
 <span class="sd">        concurrency: How many calls may be in flight at once. ``1``</span>
 <span class="sd">            (:data:`DFLT_CONCURRENCY`) runs the Plan sequentially, on the</span>
 <span class="sd">            calling thread, exactly as it always has. Above 1, independent calls</span>

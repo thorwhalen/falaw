@@ -35,3 +35,4 @@
    module_docs/falaw/results
    module_docs/falaw/scene
    module_docs/falaw/session
+   module_docs/falaw/testing

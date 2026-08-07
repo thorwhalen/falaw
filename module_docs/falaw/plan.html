@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.25 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.26 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=5d650c58"></script>
+      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -119,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
 </ul>
 
         </div>
@@ -329,10 +330,18 @@ downstream cache key.</p>
 <dt class="sig sig-object py" id="falaw.plan.FETCH_BYTES_ENVVAR">
 <span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">FETCH_BYTES_ENVVAR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FALAW_FETCH_ARTIFACT_BYTES'</span></span><a class="headerlink" href="#falaw.plan.FETCH_BYTES_ENVVAR" title="Link to this definition"></a></dt>
 <dd><p>Env var overriding <a class="reference internal" href="#falaw.plan.DFLT_FETCH_BYTES" title="falaw.plan.DFLT_FETCH_BYTES"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_FETCH_BYTES</span></code></a> process-wide.</p>
-<p>Set it to <code class="docutils literal notranslate"><span class="pre">0</span></code> for one legitimate case: an <strong>offline test suite</strong> whose
-stubbed fal responses carry URLs that resolve to nothing. It is not a
-production setting — see the <code class="docutils literal notranslate"><span class="pre">fetch_bytes</span></code> argument of <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a> for
-what opting out costs. Read at call time, so a test can set it after import.</p>
+<p>Not a production setting — see the <code class="docutils literal notranslate"><span class="pre">fetch_bytes</span></code> argument of <a class="reference internal" href="#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">execute()</span></code></a>
+for what opting out costs. Read at call time, so it can be set after import.</p>
+<p><strong>Do not reach for this to make a test suite offline.</strong> It works, and that is
+the trap: it silences the network by turning content addressing <strong>off</strong>, so the
+suite becomes hermetic and simultaneously stops exercising the feature. Every
+<code class="docutils literal notranslate"><span class="pre">asset_id</span></code> becomes a digest of the response rather than the SHA-256 of the
+bytes, chained calls key on URLs, and no test then covers the path production
+actually takes. Install a fake transport instead —
+<a class="reference internal" href="testing.html#falaw.testing.fake_assets" title="falaw.testing.fake_assets"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.testing.fake_assets()</span></code></a> is one line in a <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code> — and the
+suite stays offline <em>with</em> content addressing under test, on bytes it controls.
+Both consumers that hit this chose the fake for exactly that reason
+(thorwhalen/falaw#27).</p>
 </dd></dl>
 
 <dl class="py data">
@@ -446,13 +455,16 @@ also means <code class="docutils literal notranslate"><span class="pre">asset_id
 <code class="docutils literal notranslate"><span class="pre">lacing.Artifact</span></code>’s contract. Use it only when you genuinely
 want URL-only artifacts and no reuse.</p></li>
 <li><p><strong>asset_fetcher</strong> – Injected byte source (<code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">Iterable[bytes]</span></code>) used to
-read media results; defaults to a <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based fetcher. This is
-the seam a <strong>hermetic test suite</strong> should use: a downstream suite
-whose stubbed fal responses carry made-up URLs must inject a fake
-transport here, or execution will reach for the network. (Setting
-<code class="docutils literal notranslate"><span class="pre">$FALAW_FETCH_ARTIFACT_BYTES=0</span></code> also works but is blunter — it
-turns off content addressing altogether, so the suite stops
-exercising the thing it is testing.)</p></li>
+read media results; defaults to
+<a class="reference internal" href="content.html#falaw.content.default_url_fetcher" title="falaw.content.default_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_url_fetcher()</span></code></a>. This is the per-call
+transport seam. A <strong>hermetic test suite</strong> usually wants the
+process-wide one instead — <a class="reference internal" href="testing.html#falaw.testing.fake_assets" title="falaw.testing.fake_assets"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.testing.fake_assets()</span></code></a>, built
+on <a class="reference internal" href="content.html#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.using_url_fetcher()</span></code></a> — because a suite
+reaching falaw <em>through</em> its own public API has no <code class="docutils literal notranslate"><span class="pre">execute</span></code>
+call site to pass this to. Passing it here still wins over any
+installed default. (<code class="docutils literal notranslate"><span class="pre">$FALAW_FETCH_ARTIFACT_BYTES=0</span></code> also silences
+the network, but by turning content addressing off — see
+<a class="reference internal" href="#falaw.plan.FETCH_BYTES_ENVVAR" title="falaw.plan.FETCH_BYTES_ENVVAR"><code class="xref py py-data docutils literal notranslate"><span class="pre">FETCH_BYTES_ENVVAR</span></code></a>.)</p></li>
 <li><p><strong>concurrency</strong> – How many calls may be in flight at once. <code class="docutils literal notranslate"><span class="pre">1</span></code>
 (<a class="reference internal" href="#falaw.plan.DFLT_CONCURRENCY" title="falaw.plan.DFLT_CONCURRENCY"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_CONCURRENCY</span></code></a>) runs the Plan sequentially, on the
 calling thread, exactly as it always has. Above 1, independent calls

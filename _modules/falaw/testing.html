@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.testing &mdash; falaw 0.0.26 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.testing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.testing</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Make a suite that uses falaw genuinely offline — the fake asset transport.</span>
+
+<span class="sd">falaw content-addresses every media result (:mod:`falaw.content`): a fal URL is</span>
+<span class="sd">neither unique-per-content nor durable, so it cannot be an identity, and</span>
+<span class="sd">:func:`falaw.execute_plan` therefore **reads the bytes** behind every result. A</span>
+<span class="sd">downstream suite that stubs the fal *response* but not the *asset transport* is</span>
+<span class="sd">consequently resolving its made-up URLs for real — one DNS lookup and one</span>
+<span class="sd">connection attempt per test.</span>
+
+<span class="sd">Such a suite passes anyway. That is the trap. falaw deliberately degrades a</span>
+<span class="sd">failed asset fetch to a URL-only artifact with a :class:`UserWarning` rather</span>
+<span class="sd">than raising, so an upstream hiccup cannot throw away a render fal has already</span>
+<span class="sd">billed for — which means reaching the network is *invisible* downstream. The</span>
+<span class="sd">costs are real all the same: the suite is slower and behaves differently</span>
+<span class="sd">without a network; it exercises the *degraded* path rather than the content</span>
+<span class="sd">addressing it appears to exercise; and a stub URL whose host happens to answer</span>
+<span class="sd">**200** pulls arbitrary internet content into the cache with the test still</span>
+<span class="sd">green.</span>
+
+<span class="sd">This module is falaw&#39;s answer, so no consumer has to write one. Three autouse</span>
+<span class="sd">fixtures, each re-exportable into a ``conftest.py`` in one line:</span>
+
+<span class="sd">&gt;&gt;&gt; from falaw.testing import (  # doctest: +SKIP</span>
+<span class="sd">...     fake_assets,</span>
+<span class="sd">...     isolated_falaw_cache,</span>
+<span class="sd">...     no_outbound_network,</span>
+<span class="sd">... )  # noqa: F401</span>
+
+<span class="sd">:func:`fake_assets`</span>
+<span class="sd">    Serves falaw&#39;s asset fetches from memory. An unregistered URL yields</span>
+<span class="sd">    deterministic synthetic bytes derived from the URL, so two different stub</span>
+<span class="sd">    URLs behave like two genuinely different renders;</span>
+<span class="sd">    :meth:`FakeAssets.serve` pins explicit bytes — which is how a test makes</span>
+<span class="sd">    two *different* URLs serve the *same* bytes, the case content addressing</span>
+<span class="sd">    exists for; :meth:`FakeAssets.fail` makes a URL 404, as an expired fal</span>
+<span class="sd">    asset does, which is how a test exercises the degrade path on purpose.</span>
+
+<span class="sd">:func:`isolated_falaw_cache`</span>
+<span class="sd">    Points falaw&#39;s manifest cache, content store and url-index at a throwaway</span>
+<span class="sd">    directory. A precondition for the fake, not a nicety: once the fetches</span>
+<span class="sd">    *succeed*, an un-isolated run durably records synthetic test bytes under</span>
+<span class="sd">    real-looking URLs in the developer&#39;s own ``~/.config/falaw/cache``.</span>
+
+<span class="sd">:func:`no_outbound_network`</span>
+<span class="sd">    The backstop. The other two close the holes we know about; this one</span>
+<span class="sd">    notices the next one. Every non-loopback DNS lookup or socket connect is</span>
+<span class="sd">    refused **and recorded**, and the recording fails the test at teardown.</span>
+
+<span class="sd">**Refusing is not reporting**, and that distinction is the whole design of the</span>
+<span class="sd">guard. A guard that only raises is invisible here, because falaw&#39;s fetch path</span>
+<span class="sd">is a funnel of broad ``except Exception`` handlers that exist for good reasons:</span>
+<span class="sd">``_fetch_into_store`` turns any ``Exception`` into a ``FalAssetFetchError``,</span>
+<span class="sd">which ``execute`` then **degrades** to a URL-only artifact with a warning</span>
+<span class="sd">(rather than discard a render fal has already billed); ``remembered_ref``</span>
+<span class="sd">treats any ``Exception`` as a cache miss; ``make_call_plan``&#39;s cache probe</span>
+<span class="sd">falls back to ``&quot;unknown&quot;``. An ordinary-``Exception`` refusal is absorbed by</span>
+<span class="sd">all three, and the suite stays green with the regression back in place.</span>
+
+<span class="sd">Hence two measures, not one. :class:`OutboundNetworkAttempt` derives from</span>
+<span class="sd">:class:`BaseException` so it escapes those funnels (``execute_isolated``</span>
+<span class="sd">deliberately re-raises a non-``Exception``, since a run-level abort is not a</span>
+<span class="sd">call failure) — and every attempt is **recorded** anyway, because that only</span>
+<span class="sd">covers the funnels *inside falaw*. A consumer&#39;s own ``except BaseException``</span>
+<span class="sd">re-absorbs it, and a subprocess is out of reach entirely. The record is the</span>
+<span class="sd">part that cannot be swallowed.</span>
+
+<span class="sd">Why not ``FALAW_FETCH_ARTIFACT_BYTES=0``</span>
+<span class="sd">----------------------------------------</span>
+<span class="sd">It silences the network too — by turning content addressing **off**. The suite</span>
+<span class="sd">becomes hermetic and simultaneously stops testing the feature: every</span>
+<span class="sd">``asset_id`` becomes a response digest rather than a content hash, and no test</span>
+<span class="sd">covers the path production takes. Faking the transport keeps content addressing</span>
+<span class="sd">under test with bytes the test controls. See</span>
+<span class="sd">:data:`falaw.plan.FETCH_BYTES_ENVVAR`.</span>
+
+<span class="sd">Opting a test back into the real world</span>
+<span class="sd">--------------------------------------</span>
+<span class="sd">A test carrying any marker in :data:`DFLT_LIVE_MARKERS` (``live_api``) gets the</span>
+<span class="sd">real transport and no network guard, and keeps the cache isolation. Suites with</span>
+<span class="sd">another such marker build their own fixtures from the factories:</span>
+
+<span class="sd">&gt;&gt;&gt; gated = make_fake_assets_fixture(live_markers=(&quot;live_api&quot;, &quot;live_capture&quot;))</span>
+
+<span class="sd">The classes and context managers here need no pytest; only the fixtures do.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.error</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_CHUNK_SIZE</span><span class="p">,</span> <span class="n">using_url_fetcher</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;DFLT_LIVE_MARKERS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DFLT_SYNTHETIC_PREFIX&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FakeAssets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LOCAL_HOSTNAMES&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NON_NETWORK_SCHEMES&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OutboundNetworkAttempt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;blocked_outbound_network&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;fake_assets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;is_network_url&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;isolated_falaw_cache&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_fake_assets_fixture&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_isolated_falaw_cache_fixture&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_no_outbound_network_fixture&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;no_outbound_network&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;serving_fake_assets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;synthetic_asset_bytes&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="n">DFLT_LIVE_MARKERS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;live_api&quot;</span><span class="p">,)</span>
+<span class="sd">&quot;&quot;&quot;Pytest markers meaning &quot;this test is allowed to reach the real world&quot;.</span>
+
+<span class="sd">falaw&#39;s own convention. A suite using another name (``live_capture``, say)</span>
+<span class="sd">passes its own tuple to the fixture factories rather than editing this.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">DFLT_SYNTHETIC_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;falaw-test-asset&quot;</span>
+<span class="sd">&quot;&quot;&quot;Prefix of the stand-in bytes an unpinned URL serves.</span>
+
+<span class="sd">Only ever seen while debugging — which is exactly why it is worth setting per</span>
+<span class="sd">suite (``FakeAssets(synthetic_prefix=&quot;nw-test-asset&quot;)``): a hexdump in a</span>
+<span class="sd">failing assertion then names the suite that invented the bytes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">LOCAL_HOSTNAMES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;localhost.localdomain&quot;</span><span class="p">,</span> <span class="s2">&quot;ip6-localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;ip6-loopback&quot;</span><span class="p">}</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Hostnames that mean &quot;this machine&quot; without a DNS round-trip.&quot;&quot;&quot;</span>
+
+<span class="n">NON_NETWORK_SCHEMES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;file&quot;</span><span class="p">})</span>
+<span class="sd">&quot;&quot;&quot;URL schemes that do not leave this machine, and so are not faked.</span>
+
+<span class="sd">``file://`` is a documented falaw input — downstream packages hand it locally</span>
+<span class="sd">rendered media that way — so faking it would replace a real mp4 with synthetic</span>
+<span class="sd">bytes and break the ffmpeg that reads it. Such URLs fall through to the real</span>
+<span class="sd">fetcher unless a test pins them explicitly.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="synthetic_asset_bytes">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.synthetic_asset_bytes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">synthetic_asset_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_SYNTHETIC_PREFIX</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deterministic stand-in bytes for a URL nothing has pinned.</span>
+
+<span class="sd">    Derived from the URL, so two different stub URLs behave like two genuinely</span>
+<span class="sd">    different renders — and the same stub URL hashes the same way on every run,</span>
+<span class="sd">    which is what lets a test assert on a content hash at all.</span>
+
+<span class="sd">    &gt;&gt;&gt; synthetic_asset_bytes(&quot;https://fal.media/x.png&quot;)</span>
+<span class="sd">    b&#39;falaw-test-asset::https://fal.media/x.png&#39;</span>
+<span class="sd">    &gt;&gt;&gt; a = synthetic_asset_bytes(&quot;https://fal.media/one.png&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; b = synthetic_asset_bytes(&quot;https://fal.media/two.png&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; a == b</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">::</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_network_url">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.is_network_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_network_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True when resolving ``url`` would leave this machine.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_network_url(&quot;https://fal.media/x.png&quot;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_network_url(&quot;file:///tmp/rendered.mp4&quot;), is_network_url(&quot;/tmp/x.mp4&quot;)</span>
+<span class="sd">    (False, False)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NON_NETWORK_SCHEMES</span></div>
+
+
+
+<div class="viewcode-block" id="FakeAssets">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FakeAssets</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An in-memory ``url -&gt; bytes`` transport standing in for the network.</span>
+
+<span class="sd">    Install it with :func:`falaw.content.using_url_fetcher` (the</span>
+<span class="sd">    :func:`fake_assets` fixture does), after which every falaw entry point that</span>
+<span class="sd">    reads asset bytes is served from here.</span>
+
+<span class="sd">    Three behaviours, each of which a downstream suite discovered it needed:</span>
+
+<span class="sd">    - an **unpinned** network URL yields :func:`synthetic_asset_bytes`;</span>
+<span class="sd">    - :meth:`serve` **pins** explicit bytes, which is how a test makes two</span>
+<span class="sd">      *different* URLs serve the *same* bytes — the case content addressing</span>
+<span class="sd">      exists for — or aligns falaw&#39;s view of an asset with bytes the test also</span>
+<span class="sd">      wrote to disk itself;</span>
+<span class="sd">    - :meth:`fail` makes a URL **404**, as an expired fal asset does, which is</span>
+<span class="sd">      how a test exercises falaw&#39;s degrade-to-URL-only path on purpose.</span>
+
+<span class="sd">    Every fetch is **recorded** in :attr:`fetched`, and that is not a</span>
+<span class="sd">    convenience. falaw degrades a failed fetch to a URL-only artifact with a</span>
+<span class="sd">    warning rather than raising, so a fake that only *refused* an unexpected</span>
+<span class="sd">    URL would be swallowed and the test would pass. Assert on what was fetched,</span>
+<span class="sd">    not on an exception:</span>
+
+<span class="sd">    &gt;&gt;&gt; from lacing import ArtifactStore</span>
+<span class="sd">    &gt;&gt;&gt; from falaw import content_ref_for_url</span>
+<span class="sd">    &gt;&gt;&gt; from falaw.content import using_url_fetcher</span>
+<span class="sd">    &gt;&gt;&gt; store, assets = ArtifactStore.in_memory(), FakeAssets()</span>
+<span class="sd">    &gt;&gt;&gt; shared = assets.serve(&quot;https://fal.media/one.png&quot;, b&quot;identical bytes&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; _ = assets.serve(&quot;https://fal.media/two.png&quot;, shared)</span>
+<span class="sd">    &gt;&gt;&gt; with using_url_fetcher(assets.chunks):</span>
+<span class="sd">    ...     one = content_ref_for_url(&quot;https://fal.media/one.png&quot;, store=store)</span>
+<span class="sd">    ...     two = content_ref_for_url(&quot;https://fal.media/two.png&quot;, store=store)</span>
+<span class="sd">    &gt;&gt;&gt; one.content_hash == two.content_hash  # two URLs, one content address</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; assets.fetched</span>
+<span class="sd">    [&#39;https://fal.media/one.png&#39;, &#39;https://fal.media/two.png&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">synthetic_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_SYNTHETIC_PREFIX</span><span class="p">,</span>
+        <span class="n">fake_non_network_urls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build an empty transport.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            synthetic_prefix: prefix of the bytes an unpinned URL serves.</span>
+<span class="sd">            fake_non_network_urls: whether ``file://`` URLs and bare paths are</span>
+<span class="sd">                faked too. False by default — they are not the network, and a</span>
+<span class="sd">                test that wrote a real file expects to read it back. Pinning</span>
+<span class="sd">                such a URL with :meth:`serve` overrides this either way.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">synthetic_prefix</span> <span class="o">=</span> <span class="n">synthetic_prefix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fake_non_network_urls</span> <span class="o">=</span> <span class="n">fake_non_network_urls</span>
+
+<div class="viewcode-block" id="FakeAssets.synthetic">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.synthetic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">synthetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The bytes an unpinned ``url`` serves.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">synthetic_prefix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FakeAssets.serve">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.serve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make ``url`` serve exactly ``data``. Returns ``data``, for chaining.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="FakeAssets.fail">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.fail">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make ``url`` 404, the way an expired fal asset does.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">[</span><span class="n">url</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="FakeAssets.handles">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.handles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether this transport answers for ``url`` rather than deferring.</span>
+
+<span class="sd">        A pinned URL always. An unpinned one only when it is a network URL (or</span>
+<span class="sd">        :attr:`fake_non_network_urls` is set) — see :data:`NON_NETWORK_SCHEMES`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fake_non_network_urls</span> <span class="ow">or</span> <span class="n">is_network_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FakeAssets.chunks">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.chunks">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">chunks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CHUNK_SIZE</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Yield ``url``&#39;s bytes — the :data:`falaw.content.UrlFetcher` to install.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            urllib.error.HTTPError: ``url`` was marked with :meth:`fail`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">_http_chunks</span>
+
+            <span class="k">yield from</span> <span class="n">_http_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthetic</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">404</span><span class="p">,</span> <span class="s2">&quot;Not Found&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
+        <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="serving_fake_assets">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.serving_fake_assets">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serving_fake_assets</span><span class="p">(</span><span class="n">assets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FakeAssets</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">FakeAssets</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Install a :class:`FakeAssets` as falaw&#39;s transport for the duration.</span>
+
+<span class="sd">    The pytest-free core of :func:`fake_assets`, for a caller driving falaw</span>
+<span class="sd">    outside a pytest session (a script, a notebook, another test runner).</span>
+
+<span class="sd">    &gt;&gt;&gt; from falaw import materialize_asset</span>
+<span class="sd">    &gt;&gt;&gt; with serving_fake_assets() as assets:</span>
+<span class="sd">    ...     _ = assets.serve(&quot;https://fal.media/x.png&quot;, b&quot;pinned&quot;)</span>
+<span class="sd">    ...     path = materialize_asset(&quot;https://fal.media/x.png&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; with open(path, &quot;rb&quot;) as f:</span>
+<span class="sd">    ...     f.read()</span>
+<span class="sd">    b&#39;pinned&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">assets</span> <span class="o">=</span> <span class="n">FakeAssets</span><span class="p">()</span> <span class="k">if</span> <span class="n">assets</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">assets</span>
+    <span class="k">with</span> <span class="n">using_url_fetcher</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">chunks</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">assets</span></div>
+
+
+
+<span class="c1"># --- the no-outbound-connection backstop ------------------------------------</span>
+
+
+<div class="viewcode-block" id="OutboundNetworkAttempt">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.OutboundNetworkAttempt">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OutboundNetworkAttempt</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An offline test tried to talk to a non-local host.</span>
+
+<span class="sd">    Derived from :class:`BaseException`, not :class:`Exception`, on purpose:</span>
+<span class="sd">    the fetch path is a funnel of ``except Exception`` handlers that turn a</span>
+<span class="sd">    failed fetch into a degraded-but-successful result (falaw&#39;s URL-only</span>
+<span class="sd">    artifact fallback is the main one), so anything catchable would be caught.</span>
+
+<span class="sd">    That still is not enough on its own. It escapes *falaw&#39;s* funnels, not a</span>
+<span class="sd">    consumer&#39;s own ``except BaseException`` — and not a subprocess, which opens</span>
+<span class="sd">    its own sockets where nothing here has reach. Which is why every attempt is</span>
+<span class="sd">    also **recorded**; see :func:`blocked_outbound_network`.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_local_address</span><span class="p">(</span><span class="n">address</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True when ``address`` is loopback, unspecified, or not an IP endpoint.</span>
+
+<span class="sd">    Non-tuple addresses (``AF_UNIX`` paths, ``AF_NETLINK`` ints) are local by</span>
+<span class="sd">    construction — which keeps a local Postgres or a unix-socket service</span>
+<span class="sd">    reachable from an otherwise offline suite. A bare hostname that is not a</span>
+<span class="sd">    known loopback alias counts as outbound: resolving it is itself a network</span>
+<span class="sd">    round-trip.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">ipaddress</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">address</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="n">address</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">host</span> <span class="ow">in</span> <span class="n">LOCAL_HOSTNAMES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_address</span><span class="p">(</span><span class="n">host</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">ip</span><span class="o">.</span><span class="n">is_loopback</span> <span class="ow">or</span> <span class="n">ip</span><span class="o">.</span><span class="n">is_unspecified</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_local_hostname</span><span class="p">(</span><span class="n">host</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True for a hostname that resolves without leaving this machine.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">host</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">LOCAL_HOSTNAMES</span> <span class="ow">or</span> <span class="n">text</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.localhost&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">_is_local_address</span><span class="p">((</span><span class="n">text</span><span class="p">,))</span>
+
+
+<div class="viewcode-block" id="blocked_outbound_network">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.blocked_outbound_network">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">blocked_outbound_network</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refuse **and record** every non-local socket use; yield the record.</span>
+
+<span class="sd">    The yielded list is the point. Raising alone is not a guard here: falaw</span>
+<span class="sd">    swallows a failed fetch by design, and a refusal that reaches a consumer&#39;s</span>
+<span class="sd">    own broad ``except`` — or happens in a subprocess — vanishes without trace.</span>
+<span class="sd">    A caller asserts on the list afterwards; :func:`no_outbound_network` fails</span>
+<span class="sd">    the test at teardown when it is non-empty.</span>
+
+<span class="sd">    A test that *means* to provoke an attempt drains the list</span>
+<span class="sd">    (``attempts.clear()``) instead of failing.</span>
+
+<span class="sd">    Blind spot worth knowing: a subprocess opens its own sockets in its own</span>
+<span class="sd">    process, where this has no reach. ffmpeg is the one that matters.</span>
+
+<span class="sd">    (``.invalid`` is reserved by RFC 2606 and can never resolve, so even a</span>
+<span class="sd">    broken guard cannot turn this example into real traffic.)</span>
+
+<span class="sd">    &gt;&gt;&gt; import socket</span>
+<span class="sd">    &gt;&gt;&gt; with blocked_outbound_network() as attempts:</span>
+<span class="sd">    ...     try:</span>
+<span class="sd">    ...         socket.getaddrinfo(&quot;nowhere.invalid&quot;, 443)</span>
+<span class="sd">    ...     except OutboundNetworkAttempt:</span>
+<span class="sd">    ...         pass</span>
+<span class="sd">    &gt;&gt;&gt; attempts</span>
+<span class="sd">    [&quot;a DNS lookup for &#39;nowhere.invalid&#39;&quot;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attempts</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">real_getaddrinfo</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span>
+    <span class="n">real_connect</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect</span>
+    <span class="n">real_connect_ex</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect_ex</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">refuse</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OutboundNetworkAttempt</span><span class="p">:</span>
+        <span class="n">attempts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">what</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">OutboundNetworkAttempt</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;An offline test attempted </span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2">. Stub the transport instead — &quot;</span>
+            <span class="s2">&quot;`falaw.testing.fake_assets` serves falaw&#39;s asset fetches, and a &quot;</span>
+            <span class="s2">&quot;test needing its own HTTP should fake the call it makes.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">guarded_getaddrinfo</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_local_hostname</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">refuse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a DNS lookup for </span><span class="si">{</span><span class="n">host</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">real_getaddrinfo</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">guarded_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_local_address</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">refuse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a connection to </span><span class="si">{</span><span class="n">address</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">real_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">guarded_connect_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_local_address</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">refuse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;a connection to </span><span class="si">{</span><span class="n">address</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">real_connect_ex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span> <span class="o">=</span> <span class="n">guarded_getaddrinfo</span>  <span class="c1"># type: ignore[assignment]</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect</span> <span class="o">=</span> <span class="n">guarded_connect</span>  <span class="c1"># type: ignore[method-assign]</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect_ex</span> <span class="o">=</span> <span class="n">guarded_connect_ex</span>  <span class="c1"># type: ignore[method-assign]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">attempts</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span> <span class="o">=</span> <span class="n">real_getaddrinfo</span>  <span class="c1"># type: ignore[assignment]</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect</span> <span class="o">=</span> <span class="n">real_connect</span>  <span class="c1"># type: ignore[method-assign]</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">connect_ex</span> <span class="o">=</span> <span class="n">real_connect_ex</span>  <span class="c1"># type: ignore[method-assign]</span></div>
+
+
+
+<span class="c1"># --- the pytest fixtures ----------------------------------------------------</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fixture</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;:func:`pytest.fixture` when pytest is importable, else a no-op decorator.</span>
+
+<span class="sd">    Everything above is pytest-free, and this module is imported by the docs</span>
+<span class="sd">    build — which installs falaw without its test extra — merely to read</span>
+<span class="sd">    docstrings. A hard ``import pytest`` at module scope would break that. The</span>
+<span class="sd">    fixtures are unusable without a pytest session anyway, so degrading them to</span>
+<span class="sd">    plain functions loses nothing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+    <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>  <span class="c1"># pragma: no cover - docs build only</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">func</span><span class="p">:</span> <span class="n">func</span>
+    <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_live</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">live_markers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;True when the test under ``request`` is allowed real external I/O.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">get_closest_marker</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">live_markers</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="make_fake_assets_fixture">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.make_fake_assets_fixture">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_fake_assets_fixture</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">live_markers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_LIVE_MARKERS</span><span class="p">,</span>
+    <span class="n">synthetic_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_SYNTHETIC_PREFIX</span><span class="p">,</span>
+    <span class="n">fake_non_network_urls</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">autouse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a ``fake_assets`` fixture with non-default settings.</span>
+
+<span class="sd">    :func:`fake_assets` is ``make_fake_assets_fixture()``. Use this when the</span>
+<span class="sd">    suite&#39;s live-marker names differ, or to label the synthetic bytes with the</span>
+<span class="sd">    suite&#39;s own name:</span>
+
+<span class="sd">    &gt;&gt;&gt; fake_assets = make_fake_assets_fixture(  # doctest: +SKIP</span>
+<span class="sd">    ...     live_markers=(&quot;live_api&quot;, &quot;live_capture&quot;),</span>
+<span class="sd">    ...     synthetic_prefix=&quot;reelee-test-asset&quot;,</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">fake_assets</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">FakeAssets</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve falaw&#39;s media fetches from memory instead of the network.</span>
+
+<span class="sd">        Installed via :func:`falaw.content.using_url_fetcher`, so it covers</span>
+<span class="sd">        ``execute_plan``, ``execute_plan_isolated``, ``materialize_asset`` and</span>
+<span class="sd">        ``content_ref_for_url`` at once — including the ones a consumer reaches</span>
+<span class="sd">        through its own public API, which takes no transport argument and should</span>
+<span class="sd">        not grow one just for tests. An explicitly passed ``fetcher=`` wins over</span>
+<span class="sd">        it, as it should.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">_is_live</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">live_markers</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="kc">None</span>
+            <span class="k">return</span>
+        <span class="n">assets</span> <span class="o">=</span> <span class="n">FakeAssets</span><span class="p">(</span>
+            <span class="n">synthetic_prefix</span><span class="o">=</span><span class="n">synthetic_prefix</span><span class="p">,</span>
+            <span class="n">fake_non_network_urls</span><span class="o">=</span><span class="n">fake_non_network_urls</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">serving_fake_assets</span><span class="p">(</span><span class="n">assets</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">assets</span>
+
+    <span class="k">return</span> <span class="n">_fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="n">autouse</span><span class="p">)(</span><span class="n">fake_assets</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_isolated_falaw_cache_fixture">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.make_isolated_falaw_cache_fixture">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_isolated_falaw_cache_fixture</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">autouse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build an ``isolated_falaw_cache`` fixture. See :func:`isolated_falaw_cache`.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">isolated_falaw_cache</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">monkeypatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Point every falaw on-disk store at a throwaway directory.&quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tmp_path</span> <span class="o">/</span> <span class="s2">&quot;falaw&quot;</span>
+        <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;FALAW_DATA_DIR&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
+        <span class="n">monkeypatch</span><span class="o">.</span><span class="n">setenv</span><span class="p">(</span><span class="s2">&quot;FALAW_CACHE_DIR&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;cache&quot;</span><span class="p">))</span>
+        <span class="k">yield</span> <span class="nb">str</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="n">autouse</span><span class="p">)(</span><span class="n">isolated_falaw_cache</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="make_no_outbound_network_fixture">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.make_no_outbound_network_fixture">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_no_outbound_network_fixture</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">live_markers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_LIVE_MARKERS</span><span class="p">,</span>
+    <span class="n">autouse</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a ``no_outbound_network`` fixture. See :func:`no_outbound_network`.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">no_outbound_network</span><span class="p">(</span><span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refuse and report every non-loopback connection attempt.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">_is_live</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">live_markers</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">[]</span>
+            <span class="k">return</span>
+        <span class="k">with</span> <span class="n">blocked_outbound_network</span><span class="p">()</span> <span class="k">as</span> <span class="n">attempts</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">attempts</span>
+        <span class="k">if</span> <span class="n">attempts</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+            <span class="c1"># Teardown, not the call site, on purpose: falaw degrades a failed</span>
+            <span class="c1"># fetch to a warning and ``execute_isolated`` catches</span>
+            <span class="c1"># ``BaseException``, so a guard that only raised would let the</span>
+            <span class="c1"># regression back in with the suite still green.</span>
+            <span class="n">pytest</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
+                <span class="s2">&quot;Outbound network access attempted by an offline test: &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">attempts</span><span class="p">)),</span>
+                <span class="n">pytrace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_fixture</span><span class="p">(</span><span class="n">autouse</span><span class="o">=</span><span class="n">autouse</span><span class="p">)(</span><span class="n">no_outbound_network</span><span class="p">)</span></div>
+
+
+
+<span class="n">fake_assets</span> <span class="o">=</span> <span class="n">make_fake_assets_fixture</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;Autouse fixture serving falaw&#39;s asset fetches from memory.</span>
+
+<span class="sd">Re-export it into a ``conftest.py`` and the whole suite is covered::</span>
+
+<span class="sd">    from falaw.testing import fake_assets  # noqa: F401</span>
+
+<span class="sd">Yields the :class:`FakeAssets` in force, so a test can pin bytes</span>
+<span class="sd">(``fake_assets.serve(url, data)``), 404 a URL (``fake_assets.fail(url)``) or</span>
+<span class="sd">assert on what was fetched (``fake_assets.fetched``). Yields ``None`` for a</span>
+<span class="sd">test marked ``live_api``, which gets the real transport.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">isolated_falaw_cache</span> <span class="o">=</span> <span class="n">make_isolated_falaw_cache_fixture</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;Autouse fixture pointing falaw&#39;s on-disk state at a throwaway directory.</span>
+
+<span class="sd">falaw&#39;s manifest cache, content store and url-index all hang off</span>
+<span class="sd">``$FALAW_CACHE_DIR`` / ``$FALAW_DATA_DIR``. Without this a run writes into the</span>
+<span class="sd">developer&#39;s real cache and inherits the previous run&#39;s ``url -&gt; content hash``</span>
+<span class="sd">index — and once :func:`fake_assets` makes the fetches *succeed*, it durably</span>
+<span class="sd">records synthetic test bytes under real-looking URLs there. Yields the root of</span>
+<span class="sd">the throwaway directory.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">no_outbound_network</span> <span class="o">=</span> <span class="n">make_no_outbound_network_fixture</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;Autouse fixture failing any test that reaches a non-loopback address.</span>
+
+<span class="sd">The backstop behind :func:`fake_assets`: that one closes the holes we know</span>
+<span class="sd">about, this one notices the next. Yields the list of recorded attempts, so a</span>
+<span class="sd">test that means to provoke one can drain it (``no_outbound_network.clear()``)</span>
+<span class="sd">instead of failing at teardown. Inert for a test marked ``live_api``.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
