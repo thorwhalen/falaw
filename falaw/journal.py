@@ -17,6 +17,7 @@ Usage:
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 import time
@@ -26,6 +27,8 @@ from functools import lru_cache
 from typing import Iterable, Iterator, Literal, Optional
 
 EntryKind = Literal["note", "issue", "improvement", "trace"]
+
+_seq = itertools.count()
 
 
 def _default_journal_dir() -> str:
@@ -74,6 +77,7 @@ class Journal:
         # Nanosecond resolution prevents back-to-back appends from sharing
         # a filename prefix and falling back to UUID order in `sorted()`.
         ts_ns = time.time_ns()
+        seq = next(_seq)
         entry = JournalEntry(
             id=uuid.uuid4().hex[:12],
             timestamp=ts_ns / 1_000_000_000,
@@ -83,7 +87,7 @@ class Journal:
             suggestion=suggestion,
             context=dict(context or {}),
         )
-        fname = f"{ts_ns:020d}-{entry.id}.json"
+        fname = f"{ts_ns:020d}-{seq:010d}-{entry.id}.json"
         path = os.path.join(self.directory, fname)
         with open(path, "w") as f:
             json.dump(asdict(entry), f, indent=2, default=str)
