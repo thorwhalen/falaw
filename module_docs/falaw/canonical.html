@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.canonical &mdash; falaw 0.0.29 documentation</title>
+  <title>falaw.canonical &mdash; falaw 0.0.30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=828725f0"></script>
+      <script src="../../_static/documentation_options.js?v=61a342a2"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
 <li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">falaw.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -59,6 +60,7 @@
 <li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.canonical</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.DFLT_BACKEND"><code class="docutils literal notranslate"><span class="pre">DFLT_BACKEND</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.cache_key_payload"><code class="docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.canonical_blob"><code class="docutils literal notranslate"><span class="pre">canonical_blob()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.ensure_canonical"><code class="docutils literal notranslate"><span class="pre">ensure_canonical()</span></code></a></li>
@@ -155,9 +157,21 @@ idempotency form shared by <code class="docutils literal notranslate"><span clas
 <p>The field sets differ deliberately (<code class="docutils literal notranslate"><span class="pre">tool</span></code> is a falaw-side label; the
 underlying fal call is the same whatever the tool was called), but a field
 that changes <em>what the call produces</em> must go into <strong>both</strong> — in this module,
-in one commit. That is the discipline falaw#15’s <code class="docutils literal notranslate"><span class="pre">CallPlan.backend</span></code> needs:
-a backend added to <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> but not the cache key would let one backend
-return another backend’s artifact as a wrong hit.</p>
+in one commit. <code class="docutils literal notranslate"><span class="pre">backend</span></code> (falaw#15’s <code class="docutils literal notranslate"><span class="pre">CallPlan.backend</span></code>) is exactly that
+field: both projections accept it, and it lands in the hashed payload
+whenever it is not <a class="reference internal" href="#falaw.canonical.DFLT_BACKEND" title="falaw.canonical.DFLT_BACKEND"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_BACKEND</span></code></a> — omitted, not merely equal, when it
+is. Two consequences, both load-bearing:</p>
+<ul class="simple">
+<li><p>a backend added to <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> but not the cache key would let one
+backend return another backend’s artifact as a wrong hit — the reason the
+two projections take the parameter together rather than one growing it
+first;</p></li>
+<li><p>omitting the field for the default backend means every call falaw has ever
+planned or cached — all of them <code class="docutils literal notranslate"><span class="pre">&quot;fal&quot;</span></code> today — keeps its <strong>exact</strong>
+pre-#15 digest. A future non-default backend hashes under a genuinely
+different key (correctly — it <em>is</em> a different call), without silently
+invalidating the deployed fal cache the day this ships.</p></li>
+</ul>
 <p>Byte-compatibility: for JSON-native payloads the output of
 <a class="reference internal" href="#falaw.canonical.canonical_blob" title="falaw.canonical.canonical_blob"><code class="xref py py-func docutils literal notranslate"><span class="pre">canonical_blob()</span></code></a> is identical to the old form, so every cache entry
 whose arguments were already JSON-native keeps its key. Invalidated —
@@ -166,14 +180,25 @@ whose arguments needed any of JSON’s laxities: the <code class="docutils liter
 stringification, a bare <code class="docutils literal notranslate"><span class="pre">NaN</span></code>/<code class="docutils literal notranslate"><span class="pre">Infinity</span></code> (previously serialized natively),
 or silently-coerced non-string mapping keys. <code class="docutils literal notranslate"><span class="pre">tests/test_canonical.py</span></code> pins
 the stability half with literal digests.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.canonical.DFLT_BACKEND">
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">DFLT_BACKEND</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'fal'</span></span><a class="headerlink" href="#falaw.canonical.DFLT_BACKEND" title="Link to this definition"></a></dt>
+<dd><p>The only execution backend falaw ships until a second one lands
+(falaw#15). The single source for two defaults that must agree:
+<code class="docutils literal notranslate"><span class="pre">CallPlan.backend</span></code>’s field default, and the value <a class="reference internal" href="#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a>
+/ <a class="reference internal" href="#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a> omit from the hashed payload.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.canonical.cache_key_payload">
-<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">cache_key_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#cache_key_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.cache_key_payload" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">cache_key_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#cache_key_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.cache_key_payload" title="Link to this definition"></a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args}</span></code> — what the per-call content-addressed cache keys on.</p>
 <p>No <code class="docutils literal notranslate"><span class="pre">tool</span></code>: two CallPlans differing only in falaw-side labelling make the
-same fal call and <em>should</em> share a cache entry. A field that changes what
-the call <strong>produces</strong> (falaw#15’s <code class="docutils literal notranslate"><span class="pre">backend</span></code>) must be added here AND in
-<a class="reference internal" href="#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a>.</p>
+same fal call and <em>should</em> share a cache entry. <code class="docutils literal notranslate"><span class="pre">backend</span></code> joins the
+payload only when it is not <a class="reference internal" href="#falaw.canonical.DFLT_BACKEND" title="falaw.canonical.DFLT_BACKEND"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_BACKEND</span></code></a> — see the module
+docstring for why that asymmetry, not unconditional inclusion, is the
+safe choice. A field that changes what the call <strong>produces</strong> must be
+added here AND in <a class="reference internal" href="#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -198,13 +223,14 @@ before any network call, not on the way to one.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.canonical.plan_identity_payload">
-<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">plan_identity_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#plan_identity_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.plan_identity_payload" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">plan_identity_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fal'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#plan_identity_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.plan_identity_payload" title="Link to this definition"></a></dt>
 <dd><p><code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code> — the structural form behind <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> and
 the dry-run artifact id.</p>
 <p>Includes <code class="docutils literal notranslate"><span class="pre">tool</span></code> so a re-plan of the same request is recognizable as the
-same <em>plan</em> even though the cache would treat the calls identically. The
-counterpart projection is <a class="reference internal" href="#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a>; keep them adjacent so
-adding a field to one is an explicit decision about the other.</p>
+same <em>plan</em> even though the cache would treat the calls identically.
+<code class="docutils literal notranslate"><span class="pre">backend</span></code> joins the payload under the same omit-if-default rule as
+<a class="reference internal" href="#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a>; keep the two functions adjacent so adding a
+field to one is an explicit decision about the other.</p>
 </dd></dl>
 
 </section>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.29 documentation</title>
+  <title>Index &mdash; falaw 0.0.30 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=828725f0"></script>
+      <script src="_static/documentation_options.js?v=61a342a2"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/__main__.html">falaw.__main__</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/backends.html">falaw.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -209,6 +210,16 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.CallPlan.backend">backend (falaw.CallPlan attribute)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan.backend">(falaw.plan.CallPlan attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw/backends.html#falaw.backends.BackendExecutor">BackendExecutor (in module falaw.backends)</a>
+</li>
+      <li><a href="module_docs/falaw/backends.html#falaw.backends.backends">backends (in module falaw.backends)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Beat">Beat (class in falaw)</a>
 
       <ul>
@@ -229,14 +240,14 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan.billable_cost_usd">(falaw.plan.CallPlan property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.ExecutionReport.blocked">blocked (falaw.ExecutionReport property)</a>
 
       <ul>
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.ExecutionReport.blocked">(falaw.outcomes.ExecutionReport property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.CallOutcome.blocked_by">blocked_by (falaw.CallOutcome attribute)</a>
 
       <ul>
@@ -471,10 +482,12 @@
         <li><a href="module_docs/falaw.html#falaw.AccountStatus.detail">(falaw.AccountStatus attribute)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/falaw/plan.html#falaw.plan.DFLT_CONCURRENCY">DFLT_CONCURRENCY (in module falaw.plan)</a>
+      <li><a href="module_docs/falaw/canonical.html#falaw.canonical.DFLT_BACKEND">DFLT_BACKEND (in module falaw.canonical)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/plan.html#falaw.plan.DFLT_CONCURRENCY">DFLT_CONCURRENCY (in module falaw.plan)</a>
+</li>
       <li><a href="module_docs/falaw/plan.html#falaw.plan.DFLT_FETCH_BYTES">DFLT_FETCH_BYTES (in module falaw.plan)</a>
 </li>
       <li><a href="module_docs/falaw/testing.html#falaw.testing.DFLT_LIVE_MARKERS">DFLT_LIVE_MARKERS (in module falaw.testing)</a>
@@ -638,6 +651,13 @@
 
       <ul>
         <li><a href="module_docs/falaw/account.html#module-falaw.account">module</a>
+</li>
+      </ul></li>
+      <li>
+    falaw.backends
+
+      <ul>
+        <li><a href="module_docs/falaw/backends.html#module-falaw.backends">module</a>
 </li>
       </ul></li>
       <li>
@@ -914,6 +934,8 @@
         <li><a href="module_docs/falaw/operations/images.html#falaw.operations.images.generate_image_with_refs">(in module falaw.operations.images)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/backends.html#falaw.backends.get_backend_executor">get_backend_executor() (in module falaw.backends)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1101,6 +1123,8 @@
         <li><a href="module_docs/falaw/__main__.html#module-falaw.__main__">falaw.__main__</a>
 </li>
         <li><a href="module_docs/falaw/account.html#module-falaw.account">falaw.account</a>
+</li>
+        <li><a href="module_docs/falaw/backends.html#module-falaw.backends">falaw.backends</a>
 </li>
         <li><a href="module_docs/falaw/base.html#module-falaw.base">falaw.base</a>
 </li>

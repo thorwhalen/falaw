@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.canonical &mdash; falaw 0.0.29 documentation</title>
+  <title>falaw.canonical &mdash; falaw 0.0.30 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=828725f0"></script>
+      <script src="../../_static/documentation_options.js?v=61a342a2"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -49,6 +49,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/backends.html">falaw.backends</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
@@ -148,9 +149,20 @@
 <span class="sd">The field sets differ deliberately (``tool`` is a falaw-side label; the</span>
 <span class="sd">underlying fal call is the same whatever the tool was called), but a field</span>
 <span class="sd">that changes *what the call produces* must go into **both** — in this module,</span>
-<span class="sd">in one commit. That is the discipline falaw#15&#39;s ``CallPlan.backend`` needs:</span>
-<span class="sd">a backend added to ``plan_hash`` but not the cache key would let one backend</span>
-<span class="sd">return another backend&#39;s artifact as a wrong hit.</span>
+<span class="sd">in one commit. ``backend`` (falaw#15&#39;s ``CallPlan.backend``) is exactly that</span>
+<span class="sd">field: both projections accept it, and it lands in the hashed payload</span>
+<span class="sd">whenever it is not :data:`DFLT_BACKEND` — omitted, not merely equal, when it</span>
+<span class="sd">is. Two consequences, both load-bearing:</span>
+
+<span class="sd">* a backend added to ``plan_hash`` but not the cache key would let one</span>
+<span class="sd">  backend return another backend&#39;s artifact as a wrong hit — the reason the</span>
+<span class="sd">  two projections take the parameter together rather than one growing it</span>
+<span class="sd">  first;</span>
+<span class="sd">* omitting the field for the default backend means every call falaw has ever</span>
+<span class="sd">  planned or cached — all of them ``&quot;fal&quot;`` today — keeps its **exact**</span>
+<span class="sd">  pre-#15 digest. A future non-default backend hashes under a genuinely</span>
+<span class="sd">  different key (correctly — it *is* a different call), without silently</span>
+<span class="sd">  invalidating the deployed fal cache the day this ships.</span>
 
 <span class="sd">Byte-compatibility: for JSON-native payloads the output of</span>
 <span class="sd">:func:`canonical_blob` is identical to the old form, so every cache entry</span>
@@ -175,7 +187,15 @@
     <span class="s2">&quot;ensure_canonical&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cache_key_payload&quot;</span><span class="p">,</span>
     <span class="s2">&quot;plan_identity_payload&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DFLT_BACKEND&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+
+
+<span class="n">DFLT_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;fal&quot;</span>
+<span class="sd">&quot;&quot;&quot;The only execution backend falaw ships until a second one lands</span>
+<span class="sd">(falaw#15). The single source for two defaults that must agree:</span>
+<span class="sd">``CallPlan.backend``&#39;s field default, and the value :func:`cache_key_payload`</span>
+<span class="sd">/ :func:`plan_identity_payload` omit from the hashed payload.&quot;&quot;&quot;</span>
 
 
 <span class="n">_EXIT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
@@ -300,32 +320,50 @@
 
 <div class="viewcode-block" id="cache_key_payload">
 <a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.cache_key_payload">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">cache_key_payload</span><span class="p">(</span><span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cache_key_payload</span><span class="p">(</span>
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;``{app, args}`` — what the per-call content-addressed cache keys on.</span>
 
 <span class="sd">    No ``tool``: two CallPlans differing only in falaw-side labelling make the</span>
-<span class="sd">    same fal call and *should* share a cache entry. A field that changes what</span>
-<span class="sd">    the call **produces** (falaw#15&#39;s ``backend``) must be added here AND in</span>
-<span class="sd">    :func:`plan_identity_payload`.</span>
+<span class="sd">    same fal call and *should* share a cache entry. ``backend`` joins the</span>
+<span class="sd">    payload only when it is not :data:`DFLT_BACKEND` — see the module</span>
+<span class="sd">    docstring for why that asymmetry, not unconditional inclusion, is the</span>
+<span class="sd">    safe choice. A field that changes what the call **produces** must be</span>
+<span class="sd">    added here AND in :func:`plan_identity_payload`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">)}</span></div>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">!=</span> <span class="n">DFLT_BACKEND</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend</span>
+    <span class="k">return</span> <span class="n">payload</span></div>
 
 
 
 <div class="viewcode-block" id="plan_identity_payload">
 <a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.plan_identity_payload">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plan_identity_payload</span><span class="p">(</span>
-    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">tool</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">tool</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;``{app, args, tool}`` — the structural form behind ``plan_hash`` and</span>
 <span class="sd">    the dry-run artifact id.</span>
 
 <span class="sd">    Includes ``tool`` so a re-plan of the same request is recognizable as the</span>
-<span class="sd">    same *plan* even though the cache would treat the calls identically. The</span>
-<span class="sd">    counterpart projection is :func:`cache_key_payload`; keep them adjacent so</span>
-<span class="sd">    adding a field to one is an explicit decision about the other.</span>
+<span class="sd">    same *plan* even though the cache would treat the calls identically.</span>
+<span class="sd">    ``backend`` joins the payload under the same omit-if-default rule as</span>
+<span class="sd">    :func:`cache_key_payload`; keep the two functions adjacent so adding a</span>
+<span class="sd">    field to one is an explicit decision about the other.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">tool</span><span class="p">}</span></div>
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">tool</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">!=</span> <span class="n">DFLT_BACKEND</span><span class="p">:</span>
+        <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend</span>
+    <span class="k">return</span> <span class="n">payload</span></div>
 
 </pre></div>
 

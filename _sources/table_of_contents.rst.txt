@@ -5,6 +5,7 @@
    module_docs/falaw
    module_docs/falaw/__main__
    module_docs/falaw/account
+   module_docs/falaw/backends
    module_docs/falaw/base
    module_docs/falaw/bridges
    module_docs/falaw/bridges/mcp
