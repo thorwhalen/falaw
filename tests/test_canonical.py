@@ -253,14 +253,26 @@ def test_a_diamond_shared_subvalue_is_not_a_false_circular_refusal():
     assert key
 
 
-def test_deep_nesting_validates_as_far_as_json_serializes():
-    """Review finding 5: the recursive walk died at ~1000 levels while the C
-    serializer handled 3000 — the validator must not have a lower ceiling
-    than the thing it guards."""
+def test_deep_nesting_never_dies_in_the_validator():
+    """Review finding 5: the recursive walk died at ~1000 levels — below the
+    serializer's own ceiling — so the boundary crashed untyped on payloads
+    the old code hashed. The walk is now iterative and has NO depth ceiling
+    of its own; 5000 levels validate fine. The serializer keeps a ceiling
+    (`json.dumps` refuses ~2000 levels on CI's 3.10, more on 3.12) and
+    `_key` inherits it unchanged — that is the C encoder's limit, not the
+    validator's, which is why this asserts on `ensure_canonical` and pins
+    `_key` only at a depth every supported serializer handles."""
+    from falaw.canonical import ensure_canonical
+
     deep: dict = {"leaf": 1}
-    for _ in range(2000):
+    for _ in range(5000):
         deep = {"n": deep}
-    assert _key("fal-ai/flux/dev", {"deep": deep})
+    ensure_canonical({"deep": deep})  # the walk is not the binding constraint
+
+    modest: dict = {"leaf": 1}
+    for _ in range(200):
+        modest = {"n": modest}
+    assert _key("fal-ai/flux/dev", {"deep": modest})
 
 
 # --- adversarial-review fixes: a paid result is never discarded ---------------
