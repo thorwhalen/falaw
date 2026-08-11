@@ -68,6 +68,7 @@ from contextvars import ContextVar, copy_context
 from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Iterator, Literal, Optional
 
+from .canonical import DFLT_BACKEND
 from .outcomes import CallOutcome, ExecutionReport
 
 
@@ -103,7 +104,16 @@ class CallPlan:
     fal models depending on quality tier."""
 
     application: str
-    """The fal model id that will be invoked (e.g. ``"fal-ai/flux/dev"``)."""
+    """The fal model id that will be invoked (e.g. ``"fal-ai/flux/dev"``).
+    Backend-scoped: what it names depends on :attr:`backend`."""
+
+    backend: str = DFLT_BACKEND
+    """Which execution backend :func:`execute_plan` dispatches this call to
+    (falaw#15) — see :mod:`falaw.backends`. Defaults to
+    :data:`falaw.canonical.DFLT_BACKEND` (``"fal"``), the only backend until a
+    second one lands. Enters the per-call cache key and ``plan_hash`` only
+    when it is **not** the default, so every call falaw has ever planned or
+    cached keeps its exact pre-#15 digest — see :mod:`falaw.canonical`."""
 
     arguments: dict
     """Keyword arguments to pass to fal. Will be JSON-canonicalized for
@@ -222,10 +232,18 @@ def call_plan_to_dict(call: CallPlan) -> dict:
     The inverse of :func:`call_plan_from_dict`. ``expected_duration_s`` (a
     ``tuple``) becomes a 2-element list since JSON has no tuple type;
     everything else is already JSON-native.
+
+    ``backend`` (falaw#15) is a **tolerated-default addition**, not a
+    :data:`PLAN_DICT_SCHEMA` bump: it is always written, but
+    :func:`call_plan_from_dict` defaults it to :data:`DFLT_BACKEND` when
+    absent, so a dict from before this field existed still parses, and a
+    dict written by this version still parses under older falaw (the extra
+    key is simply never read there). No migration needed either direction.
     """
     return {
         "tool": call.tool,
         "application": call.application,
+        "backend": call.backend,
         "arguments": call.arguments,
         "output_kind": call.output_kind,
         "estimated_cost_usd": call.estimated_cost_usd,
@@ -243,12 +261,15 @@ def call_plan_from_dict(d: dict) -> CallPlan:
     """Rebuild a :class:`CallPlan` from a :func:`call_plan_to_dict` dict.
 
     ``arguments`` / ``metadata`` are copied (a deserialized plan owns its own
-    data); ``expected_duration_s`` is re-tupled.
+    data); ``expected_duration_s`` is re-tupled. ``backend`` defaults to
+    :data:`DFLT_BACKEND` when absent — a dict written before falaw#15 names no
+    backend, and it always meant ``"fal"``.
     """
     duration = d.get("expected_duration_s")
     return CallPlan(
         tool=d["tool"],
         application=d["application"],
+        backend=d.get("backend", DFLT_BACKEND),
         arguments=dict(d["arguments"]),
         output_kind=d["output_kind"],
         estimated_cost_usd=d.get("estimated_cost_usd"),
@@ -323,6 +344,17 @@ def plan_hash(plan: Plan) -> str:
     True
     >>> plan_hash(Plan(calls=(a, b))) == plan_hash(Plan(calls=(b, a)))
     False
+
+    ``backend`` (falaw#15) joins the hashed payload too, so a plan built for
+    one backend never dedups against the structurally-identical plan for
+    another — and, since it is included only when non-default, every plan
+    made of today's (all-``"fal"``) calls hashes exactly as it did before:
+
+    >>> comfy = CallPlan(tool="generate_image", application="fal-ai/flux/dev",
+    ...                   arguments={"prompt": "a tiger"}, output_kind="image",
+    ...                   backend="comfyui")
+    >>> plan_hash(Plan(calls=(a,))) == plan_hash(Plan(calls=(comfy,)))
+    False
     """
     import hashlib
 
@@ -330,7 +362,9 @@ def plan_hash(plan: Plan) -> str:
 
     blob = canonical_blob(
         [
-            plan_identity_payload(c.application, c.arguments, tool=c.tool)
+            plan_identity_payload(
+                c.application, c.arguments, tool=c.tool, backend=c.backend
+            )
             for c in plan.calls
         ]
     )
@@ -346,6 +380,7 @@ def make_call_plan(
     application: str,
     arguments: dict,
     output_kind: OutputKind,
+    backend: str = DFLT_BACKEND,
     estimated_cost_usd: Optional[float] = None,
     expected_duration_s: Optional[tuple[float, float]] = None,
     metadata: Optional[dict] = None,
@@ -361,13 +396,16 @@ def make_call_plan(
     When ``consult_cache=False`` (e.g. for unit tests or "what would a fresh
     run cost?" reporting), ``cache_status`` is ``"unknown"``.
 
-    Known gap (falaw#15): the peek uses the *unresolved* arguments, so for a
-    chained call — one whose arguments still hold a ``<from N>`` placeholder —
-    it keys on the placeholder rather than on the upstream content ref
-    :func:`execute` will key on. ``cache_status`` is therefore not to be
-    trusted for chained calls, and a plan's reported cost can understate what
-    the run bills. Fixing it needs the upstream to have executed, which is a
-    planner-level change, not a converter-level one.
+    A **chained call** — arguments still holding a ``"<from N>"`` placeholder,
+    because the upstream call has not executed yet — is never peeked
+    (falaw#15, D2): its resolved key is not knowable at plan time, and the
+    unresolved key is never written by anything (:func:`execute` always keys
+    on the resolved form), so peeking it can only ever report a false
+    ``"miss"`` — never a real ``"hit"``. That silently over-quotes cost and
+    under-reports the plan's ``cache_hit_savings_usd`` on every chained call,
+    which under prepaid billing (a quote that may be *deducted*) is a billing
+    bug. ``cache_status`` is ``"unknown"`` here instead, exactly the case
+    :data:`CacheStatus` documents it for.
 
     Raises:
         falaw.errors.FalNonCanonicalArgument: an argument cannot be hashed
@@ -385,19 +423,32 @@ def make_call_plan(
 
     status: CacheStatus = "unknown"
     if consult_cache:
-        # Local import to avoid a cycle: cache imports from core, core imports
-        # from errors, none of which need plan.
-        try:
-            from .cache import cache_get  # type: ignore[import-not-found]
-
-            status = "hit" if cache_get(application, arguments) is not None else "miss"
-        except Exception:
-            # Cache lookup is best-effort — if it errors (corrupted manifest,
-            # etc.) fall back to ``"unknown"`` rather than fail the planner.
+        if _has_placeholder(arguments):
+            # D2: the resolved key isn't knowable yet, and the unresolved key
+            # is never written by anything — peeking it can only ever
+            # fabricate a "miss". "unknown" is honest; a "hit" or "miss" here
+            # would be a guess dressed up as an observation.
             status = "unknown"
+        else:
+            # Local import to avoid a cycle: cache imports from core, core
+            # imports from errors, none of which need plan.
+            try:
+                from .cache import cache_get  # type: ignore[import-not-found]
+
+                status = (
+                    "hit"
+                    if cache_get(application, arguments, backend=backend) is not None
+                    else "miss"
+                )
+            except Exception:
+                # Cache lookup is best-effort — if it errors (corrupted
+                # manifest, etc.) fall back to "unknown" rather than fail
+                # the planner.
+                status = "unknown"
     return CallPlan(
         tool=tool,
         application=application,
+        backend=backend,
         arguments=arguments,
         output_kind=output_kind,
         estimated_cost_usd=estimated_cost_usd,
@@ -936,14 +987,14 @@ def _execute_call(
     is dropped and the call re-executed — the alternative is a cache entry that
     fails forever and can only be escaped by re-billing the entire plan.
     """
+    from .backends import get_backend_executor
     from .cache import cached_call_fal, drop_cache_entry, emit_cache_hit
-    from .core import call_fal
 
     key_arguments = None if key_args is wire_args else key_args
     if use_cache:
         from .cache import cache_get
 
-        hit = cache_get(call.application, key_args)
+        hit = cache_get(call.application, key_args, backend=call.backend)
         if hit is not None:
             # Speculative: the conversion may turn out to be unusable, in which
             # case its own complaints are noise the caller must not see (we are
@@ -965,16 +1016,19 @@ def _execute_call(
                 UserWarning,
                 stacklevel=3,
             )
-            drop_cache_entry(call.application, key_args)
+            drop_cache_entry(call.application, key_args, backend=call.backend)
         raw = cached_call_fal(
             call.application,
             wire_args,
             key_arguments=key_arguments,
             refresh=True,
             on_event=on_event,
+            backend=call.backend,
         )
     else:
-        raw = call_fal(call.application, wire_args, on_event=on_event)
+        raw = get_backend_executor(call.backend)(
+            call.application, wire_args, on_event=on_event
+        )
     return converter(raw, call), False
 
 
@@ -1273,7 +1327,9 @@ def _synthetic_artifact(call: CallPlan):
     from .canonical import canonical_blob, plan_identity_payload
 
     blob = canonical_blob(
-        plan_identity_payload(call.application, call.arguments, tool=call.tool)
+        plan_identity_payload(
+            call.application, call.arguments, tool=call.tool, backend=call.backend
+        )
     )
     synthetic_id = hash_bytes(blob)
     return Artifact(

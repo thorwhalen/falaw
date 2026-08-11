@@ -38,9 +38,20 @@ Two payload projections live here **side by side, on purpose**:
 The field sets differ deliberately (``tool`` is a falaw-side label; the
 underlying fal call is the same whatever the tool was called), but a field
 that changes *what the call produces* must go into **both** — in this module,
-in one commit. That is the discipline falaw#15's ``CallPlan.backend`` needs:
-a backend added to ``plan_hash`` but not the cache key would let one backend
-return another backend's artifact as a wrong hit.
+in one commit. ``backend`` (falaw#15's ``CallPlan.backend``) is exactly that
+field: both projections accept it, and it lands in the hashed payload
+whenever it is not :data:`DFLT_BACKEND` — omitted, not merely equal, when it
+is. Two consequences, both load-bearing:
+
+* a backend added to ``plan_hash`` but not the cache key would let one
+  backend return another backend's artifact as a wrong hit — the reason the
+  two projections take the parameter together rather than one growing it
+  first;
+* omitting the field for the default backend means every call falaw has ever
+  planned or cached — all of them ``"fal"`` today — keeps its **exact**
+  pre-#15 digest. A future non-default backend hashes under a genuinely
+  different key (correctly — it *is* a different call), without silently
+  invalidating the deployed fal cache the day this ships.
 
 Byte-compatibility: for JSON-native payloads the output of
 :func:`canonical_blob` is identical to the old form, so every cache entry
@@ -65,7 +76,15 @@ __all__ = [
     "ensure_canonical",
     "cache_key_payload",
     "plan_identity_payload",
+    "DFLT_BACKEND",
 ]
+
+
+DFLT_BACKEND = "fal"
+"""The only execution backend falaw ships until a second one lands
+(falaw#15). The single source for two defaults that must agree:
+``CallPlan.backend``'s field default, and the value :func:`cache_key_payload`
+/ :func:`plan_identity_payload` omit from the hashed payload."""
 
 
 _EXIT = object()
@@ -182,26 +201,44 @@ def canonical_blob(payload: Any) -> bytes:
     return json.dumps(payload, sort_keys=True, allow_nan=False).encode("utf-8")
 
 
-def cache_key_payload(application: str, arguments: Mapping[str, Any]) -> dict:
+def cache_key_payload(
+    application: str,
+    arguments: Mapping[str, Any],
+    *,
+    backend: str = DFLT_BACKEND,
+) -> dict:
     """``{app, args}`` — what the per-call content-addressed cache keys on.
 
     No ``tool``: two CallPlans differing only in falaw-side labelling make the
-    same fal call and *should* share a cache entry. A field that changes what
-    the call **produces** (falaw#15's ``backend``) must be added here AND in
-    :func:`plan_identity_payload`.
+    same fal call and *should* share a cache entry. ``backend`` joins the
+    payload only when it is not :data:`DFLT_BACKEND` — see the module
+    docstring for why that asymmetry, not unconditional inclusion, is the
+    safe choice. A field that changes what the call **produces** must be
+    added here AND in :func:`plan_identity_payload`.
     """
-    return {"app": application, "args": dict(arguments)}
+    payload = {"app": application, "args": dict(arguments)}
+    if backend != DFLT_BACKEND:
+        payload["backend"] = backend
+    return payload
 
 
 def plan_identity_payload(
-    application: str, arguments: Mapping[str, Any], *, tool: Optional[str]
+    application: str,
+    arguments: Mapping[str, Any],
+    *,
+    tool: Optional[str],
+    backend: str = DFLT_BACKEND,
 ) -> dict:
     """``{app, args, tool}`` — the structural form behind ``plan_hash`` and
     the dry-run artifact id.
 
     Includes ``tool`` so a re-plan of the same request is recognizable as the
-    same *plan* even though the cache would treat the calls identically. The
-    counterpart projection is :func:`cache_key_payload`; keep them adjacent so
-    adding a field to one is an explicit decision about the other.
+    same *plan* even though the cache would treat the calls identically.
+    ``backend`` joins the payload under the same omit-if-default rule as
+    :func:`cache_key_payload`; keep the two functions adjacent so adding a
+    field to one is an explicit decision about the other.
     """
-    return {"app": application, "args": dict(arguments), "tool": tool}
+    payload = {"app": application, "args": dict(arguments), "tool": tool}
+    if backend != DFLT_BACKEND:
+        payload["backend"] = backend
+    return payload

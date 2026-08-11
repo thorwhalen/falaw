@@ -54,11 +54,17 @@ def _patch_fal(monkeypatch):
                 }
             }
         if "omnihuman" in application or "ai-avatar" in application:
-            return {"video": {"url": "http://x/talk.mp4", "duration": 5.0,
-                              "content_type": "video/mp4"}}
+            return {
+                "video": {
+                    "url": "http://x/talk.mp4",
+                    "duration": 5.0,
+                    "content_type": "video/mp4",
+                }
+            }
         if "flux-kontext" in application or "image_edit" in application:
-            return {"images": [{"url": "http://x/edited.png",
-                                "content_type": "image/png"}]}
+            return {
+                "images": [{"url": "http://x/edited.png", "content_type": "image/png"}]
+            }
         # Default: image generation.
         return {"images": [{"url": "http://x/img.png", "content_type": "image/png"}]}
 
@@ -108,8 +114,12 @@ def test_two_step_render_plan_roundtrip(monkeypatch, fake_assets):
         f"{[(c.tool, c.application, c.estimated_cost_usd) for c in plan.calls]}"
     )
 
-    # The cache_status should be 'miss' for both calls (they haven't run).
-    assert all(c.cache_status == "miss" for c in plan.calls)
+    # p1 has no placeholder, so its peek is trustworthy: 'miss' (nothing
+    # cached yet). p2 is the chained call — its arguments still hold
+    # "<from 0>", so the peek is not (falaw#15 D2): 'unknown', never a
+    # fabricated 'miss'.
+    assert p1.cache_status == "miss"
+    assert p2.cache_status == "unknown"
 
     # 3. Execute — should produce two Artifacts.
     artifacts = execute_plan(plan)
@@ -166,6 +176,22 @@ def test_two_step_render_plan_roundtrip(monkeypatch, fake_assets):
     plan_after = Plan(calls=(p1_after,))
     assert plan_after.total_cost_usd == 0.0  # cache hit means no billable cost
     assert plan_after.cache_hit_savings_usd > 0
+
+    # 6. Re-plan the CHAINED call — this is where D2 lived (falaw#15). Its
+    # arguments still hold the unresolved "<from 0>" placeholder; execute
+    # keys on the upstream's *resolved* content ref, which the peek cannot
+    # reproduce. Before the fix this silently reported "miss" (the unresolved
+    # key is never written by anything, so it can only ever fabricate one).
+    # It must report "unknown" — a guess is not an observation.
+    p2_after = plan_image_to_video(
+        image_url="<from 0>",
+        duration_s=3.0,
+        metadata={"shot_id": "s01", "step": "motion"},
+    )
+    assert p2_after.cache_status == "unknown", (
+        "a chained call's key can't be peeked with an unresolved placeholder "
+        "— report 'unknown', never a fabricated 'miss' or 'hit' (falaw#15 D2)"
+    )
 
 
 def test_dry_run_plan_does_not_call_fal(monkeypatch):

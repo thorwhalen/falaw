@@ -123,3 +123,41 @@ def test_cost_and_cache_status_do_not_change_the_hash():
 
 def test_empty_plan_is_stable():
     assert plan_hash(Plan(calls=())) == plan_hash(Plan())
+
+
+def test_backend_changes_the_hash_but_only_when_non_default():
+    """falaw#15: `backend` must join `plan_hash` — a plan for a second
+    backend must never dedup against the structurally-identical fal plan, or
+    a job manager replays the wrong backend's cached result as if it were
+    this plan's own. But it must join it the SAFE way: only when non-default,
+    so every plan made of today's (implicitly-"fal") calls keeps its exact
+    pre-#15 hash — sibling of test_cost_and_cache_status_do_not_change_the_hash.
+    """
+    fal_call = _image_call()
+    explicit_fal = CallPlan(
+        tool="generate_image",
+        application="fal-ai/flux/dev",
+        arguments={"prompt": "a tiger", "image_size": "landscape_4_3"},
+        output_kind="image",
+        backend="fal",  # explicit, not omitted — must hash identically
+    )
+    comfy_call = CallPlan(
+        tool="generate_image",
+        application="fal-ai/flux/dev",
+        arguments={"prompt": "a tiger", "image_size": "landscape_4_3"},
+        output_kind="image",
+        backend="comfyui",
+    )
+    assert plan_hash(Plan(calls=(fal_call,))) == plan_hash(Plan(calls=(explicit_fal,)))
+    assert plan_hash(Plan(calls=(fal_call,))) != plan_hash(Plan(calls=(comfy_call,)))
+
+
+def test_backend_changes_the_per_call_cache_key_the_same_way():
+    """The other half of the same invariant, at the cache-key layer — if only
+    `plan_hash` changed, two backends running the 'same' nominal operation
+    would share a cache entry and one would return the other's artifact."""
+    from falaw.cache import _key
+
+    fal_key = _key("fal-ai/flux/dev", {"prompt": "a tiger"})
+    assert fal_key == _key("fal-ai/flux/dev", {"prompt": "a tiger"}, backend="fal")
+    assert fal_key != _key("fal-ai/flux/dev", {"prompt": "a tiger"}, backend="comfyui")

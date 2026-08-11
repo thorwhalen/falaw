@@ -17,6 +17,9 @@ authors = [
 dependencies = [
     "fal-client>=0.5",
     "lacing>=0.0.22",
+    # falaw.backends' execution-backend registry (falaw#15) — a second
+    # backend (ComfyUI etc.) dispatches here, not through a hand-rolled if/elif.
+    "xdol>=0.1.12",
 ]
 
 [tool.hatch.build.targets.wheel]
