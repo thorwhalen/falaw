@@ -299,14 +299,18 @@ def plan_hash(plan: Plan) -> str:
     with ``<from N>`` placeholders intact, so it is stable across re-plans of the
     same structural request.
 
-    The digest canonicalizes each call over ``{app, args, tool}`` — matching
+    The digest canonicalizes each call over ``{app, args, tool}``
+    (:func:`falaw.canonical.plan_identity_payload`) — matching
     :func:`_synthetic_artifact`'s canonicalization, and deliberately **not** the
     per-call content-addressed cache key (:func:`falaw.cache._key`, which keys on
     ``{app, args}`` with no ``tool``). ``plan_hash`` and the per-call cache key
     therefore key on *different* bytes and must not be assumed to agree
-    call-for-call; what is reused from the cache is only the canonicalization
-    *discipline* (``sort_keys=True`` / ``default=str``), which is all a
-    stable-across-re-plans dedup handle needs.
+    call-for-call. Both projections live side by side in :mod:`falaw.canonical`
+    with one shared byte-form (:func:`falaw.canonical.canonical_blob` — sorted
+    keys, **no** ``default=str`` fallback, no NaN), so an argument the form
+    cannot represent faithfully raises
+    :class:`falaw.errors.FalNonCanonicalArgument` instead of colliding, and a
+    new identity-bearing field is an explicit decision about both hashes.
 
     Two structurally-identical plans hash equal; changing any call's ``app``,
     ``args``, or ``tool`` — or the *order* of calls — changes the hash.
@@ -321,16 +325,15 @@ def plan_hash(plan: Plan) -> str:
     False
     """
     import hashlib
-    import json as _json
 
-    blob = _json.dumps(
+    from .canonical import canonical_blob, plan_identity_payload
+
+    blob = canonical_blob(
         [
-            {"app": c.application, "args": c.arguments, "tool": c.tool}
+            plan_identity_payload(c.application, c.arguments, tool=c.tool)
             for c in plan.calls
-        ],
-        sort_keys=True,
-        default=str,
-    ).encode("utf-8")
+        ]
+    )
     return hashlib.sha256(blob).hexdigest()
 
 
@@ -365,7 +368,21 @@ def make_call_plan(
     trusted for chained calls, and a plan's reported cost can understate what
     the run bills. Fixing it needs the upstream to have executed, which is a
     planner-level change, not a converter-level one.
+
+    Raises:
+        falaw.errors.FalNonCanonicalArgument: an argument cannot be hashed
+            faithfully (non-JSON object, non-finite float, non-string mapping
+            key). Raised here — while planning is still free — rather than at
+            key-composition time on the way to the network (falaw#17).
     """
+    from .canonical import ensure_canonical
+
+    # Validate before the cache peek: the peek's `except Exception` fallback
+    # (best-effort by design) would otherwise swallow the refusal into a
+    # silent `"unknown"`. `extra=` is the documented escape hatch for
+    # model-specific params, so arbitrary Python values genuinely reach here.
+    ensure_canonical(dict(arguments), context="arguments")
+
     status: CacheStatus = "unknown"
     if consult_cache:
         # Local import to avoid a cycle: cache imports from core, core imports
@@ -639,16 +656,22 @@ def execute_isolated(
         )
 
     if dry_run:
-        return ExecutionReport(
-            outcomes=tuple(
-                CallOutcome(
-                    index=i,
-                    call=call,
-                    status="succeeded",
-                    artifact=_synthetic_artifact(call),
-                )
-                for i, call in enumerate(plan.calls)
+        # Per-call isolation applies to dry runs too: a hand-built CallPlan
+        # whose arguments cannot be canonicalised makes _synthetic_artifact
+        # raise, and the report's "always one outcome per call" guarantee must
+        # survive that — one junk call is that call's failure, not the run's.
+        # (`execute` still raises, via artifacts_or_raise, as it always has.)
+        def _dry_outcome(i: int, call: CallPlan) -> CallOutcome:
+            try:
+                artifact = _synthetic_artifact(call)
+            except Exception as e:
+                return CallOutcome(index=i, call=call, status="failed", error=e)
+            return CallOutcome(
+                index=i, call=call, status="succeeded", artifact=artifact
             )
+
+        return ExecutionReport(
+            outcomes=tuple(_dry_outcome(i, call) for i, call in enumerate(plan.calls))
         )
 
     if artifact_converter is not None:
@@ -1247,13 +1270,11 @@ def _synthetic_artifact(call: CallPlan):
 
     # Deterministic asset_id from the call's identity, so dry-run twice over
     # the same Plan yields the same Artifact.id pair (helpful for testing).
-    import json as _json
+    from .canonical import canonical_blob, plan_identity_payload
 
-    blob = _json.dumps(
-        {"app": call.application, "args": call.arguments, "tool": call.tool},
-        sort_keys=True,
-        default=str,
-    ).encode("utf-8")
+    blob = canonical_blob(
+        plan_identity_payload(call.application, call.arguments, tool=call.tool)
+    )
     synthetic_id = hash_bytes(blob)
     return Artifact(
         asset_id=synthetic_id,

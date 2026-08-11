@@ -41,8 +41,10 @@ import json
 import os
 import time
 import uuid
+import warnings
 from typing import Any, Mapping, Optional
 
+from .canonical import cache_key_payload, canonical_blob, ensure_canonical
 from .core import call_fal
 
 
@@ -63,12 +65,14 @@ def _cache_dir() -> str:
 
 
 def _key(application: str, arguments: Mapping[str, Any]) -> str:
-    blob = json.dumps(
-        {"app": application, "args": dict(arguments)},
-        sort_keys=True,
-        default=str,
-    ).encode("utf-8")
-    return hashlib.sha256(blob).hexdigest()
+    # No `default=str` fallback: a hashing function that guesses is a hashing
+    # function that collides (falaw#17). Non-canonicalisable arguments raise
+    # `FalNonCanonicalArgument` instead of silently sharing (or forever
+    # missing) a key. The payload shape lives in `falaw.canonical`, next to
+    # `plan_hash`'s, so a new identity-bearing field is added to both at once.
+    return hashlib.sha256(
+        canonical_blob(cache_key_payload(application, arguments))
+    ).hexdigest()
 
 
 def _entry_dir(key: str) -> str:
@@ -138,7 +142,12 @@ def cache_put(
     tmp = f"{path}.{uuid.uuid4().hex[:8]}.part"
     try:
         with open(tmp, "w") as f:
-            json.dump(manifest, f, indent=2, default=str)
+            # `default=str` here is display-only, never keyed: `raw` and
+            # `wire_arguments` may hold values we render for debugging. But
+            # `allow_nan=False` is load-bearing — Python's json would happily
+            # write a bare `NaN`, valid to itself and invalid JSON to every
+            # strict parser, leaving an on-disk entry nothing else can read.
+            json.dump(manifest, f, indent=2, default=str, allow_nan=False)
         os.replace(tmp, path)
     except BaseException:
         _unlink_quietly(tmp)
@@ -221,18 +230,45 @@ def cached_call_fal(
         Raw fal response (whether from cache or network).
     """
     key_args = arguments if key_arguments is None else key_arguments
+    # Refuse while it is still free: on the `refresh=True` path the first key
+    # computation would otherwise happen in `cache_put`, *after* the paid call
+    # — raising there loses a response fal has already billed for.
+    ensure_canonical(dict(key_args), context="key_arguments")
     if not refresh:
         hit = cache_get(application, key_args)
         if hit is not None:
             emit_cache_hit(application, on_event)
             return hit
     raw = call_fal(application, arguments, on_event=on_event)
-    cache_put(
-        application,
-        key_args,
-        raw,
-        wire_arguments=None if key_arguments is None else arguments,
-    )
+    try:
+        cache_put(
+            application,
+            key_args,
+            raw,
+            wire_arguments=None if key_arguments is None else arguments,
+        )
+    except Exception as e:
+        # A paid result is never discarded (see falaw.plan.execute's failure
+        # policy): fal has already run — and billed — this call, so a cache
+        # WRITE failure (a response carrying a non-finite float that the
+        # strict manifest refuses, a full disk, a permission error) must
+        # degrade to "uncached", not destroy the response. On refresh=True the
+        # pre-refresh entry is dropped too — the caller explicitly asked for
+        # fresh, so letting the old entry keep serving would quietly undo the
+        # refresh on every later call.
+        if refresh:
+            try:
+                drop_cache_entry(application, key_args)
+            except OSError:
+                pass
+        warnings.warn(
+            f"falaw could not cache the response for {application!r} "
+            f"({type(e).__name__}: {e}); returning the billed response "
+            "uncached. Until the cause is fixed, re-running this call will "
+            "bill again.",
+            UserWarning,
+            stacklevel=2,
+        )
     return raw
 
 
