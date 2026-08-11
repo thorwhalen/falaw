@@ -174,6 +174,25 @@ class FalAssetFetchError(FalError):
         self.cause = cause
 
 
+class FalNonCanonicalArgument(FalError):
+    """An argument cannot be canonicalised into falaw's hashed JSON form.
+
+    Raised by :mod:`falaw.canonical` when a value reaches a key-composition
+    site (the per-call cache key, ``plan_hash``, the dry-run artifact id) that
+    JSON cannot represent faithfully: a non-JSON object, a non-finite float,
+    or a non-string mapping key. Deliberately **loud**: the old behaviour —
+    ``json.dumps(..., default=str)`` — silently collided structurally
+    different calls into one cache key, handing back the *wrong artifact* as
+    a supposed saving (falaw#17).
+
+    ``path`` names the offending node, e.g. ``arguments.extra.ref``.
+    """
+
+    def __init__(self, message: str, *, path: str):
+        super().__init__(message)
+        self.path = path
+
+
 # --- Translation from fal_client errors --------------------------------------
 
 
