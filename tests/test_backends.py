@@ -130,6 +130,44 @@ def test_a_backend_named_by_a_call_but_never_registered_fails_that_call_only(
     assert "fkae" in str(report.outcomes[1].error)
 
 
+@pytest.mark.parametrize("use_cache", [False, True], ids=["uncached", "cached"])
+def test_a_bad_backend_is_isolated_under_a_real_thread_pool_too(
+    fake_backend, use_cache
+):
+    """Adversarial review of falaw#15: the shipped isolation test above only
+    ran at concurrency=1 (`_InlineExecutor`) — the module's own docstring
+    warns that sequential and concurrent paths can diverge and only one is
+    ever covered by a given test. `concurrency=2` here forces the real
+    `ThreadPoolExecutor` for both the uncached branch (bad backend raises in
+    `get_backend_executor` directly) and the cached branch (raises inside
+    `cached_call_fal` after a miss) — one bad call must not hang the pool,
+    corrupt a sibling's outcome, or escape per-call isolation.
+    """
+    good = CallPlan(
+        tool="generate_image",
+        application="model://fake/whatever",
+        backend="fake",
+        arguments={"prompt": "a tiger"},
+        output_kind="image",
+    )
+    typo = CallPlan(
+        tool="generate_image",
+        application="model://fake/whatever",
+        backend="fkae",  # typo — independent of `good`, so both run concurrently
+        arguments={"prompt": "a cat"},
+        output_kind="image",
+    )
+    report = execute_plan_isolated(
+        Plan(calls=(good, typo)), use_cache=use_cache, concurrency=2
+    )
+    assert report.outcomes[0].status == "succeeded"
+    assert report.outcomes[0].artifact.url == "http://fake-backend/out.png"
+    assert report.outcomes[1].status == "failed"
+    assert isinstance(report.outcomes[1].error, KeyError)
+    assert "fkae" in str(report.outcomes[1].error)
+    assert len(fake_backend) == 1  # only the good call ever reached the executor
+
+
 def test_registering_a_backend_under_an_existing_name_raises():
     """`on_conflict="error"` — a misconfigured plugin must fail loudly rather
     than silently shadow the built-in fal executor."""
