@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.28 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/documentation_options.js?v=828725f0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
@@ -431,14 +432,18 @@
 <span class="sd">    with ``&lt;from N&gt;`` placeholders intact, so it is stable across re-plans of the</span>
 <span class="sd">    same structural request.</span>
 
-<span class="sd">    The digest canonicalizes each call over ``{app, args, tool}`` — matching</span>
+<span class="sd">    The digest canonicalizes each call over ``{app, args, tool}``</span>
+<span class="sd">    (:func:`falaw.canonical.plan_identity_payload`) — matching</span>
 <span class="sd">    :func:`_synthetic_artifact`&#39;s canonicalization, and deliberately **not** the</span>
 <span class="sd">    per-call content-addressed cache key (:func:`falaw.cache._key`, which keys on</span>
 <span class="sd">    ``{app, args}`` with no ``tool``). ``plan_hash`` and the per-call cache key</span>
 <span class="sd">    therefore key on *different* bytes and must not be assumed to agree</span>
-<span class="sd">    call-for-call; what is reused from the cache is only the canonicalization</span>
-<span class="sd">    *discipline* (``sort_keys=True`` / ``default=str``), which is all a</span>
-<span class="sd">    stable-across-re-plans dedup handle needs.</span>
+<span class="sd">    call-for-call. Both projections live side by side in :mod:`falaw.canonical`</span>
+<span class="sd">    with one shared byte-form (:func:`falaw.canonical.canonical_blob` — sorted</span>
+<span class="sd">    keys, **no** ``default=str`` fallback, no NaN), so an argument the form</span>
+<span class="sd">    cannot represent faithfully raises</span>
+<span class="sd">    :class:`falaw.errors.FalNonCanonicalArgument` instead of colliding, and a</span>
+<span class="sd">    new identity-bearing field is an explicit decision about both hashes.</span>
 
 <span class="sd">    Two structurally-identical plans hash equal; changing any call&#39;s ``app``,</span>
 <span class="sd">    ``args``, or ``tool`` — or the *order* of calls — changes the hash.</span>
@@ -453,16 +458,15 @@
 <span class="sd">    False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
 
-    <span class="n">blob</span> <span class="o">=</span> <span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.canonical</span><span class="w"> </span><span class="kn">import</span> <span class="n">canonical_blob</span><span class="p">,</span> <span class="n">plan_identity_payload</span>
+
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">canonical_blob</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">tool</span><span class="p">}</span>
+            <span class="n">plan_identity_payload</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">tool</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">tool</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span>
-        <span class="p">],</span>
-        <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 
@@ -500,7 +504,21 @@
 <span class="sd">    trusted for chained calls, and a plan&#39;s reported cost can understate what</span>
 <span class="sd">    the run bills. Fixing it needs the upstream to have executed, which is a</span>
 <span class="sd">    planner-level change, not a converter-level one.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        falaw.errors.FalNonCanonicalArgument: an argument cannot be hashed</span>
+<span class="sd">            faithfully (non-JSON object, non-finite float, non-string mapping</span>
+<span class="sd">            key). Raised here — while planning is still free — rather than at</span>
+<span class="sd">            key-composition time on the way to the network (falaw#17).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.canonical</span><span class="w"> </span><span class="kn">import</span> <span class="n">ensure_canonical</span>
+
+    <span class="c1"># Validate before the cache peek: the peek&#39;s `except Exception` fallback</span>
+    <span class="c1"># (best-effort by design) would otherwise swallow the refusal into a</span>
+    <span class="c1"># silent `&quot;unknown&quot;`. `extra=` is the documented escape hatch for</span>
+    <span class="c1"># model-specific params, so arbitrary Python values genuinely reach here.</span>
+    <span class="n">ensure_canonical</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;arguments&quot;</span><span class="p">)</span>
+
     <span class="n">status</span><span class="p">:</span> <span class="n">CacheStatus</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="k">if</span> <span class="n">consult_cache</span><span class="p">:</span>
         <span class="c1"># Local import to avoid a cycle: cache imports from core, core imports</span>
@@ -780,16 +798,22 @@
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">ExecutionReport</span><span class="p">(</span>
-            <span class="n">outcomes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span>
-                <span class="n">CallOutcome</span><span class="p">(</span>
-                    <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
-                    <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span>
-                    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;succeeded&quot;</span><span class="p">,</span>
-                    <span class="n">artifact</span><span class="o">=</span><span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">call</span><span class="p">),</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">call</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+        <span class="c1"># Per-call isolation applies to dry runs too: a hand-built CallPlan</span>
+        <span class="c1"># whose arguments cannot be canonicalised makes _synthetic_artifact</span>
+        <span class="c1"># raise, and the report&#39;s &quot;always one outcome per call&quot; guarantee must</span>
+        <span class="c1"># survive that — one junk call is that call&#39;s failure, not the run&#39;s.</span>
+        <span class="c1"># (`execute` still raises, via artifacts_or_raise, as it always has.)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_dry_outcome</span><span class="p">(</span><span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">artifact</span> <span class="o">=</span> <span class="n">_synthetic_artifact</span><span class="p">(</span><span class="n">call</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">CallOutcome</span><span class="p">(</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">call</span><span class="o">=</span><span class="n">call</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;succeeded&quot;</span><span class="p">,</span> <span class="n">artifact</span><span class="o">=</span><span class="n">artifact</span>
             <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ExecutionReport</span><span class="p">(</span>
+            <span class="n">outcomes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">_dry_outcome</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">call</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">))</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">artifact_converter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1392,13 +1416,11 @@
 
     <span class="c1"># Deterministic asset_id from the call&#39;s identity, so dry-run twice over</span>
     <span class="c1"># the same Plan yields the same Artifact.id pair (helpful for testing).</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_json</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.canonical</span><span class="w"> </span><span class="kn">import</span> <span class="n">canonical_blob</span><span class="p">,</span> <span class="n">plan_identity_payload</span>
 
-    <span class="n">blob</span> <span class="o">=</span> <span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">},</span>
-        <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">blob</span> <span class="o">=</span> <span class="n">canonical_blob</span><span class="p">(</span>
+        <span class="n">plan_identity_payload</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">tool</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">synthetic_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Artifact</span><span class="p">(</span>
         <span class="n">asset_id</span><span class="o">=</span><span class="n">synthetic_id</span><span class="p">,</span>

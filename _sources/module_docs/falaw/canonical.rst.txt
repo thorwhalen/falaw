@@ -1,0 +1,4 @@
+falaw.canonical
+===============
+.. automodule:: falaw.canonical
+   :members:

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.errors &mdash; falaw 0.0.28 documentation</title>
+  <title>falaw.errors &mdash; falaw 0.0.29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../../_static/documentation_options.js?v=828725f0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
@@ -316,6 +317,28 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cause</span> <span class="o">=</span> <span class="n">cause</span></div>
+
+
+
+<div class="viewcode-block" id="FalNonCanonicalArgument">
+<a class="viewcode-back" href="../../module_docs/falaw/errors.html#falaw.FalNonCanonicalArgument">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalNonCanonicalArgument</span><span class="p">(</span><span class="n">FalError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An argument cannot be canonicalised into falaw&#39;s hashed JSON form.</span>
+
+<span class="sd">    Raised by :mod:`falaw.canonical` when a value reaches a key-composition</span>
+<span class="sd">    site (the per-call cache key, ``plan_hash``, the dry-run artifact id) that</span>
+<span class="sd">    JSON cannot represent faithfully: a non-JSON object, a non-finite float,</span>
+<span class="sd">    or a non-string mapping key. Deliberately **loud**: the old behaviour —</span>
+<span class="sd">    ``json.dumps(..., default=str)`` — silently collided structurally</span>
+<span class="sd">    different calls into one cache key, handing back the *wrong artifact* as</span>
+<span class="sd">    a supposed saving (falaw#17).</span>
+
+<span class="sd">    ``path`` names the offending node, e.g. ``arguments.extra.ref``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span></div>
 
 
 

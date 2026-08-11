@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw &mdash; falaw 0.0.28 documentation</title>
+  <title>falaw &mdash; falaw 0.0.29 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=26ffa1e9"></script>
+      <script src="../_static/documentation_options.js?v=828725f0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -127,6 +127,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalHTTPError"><code class="docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalInsufficientFunds"><code class="docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalModelHung"><code class="docutils literal notranslate"><span class="pre">FalModelHung</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.FalNonCanonicalArgument"><code class="docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalRateLimited"><code class="docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
@@ -246,6 +247,7 @@
 <li class="toctree-l1"><a class="reference internal" href="falaw/bridges/service.html">falaw.bridges.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/bridges/skill.html">falaw.bridges.skill</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="falaw/canonical.html">falaw.canonical</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/content.html">falaw.content</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/corpus.html">falaw.corpus</a></li>
@@ -821,6 +823,20 @@ you want to catch any HTTP failure (e.g. for retry).</p>
 <dd><p>A model was queued but never returned — distinct from a network timeout.</p>
 <p>Raised by higher-level orchestration that sets a per-call wall-clock
 budget (e.g. “give up on this lipsync after 5 minutes and pick another model”).</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.FalNonCanonicalArgument">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">FalNonCanonicalArgument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#FalNonCanonicalArgument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.FalNonCanonicalArgument" title="Link to this definition"></a></dt>
+<dd><p>An argument cannot be canonicalised into falaw’s hashed JSON form.</p>
+<p>Raised by <a class="reference internal" href="falaw/canonical.html#module-falaw.canonical" title="falaw.canonical"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.canonical</span></code></a> when a value reaches a key-composition
+site (the per-call cache key, <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code>, the dry-run artifact id) that
+JSON cannot represent faithfully: a non-JSON object, a non-finite float,
+or a non-string mapping key. Deliberately <strong>loud</strong>: the old behaviour —
+<code class="docutils literal notranslate"><span class="pre">json.dumps(...,</span> <span class="pre">default=str)</span></code> — silently collided structurally
+different calls into one cache key, handing back the <em>wrong artifact</em> as
+a supposed saving (falaw#17).</p>
+<p><code class="docutils literal notranslate"><span class="pre">path</span></code> names the offending node, e.g. <code class="docutils literal notranslate"><span class="pre">arguments.extra.ref</span></code>.</p>
 </dd></dl>
 
 <dl class="py exception">
@@ -1592,6 +1608,14 @@ it keys on the placeholder rather than on the upstream content ref
 trusted for chained calls, and a plan’s reported cost can understate what
 the run bills. Fixing it needs the upstream to have executed, which is a
 planner-level change, not a converter-level one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="falaw/errors.html#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><strong>falaw.errors.FalNonCanonicalArgument</strong></a> – an argument cannot be hashed
+    faithfully (non-JSON object, non-finite float, non-string mapping
+    key). Raised here — while planning is still free — rather than at
+    key-composition time on the way to the network (falaw#17).</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1766,14 +1790,18 @@ manager (its first customer, <code class="xref py py-mod docutils literal notran
 to replay a resumed render for free. It is computed <em>before</em> execution and
 with <code class="docutils literal notranslate"><span class="pre">&lt;from</span> <span class="pre">N&gt;</span></code> placeholders intact, so it is stable across re-plans of the
 same structural request.</p>
-<p>The digest canonicalizes each call over <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code> — matching
+<p>The digest canonicalizes each call over <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code>
+(<a class="reference internal" href="falaw/canonical.html#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.canonical.plan_identity_payload()</span></code></a>) — matching
 <code class="xref py py-func docutils literal notranslate"><span class="pre">_synthetic_artifact()</span></code>’s canonicalization, and deliberately <strong>not</strong> the
 per-call content-addressed cache key (<code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache._key()</span></code>, which keys on
 <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args}</span></code> with no <code class="docutils literal notranslate"><span class="pre">tool</span></code>). <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> and the per-call cache key
 therefore key on <em>different</em> bytes and must not be assumed to agree
-call-for-call; what is reused from the cache is only the canonicalization
-<em>discipline</em> (<code class="docutils literal notranslate"><span class="pre">sort_keys=True</span></code> / <code class="docutils literal notranslate"><span class="pre">default=str</span></code>), which is all a
-stable-across-re-plans dedup handle needs.</p>
+call-for-call. Both projections live side by side in <a class="reference internal" href="falaw/canonical.html#module-falaw.canonical" title="falaw.canonical"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.canonical</span></code></a>
+with one shared byte-form (<a class="reference internal" href="falaw/canonical.html#falaw.canonical.canonical_blob" title="falaw.canonical.canonical_blob"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.canonical.canonical_blob()</span></code></a> — sorted
+keys, <strong>no</strong> <code class="docutils literal notranslate"><span class="pre">default=str</span></code> fallback, no NaN), so an argument the form
+cannot represent faithfully raises
+<a class="reference internal" href="falaw/errors.html#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.errors.FalNonCanonicalArgument</span></code></a> instead of colliding, and a
+new identity-bearing field is an explicit decision about both hashes.</p>
 <p>Two structurally-identical plans hash equal; changing any call’s <code class="docutils literal notranslate"><span class="pre">app</span></code>,
 <code class="docutils literal notranslate"><span class="pre">args</span></code>, or <code class="docutils literal notranslate"><span class="pre">tool</span></code> — or the <em>order</em> of calls — changes the hash.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>

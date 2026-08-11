@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.canonical &mdash; falaw 0.0.29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=828725f0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.canonical</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.canonical</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;One canonical byte-form for everything falaw hashes (falaw#17).</span>
+
+<span class="sd">falaw derives money-bearing identities from JSON: the per-call cache key</span>
+<span class="sd">(:func:`falaw.cache._key`), the whole-plan idempotency handle</span>
+<span class="sd">(:func:`falaw.plan.plan_hash`), and the dry-run artifact id</span>
+<span class="sd">(``falaw.plan._synthetic_artifact``). Before this module each site called</span>
+<span class="sd">``json.dumps(..., sort_keys=True, default=str)`` — and ``default=str`` is a</span>
+<span class="sd">**give-up-quietly branch inside a key-composition function**, which fails in</span>
+<span class="sd">both directions at once:</span>
+
+<span class="sd">* two structurally different values whose ``str()`` coincide collapse to one</span>
+<span class="sd">  key — ``Decimal(&quot;0.5&quot;)`` vs ``&quot;0.5&quot;``, ``Path(&quot;/a/b&quot;)`` vs ``&quot;/a/b&quot;`` — a</span>
+<span class="sd">  silent *wrong hit*: the caller is handed someone else&#39;s artifact and billed</span>
+<span class="sd">  it as a saving;</span>
+<span class="sd">* an object without a stable ``str()`` (the default ``&lt;Ref object at 0x...&gt;``</span>
+<span class="sd">  repr) mints a fresh key per instance — a *permanent miss* plus unbounded</span>
+<span class="sd">  cache growth.</span>
+
+<span class="sd">JSON&#39;s silent key coercion has the same collision property from the other</span>
+<span class="sd">side: ``{1: &quot;x&quot;}`` and ``{&quot;1&quot;: &quot;x&quot;}`` dump to identical bytes, so two</span>
+<span class="sd">different argument dicts share a key. (``lacing`` rejects the same case in</span>
+<span class="sd">its digests, for the same reason.)</span>
+
+<span class="sd">The rule this module enforces: **a key-composition function must never have a</span>
+<span class="sd">&quot;give up quietly&quot; branch.** :func:`canonical_blob` serializes with</span>
+<span class="sd">``sort_keys=True``, **no** ``default``, ``allow_nan=False``, and string-only</span>
+<span class="sd">mapping keys — anything else raises :class:`falaw.errors.FalNonCanonicalArgument`</span>
+<span class="sd">naming the offending path and type, so the failure is a diagnosable refusal at</span>
+<span class="sd">plan time rather than a wrong artifact at collect time.</span>
+
+<span class="sd">Two payload projections live here **side by side, on purpose**:</span>
+
+<span class="sd">* :func:`cache_key_payload` — ``{app, args}``, the per-call content-addressed</span>
+<span class="sd">  cache key;</span>
+<span class="sd">* :func:`plan_identity_payload` — ``{app, args, tool}``, the structural</span>
+<span class="sd">  idempotency form shared by ``plan_hash`` and the dry-run artifact id.</span>
+
+<span class="sd">The field sets differ deliberately (``tool`` is a falaw-side label; the</span>
+<span class="sd">underlying fal call is the same whatever the tool was called), but a field</span>
+<span class="sd">that changes *what the call produces* must go into **both** — in this module,</span>
+<span class="sd">in one commit. That is the discipline falaw#15&#39;s ``CallPlan.backend`` needs:</span>
+<span class="sd">a backend added to ``plan_hash`` but not the cache key would let one backend</span>
+<span class="sd">return another backend&#39;s artifact as a wrong hit.</span>
+
+<span class="sd">Byte-compatibility: for JSON-native payloads the output of</span>
+<span class="sd">:func:`canonical_blob` is identical to the old form, so every cache entry</span>
+<span class="sd">whose arguments were already JSON-native keeps its key. Invalidated —</span>
+<span class="sd">deliberately, because their keys were unreliable or unportable — are entries</span>
+<span class="sd">whose arguments needed any of JSON&#39;s laxities: the ``default=str``</span>
+<span class="sd">stringification, a bare ``NaN``/``Infinity`` (previously serialized natively),</span>
+<span class="sd">or silently-coerced non-string mapping keys. ``tests/test_canonical.py`` pins</span>
+<span class="sd">the stability half with literal digests.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FalNonCanonicalArgument</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;canonical_blob&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ensure_canonical&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cache_key_payload&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plan_identity_payload&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="n">_EXIT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;Stack sentinel: &#39;every child of this container has been visited&#39;.&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_offenders</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``(path, why)`` for every non-canonicalisable node under ``value``.</span>
+
+<span class="sd">    The acceptance set is **exactly** what ``json.dumps`` (no ``default``)</span>
+<span class="sd">    serializes, because anything the walk accepts and the serializer then</span>
+<span class="sd">    rejects escapes as an untyped ``TypeError`` — which is the give-up-quietly</span>
+<span class="sd">    hole this module exists to close, reopened one layer down. Two</span>
+<span class="sd">    consequences that look pedantic and are not:</span>
+
+<span class="sd">    * only ``dict`` recurses — a non-``dict`` ``Mapping`` (``MappingProxyType``,</span>
+<span class="sd">      ``ChainMap``) is refused even though it walks like a dict, because</span>
+<span class="sd">      ``json.dumps`` refuses it;</span>
+<span class="sd">    * a **circular** value is refused here, as a typed error, where</span>
+<span class="sd">      ``json.dumps`` would raise its own ``ValueError``.</span>
+
+<span class="sd">    Iterative (explicit stack) rather than recursive: the serializer&#39;s C</span>
+<span class="sd">    encoder handles thousands of nesting levels, and the validator must not</span>
+<span class="sd">    have a lower ceiling than the thing it guards (a ``RecursionError`` at</span>
+<span class="sd">    depth 1000 would be an untyped crash for a payload the old code hashed).</span>
+<span class="sd">    ``on_path`` tracks ancestors only, so a diamond — the same object reached</span>
+<span class="sd">    twice non-cyclically — walks fine, exactly as ``json`` treats it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">on_path</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">stack</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">value</span><span class="p">,</span> <span class="n">path</span><span class="p">)]</span>
+    <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+        <span class="n">top</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">top</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">_EXIT</span><span class="p">:</span>
+            <span class="n">on_path</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">top</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">continue</span>
+        <span class="n">node</span><span class="p">,</span> <span class="n">node_path</span> <span class="o">=</span> <span class="n">top</span>
+        <span class="c1"># bool before int: bool is an int subclass and is fine either way, but</span>
+        <span class="c1"># the explicit branch documents that True/False are canonical JSON.</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">node_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;non-finite float </span><span class="si">{</span><span class="n">node</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">on_path</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">node_path</span><span class="p">,</span> <span class="s2">&quot;circular reference (the value contains itself)&quot;</span>
+                <span class="k">continue</span>
+            <span class="n">on_path</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_EXIT</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">k</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;non-string mapping key </span><span class="si">{</span><span class="n">k</span><span class="si">!r}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="s2">&quot;(JSON key coercion can collide: {1: ...} and {&#39;1&#39;: ...} &quot;</span>
+                        <span class="s2">&quot;would share a key)&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="p">(</span>
+                <span class="n">node_path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;mapping of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not a dict — &quot;</span>
+                <span class="s2">&quot;json.dumps refuses non-dict mappings; convert with dict(...) &quot;</span>
+                <span class="s2">&quot;at the boundary&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="ow">in</span> <span class="n">on_path</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">node_path</span><span class="p">,</span> <span class="s2">&quot;circular reference (the value contains itself)&quot;</span>
+                <span class="k">continue</span>
+            <span class="n">on_path</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+            <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_EXIT</span><span class="p">,</span> <span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">item</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_path</span><span class="si">}</span><span class="s2">[</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">))</span>
+            <span class="k">continue</span>
+        <span class="k">yield</span> <span class="p">(</span>
+            <span class="n">node_path</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;value of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> is not JSON-canonicalisable&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="ensure_canonical">
+<a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.ensure_canonical">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_canonical</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;arguments&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise :class:`FalNonCanonicalArgument` unless ``payload`` is canonical JSON.</span>
+
+<span class="sd">    Canonical means: ``str`` / ``bool`` / ``int`` / finite ``float`` / ``None``</span>
+<span class="sd">    scalars, ``list`` / ``tuple`` sequences, and mappings with **string** keys,</span>
+<span class="sd">    recursively. Call this at a boundary (``make_call_plan``,</span>
+<span class="sd">    ``cached_call_fal``) so the refusal happens while it is still free —</span>
+<span class="sd">    before any network call, not on the way to one.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">_offenders</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">why</span> <span class="o">=</span> <span class="n">found</span>
+        <span class="k">raise</span> <span class="n">FalNonCanonicalArgument</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">why</span><span class="si">}</span><span class="s2">. Cache keys and plan hashes require JSON-native &quot;</span>
+            <span class="s2">&quot;values — convert at the plan_* boundary (e.g. str(path), &quot;</span>
+            <span class="s2">&quot;float(decimal)) and say what you mean, rather than relying on a &quot;</span>
+            <span class="s2">&quot;lossy implicit str().&quot;</span><span class="p">,</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="canonical_blob">
+<a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.canonical_blob">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">canonical_blob</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The one byte-form falaw hashes: sorted keys, no fallback, no NaN.</span>
+
+<span class="sd">    Raises :class:`FalNonCanonicalArgument` for anything JSON cannot represent</span>
+<span class="sd">    faithfully — there is deliberately no ``default=`` escape hatch, because a</span>
+<span class="sd">    hashing function that guesses is a hashing function that collides.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ensure_canonical</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;payload&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cache_key_payload">
+<a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.cache_key_payload">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cache_key_payload</span><span class="p">(</span><span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``{app, args}`` — what the per-call content-addressed cache keys on.</span>
+
+<span class="sd">    No ``tool``: two CallPlans differing only in falaw-side labelling make the</span>
+<span class="sd">    same fal call and *should* share a cache entry. A field that changes what</span>
+<span class="sd">    the call **produces** (falaw#15&#39;s ``backend``) must be added here AND in</span>
+<span class="sd">    :func:`plan_identity_payload`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">)}</span></div>
+
+
+
+<div class="viewcode-block" id="plan_identity_payload">
+<a class="viewcode-back" href="../../module_docs/falaw/canonical.html#falaw.canonical.plan_identity_payload">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plan_identity_payload</span><span class="p">(</span>
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">tool</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``{app, args, tool}`` — the structural form behind ``plan_hash`` and</span>
+<span class="sd">    the dry-run artifact id.</span>
+
+<span class="sd">    Includes ``tool`` so a re-plan of the same request is recognizable as the</span>
+<span class="sd">    same *plan* even though the cache would treat the calls identically. The</span>
+<span class="sd">    counterpart projection is :func:`cache_key_payload`; keep them adjacent so</span>
+<span class="sd">    adding a field to one is an explicit decision about the other.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span> <span class="s2">&quot;tool&quot;</span><span class="p">:</span> <span class="n">tool</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

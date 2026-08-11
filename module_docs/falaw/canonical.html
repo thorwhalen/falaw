@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.canonical &mdash; falaw 0.0.29 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=828725f0"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.content" href="content.html" />
+    <link rel="prev" title="falaw.cache" href="cache.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.canonical</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.cache_key_payload"><code class="docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.canonical_blob"><code class="docutils literal notranslate"><span class="pre">canonical_blob()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.ensure_canonical"><code class="docutils literal notranslate"><span class="pre">ensure_canonical()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.canonical.plan_identity_payload"><code class="docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.canonical</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/canonical.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.canonical">
+<span id="falaw-canonical"></span><h1>falaw.canonical<a class="headerlink" href="#module-falaw.canonical" title="Link to this heading"></a></h1>
+<p>One canonical byte-form for everything falaw hashes (falaw#17).</p>
+<p>falaw derives money-bearing identities from JSON: the per-call cache key
+(<code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache._key()</span></code>), the whole-plan idempotency handle
+(<a class="reference internal" href="plan.html#falaw.plan.plan_hash" title="falaw.plan.plan_hash"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.plan_hash()</span></code></a>), and the dry-run artifact id
+(<code class="docutils literal notranslate"><span class="pre">falaw.plan._synthetic_artifact</span></code>). Before this module each site called
+<code class="docutils literal notranslate"><span class="pre">json.dumps(...,</span> <span class="pre">sort_keys=True,</span> <span class="pre">default=str)</span></code> — and <code class="docutils literal notranslate"><span class="pre">default=str</span></code> is a
+<strong>give-up-quietly branch inside a key-composition function</strong>, which fails in
+both directions at once:</p>
+<ul class="simple">
+<li><p>two structurally different values whose <code class="docutils literal notranslate"><span class="pre">str()</span></code> coincide collapse to one
+key — <code class="docutils literal notranslate"><span class="pre">Decimal(&quot;0.5&quot;)</span></code> vs <code class="docutils literal notranslate"><span class="pre">&quot;0.5&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">Path(&quot;/a/b&quot;)</span></code> vs <code class="docutils literal notranslate"><span class="pre">&quot;/a/b&quot;</span></code> — a
+silent <em>wrong hit</em>: the caller is handed someone else’s artifact and billed
+it as a saving;</p></li>
+<li><p>an object without a stable <code class="docutils literal notranslate"><span class="pre">str()</span></code> (the default <code class="docutils literal notranslate"><span class="pre">&lt;Ref</span> <span class="pre">object</span> <span class="pre">at</span> <span class="pre">0x...&gt;</span></code>
+repr) mints a fresh key per instance — a <em>permanent miss</em> plus unbounded
+cache growth.</p></li>
+</ul>
+<p>JSON’s silent key coercion has the same collision property from the other
+side: <code class="docutils literal notranslate"><span class="pre">{1:</span> <span class="pre">&quot;x&quot;}</span></code> and <code class="docutils literal notranslate"><span class="pre">{&quot;1&quot;:</span> <span class="pre">&quot;x&quot;}</span></code> dump to identical bytes, so two
+different argument dicts share a key. (<code class="docutils literal notranslate"><span class="pre">lacing</span></code> rejects the same case in
+its digests, for the same reason.)</p>
+<p>The rule this module enforces: <strong>a key-composition function must never have a
+“give up quietly” branch.</strong> <a class="reference internal" href="#falaw.canonical.canonical_blob" title="falaw.canonical.canonical_blob"><code class="xref py py-func docutils literal notranslate"><span class="pre">canonical_blob()</span></code></a> serializes with
+<code class="docutils literal notranslate"><span class="pre">sort_keys=True</span></code>, <strong>no</strong> <code class="docutils literal notranslate"><span class="pre">default</span></code>, <code class="docutils literal notranslate"><span class="pre">allow_nan=False</span></code>, and string-only
+mapping keys — anything else raises <a class="reference internal" href="errors.html#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.errors.FalNonCanonicalArgument</span></code></a>
+naming the offending path and type, so the failure is a diagnosable refusal at
+plan time rather than a wrong artifact at collect time.</p>
+<p>Two payload projections live here <strong>side by side, on purpose</strong>:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a> — <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args}</span></code>, the per-call content-addressed
+cache key;</p></li>
+<li><p><a class="reference internal" href="#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a> — <code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code>, the structural
+idempotency form shared by <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> and the dry-run artifact id.</p></li>
+</ul>
+<p>The field sets differ deliberately (<code class="docutils literal notranslate"><span class="pre">tool</span></code> is a falaw-side label; the
+underlying fal call is the same whatever the tool was called), but a field
+that changes <em>what the call produces</em> must go into <strong>both</strong> — in this module,
+in one commit. That is the discipline falaw#15’s <code class="docutils literal notranslate"><span class="pre">CallPlan.backend</span></code> needs:
+a backend added to <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> but not the cache key would let one backend
+return another backend’s artifact as a wrong hit.</p>
+<p>Byte-compatibility: for JSON-native payloads the output of
+<a class="reference internal" href="#falaw.canonical.canonical_blob" title="falaw.canonical.canonical_blob"><code class="xref py py-func docutils literal notranslate"><span class="pre">canonical_blob()</span></code></a> is identical to the old form, so every cache entry
+whose arguments were already JSON-native keeps its key. Invalidated —
+deliberately, because their keys were unreliable or unportable — are entries
+whose arguments needed any of JSON’s laxities: the <code class="docutils literal notranslate"><span class="pre">default=str</span></code>
+stringification, a bare <code class="docutils literal notranslate"><span class="pre">NaN</span></code>/<code class="docutils literal notranslate"><span class="pre">Infinity</span></code> (previously serialized natively),
+or silently-coerced non-string mapping keys. <code class="docutils literal notranslate"><span class="pre">tests/test_canonical.py</span></code> pins
+the stability half with literal digests.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.canonical.cache_key_payload">
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">cache_key_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#cache_key_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.cache_key_payload" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args}</span></code> — what the per-call content-addressed cache keys on.</p>
+<p>No <code class="docutils literal notranslate"><span class="pre">tool</span></code>: two CallPlans differing only in falaw-side labelling make the
+same fal call and <em>should</em> share a cache entry. A field that changes what
+the call <strong>produces</strong> (falaw#15’s <code class="docutils literal notranslate"><span class="pre">backend</span></code>) must be added here AND in
+<a class="reference internal" href="#falaw.canonical.plan_identity_payload" title="falaw.canonical.plan_identity_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">plan_identity_payload()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.canonical.canonical_blob">
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">canonical_blob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#canonical_blob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.canonical_blob" title="Link to this definition"></a></dt>
+<dd><p>The one byte-form falaw hashes: sorted keys, no fallback, no NaN.</p>
+<p>Raises <code class="xref py py-class docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code> for anything JSON cannot represent
+faithfully — there is deliberately no <code class="docutils literal notranslate"><span class="pre">default=</span></code> escape hatch, because a
+hashing function that guesses is a hashing function that collides.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.canonical.ensure_canonical">
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">ensure_canonical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'arguments'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#ensure_canonical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.ensure_canonical" title="Link to this definition"></a></dt>
+<dd><p>Raise <code class="xref py py-class docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code> unless <code class="docutils literal notranslate"><span class="pre">payload</span></code> is canonical JSON.</p>
+<p>Canonical means: <code class="docutils literal notranslate"><span class="pre">str</span></code> / <code class="docutils literal notranslate"><span class="pre">bool</span></code> / <code class="docutils literal notranslate"><span class="pre">int</span></code> / finite <code class="docutils literal notranslate"><span class="pre">float</span></code> / <code class="docutils literal notranslate"><span class="pre">None</span></code>
+scalars, <code class="docutils literal notranslate"><span class="pre">list</span></code> / <code class="docutils literal notranslate"><span class="pre">tuple</span></code> sequences, and mappings with <strong>string</strong> keys,
+recursively. Call this at a boundary (<code class="docutils literal notranslate"><span class="pre">make_call_plan</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cached_call_fal</span></code>) so the refusal happens while it is still free —
+before any network call, not on the way to one.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.canonical.plan_identity_payload">
+<span class="sig-prename descclassname"><span class="pre">falaw.canonical.</span></span><span class="sig-name descname"><span class="pre">plan_identity_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/canonical.html#plan_identity_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.canonical.plan_identity_payload" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{app,</span> <span class="pre">args,</span> <span class="pre">tool}</span></code> — the structural form behind <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> and
+the dry-run artifact id.</p>
+<p>Includes <code class="docutils literal notranslate"><span class="pre">tool</span></code> so a re-plan of the same request is recognizable as the
+same <em>plan</em> even though the cache would treat the calls identically. The
+counterpart projection is <a class="reference internal" href="#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_key_payload()</span></code></a>; keep them adjacent so
+adding a field to one is an explicit decision about the other.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cache.html" class="btn btn-neutral float-left" title="falaw.cache" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="content.html" class="btn btn-neutral float-right" title="falaw.content" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
