@@ -17,6 +17,7 @@ Usage:
 
 from __future__ import annotations
 
+import itertools
 import json
 import os
 import time
@@ -26,6 +27,11 @@ from functools import lru_cache
 from typing import Iterable, Iterator, Literal, Optional
 
 EntryKind = Literal["note", "issue", "improvement", "trace"]
+
+# Tie-break for filenames minted within one clock tick (falaw#25). Process-wide
+# on purpose: `count().__next__` is atomic under the GIL, so concurrent threads
+# get distinct numbers without a lock.
+_seq = itertools.count()
 
 
 def _default_journal_dir() -> str:
@@ -47,8 +53,9 @@ class JournalEntry:
 class Journal:
     """File-backed append-only journal.
 
-    Each entry becomes a single JSON file. Names are timestamp-prefixed so
-    `sorted(os.listdir(...))` yields chronological order without parsing.
+    Each entry becomes a single JSON file. Names are timestamp-prefixed, with
+    a process-wide sequence number breaking same-tick ties, so
+    `sorted(os.listdir(...))` yields insertion order without parsing.
 
     >>> import tempfile
     >>> j = Journal(tempfile.mkdtemp())
@@ -71,9 +78,13 @@ class Journal:
         suggestion: str = "",
         context: Optional[dict] = None,
     ) -> JournalEntry:
-        # Nanosecond resolution prevents back-to-back appends from sharing
-        # a filename prefix and falling back to UUID order in `sorted()`.
+        # `time.time_ns()` looks tie-proof but is not: on Windows the clock
+        # advances in coarse ticks, so back-to-back appends can share a
+        # timestamp and the name would fall back to UUID order — random
+        # (falaw#25). The sequence counter is what actually guarantees that
+        # `sorted()` returns appends in insertion order.
         ts_ns = time.time_ns()
+        seq = next(_seq)
         entry = JournalEntry(
             id=uuid.uuid4().hex[:12],
             timestamp=ts_ns / 1_000_000_000,
@@ -83,7 +94,7 @@ class Journal:
             suggestion=suggestion,
             context=dict(context or {}),
         )
-        fname = f"{ts_ns:020d}-{entry.id}.json"
+        fname = f"{ts_ns:020d}-{seq:010d}-{entry.id}.json"
         path = os.path.join(self.directory, fname)
         with open(path, "w") as f:
             json.dump(asdict(entry), f, indent=2, default=str)
