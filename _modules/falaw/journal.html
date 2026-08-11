@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.journal &mdash; falaw 0.0.26 documentation</title>
+  <title>falaw.journal &mdash; falaw 0.0.27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../_static/documentation_options.js?v=cee5022b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -126,6 +126,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
@@ -135,6 +136,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="n">EntryKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="s2">&quot;issue&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">]</span>
+
+<span class="c1"># Tie-break for filenames minted within one clock tick (falaw#25). Process-wide</span>
+<span class="c1"># on purpose: `count().__next__` is atomic under the GIL, so concurrent threads</span>
+<span class="c1"># get distinct numbers without a lock.</span>
+<span class="n">_seq</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_journal_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -161,8 +167,9 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">Journal</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;File-backed append-only journal.</span>
 
-<span class="sd">    Each entry becomes a single JSON file. Names are timestamp-prefixed so</span>
-<span class="sd">    `sorted(os.listdir(...))` yields chronological order without parsing.</span>
+<span class="sd">    Each entry becomes a single JSON file. Names are timestamp-prefixed, with</span>
+<span class="sd">    a process-wide sequence number breaking same-tick ties, so</span>
+<span class="sd">    `sorted(os.listdir(...))` yields insertion order without parsing.</span>
 
 <span class="sd">    &gt;&gt;&gt; import tempfile</span>
 <span class="sd">    &gt;&gt;&gt; j = Journal(tempfile.mkdtemp())</span>
@@ -185,9 +192,13 @@
         <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalEntry</span><span class="p">:</span>
-        <span class="c1"># Nanosecond resolution prevents back-to-back appends from sharing</span>
-        <span class="c1"># a filename prefix and falling back to UUID order in `sorted()`.</span>
+        <span class="c1"># `time.time_ns()` looks tie-proof but is not: on Windows the clock</span>
+        <span class="c1"># advances in coarse ticks, so back-to-back appends can share a</span>
+        <span class="c1"># timestamp and the name would fall back to UUID order — random</span>
+        <span class="c1"># (falaw#25). The sequence counter is what actually guarantees that</span>
+        <span class="c1"># `sorted()` returns appends in insertion order.</span>
         <span class="n">ts_ns</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time_ns</span><span class="p">()</span>
+        <span class="n">seq</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">_seq</span><span class="p">)</span>
         <span class="n">entry</span> <span class="o">=</span> <span class="n">JournalEntry</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">],</span>
             <span class="n">timestamp</span><span class="o">=</span><span class="n">ts_ns</span> <span class="o">/</span> <span class="mi">1_000_000_000</span><span class="p">,</span>
@@ -197,7 +208,7 @@
             <span class="n">suggestion</span><span class="o">=</span><span class="n">suggestion</span><span class="p">,</span>
             <span class="n">context</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="p">{}),</span>
         <span class="p">)</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ts_ns</span><span class="si">:</span><span class="s2">020d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ts_ns</span><span class="si">:</span><span class="s2">020d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">seq</span><span class="si">:</span><span class="s2">010d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json&quot;</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>

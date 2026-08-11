@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.journal &mdash; falaw 0.0.26 documentation</title>
+  <title>falaw.journal &mdash; falaw 0.0.27 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6a9d8632"></script>
+      <script src="../../_static/documentation_options.js?v=cee5022b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -133,8 +133,9 @@ novel work, so each session starts smarter than the last.</p>
 <dt class="sig sig-object py" id="falaw.journal.Journal">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.journal.</span></span><span class="sig-name descname"><span class="pre">Journal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/journal.html#Journal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.journal.Journal" title="Link to this definition"></a></dt>
 <dd><p>File-backed append-only journal.</p>
-<p>Each entry becomes a single JSON file. Names are timestamp-prefixed so
-<cite>sorted(os.listdir(…))</cite> yields chronological order without parsing.</p>
+<p>Each entry becomes a single JSON file. Names are timestamp-prefixed, with
+a process-wide sequence number breaking same-tick ties, so
+<cite>sorted(os.listdir(…))</cite> yields insertion order without parsing.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">j</span> <span class="o">=</span> <span class="n">Journal</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
