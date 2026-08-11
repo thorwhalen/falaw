@@ -111,7 +111,7 @@ def test_cached_call_fal_refuses_junk_key_arguments_before_spending(monkeypatch)
     `cache_put` — after the paid call. The refusal must precede the spend."""
     calls: list[str] = []
     monkeypatch.setattr(
-        "falaw.cache.call_fal",
+        "falaw.core.call_fal",
         lambda app, args, **kw: calls.append(app) or {"images": []},
     )
     with pytest.raises(FalNonCanonicalArgument):
@@ -222,7 +222,7 @@ def test_cached_call_fal_refuses_a_nested_mapping_proxy_before_spending(monkeypa
 
     calls: list[str] = []
     monkeypatch.setattr(
-        "falaw.cache.call_fal",
+        "falaw.core.call_fal",
         lambda app, args, **kw: calls.append(app) or {"images": []},
     )
     with pytest.raises(FalNonCanonicalArgument):
@@ -285,7 +285,7 @@ def test_a_nan_bearing_response_is_returned_and_warned_not_destroyed(monkeypatch
     from falaw.cache import cache_get
 
     nan_raw = {"images": [], "score": float("nan")}
-    monkeypatch.setattr("falaw.cache.call_fal", lambda app, args, **kw: nan_raw)
+    monkeypatch.setattr("falaw.core.call_fal", lambda app, args, **kw: nan_raw)
     with pytest.warns(UserWarning, match="could not cache"):
         got = cached_call_fal("fal-ai/flux/dev", {"prompt": "p"})
     assert got is nan_raw
@@ -303,7 +303,7 @@ def test_a_failed_refresh_drops_the_stale_entry_instead_of_reserving_it(monkeypa
     assert cache_get("fal-ai/flux/dev", args) == {"images": ["old"]}
 
     monkeypatch.setattr(
-        "falaw.cache.call_fal",
+        "falaw.core.call_fal",
         lambda app, a, **kw: {"images": ["new"], "score": float("nan")},
     )
     with pytest.warns(UserWarning, match="could not cache"):
