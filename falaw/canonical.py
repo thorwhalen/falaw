@@ -44,9 +44,12 @@ return another backend's artifact as a wrong hit.
 
 Byte-compatibility: for JSON-native payloads the output of
 :func:`canonical_blob` is identical to the old form, so every cache entry
-whose arguments were already JSON-native keeps its key. Entries that relied
-on ``default=str`` are invalidated — deliberately; they were unreliable.
-``tests/test_canonical.py`` pins both facts with literal digests.
+whose arguments were already JSON-native keeps its key. Invalidated —
+deliberately, because their keys were unreliable or unportable — are entries
+whose arguments needed any of JSON's laxities: the ``default=str``
+stringification, a bare ``NaN``/``Infinity`` (previously serialized natively),
+or silently-coerced non-string mapping keys. ``tests/test_canonical.py`` pins
+the stability half with literal digests.
 """
 
 from __future__ import annotations
@@ -65,33 +68,86 @@ __all__ = [
 ]
 
 
+_EXIT = object()
+"""Stack sentinel: 'every child of this container has been visited'."""
+
+
 def _offenders(value: Any, path: str) -> Iterator[tuple[str, str]]:
-    """Yield ``(path, why)`` for every non-canonicalisable node under ``value``."""
-    # bool before int: bool is an int subclass and is fine either way, but the
-    # explicit branch documents that True/False are canonical JSON.
-    if value is None or isinstance(value, (str, bool, int)):
-        return
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            yield path, f"non-finite float {value!r}"
-        return
-    if isinstance(value, Mapping):
-        for k, v in value.items():
-            if not isinstance(k, str):
-                yield (
-                    f"{path}.{k!r}",
-                    f"non-string mapping key {k!r} of type {type(k).__name__} "
-                    "(JSON key coercion can collide: {1: ...} and {'1': ...} "
-                    "would share a key)",
-                )
-            else:
-                yield from _offenders(v, f"{path}.{k}")
-        return
-    if isinstance(value, (list, tuple)):
-        for i, item in enumerate(value):
-            yield from _offenders(item, f"{path}[{i}]")
-        return
-    yield path, f"value of type {type(value).__name__} is not JSON-canonicalisable"
+    """Yield ``(path, why)`` for every non-canonicalisable node under ``value``.
+
+    The acceptance set is **exactly** what ``json.dumps`` (no ``default``)
+    serializes, because anything the walk accepts and the serializer then
+    rejects escapes as an untyped ``TypeError`` — which is the give-up-quietly
+    hole this module exists to close, reopened one layer down. Two
+    consequences that look pedantic and are not:
+
+    * only ``dict`` recurses — a non-``dict`` ``Mapping`` (``MappingProxyType``,
+      ``ChainMap``) is refused even though it walks like a dict, because
+      ``json.dumps`` refuses it;
+    * a **circular** value is refused here, as a typed error, where
+      ``json.dumps`` would raise its own ``ValueError``.
+
+    Iterative (explicit stack) rather than recursive: the serializer's C
+    encoder handles thousands of nesting levels, and the validator must not
+    have a lower ceiling than the thing it guards (a ``RecursionError`` at
+    depth 1000 would be an untyped crash for a payload the old code hashed).
+    ``on_path`` tracks ancestors only, so a diamond — the same object reached
+    twice non-cyclically — walks fine, exactly as ``json`` treats it.
+    """
+    on_path: set[int] = set()
+    stack: list = [(value, path)]
+    while stack:
+        top = stack.pop()
+        if top[0] is _EXIT:
+            on_path.discard(top[1])
+            continue
+        node, node_path = top
+        # bool before int: bool is an int subclass and is fine either way, but
+        # the explicit branch documents that True/False are canonical JSON.
+        if node is None or isinstance(node, (str, bool, int)):
+            continue
+        if isinstance(node, float):
+            if not math.isfinite(node):
+                yield node_path, f"non-finite float {node!r}"
+            continue
+        if isinstance(node, dict):
+            if id(node) in on_path:
+                yield node_path, "circular reference (the value contains itself)"
+                continue
+            on_path.add(id(node))
+            stack.append((_EXIT, id(node)))
+            for k, v in node.items():
+                if not isinstance(k, str):
+                    yield (
+                        f"{node_path}.{k!r}",
+                        f"non-string mapping key {k!r} of type {type(k).__name__} "
+                        "(JSON key coercion can collide: {1: ...} and {'1': ...} "
+                        "would share a key)",
+                    )
+                else:
+                    stack.append((v, f"{node_path}.{k}"))
+            continue
+        if isinstance(node, Mapping):
+            yield (
+                node_path,
+                f"mapping of type {type(node).__name__} is not a dict — "
+                "json.dumps refuses non-dict mappings; convert with dict(...) "
+                "at the boundary",
+            )
+            continue
+        if isinstance(node, (list, tuple)):
+            if id(node) in on_path:
+                yield node_path, "circular reference (the value contains itself)"
+                continue
+            on_path.add(id(node))
+            stack.append((_EXIT, id(node)))
+            for i, item in enumerate(node):
+                stack.append((item, f"{node_path}[{i}]"))
+            continue
+        yield (
+            node_path,
+            f"value of type {type(node).__name__} is not JSON-canonicalisable",
+        )
 
 
 def ensure_canonical(payload: Any, *, context: str = "arguments") -> None:

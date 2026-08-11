@@ -41,6 +41,7 @@ import json
 import os
 import time
 import uuid
+import warnings
 from typing import Any, Mapping, Optional
 
 from .canonical import cache_key_payload, canonical_blob, ensure_canonical
@@ -239,12 +240,35 @@ def cached_call_fal(
             emit_cache_hit(application, on_event)
             return hit
     raw = call_fal(application, arguments, on_event=on_event)
-    cache_put(
-        application,
-        key_args,
-        raw,
-        wire_arguments=None if key_arguments is None else arguments,
-    )
+    try:
+        cache_put(
+            application,
+            key_args,
+            raw,
+            wire_arguments=None if key_arguments is None else arguments,
+        )
+    except Exception as e:
+        # A paid result is never discarded (see falaw.plan.execute's failure
+        # policy): fal has already run — and billed — this call, so a cache
+        # WRITE failure (a response carrying a non-finite float that the
+        # strict manifest refuses, a full disk, a permission error) must
+        # degrade to "uncached", not destroy the response. On refresh=True the
+        # pre-refresh entry is dropped too — the caller explicitly asked for
+        # fresh, so letting the old entry keep serving would quietly undo the
+        # refresh on every later call.
+        if refresh:
+            try:
+                drop_cache_entry(application, key_args)
+            except OSError:
+                pass
+        warnings.warn(
+            f"falaw could not cache the response for {application!r} "
+            f"({type(e).__name__}: {e}); returning the billed response "
+            "uncached. Until the cause is fixed, re-running this call will "
+            "bill again.",
+            UserWarning,
+            stacklevel=2,
+        )
     return raw
 
 

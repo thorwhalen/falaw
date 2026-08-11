@@ -656,16 +656,22 @@ def execute_isolated(
         )
 
     if dry_run:
-        return ExecutionReport(
-            outcomes=tuple(
-                CallOutcome(
-                    index=i,
-                    call=call,
-                    status="succeeded",
-                    artifact=_synthetic_artifact(call),
-                )
-                for i, call in enumerate(plan.calls)
+        # Per-call isolation applies to dry runs too: a hand-built CallPlan
+        # whose arguments cannot be canonicalised makes _synthetic_artifact
+        # raise, and the report's "always one outcome per call" guarantee must
+        # survive that — one junk call is that call's failure, not the run's.
+        # (`execute` still raises, via artifacts_or_raise, as it always has.)
+        def _dry_outcome(i: int, call: CallPlan) -> CallOutcome:
+            try:
+                artifact = _synthetic_artifact(call)
+            except Exception as e:
+                return CallOutcome(index=i, call=call, status="failed", error=e)
+            return CallOutcome(
+                index=i, call=call, status="succeeded", artifact=artifact
             )
+
+        return ExecutionReport(
+            outcomes=tuple(_dry_outcome(i, call) for i, call in enumerate(plan.calls))
         )
 
     if artifact_converter is not None:

@@ -187,3 +187,142 @@ def test_json_native_plan_hash_and_synthetic_id_are_byte_identical_to_before():
     plan = _native_plan()
     assert plan_hash(plan) == _PLAN_HASH_BEFORE
     assert _synthetic_artifact(plan.calls[0]).asset_id == _SYNTHETIC_BEFORE
+
+
+# --- adversarial-review fixes: the walk matches json.dumps exactly ------------
+
+
+def test_a_nested_non_dict_mapping_is_a_typed_refusal_not_a_typeerror():
+    """`MappingProxyType` walks like a dict but json.dumps refuses it — so the
+    validator must too, or the untyped TypeError escapes one layer down and
+    the boundary check launders it into a silent "unknown" (review finding 1)."""
+    from types import MappingProxyType
+
+    proxy_args = {"extra": MappingProxyType({"a": 1})}
+    with pytest.raises(FalNonCanonicalArgument) as e:
+        _key("fal-ai/flux/dev", proxy_args)
+    assert "extra" in e.value.path
+    assert "mappingproxy" in str(e.value)
+    # And the plan boundary refuses loudly instead of swallowing a TypeError
+    # into cache_status="unknown".
+    with pytest.raises(FalNonCanonicalArgument):
+        make_call_plan(
+            tool="generate_image",
+            application="fal-ai/flux/dev",
+            arguments=proxy_args,
+            output_kind="image",
+        )
+
+
+def test_cached_call_fal_refuses_a_nested_mapping_proxy_before_spending(monkeypatch):
+    """Review finding 1's worst consequence: the old walk passed the proxy,
+    the paid call ran, and cache_put's TypeError then destroyed the billed
+    response. The refusal must come first."""
+    from types import MappingProxyType
+
+    calls: list[str] = []
+    monkeypatch.setattr(
+        "falaw.cache.call_fal",
+        lambda app, args, **kw: calls.append(app) or {"images": []},
+    )
+    with pytest.raises(FalNonCanonicalArgument):
+        cached_call_fal(
+            "fal-ai/flux/dev",
+            {"prompt": "fine"},
+            key_arguments={"ref": MappingProxyType({"a": 1})},
+            refresh=True,
+        )
+    assert calls == []
+
+
+def test_a_circular_argument_is_a_typed_refusal():
+    """json.dumps would raise its own ValueError('Circular reference'); the
+    walk must classify it first — and must not loop or blow the stack."""
+    loop: dict = {"a": 1}
+    loop["self"] = loop
+    with pytest.raises(FalNonCanonicalArgument) as e:
+        _key("fal-ai/flux/dev", loop)
+    assert "circular" in str(e.value)
+
+
+def test_a_diamond_shared_subvalue_is_not_a_false_circular_refusal():
+    """The same object reached twice non-cyclically is fine — json accepts it,
+    so the validator must not cry 'circular'."""
+    shared = {"w": 512}
+    key = _key("fal-ai/flux/dev", {"a": shared, "b": shared})
+    assert key
+
+
+def test_deep_nesting_validates_as_far_as_json_serializes():
+    """Review finding 5: the recursive walk died at ~1000 levels while the C
+    serializer handled 3000 — the validator must not have a lower ceiling
+    than the thing it guards."""
+    deep: dict = {"leaf": 1}
+    for _ in range(2000):
+        deep = {"n": deep}
+    assert _key("fal-ai/flux/dev", {"deep": deep})
+
+
+# --- adversarial-review fixes: a paid result is never discarded ---------------
+
+
+def test_a_nan_bearing_response_is_returned_and_warned_not_destroyed(monkeypatch):
+    """Review finding 2: fal_client's json.loads accepts bare NaN, and the
+    strict manifest write then raised AFTER the billed call — losing the
+    response. It must degrade: warn, skip the cache, return the response."""
+    from falaw.cache import cache_get
+
+    nan_raw = {"images": [], "score": float("nan")}
+    monkeypatch.setattr("falaw.cache.call_fal", lambda app, args, **kw: nan_raw)
+    with pytest.warns(UserWarning, match="could not cache"):
+        got = cached_call_fal("fal-ai/flux/dev", {"prompt": "p"})
+    assert got is nan_raw
+    assert cache_get("fal-ai/flux/dev", {"prompt": "p"}) is None
+
+
+def test_a_failed_refresh_drops_the_stale_entry_instead_of_reserving_it(monkeypatch):
+    """The second half of finding 2: on refresh=True a failed re-cache left
+    the PRE-refresh entry serving on every later call — the refresh the
+    caller explicitly asked for was silently undone."""
+    from falaw.cache import cache_get, cache_put
+
+    args = {"prompt": "p"}
+    cache_put("fal-ai/flux/dev", args, {"images": ["old"]})
+    assert cache_get("fal-ai/flux/dev", args) == {"images": ["old"]}
+
+    monkeypatch.setattr(
+        "falaw.cache.call_fal",
+        lambda app, a, **kw: {"images": ["new"], "score": float("nan")},
+    )
+    with pytest.warns(UserWarning, match="could not cache"):
+        got = cached_call_fal("fal-ai/flux/dev", args, refresh=True)
+    assert got["images"] == ["new"]  # the billed fresh response survives
+    assert cache_get("fal-ai/flux/dev", args) is None  # and stale stops serving
+
+
+# --- adversarial-review fixes: dry-run keeps the isolation contract -----------
+
+
+def test_dry_run_isolated_reports_a_junk_call_instead_of_raising():
+    """Review finding 6: `execute_isolated(dry_run=True)` guarantees one
+    outcome per call 'always' — a hand-built junk CallPlan must be that
+    call's failed outcome, not the run's exception."""
+    from falaw import execute_plan_isolated
+
+    good = CallPlan(
+        tool="generate_image",
+        application="fal-ai/flux/dev",
+        arguments={"prompt": "fine"},
+        output_kind="image",
+    )
+    junk = CallPlan(
+        tool="generate_image",
+        application="fal-ai/flux/dev",
+        arguments={"ref": _SameStr()},
+        output_kind="image",
+    )
+    report = execute_plan_isolated(Plan(calls=(good, junk)), dry_run=True)
+    assert len(report.outcomes) == 2
+    assert report.outcomes[0].status == "succeeded"
+    assert report.outcomes[1].status == "failed"
+    assert isinstance(report.outcomes[1].error, FalNonCanonicalArgument)
