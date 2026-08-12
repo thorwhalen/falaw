@@ -1568,12 +1568,12 @@ def _materialize_text_to_cache(content: str, kind: str) -> tuple[str, str]:
 
     from lacing import hash_bytes
 
-    from .cache import _cache_dir
+    from .cache import ASSETS_DIRNAME, _cache_dir
 
     data = content.encode("utf-8")
     asset_id = hash_bytes(data)
     ext = ".json" if kind == "json" else ".txt"
-    assets_dir = os.path.join(_cache_dir(), "assets")
+    assets_dir = os.path.join(_cache_dir(), ASSETS_DIRNAME)
     os.makedirs(assets_dir, exist_ok=True)
     path = os.path.join(assets_dir, f"llm-{asset_id}{ext}")
     if not os.path.exists(path):

@@ -401,11 +401,17 @@ def cache_stats() -> dict:
     thinking. Each area's economics, and the primitives that reclaim it, are in
     :mod:`falaw.prune`.
 
-    >>> stats = cache_stats()
-    >>> sorted(stats["areas"])
-    ['assets', 'content', 'manifests', 'url_index']
-    >>> stats["size_bytes"] == sum(a["bytes"] for a in stats["areas"].values())
-    True
+    ``size_bytes`` is every byte under the cache root, unchanged in meaning from
+    before the breakdown existed: the ``other`` area absorbs whatever the named
+    areas do not claim, so the areas always sum to the whole.
+
+    (``+SKIP``\\ ed — it reads the caller's real cache, a multi-gigabyte walk on
+    the production box. :mod:`tests.test_prune` pins this against a throwaway
+    cache instead.)
+
+    >>> stats = cache_stats()                        # doctest: +SKIP
+    >>> sorted(stats["areas"])                       # doctest: +SKIP
+    ['assets', 'content', 'manifests', 'other', 'scenes', 'url_index']
     """
     # Local import: `falaw.prune` imports `_cache_dir` from this module, so a
     # module-scope import would be a cycle — the same reason
