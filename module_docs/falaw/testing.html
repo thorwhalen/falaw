@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.testing &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw.testing &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -63,6 +63,7 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
@@ -91,8 +92,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.testing.DFLT_SYNTHETIC_PREFIX"><code class="docutils literal notranslate"><span class="pre">DFLT_SYNTHETIC_PREFIX</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.testing.FakeAssets"><code class="docutils literal notranslate"><span class="pre">FakeAssets</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.chunks"><code class="docutils literal notranslate"><span class="pre">FakeAssets.chunks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.conditional_fetch"><code class="docutils literal notranslate"><span class="pre">FakeAssets.conditional_fetch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.etag_for"><code class="docutils literal notranslate"><span class="pre">FakeAssets.etag_for()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.fail"><code class="docutils literal notranslate"><span class="pre">FakeAssets.fail()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.handles"><code class="docutils literal notranslate"><span class="pre">FakeAssets.handles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.revalidated"><code class="docutils literal notranslate"><span class="pre">FakeAssets.revalidated</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.serve"><code class="docutils literal notranslate"><span class="pre">FakeAssets.serve()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.testing.FakeAssets.synthetic"><code class="docutils literal notranslate"><span class="pre">FakeAssets.synthetic()</span></code></a></li>
 </ul>
@@ -285,6 +289,30 @@ not on an exception:</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="falaw.testing.FakeAssets.conditional_fetch">
+<span class="sig-name descname"><span class="pre">conditional_fetch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validators</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">65536</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/testing.html#FakeAssets.conditional_fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.testing.FakeAssets.conditional_fetch" title="Link to this definition"></a></dt>
+<dd><p>Answer a revalidation — the capability falaw#23 asks a transport for.</p>
+<p>Present so a downstream suite exercises the <strong>cheap</strong> path rather than
+the fallback. Without it falaw can never confirm a mutable URL is
+unchanged, so it re-fetches on every call: correct, but it would mean no
+test in the ecosystem ever covers the <code class="docutils literal notranslate"><span class="pre">304</span></code> branch, and any suite
+asserting “did not refetch” for a non-fal URL would fail for a reason
+that has nothing to do with what it is testing.</p>
+<p>Deferred to <a class="reference internal" href="#falaw.testing.FakeAssets.chunks" title="falaw.testing.FakeAssets.chunks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">chunks()</span></code></a> for a URL this fake does not handle, so a
+real <code class="docutils literal notranslate"><span class="pre">file://</span></code> still reaches the real filesystem.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.testing.FakeAssets.etag_for">
+<span class="sig-name descname"><span class="pre">etag_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/testing.html#FakeAssets.etag_for"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.testing.FakeAssets.etag_for" title="Link to this definition"></a></dt>
+<dd><p>The ETag this fake serves for <code class="docutils literal notranslate"><span class="pre">url</span></code> — a digest of its current bytes.</p>
+<p>A well-behaved origin’s ETag changes exactly when the body does, so
+deriving it from the served bytes is the most faithful fake available:
+<a class="reference internal" href="#falaw.testing.FakeAssets.serve" title="falaw.testing.FakeAssets.serve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">serve()</span></code></a>-ing different bytes at the same URL flips it, and serving
+the same bytes twice does not.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="falaw.testing.FakeAssets.fail">
 <span class="sig-name descname"><span class="pre">fail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/testing.html#FakeAssets.fail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.testing.FakeAssets.fail" title="Link to this definition"></a></dt>
 <dd><p>Make <code class="docutils literal notranslate"><span class="pre">url</span></code> 404, the way an expired fal asset does.</p>
@@ -296,6 +324,17 @@ not on an exception:</p>
 <dd><p>Whether this transport answers for <code class="docutils literal notranslate"><span class="pre">url</span></code> rather than deferring.</p>
 <p>A pinned URL always. An unpinned one only when it is a network URL (or
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">fake_non_network_urls</span></code> is set) — see <a class="reference internal" href="#falaw.testing.NON_NETWORK_SCHEMES" title="falaw.testing.NON_NETWORK_SCHEMES"><code class="xref py py-data docutils literal notranslate"><span class="pre">NON_NETWORK_SCHEMES</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.testing.FakeAssets.revalidated">
+<span class="sig-name descname"><span class="pre">revalidated</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.testing.FakeAssets.revalidated" title="Link to this definition"></a></dt>
+<dd><p>URLs answered with a cheap “unchanged” — no body transferred.</p>
+<p>Separate from <code class="xref py py-attr docutils literal notranslate"><span class="pre">fetched</span></code> because the two are the <em>point</em> of
+falaw#23 and a suite must be able to tell them apart. Without this, “we
+revalidated cheaply” and “we never asked at all” are indistinguishable,
+and every cheap-path assertion in the suite is equally satisfied by the
+un-fixed code that simply trusted its index.</p>
 </dd></dl>
 
 <dl class="py method">

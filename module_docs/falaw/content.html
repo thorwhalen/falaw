@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.content &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw.content &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -61,11 +61,14 @@
 <li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
 <li class="toctree-l1"><a class="reference internal" href="canonical.html">falaw.canonical</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.content</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.ConditionalOutcome"><code class="docutils literal notranslate"><span class="pre">ConditionalOutcome</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.ContentRef"><code class="docutils literal notranslate"><span class="pre">ContentRef</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.UrlFetcher"><code class="docutils literal notranslate"><span class="pre">UrlFetcher</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.Validators"><code class="docutils literal notranslate"><span class="pre">Validators</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.content_ref_for_url"><code class="docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.default_content_store"><code class="docutils literal notranslate"><span class="pre">default_content_store()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.default_url_fetcher"><code class="docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.content.is_immutable_url"><code class="docutils literal notranslate"><span class="pre">is_immutable_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.remembered_ref"><code class="docutils literal notranslate"><span class="pre">remembered_ref()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.using_url_fetcher"><code class="docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.content.write_blob_to_file"><code class="docutils literal notranslate"><span class="pre">write_blob_to_file()</span></code></a></li>
@@ -74,6 +77,7 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
@@ -143,20 +147,30 @@ downstream cache <strong>hit</strong>. With a URL in the key it produces a miss,
 miss re-bills a $0.35–$1.50 clip for work that did not change.</p></li>
 </ol>
 <p>This module is the single place falaw turns a URL into a content hash. It</p>
-<ul class="simple">
+<ul>
 <li><p>streams the bytes into a <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code> blob store — which is
 content-addressed, <code class="docutils literal notranslate"><span class="pre">dol</span></code>-backed and swappable (in-memory / directory /
 object store) — rather than growing a second blob store of its own;</p></li>
-<li><p>remembers <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">(content_hash,</span> <span class="pre">bytes_size)</span></code> in a small on-disk index, so
-re-executing an already-cached plan does <strong>not</strong> re-download anything. The
-index is a <em>hint</em>, never an identity, and it is only <strong>sound for immutable
-URLs</strong>. It is sound for fal’s own, because fal guarantees a URL is minted per
-upload and therefore never re-points at different bytes. It is <em>not</em> sound
-for an arbitrary caller-supplied URL reached through
-<a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a> — a mutable <code class="docutils literal notranslate"><span class="pre">https://…/reference.png</span></code>
-that changes behind our back keeps resolving to the old hash. Pass
-<code class="docutils literal notranslate"><span class="pre">refresh=True</span></code> when the URL is not known to be immutable
-(thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);</p></li>
+<li><p>remembers <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">(content_hash,</span> <span class="pre">bytes_size,</span> <span class="pre">validators)</span></code> in a small
+on-disk index, so re-executing an already-cached plan does <strong>not</strong> re-download
+anything. The index is a <em>hint</em>, never an identity, and it is only <strong>sound for
+immutable URLs</strong> — so falaw decides, per URL, whether it may be trusted
+(thorwhalen/falaw#23):</p>
+<ul class="simple">
+<li><p>a <strong>fal-served</strong> URL is trusted outright, because fal guarantees a URL is
+minted per upload and therefore never re-points at different bytes;</p></li>
+<li><p><strong>anything else</strong> — an arbitrary caller-supplied <code class="docutils literal notranslate"><span class="pre">https://…/reference.png</span></code>
+reached through <a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a>, or a <code class="docutils literal notranslate"><span class="pre">file://</span></code> clip
+that gets re-rendered to the same path — is <strong>revalidated</strong> before reuse: a
+conditional request replaying the recorded <code class="docutils literal notranslate"><span class="pre">ETag</span></code> / <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code>, or
+a <code class="docutils literal notranslate"><span class="pre">(mtime,</span> <span class="pre">size)</span></code> check for a local file. <code class="docutils literal notranslate"><span class="pre">304</span></code> costs a round-trip and
+no payload; a changed asset yields a changed content hash, as it must.</p></li>
+</ul>
+<p>When falaw <em>cannot</em> check — no validators recorded, or an injected transport
+with no conditional-request support — it re-fetches rather than trusting. An
+unverifiable hint is not evidence. <a class="reference internal" href="#falaw.content.is_immutable_url" title="falaw.content.is_immutable_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_immutable_url()</span></code></a> is the predicate,
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">IMMUTABLE_URL_HOSTS</span></code> is where you add a host you mint yourself;</p>
+</li>
 <li><p>serves the bytes from the store after the URL has expired, so a months-old
 cache hit still yields a usable artifact instead of a dead link.</p></li>
 </ul>
@@ -200,6 +214,16 @@ the whole point:</p>
 </pre></div>
 </div>
 <dl class="py class">
+<dt class="sig sig-object py" id="falaw.content.ConditionalOutcome">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">ConditionalOutcome</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">not_modified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validators</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.content.Validators" title="falaw.content.Validators"><span class="pre">Validators</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Validators(etag='',</span> <span class="pre">last_modified='')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/content.html#ConditionalOutcome"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.ConditionalOutcome" title="Link to this definition"></a></dt>
+<dd><p>The result of asking an origin whether a URL’s bytes changed.</p>
+<p>Either <code class="docutils literal notranslate"><span class="pre">not_modified</span></code> (the remembered content hash still stands, at the
+cost of one round-trip and no payload), or the <strong>new</strong> bytes — carried here
+rather than re-requested, because a caller that discovers staleness has
+already paid for the response body.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="falaw.content.ContentRef">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">ContentRef</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_hash</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/content.html#ContentRef"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.ContentRef" title="Link to this definition"></a></dt>
 <dd><p>A content-addressed handle on some bytes falaw has materialized.</p>
@@ -218,26 +242,58 @@ the one in force; <a class="reference internal" href="#falaw.content.using_url_f
 <p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code>]]</p>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.content.Validators">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">Validators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">etag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_modified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/content.html#Validators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.Validators" title="Link to this definition"></a></dt>
+<dd><p>What an origin gave us to ask “are these bytes still current?” cheaply.</p>
+<p><code class="docutils literal notranslate"><span class="pre">etag</span></code> and <code class="docutils literal notranslate"><span class="pre">last_modified</span></code> are the HTTP response headers of the same
+names, replayed as <code class="docutils literal notranslate"><span class="pre">If-None-Match</span></code> / <code class="docutils literal notranslate"><span class="pre">If-Modified-Since</span></code> on the next
+read. A <code class="docutils literal notranslate"><span class="pre">file://</span></code> URL has neither, so falaw synthesises an <code class="docutils literal notranslate"><span class="pre">etag</span></code> from
+the file’s <code class="docutils literal notranslate"><span class="pre">(mtime_ns,</span> <span class="pre">size)</span></code> — see <code class="xref py py-func docutils literal notranslate"><span class="pre">_file_validators()</span></code>. Falsy when
+the origin offered nothing, which is the case falaw must treat as
+“cannot revalidate”, never as “unchanged”.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.content.content_ref_for_url">
-<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.content_ref_for_url" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_immutable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.content_ref_for_url" title="Link to this definition"></a></dt>
 <dd><p>Materialize <code class="docutils literal notranslate"><span class="pre">url</span></code>’s bytes into <code class="docutils literal notranslate"><span class="pre">store</span></code> and return their content hash.</p>
-<p>Idempotent and download-free on repeat: the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">ContentRef</span></code> index is
-consulted first, and a remembered reference whose blob is still present is
-returned without touching the network. That is what makes re-executing an
-already-cached plan free rather than re-downloading every clip.</p>
+<p>Idempotent and cheap on repeat, but <em>how</em> cheap depends on whether the URL
+can change behind falaw’s back — and falaw decides that rather than asking
+the caller to know (thorwhalen/falaw#23):</p>
+<ol class="arabic simple">
+<li><p><strong>Immutable URL</strong> (fal’s own — see <a class="reference internal" href="#falaw.content.is_immutable_url" title="falaw.content.is_immutable_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_immutable_url()</span></code></a>) with a
+remembered hash whose blob is present: returned immediately, <strong>no
+network</strong>. This is what makes re-executing an already-cached plan free
+rather than re-downloading every clip.</p></li>
+<li><p><strong>Mutable URL</strong> with a remembered hash: falaw <strong>revalidates</strong> — a
+conditional <code class="docutils literal notranslate"><span class="pre">GET</span></code> replaying the recorded <code class="docutils literal notranslate"><span class="pre">ETag</span></code> / <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code>
+(for <code class="docutils literal notranslate"><span class="pre">file://</span></code>, a <code class="docutils literal notranslate"><span class="pre">(mtime,</span> <span class="pre">size)</span></code> comparison). A <code class="docutils literal notranslate"><span class="pre">304</span></code> costs one
+round-trip and no payload; a <code class="docutils literal notranslate"><span class="pre">200</span></code> means the bytes really changed and
+the new ones are stored, so the content hash changes with them.</p></li>
+<li><p><strong>No usable answer</strong> — nothing remembered, no validators recorded, or a
+transport that cannot make conditional requests: a plain fetch.</p></li>
+</ol>
+<p>Step 3 is the important default. A transport that cannot revalidate makes
+falaw <strong>re-fetch</strong>, never trust: an unverifiable hint is not evidence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> – The remote asset URL (typically fal’s CDN).</p></li>
+<li><p><strong>url</strong> – The asset URL. <code class="docutils literal notranslate"><span class="pre">file://</span></code> is supported and treated as mutable.</p></li>
 <li><p><strong>store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
 <a class="reference internal" href="#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a>.</p></li>
 <li><p><strong>fetcher</strong> – Injected byte source; defaults to <a class="reference internal" href="#falaw.content.default_url_fetcher" title="falaw.content.default_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a>
 (the built-in <code class="docutils literal notranslate"><span class="pre">urllib</span></code> transport unless <a class="reference internal" href="#falaw.content.using_url_fetcher" title="falaw.content.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a>
-has installed another).</p></li>
-<li><p><strong>refresh</strong> – Ignore the remembered reference and re-fetch. Only useful when
-you suspect the index is wrong — fal URLs are per-upload, so the
-same URL never legitimately serves different bytes.</p></li>
+has installed another). To support revalidation, a custom transport
+exposes a <code class="docutils literal notranslate"><span class="pre">conditional_fetch(url,</span> <span class="pre">validators)</span> <span class="pre">-&gt;</span> <span class="pre">ConditionalOutcome</span></code>
+attribute; without one it is simply never asked.</p></li>
+<li><p><strong>refresh</strong> – Skip every shortcut and re-fetch unconditionally. Rarely needed
+now that mutable URLs revalidate on their own — keep it for a URL
+whose origin lies about its validators.</p></li>
+<li><p><strong>assume_immutable</strong> – Override the host-based decision. <code class="docutils literal notranslate"><span class="pre">True</span></code> restores
+the old unconditional trust (use for a host you mint yourself, and
+prefer adding it to <code class="xref py py-data docutils literal notranslate"><span class="pre">IMMUTABLE_URL_HOSTS</span></code>); <code class="docutils literal notranslate"><span class="pre">False</span></code> forces
+revalidation even for fal.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -271,6 +327,56 @@ they were imported.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.content.is_immutable_url">
+<span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">is_immutable_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#is_immutable_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.is_immutable_url" title="Link to this definition"></a></dt>
+<dd><p>Whether <code class="docutils literal notranslate"><span class="pre">url</span></code> is guaranteed never to serve different bytes later.</p>
+<p>True only for hosts falaw knows mint a fresh URL per upload —
+<code class="xref py py-data docutils literal notranslate"><span class="pre">IMMUTABLE_URL_HOSTS</span></code>, which is fal’s own CDN out of the box, and any
+<strong>subdomain</strong> of one. <strong>Everything else is mutable</strong>, including <code class="docutils literal notranslate"><span class="pre">file://</span></code>:
+a locally-rendered clip re-rendered to the same path is the textbook case of
+one URL serving two different things.</p>
+<p>The default is the safe one on purpose. Guessing “probably immutable” for
+an unknown host is what thorwhalen/falaw#23 was: a changed input producing
+an unchanged content address, silently, with the stale hash flowing into
+<code class="docutils literal notranslate"><span class="pre">Artifact.asset_id</span></code> and every downstream cache key.</p>
+<p>Two rules make this a <em>security</em> boundary rather than a string comparison,
+and both were added after a review reproduced falaw#23 against the first
+cut of this function:</p>
+<ol class="arabic simple">
+<li><p><strong>The host must be a plain DNS name.</strong> <code class="docutils literal notranslate"><span class="pre">urlsplit().hostname</span></code> is not
+what an HTTP client resolves. Python accepts a backslash (and <code class="docutils literal notranslate"><span class="pre">%2F</span></code>)
+inside a netloc, while WHATWG-conformant clients — including
+<code class="docutils literal notranslate"><span class="pre">requests</span></code>/<code class="docutils literal notranslate"><span class="pre">urllib3</span></code> — treat them as <em>delimiters</em>. So
+<code class="docutils literal notranslate"><span class="pre">http://127.0.0.1:8000\&#64;fal.media/x</span></code> parses here with hostname
+<code class="docutils literal notranslate"><span class="pre">fal.media</span></code> and is fetched from <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code>. Anything outside
+<code class="docutils literal notranslate"><span class="pre">[a-z0-9.-]</span></code> is therefore refused outright.</p></li>
+<li><p><strong>Matching is label-wise, never by raw suffix.</strong> <code class="docutils literal notranslate"><span class="pre">endswith(&quot;.fal.media&quot;)</span></code>
+is true of <code class="docutils literal notranslate"><span class="pre">evil.com\.fal.media</span></code>; <code class="docutils literal notranslate"><span class="pre">host</span> <span class="pre">==</span> <span class="pre">h</span> <span class="pre">or</span> <span class="pre">host.endswith(&quot;.&quot;</span> <span class="pre">+</span> <span class="pre">h)</span></code>
+is not.</p></li>
+</ol>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://v3b.fal.media/files/x.png&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/files/x.png&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/reference.png&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;file:///tmp/render.mp4&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>A host that merely <em>contains</em> a trusted name is not that host, however it
+is spelled:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media@evil.example/x.png&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://notfal.media/x.png&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8000</span><span class="se">\\</span><span class="s2">@fal.media/x.png&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.content.remembered_ref">
 <span class="sig-prename descclassname"><span class="pre">falaw.content.</span></span><span class="sig-name descname"><span class="pre">remembered_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/content.html#remembered_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content.remembered_ref" title="Link to this definition"></a></dt>
 <dd><p>The <a class="reference internal" href="#falaw.content.ContentRef" title="falaw.content.ContentRef"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentRef</span></code></a> previously recorded for <code class="docutils literal notranslate"><span class="pre">url</span></code>, if any.</p>
@@ -281,6 +387,10 @@ already-materialized file on disk) before trusting it.</p>
 <p>Public because it is the cheap pre-check that lets a caller answer “do I
 already have this?” without a network round-trip — see
 <a class="reference internal" href="cache.html#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache.materialize_asset()</span></code></a>.</p>
+<p><strong>It says nothing about whether the URL still serves those bytes.</strong> For a
+mutable URL that question needs <a class="reference internal" href="#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">content_ref_for_url()</span></code></a>, which
+revalidates; this is the raw recorded value, and trusting it for a
+non-<a class="reference internal" href="#falaw.content.is_immutable_url" title="falaw.content.is_immutable_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_immutable_url()</span></code></a> URL is thorwhalen/falaw#23.</p>
 </dd></dl>
 
 <dl class="py function">

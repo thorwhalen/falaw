@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.testing &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw.testing &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -61,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
@@ -198,6 +199,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.error</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
@@ -291,6 +293,11 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_etag_of</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A well-behaved origin&#39;s ETag: derived from the body, so it changes with it.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">32</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+
 <div class="viewcode-block" id="FakeAssets">
 <a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FakeAssets</span><span class="p">:</span>
@@ -348,6 +355,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">revalidated</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;URLs answered with a cheap &quot;unchanged&quot; — no body transferred.</span>
+
+<span class="sd">        Separate from :attr:`fetched` because the two are the *point* of</span>
+<span class="sd">        falaw#23 and a suite must be able to tell them apart. Without this, &quot;we</span>
+<span class="sd">        revalidated cheaply&quot; and &quot;we never asked at all&quot; are indistinguishable,</span>
+<span class="sd">        and every cheap-path assertion in the suite is equally satisfied by the</span>
+<span class="sd">        un-fixed code that simply trusted its index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">synthetic_prefix</span> <span class="o">=</span> <span class="n">synthetic_prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fake_non_network_urls</span> <span class="o">=</span> <span class="n">fake_non_network_urls</span>
 
@@ -400,13 +416,77 @@
 
             <span class="k">yield from</span> <span class="n">_http_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
             <span class="k">return</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bytes_or_404</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_bytes_or_404</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthetic</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">404</span><span class="p">,</span> <span class="s2">&quot;Not Found&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
-        <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">chunk_size</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">data</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">chunk_size</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">data</span>
+
+<div class="viewcode-block" id="FakeAssets.etag_for">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.etag_for">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">etag_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The ETag this fake serves for ``url`` — a digest of its current bytes.</span>
+
+<span class="sd">        A well-behaved origin&#39;s ETag changes exactly when the body does, so</span>
+<span class="sd">        deriving it from the served bytes is the most faithful fake available:</span>
+<span class="sd">        :meth:`serve`-ing different bytes at the same URL flips it, and serving</span>
+<span class="sd">        the same bytes twice does not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_etag_of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bytes_or_404</span><span class="p">(</span><span class="n">url</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FakeAssets.conditional_fetch">
+<a class="viewcode-back" href="../../module_docs/falaw/testing.html#falaw.testing.FakeAssets.conditional_fetch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">conditional_fetch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validators</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CHUNK_SIZE</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Answer a revalidation — the capability falaw#23 asks a transport for.</span>
+
+<span class="sd">        Present so a downstream suite exercises the **cheap** path rather than</span>
+<span class="sd">        the fallback. Without it falaw can never confirm a mutable URL is</span>
+<span class="sd">        unchanged, so it re-fetches on every call: correct, but it would mean no</span>
+<span class="sd">        test in the ecosystem ever covers the ``304`` branch, and any suite</span>
+<span class="sd">        asserting &quot;did not refetch&quot; for a non-fal URL would fail for a reason</span>
+<span class="sd">        that has nothing to do with what it is testing.</span>
+
+<span class="sd">        Deferred to :meth:`chunks` for a URL this fake does not handle, so a</span>
+<span class="sd">        real ``file://`` still reaches the real filesystem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConditionalOutcome</span><span class="p">,</span> <span class="n">Validators</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">_http_conditional_fetch</span>
+
+            <span class="k">return</span> <span class="n">_http_conditional_fetch</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">validators</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">by_url</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthetic</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># A request that reached the origin and failed **is** a fetch, and</span>
+            <span class="c1"># must appear in `fetched`: falaw degrades a failed fetch to a</span>
+            <span class="c1"># warning, so a suite asserting on the exception alone would go</span>
+            <span class="c1"># green having tested nothing.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fetched</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">404</span><span class="p">,</span> <span class="s2">&quot;Not Found&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">Validators</span><span class="p">(</span><span class="n">etag</span><span class="o">=</span><span class="n">_etag_of</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">validators</span> <span class="ow">and</span> <span class="n">validators</span><span class="o">.</span><span class="n">etag</span> <span class="o">==</span> <span class="n">current</span><span class="o">.</span><span class="n">etag</span><span class="p">:</span>
+            <span class="c1"># Recorded in `revalidated`, not `fetched`: a request happened, but</span>
+            <span class="c1"># no body crossed the wire — which is exactly what a caller</span>
+            <span class="c1"># asserting &quot;did not refetch&quot; means, and distinct from not asking.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">revalidated</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span><span class="n">not_modified</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span>
+            <span class="n">not_modified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">),</span>
+            <span class="n">validators</span><span class="o">=</span><span class="n">current</span><span class="p">,</span>
+        <span class="p">)</span></div>
 </div>
 
 

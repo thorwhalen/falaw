@@ -1,0 +1,4 @@
+falaw.degrade
+=============
+.. automodule:: falaw.degrade
+   :members:

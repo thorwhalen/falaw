@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -271,6 +271,7 @@
 <li class="toctree-l1"><a class="reference internal" href="falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="falaw/degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/journal.html">falaw.journal</a></li>
@@ -1435,24 +1436,44 @@ balanced/high tier). Pass <code class="docutils literal notranslate"><span class
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.content_ref_for_url">
-<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/content.html#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content_ref_for_url" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">content_ref_for_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">bytes</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assume_immutable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/content.html#falaw.content.ContentRef" title="falaw.content.ContentRef"><span class="pre">ContentRef</span></a></span></span><a class="reference internal" href="../_modules/falaw/content.html#content_ref_for_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.content_ref_for_url" title="Link to this definition"></a></dt>
 <dd><p>Materialize <code class="docutils literal notranslate"><span class="pre">url</span></code>’s bytes into <code class="docutils literal notranslate"><span class="pre">store</span></code> and return their content hash.</p>
-<p>Idempotent and download-free on repeat: the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">ContentRef</span></code> index is
-consulted first, and a remembered reference whose blob is still present is
-returned without touching the network. That is what makes re-executing an
-already-cached plan free rather than re-downloading every clip.</p>
+<p>Idempotent and cheap on repeat, but <em>how</em> cheap depends on whether the URL
+can change behind falaw’s back — and falaw decides that rather than asking
+the caller to know (thorwhalen/falaw#23):</p>
+<ol class="arabic simple">
+<li><p><strong>Immutable URL</strong> (fal’s own — see <code class="xref py py-func docutils literal notranslate"><span class="pre">is_immutable_url()</span></code>) with a
+remembered hash whose blob is present: returned immediately, <strong>no
+network</strong>. This is what makes re-executing an already-cached plan free
+rather than re-downloading every clip.</p></li>
+<li><p><strong>Mutable URL</strong> with a remembered hash: falaw <strong>revalidates</strong> — a
+conditional <code class="docutils literal notranslate"><span class="pre">GET</span></code> replaying the recorded <code class="docutils literal notranslate"><span class="pre">ETag</span></code> / <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code>
+(for <code class="docutils literal notranslate"><span class="pre">file://</span></code>, a <code class="docutils literal notranslate"><span class="pre">(mtime,</span> <span class="pre">size)</span></code> comparison). A <code class="docutils literal notranslate"><span class="pre">304</span></code> costs one
+round-trip and no payload; a <code class="docutils literal notranslate"><span class="pre">200</span></code> means the bytes really changed and
+the new ones are stored, so the content hash changes with them.</p></li>
+<li><p><strong>No usable answer</strong> — nothing remembered, no validators recorded, or a
+transport that cannot make conditional requests: a plain fetch.</p></li>
+</ol>
+<p>Step 3 is the important default. A transport that cannot revalidate makes
+falaw <strong>re-fetch</strong>, never trust: an unverifiable hint is not evidence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> – The remote asset URL (typically fal’s CDN).</p></li>
+<li><p><strong>url</strong> – The asset URL. <code class="docutils literal notranslate"><span class="pre">file://</span></code> is supported and treated as mutable.</p></li>
 <li><p><strong>store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
 <a class="reference internal" href="#falaw.default_content_store" title="falaw.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_content_store()</span></code></a>.</p></li>
 <li><p><strong>fetcher</strong> – Injected byte source; defaults to <a class="reference internal" href="#falaw.default_url_fetcher" title="falaw.default_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">default_url_fetcher()</span></code></a>
 (the built-in <code class="docutils literal notranslate"><span class="pre">urllib</span></code> transport unless <a class="reference internal" href="#falaw.using_url_fetcher" title="falaw.using_url_fetcher"><code class="xref py py-func docutils literal notranslate"><span class="pre">using_url_fetcher()</span></code></a>
-has installed another).</p></li>
-<li><p><strong>refresh</strong> – Ignore the remembered reference and re-fetch. Only useful when
-you suspect the index is wrong — fal URLs are per-upload, so the
-same URL never legitimately serves different bytes.</p></li>
+has installed another). To support revalidation, a custom transport
+exposes a <code class="docutils literal notranslate"><span class="pre">conditional_fetch(url,</span> <span class="pre">validators)</span> <span class="pre">-&gt;</span> <span class="pre">ConditionalOutcome</span></code>
+attribute; without one it is simply never asked.</p></li>
+<li><p><strong>refresh</strong> – Skip every shortcut and re-fetch unconditionally. Rarely needed
+now that mutable URLs revalidate on their own — keep it for a URL
+whose origin lies about its validators.</p></li>
+<li><p><strong>assume_immutable</strong> – Override the host-based decision. <code class="docutils literal notranslate"><span class="pre">True</span></code> restores
+the old unconditional trust (use for a host you mint yourself, and
+prefer adding it to <code class="xref py py-data docutils literal notranslate"><span class="pre">IMMUTABLE_URL_HOSTS</span></code>); <code class="docutils literal notranslate"><span class="pre">False</span></code> forces
+revalidation even for fal.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -1814,16 +1835,25 @@ bug. <code class="docutils literal notranslate"><span class="pre">cache_status</
 <p>The local filename is content-addressed by the asset’s <strong>bytes</strong>, so two
 URLs serving identical bytes resolve to one file. The extension is a
 presentational hint for ffmpeg/PIL; the SHA-256 is the address.</p>
-<p>Repeat calls are free, in three widening circles — this is what makes it
+<p>Repeat calls are cheap, in three widening circles — this is what makes it
 safe to call from a loop over 200 shots:</p>
 <ol class="arabic simple">
-<li><p>the file is already on disk here (no store lookup, no network);</p></li>
-<li><p>the bytes are in the content store (no network) — so it still works
-after fal has expired the URL;</p></li>
+<li><p>the file is already on disk here (no store lookup, no network) —
+<strong>immutable URLs only</strong>, see below;</p></li>
+<li><p>the bytes are in the content store (no network, or one validating
+round-trip) — so it still works after fal has expired the URL;</p></li>
 <li><p>otherwise, one download.</p></li>
 </ol>
 <p>Circle 1 matters on its own: the content store is prunable, so an asset
 can survive as a materialized file after its blob is gone.</p>
+<p><strong>Circle 1 is taken only when the URL cannot change</strong> — that is,
+<a class="reference internal" href="falaw/content.html#falaw.content.is_immutable_url" title="falaw.content.is_immutable_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.is_immutable_url()</span></code></a> — because reaching it requires
+trusting the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">hash</span></code> index to name the <em>current</em> bytes, and for an
+arbitrary caller-supplied URL it does not (thorwhalen/falaw#23). A mutable
+URL goes to circle 2, where <a class="reference internal" href="falaw/content.html#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.content_ref_for_url()</span></code></a>
+revalidates before reusing anything; when the bytes really are unchanged
+that costs one conditional request and still no download, and when they
+have changed you get the new file instead of silently getting the old one.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1835,10 +1865,9 @@ deliberately by downstream packages for locally-rendered media.</p></li>
 <li><p><strong>fetcher</strong> – injected byte source (<code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">Iterable[bytes]</span></code>); defaults to
 the <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based one. The seam for custom transport (auth
 headers, retries) and for a hermetic test suite.</p></li>
-<li><p><strong>refresh</strong> – re-fetch even when a remembered content hash exists. Pass this
-for a <strong>mutable</strong> URL — the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">hash</span></code> hint index assumes the
-URL is immutable, which is true of fal’s own but not of an
-arbitrary one.</p></li>
+<li><p><strong>refresh</strong> – re-fetch unconditionally, skipping every circle. Rarely needed
+now: a mutable URL revalidates on its own (falaw#23), so this is for
+an origin that lies about its validators.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>

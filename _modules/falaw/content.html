@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.content &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw.content &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -61,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
@@ -135,16 +136,25 @@
 <span class="sd">* streams the bytes into a :class:`lacing.ArtifactStore` blob store — which is</span>
 <span class="sd">  content-addressed, ``dol``-backed and swappable (in-memory / directory /</span>
 <span class="sd">  object store) — rather than growing a second blob store of its own;</span>
-<span class="sd">* remembers ``url -&gt; (content_hash, bytes_size)`` in a small on-disk index, so</span>
-<span class="sd">  re-executing an already-cached plan does **not** re-download anything. The</span>
-<span class="sd">  index is a *hint*, never an identity, and it is only **sound for immutable</span>
-<span class="sd">  URLs**. It is sound for fal&#39;s own, because fal guarantees a URL is minted per</span>
-<span class="sd">  upload and therefore never re-points at different bytes. It is *not* sound</span>
-<span class="sd">  for an arbitrary caller-supplied URL reached through</span>
-<span class="sd">  :func:`falaw.cache.materialize_asset` — a mutable ``https://…/reference.png``</span>
-<span class="sd">  that changes behind our back keeps resolving to the old hash. Pass</span>
-<span class="sd">  ``refresh=True`` when the URL is not known to be immutable</span>
-<span class="sd">  (thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);</span>
+<span class="sd">* remembers ``url -&gt; (content_hash, bytes_size, validators)`` in a small</span>
+<span class="sd">  on-disk index, so re-executing an already-cached plan does **not** re-download</span>
+<span class="sd">  anything. The index is a *hint*, never an identity, and it is only **sound for</span>
+<span class="sd">  immutable URLs** — so falaw decides, per URL, whether it may be trusted</span>
+<span class="sd">  (thorwhalen/falaw#23):</span>
+
+<span class="sd">  - a **fal-served** URL is trusted outright, because fal guarantees a URL is</span>
+<span class="sd">    minted per upload and therefore never re-points at different bytes;</span>
+<span class="sd">  - **anything else** — an arbitrary caller-supplied ``https://…/reference.png``</span>
+<span class="sd">    reached through :func:`falaw.cache.materialize_asset`, or a ``file://`` clip</span>
+<span class="sd">    that gets re-rendered to the same path — is **revalidated** before reuse: a</span>
+<span class="sd">    conditional request replaying the recorded ``ETag`` / ``Last-Modified``, or</span>
+<span class="sd">    a ``(mtime, size)`` check for a local file. ``304`` costs a round-trip and</span>
+<span class="sd">    no payload; a changed asset yields a changed content hash, as it must.</span>
+
+<span class="sd">  When falaw *cannot* check — no validators recorded, or an injected transport</span>
+<span class="sd">  with no conditional-request support — it re-fetches rather than trusting. An</span>
+<span class="sd">  unverifiable hint is not evidence. :func:`is_immutable_url` is the predicate,</span>
+<span class="sd">  and :data:`IMMUTABLE_URL_HOSTS` is where you add a host you mint yourself;</span>
 <span class="sd">* serves the bytes from the store after the URL has expired, so a months-old</span>
 <span class="sd">  cache hit still yields a usable artifact instead of a dead link.</span>
 
@@ -195,7 +205,11 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.error</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
@@ -203,15 +217,19 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">_cache_dir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.degrade</span><span class="w"> </span><span class="kn">import</span> <span class="n">emit_degradation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FalAssetFetchError</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;ConditionalOutcome&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ContentRef&quot;</span><span class="p">,</span>
     <span class="s2">&quot;UrlFetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Validators&quot;</span><span class="p">,</span>
     <span class="s2">&quot;content_ref_for_url&quot;</span><span class="p">,</span>
     <span class="s2">&quot;default_content_store&quot;</span><span class="p">,</span>
     <span class="s2">&quot;default_url_fetcher&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;is_immutable_url&quot;</span><span class="p">,</span>
     <span class="s2">&quot;remembered_ref&quot;</span><span class="p">,</span>
     <span class="s2">&quot;using_url_fetcher&quot;</span><span class="p">,</span>
     <span class="s2">&quot;write_blob_to_file&quot;</span><span class="p">,</span>
@@ -220,6 +238,62 @@
 
 <span class="n">DFLT_CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span>
 <span class="sd">&quot;&quot;&quot;Bytes per read when streaming a remote asset into the blob store.&quot;&quot;&quot;</span>
+
+<span class="n">IMMUTABLE_URL_HOSTS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fal.media&quot;</span><span class="p">,</span> <span class="s2">&quot;fal.run&quot;</span><span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;Hosts whose URLs are minted per upload and never re-point at other bytes.</span>
+
+<span class="sd">A **mutable** set, deliberately: a deployment that serves generated media from</span>
+<span class="sd">its own immutable-by-construction store (content-addressed object storage, a</span>
+<span class="sd">CDN with digest-named keys) adds its host here rather than paying a</span>
+<span class="sd">revalidation round-trip per asset. Adding a host that is *not* immutable</span>
+<span class="sd">re-introduces thorwhalen/falaw#23, so add only what you mint yourself.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">_FETCH_FAILED</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Could not fetch asset bytes from </span><span class="si">{url}</span><span class="s2">: </span><span class="si">{error}</span><span class="s2">. falaw needs the bytes to &quot;</span>
+    <span class="s2">&quot;content-address the artifact, and fal-served URLs expire and are then &quot;</span>
+    <span class="s2">&quot;permanently deleted. If you are running an offline test suite whose &quot;</span>
+    <span class="s2">&quot;stubbed responses carry made-up URLs, install a fake transport &quot;</span>
+    <span class="s2">&quot;(`falaw.testing.fake_assets`, or `falaw.content.using_url_fetcher`) rather &quot;</span>
+    <span class="s2">&quot;than reaching for the network.&quot;</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;The one fetch-failure message.</span>
+
+<span class="sd">Shared by the eager path (a transport that fails at request time) and the lazy</span>
+<span class="sd">one (a transport that fails mid-stream). They used to differ, and the eager one</span>
+<span class="sd">— which the built-in transport now always takes, because a conditional request</span>
+<span class="sd">calls `urlopen` before returning chunks — was the terse one, losing exactly the</span>
+<span class="sd">guidance `falaw.testing` exists to give.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">GONE_HTTP_STATUSES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="mi">404</span><span class="p">,</span> <span class="mi">410</span><span class="p">})</span>
+<span class="sd">&quot;&quot;&quot;Statuses that mean the asset is gone, rather than momentarily unreachable.</span>
+
+<span class="sd">The whole list, deliberately. ``5xx``, ``429`` and every transport error are</span>
+<span class="sd">*transient* until proven otherwise, and serving stored bytes in response to one</span>
+<span class="sd">is how a superseded content hash gets reported as current forever.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">_NETLOC_FORBIDDEN</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Characters that disqualify a netloc from ever being judged immutable.</span>
+
+<span class="sd">Not a hostname-validity rule — a *parser-agreement* rule. Each of these is read</span>
+<span class="sd">differently by Python&#39;s ``urlsplit`` and by a WHATWG-conformant client</span>
+<span class="sd">(``requests``/``urllib3``), so a netloc containing one means falaw&#39;s idea of the</span>
+<span class="sd">host and the transport&#39;s idea of the host may differ. ``@`` is included even</span>
+<span class="sd">though Python handles it consistently: userinfo has no legitimate role in a</span>
+<span class="sd">media URL, and every spoof of the form ``https://fal.media@evil.example/x``</span>
+<span class="sd">depends on it.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">_HOSTNAME_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[a-z0-9]([a-z0-9.-]*[a-z0-9])?&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A plain DNS name. Anything else is refused by :func:`is_immutable_url`.</span>
+
+<span class="sd">Deliberately narrow. The job is not to validate hostnames but to guarantee that</span>
+<span class="sd">falaw&#39;s idea of the host and the transport&#39;s idea of the host cannot diverge —</span>
+<span class="sd">which they do the moment a netloc contains a character Python treats as data</span>
+<span class="sd">and a WHATWG-conformant client treats as a delimiter.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="n">CONTENT_STORE_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
 <span class="sd">&quot;&quot;&quot;Sub-directory of the falaw cache holding the default content store.&quot;&quot;&quot;</span>
@@ -314,6 +388,46 @@
 
 
 
+<div class="viewcode-block" id="Validators">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.Validators">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Validators</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;What an origin gave us to ask &quot;are these bytes still current?&quot; cheaply.</span>
+
+<span class="sd">    ``etag`` and ``last_modified`` are the HTTP response headers of the same</span>
+<span class="sd">    names, replayed as ``If-None-Match`` / ``If-Modified-Since`` on the next</span>
+<span class="sd">    read. A ``file://`` URL has neither, so falaw synthesises an ``etag`` from</span>
+<span class="sd">    the file&#39;s ``(mtime_ns, size)`` — see :func:`_file_validators`. Falsy when</span>
+<span class="sd">    the origin offered nothing, which is the case falaw must treat as</span>
+<span class="sd">    &quot;cannot revalidate&quot;, never as &quot;unchanged&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">etag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">last_modified</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">etag</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_modified</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ConditionalOutcome">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.ConditionalOutcome">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConditionalOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The result of asking an origin whether a URL&#39;s bytes changed.</span>
+
+<span class="sd">    Either ``not_modified`` (the remembered content hash still stands, at the</span>
+<span class="sd">    cost of one round-trip and no payload), or the **new** bytes — carried here</span>
+<span class="sd">    rather than re-requested, because a caller that discovers staleness has</span>
+<span class="sd">    already paid for the response body.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">not_modified</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">chunks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">validators</span><span class="p">:</span> <span class="s2">&quot;Validators&quot;</span> <span class="o">=</span> <span class="n">Validators</span><span class="p">()</span></div>
+
+
+
 <div class="viewcode-block" id="ContentRef">
 <a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.ContentRef">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -348,6 +462,77 @@
 
 
 
+<div class="viewcode-block" id="is_immutable_url">
+<a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.is_immutable_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_immutable_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether ``url`` is guaranteed never to serve different bytes later.</span>
+
+<span class="sd">    True only for hosts falaw knows mint a fresh URL per upload —</span>
+<span class="sd">    :data:`IMMUTABLE_URL_HOSTS`, which is fal&#39;s own CDN out of the box, and any</span>
+<span class="sd">    **subdomain** of one. **Everything else is mutable**, including ``file://``:</span>
+<span class="sd">    a locally-rendered clip re-rendered to the same path is the textbook case of</span>
+<span class="sd">    one URL serving two different things.</span>
+
+<span class="sd">    The default is the safe one on purpose. Guessing &quot;probably immutable&quot; for</span>
+<span class="sd">    an unknown host is what thorwhalen/falaw#23 was: a changed input producing</span>
+<span class="sd">    an unchanged content address, silently, with the stale hash flowing into</span>
+<span class="sd">    ``Artifact.asset_id`` and every downstream cache key.</span>
+
+<span class="sd">    Two rules make this a *security* boundary rather than a string comparison,</span>
+<span class="sd">    and both were added after a review reproduced falaw#23 against the first</span>
+<span class="sd">    cut of this function:</span>
+
+<span class="sd">    1. **The host must be a plain DNS name.** ``urlsplit().hostname`` is not</span>
+<span class="sd">       what an HTTP client resolves. Python accepts a backslash (and ``%2F``)</span>
+<span class="sd">       inside a netloc, while WHATWG-conformant clients — including</span>
+<span class="sd">       ``requests``/``urllib3`` — treat them as *delimiters*. So</span>
+<span class="sd">       ``http://127.0.0.1:8000\\@fal.media/x`` parses here with hostname</span>
+<span class="sd">       ``fal.media`` and is fetched from ``127.0.0.1``. Anything outside</span>
+<span class="sd">       ``[a-z0-9.-]`` is therefore refused outright.</span>
+<span class="sd">    2. **Matching is label-wise, never by raw suffix.** ``endswith(&quot;.fal.media&quot;)``</span>
+<span class="sd">       is true of ``evil.com\\.fal.media``; ``host == h or host.endswith(&quot;.&quot; + h)``</span>
+<span class="sd">       is not.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;https://v3b.fal.media/files/x.png&quot;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;https://fal.media/files/x.png&quot;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;https://example.com/reference.png&quot;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;file:///tmp/render.mp4&quot;)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    A host that merely *contains* a trusted name is not that host, however it</span>
+<span class="sd">    is spelled:</span>
+
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;https://fal.media@evil.example/x.png&quot;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;https://notfal.media/x.png&quot;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &gt;&gt;&gt; is_immutable_url(&quot;http://127.0.0.1:8000\\\\@fal.media/x.png&quot;)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">split</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="c1"># Judge the *raw* netloc first. `split.hostname` has already made a choice</span>
+    <span class="c1"># about where the host ends, and that choice is the one an attacker</span>
+    <span class="c1"># controls: Python splits userinfo on the last `@` and treats `\` as data,</span>
+    <span class="c1"># so `http://127.0.0.1:8000\@fal.media/x` hands back `fal.media` while</span>
+    <span class="c1"># requests/urllib3 fetch from `127.0.0.1`. Any netloc carrying a character</span>
+    <span class="c1"># two conformant parsers can read differently is refused before the host is</span>
+    <span class="c1"># even looked at — and userinfo is refused outright, because a media URL has</span>
+    <span class="c1"># no use for it and its only role here is to move the apparent host.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">split</span><span class="o">.</span><span class="n">netloc</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">split</span><span class="o">.</span><span class="n">netloc</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_NETLOC_FORBIDDEN</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">host</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_HOSTNAME_RE</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">host</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">host</span> <span class="o">==</span> <span class="n">trusted</span> <span class="ow">or</span> <span class="n">host</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">trusted</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">trusted</span> <span class="ow">in</span> <span class="n">IMMUTABLE_URL_HOSTS</span>
+    <span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="content_ref_for_url">
 <a class="viewcode-back" href="../../module_docs/falaw/content.html#falaw.content_ref_for_url">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">content_ref_for_url</span><span class="p">(</span>
@@ -356,24 +541,45 @@
     <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fetcher</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">UrlFetcher</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">assume_immutable</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentRef</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Materialize ``url``&#39;s bytes into ``store`` and return their content hash.</span>
 
-<span class="sd">    Idempotent and download-free on repeat: the ``url -&gt; ContentRef`` index is</span>
-<span class="sd">    consulted first, and a remembered reference whose blob is still present is</span>
-<span class="sd">    returned without touching the network. That is what makes re-executing an</span>
-<span class="sd">    already-cached plan free rather than re-downloading every clip.</span>
+<span class="sd">    Idempotent and cheap on repeat, but *how* cheap depends on whether the URL</span>
+<span class="sd">    can change behind falaw&#39;s back — and falaw decides that rather than asking</span>
+<span class="sd">    the caller to know (thorwhalen/falaw#23):</span>
+
+<span class="sd">    1. **Immutable URL** (fal&#39;s own — see :func:`is_immutable_url`) with a</span>
+<span class="sd">       remembered hash whose blob is present: returned immediately, **no</span>
+<span class="sd">       network**. This is what makes re-executing an already-cached plan free</span>
+<span class="sd">       rather than re-downloading every clip.</span>
+<span class="sd">    2. **Mutable URL** with a remembered hash: falaw **revalidates** — a</span>
+<span class="sd">       conditional ``GET`` replaying the recorded ``ETag`` / ``Last-Modified``</span>
+<span class="sd">       (for ``file://``, a ``(mtime, size)`` comparison). A ``304`` costs one</span>
+<span class="sd">       round-trip and no payload; a ``200`` means the bytes really changed and</span>
+<span class="sd">       the new ones are stored, so the content hash changes with them.</span>
+<span class="sd">    3. **No usable answer** — nothing remembered, no validators recorded, or a</span>
+<span class="sd">       transport that cannot make conditional requests: a plain fetch.</span>
+
+<span class="sd">    Step 3 is the important default. A transport that cannot revalidate makes</span>
+<span class="sd">    falaw **re-fetch**, never trust: an unverifiable hint is not evidence.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        url: The remote asset URL (typically fal&#39;s CDN).</span>
+<span class="sd">        url: The asset URL. ``file://`` is supported and treated as mutable.</span>
 <span class="sd">        store: Injected :class:`lacing.ArtifactStore`; defaults to</span>
 <span class="sd">            :func:`default_content_store`.</span>
 <span class="sd">        fetcher: Injected byte source; defaults to :func:`default_url_fetcher`</span>
 <span class="sd">            (the built-in ``urllib`` transport unless :func:`using_url_fetcher`</span>
-<span class="sd">            has installed another).</span>
-<span class="sd">        refresh: Ignore the remembered reference and re-fetch. Only useful when</span>
-<span class="sd">            you suspect the index is wrong — fal URLs are per-upload, so the</span>
-<span class="sd">            same URL never legitimately serves different bytes.</span>
+<span class="sd">            has installed another). To support revalidation, a custom transport</span>
+<span class="sd">            exposes a ``conditional_fetch(url, validators) -&gt; ConditionalOutcome``</span>
+<span class="sd">            attribute; without one it is simply never asked.</span>
+<span class="sd">        refresh: Skip every shortcut and re-fetch unconditionally. Rarely needed</span>
+<span class="sd">            now that mutable URLs revalidate on their own — keep it for a URL</span>
+<span class="sd">            whose origin lies about its validators.</span>
+<span class="sd">        assume_immutable: Override the host-based decision. ``True`` restores</span>
+<span class="sd">            the old unconditional trust (use for a host you mint yourself, and</span>
+<span class="sd">            prefer adding it to :data:`IMMUTABLE_URL_HOSTS`); ``False`` forces</span>
+<span class="sd">            revalidation even for fal.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        FalAssetFetchError: the bytes could not be retrieved, or the response</span>
@@ -381,14 +587,154 @@
 <span class="sd">            a silent zero-byte &quot;artifact&quot; is the failure mode this guards.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
-        <span class="n">remembered</span> <span class="o">=</span> <span class="n">remembered_ref</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">remembered</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">store</span><span class="o">.</span><span class="n">has_blob</span><span class="p">(</span><span class="n">remembered</span><span class="o">.</span><span class="n">content_hash</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">remembered</span>
-    <span class="n">ref</span> <span class="o">=</span> <span class="n">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_url_fetcher</span><span class="p">())</span>
-    <span class="n">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
+    <span class="n">fetcher</span> <span class="o">=</span> <span class="n">fetcher</span> <span class="ow">or</span> <span class="n">default_url_fetcher</span><span class="p">()</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">refresh</span> <span class="k">else</span> <span class="n">_remembered_record</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">have_blob</span> <span class="o">=</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">store</span><span class="o">.</span><span class="n">has_blob</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">have_blob</span><span class="p">:</span>
+        <span class="n">immutable</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">is_immutable_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">if</span> <span class="n">assume_immutable</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">assume_immutable</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">immutable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">ref</span>
+
+    <span class="c1"># Offer validators only when the blob is actually here. A `304` is an</span>
+    <span class="c1"># instruction to serve the copy you already have, so asking for one without</span>
+    <span class="c1"># a copy would earn an answer carrying no bytes and nothing to fall back on</span>
+    <span class="c1"># — the HTTP rule for `If-None-Match`, and the same reason for it.</span>
+    <span class="n">validators</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">validators</span> <span class="k">if</span> <span class="n">have_blob</span> <span class="k">else</span> <span class="n">Validators</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">outcome</span> <span class="o">=</span> <span class="n">_read</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">,</span> <span class="n">validators</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">FalAssetFetchError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># The origin is **gone**, and we already hold the bytes. Serving them is</span>
+        <span class="c1"># the falaw#14 guarantee — &quot;a months-old cache hit still yields a usable</span>
+        <span class="c1"># artifact instead of a dead link&quot; — and it does not reintroduce</span>
+        <span class="c1"># falaw#23: there is no newer version being shadowed, because there is</span>
+        <span class="c1"># no newer version.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Only for a *definitive* absence, though. An earlier cut caught every</span>
+        <span class="c1"># error here, which meant a timeout, a 500, a 429 or a rate-limit made</span>
+        <span class="c1"># falaw report the superseded hash as current — on that call and every</span>
+        <span class="c1"># later one. That inverts this fallback&#39;s own justification: the truth</span>
+        <span class="c1"># was available, falaw looked, and answered from memory anyway.</span>
+        <span class="k">if</span> <span class="n">have_blob</span> <span class="ow">and</span> <span class="n">_is_definitively_gone</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="n">emit_degradation</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2"> is gone from its origin (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); serving the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span><span class="si">}</span><span class="s2"> bytes falaw stored earlier. If that &quot;</span>
+                <span class="s2">&quot;URL was mutable, this content hash may name superseded bytes.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">ref</span>
+        <span class="k">raise</span>
+    <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">not_modified</span><span class="p">:</span>
+        <span class="c1"># Believe &quot;unchanged&quot; only when there is something unchanged to serve.</span>
+        <span class="c1"># `have_blob` gates *sending* validators, but a transport is not</span>
+        <span class="c1"># obliged to be correct, and this module&#39;s own thesis — an unverifiable</span>
+        <span class="c1"># claim is not evidence — applies at least as much to an injected</span>
+        <span class="c1"># transport as to an index entry falaw wrote itself.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_blob</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Transport answered &#39;not modified&#39; for </span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2">, but falaw holds &quot;</span>
+                <span class="s2">&quot;no bytes for it. A conditional_fetch may only answer &quot;</span>
+                <span class="s2">&quot;not_modified to validators it was given, and none were sent.&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">ref</span>
+    <span class="c1"># Outside the `try`: a failure to *store* is not the origin being gone. An</span>
+    <span class="c1"># earlier cut had `_store_chunks` inside it, so a full disk — the exact</span>
+    <span class="c1"># condition `falaw.prune` exists for — discarded bytes already in hand and</span>
+    <span class="c1"># returned the previous content hash for them.</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">_store_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">outcome</span><span class="o">.</span><span class="n">chunks</span> <span class="ow">or</span> <span class="p">(),</span> <span class="n">store</span><span class="p">)</span>
+    <span class="n">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">outcome</span><span class="o">.</span><span class="n">validators</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">ref</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_definitively_gone</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="n">FalAssetFetchError</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether ``error`` proves the asset no longer exists at its origin.</span>
+
+<span class="sd">    True only for an answer that cannot be transient: HTTP ``404``/``410``, or a</span>
+<span class="sd">    local file that is not there. A timeout, a refused connection, a ``5xx``, a</span>
+<span class="sd">    ``429`` and a DNS failure are all **false** — they say the origin could not</span>
+<span class="sd">    be *reached*, which is a different claim from the asset being gone, and</span>
+<span class="sd">    treating them alike is what let a stale hash be reported as current</span>
+<span class="sd">    indefinitely.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cause</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s2">&quot;cause&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cause</span><span class="p">,</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cause</span><span class="o">.</span><span class="n">code</span> <span class="ow">in</span> <span class="n">GONE_HTTP_STATUSES</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cause</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_conditional_capability</span><span class="p">(</span><span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;``fetcher``&#39;s conditional-request capability, or ``None``.</span>
+
+<span class="sd">    Checks the callable, and — when it is a **bound method** — the object it is</span>
+<span class="sd">    bound to. That second lookup is not a nicety: the documented way to install</span>
+<span class="sd">    :class:`falaw.testing.FakeAssets` is ``using_url_fetcher(assets.chunks)``,</span>
+<span class="sd">    which hands falaw a bound method while the capability lives on the instance.</span>
+<span class="sd">    Looking only at the callable would find nothing, and every mutable URL in</span>
+<span class="sd">    every downstream suite would re-download forever while appearing to work.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="n">fetcher</span><span class="p">,</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="s2">&quot;__self__&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">_partial_target</span><span class="p">(</span><span class="n">fetcher</span><span class="p">),</span>
+    <span class="p">):</span>
+        <span class="n">capability</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">candidate</span><span class="p">,</span> <span class="s2">&quot;conditional_fetch&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">capability</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">capability</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_partial_target</span><span class="p">(</span><span class="n">fetcher</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The callable wrapped by a :func:`functools.partial`, if that is what this is.</span>
+
+<span class="sd">    ``partial(assets.chunks, chunk_size=4096)`` is a natural way to install the</span>
+<span class="sd">    documented fake, and it hides both the attribute and ``__self__``. Losing</span>
+<span class="sd">    the capability there is silent and costs a full download per read.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fetcher</span><span class="p">,</span> <span class="s2">&quot;func&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">inner</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="s2">&quot;__self__&quot;</span><span class="p">,</span> <span class="n">inner</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_read</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">,</span> <span class="n">validators</span><span class="p">:</span> <span class="n">Validators</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConditionalOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read ``url``, offering ``validators`` for a cheap &quot;unchanged&quot; answer.</span>
+
+<span class="sd">    One entry point for both the first read and a revalidation, and that is</span>
+<span class="sd">    deliberate: routing the *first* fetch through ``conditional_fetch`` too (with</span>
+<span class="sd">    empty validators, which no origin can match) is what records an ``ETag`` in</span>
+<span class="sd">    the first place. The plain :data:`UrlFetcher` seam yields bytes and not a</span>
+<span class="sd">    response, so a transport reached only through it can never earn validators —</span>
+<span class="sd">    and would then re-download forever, which is option 1 of thorwhalen/falaw#23</span>
+<span class="sd">    rather than the fix.</span>
+
+<span class="sd">    A transport without the capability still works; it simply never gets a cheap</span>
+<span class="sd">    answer. **So does one whose capability is not the capability**: the lookup is</span>
+<span class="sd">    duck-typed, so an unrelated ``conditional_fetch``, a wrong signature, or a</span>
+<span class="sd">    ``MagicMock`` (which auto-creates any attribute, and whose every return value</span>
+<span class="sd">    is truthy) all reach here. Anything that does not hand back a real</span>
+<span class="sd">    :class:`ConditionalOutcome` is therefore treated as *no capability* and falls</span>
+<span class="sd">    through to a plain fetch — never as a &quot;not modified&quot; to be believed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">conditional</span> <span class="o">=</span> <span class="n">_conditional_capability</span><span class="p">(</span><span class="n">fetcher</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">conditional</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="n">conditional</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">validators</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">FalAssetFetchError</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># not the capability we meant; fall through</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — normalized to falaw&#39;s typed error</span>
+            <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
+                <span class="n">_FETCH_FAILED</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">url</span><span class="p">),</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">),</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">ConditionalOutcome</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">outcome</span>
+    <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span>
+        <span class="n">not_modified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">chunks</span><span class="o">=</span><span class="n">fetcher</span><span class="p">(</span><span class="n">url</span><span class="p">),</span>
+        <span class="n">validators</span><span class="o">=</span><span class="n">_validators_for</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">),</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="remembered_ref">
@@ -404,18 +750,14 @@
 <span class="sd">    Public because it is the cheap pre-check that lets a caller answer &quot;do I</span>
 <span class="sd">    already have this?&quot; without a network round-trip — see</span>
 <span class="sd">    :func:`falaw.cache.materialize_asset`.</span>
+
+<span class="sd">    **It says nothing about whether the URL still serves those bytes.** For a</span>
+<span class="sd">    mutable URL that question needs :func:`content_ref_for_url`, which</span>
+<span class="sd">    revalidates; this is the raw recorded value, and trusting it for a</span>
+<span class="sd">    non-:func:`is_immutable_url` URL is thorwhalen/falaw#23.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">record</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ContentRef</span><span class="p">(</span>
-            <span class="n">content_hash</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;content_hash&quot;</span><span class="p">],</span> <span class="n">bytes_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;bytes_size&quot;</span><span class="p">])</span>
-        <span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — a corrupt hint is a miss, never a failure</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">_remembered_record</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">record</span><span class="o">.</span><span class="n">ref</span></div>
 
 
 
@@ -493,8 +835,138 @@
             <span class="k">yield</span> <span class="n">chunk</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_fetch_into_store</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">store</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentRef</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream ``url`` through ``fetcher`` into ``store``; return the ContentRef.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_file_path_of</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The local path behind a ``file://`` URL, or ``None`` if it is not one.&quot;&quot;&quot;</span>
+    <span class="n">split</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">split</span><span class="o">.</span><span class="n">scheme</span> <span class="o">!=</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">url2pathname</span><span class="p">(</span><span class="n">split</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_file_validators</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validators</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A synthetic validator for a local file: ``(mtime_ns, ctime_ns, size)``.</span>
+
+<span class="sd">    ``file://`` has no ETag, and locally-rendered media is exactly the mutable</span>
+<span class="sd">    case — re-rendering a clip to the same path leaves the URL identical and the</span>
+<span class="sd">    bytes different. These three are what a filesystem answers *without reading</span>
+<span class="sd">    the file*, which is the whole point of a validator.</span>
+
+<span class="sd">    **This is a heuristic and it can collide**, which the fallback below cannot:</span>
+<span class="sd">    a same-length rewrite that also preserves the timestamps reads as unchanged.</span>
+<span class="sd">    ``ctime_ns`` is included precisely because it narrows that a lot — it is the</span>
+<span class="sd">    inode&#39;s own change time, which the kernel updates on any metadata write and</span>
+<span class="sd">    which ``cp -p`` / ``rsync -t`` / ``git checkout`` / ``tar -x`` / ``os.utime``</span>
+<span class="sd">    cannot forge, so the classic &quot;restored a file and kept its mtime&quot; case is</span>
+<span class="sd">    caught. What remains uncovered is a same-length in-place rewrite on a</span>
+<span class="sd">    filesystem with coarse timestamp granularity (HFS+ 1 s, FAT 2 s, some</span>
+<span class="sd">    network mounts) inside one tick.</span>
+
+<span class="sd">    If that matters for your data, pass ``refresh=True``, or do not address</span>
+<span class="sd">    mutable local media by path.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Validators</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Validators</span><span class="p">(</span><span class="n">etag</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:</span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">st_mtime_ns</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">st_ctime_ns</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">st</span><span class="o">.</span><span class="n">st_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_http_conditional_fetch</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validators</span><span class="p">:</span> <span class="n">Validators</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DFLT_CHUNK_SIZE</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConditionalOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conditional read for the built-in transport. See :data:`UrlFetcher`.</span>
+
+<span class="sd">    Attached to :func:`_http_chunks` as its ``conditional_fetch`` attribute, so</span>
+<span class="sd">    the built-in transport advertises the capability through the same duck-typed</span>
+<span class="sd">    seam a custom transport uses — rather than :func:`_revalidate` special-casing</span>
+<span class="sd">    it by identity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="n">_file_path_of</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">_file_validators</span><span class="p">(</span><span class="n">local</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current</span> <span class="ow">and</span> <span class="n">current</span> <span class="o">==</span> <span class="n">validators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span><span class="n">not_modified</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span>
+            <span class="n">not_modified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="n">_http_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="n">chunk_size</span><span class="p">),</span>
+            <span class="n">validators</span><span class="o">=</span><span class="n">current</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">request</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">validators</span><span class="o">.</span><span class="n">etag</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s2">&quot;If-None-Match&quot;</span><span class="p">,</span> <span class="n">validators</span><span class="o">.</span><span class="n">etag</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">validators</span><span class="o">.</span><span class="n">last_modified</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s2">&quot;If-Modified-Since&quot;</span><span class="p">,</span> <span class="n">validators</span><span class="o">.</span><span class="n">last_modified</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>  <span class="c1"># noqa: S310 (https URLs)</span>
+    <span class="k">except</span> <span class="n">urllib</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># `HTTPError` *is* the response object, socket and all. Closing it is</span>
+        <span class="c1"># not tidiness: a 304 is the cheap path this whole feature exists for,</span>
+        <span class="c1"># so leaking a connection on every hit would make the optimisation cost</span>
+        <span class="c1"># more than the download it avoids.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="mi">304</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span><span class="n">not_modified</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">e</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ConditionalOutcome</span><span class="p">(</span>
+        <span class="n">not_modified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">chunks</span><span class="o">=</span><span class="n">_drain</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">),</span>
+        <span class="n">validators</span><span class="o">=</span><span class="n">_validators_of</span><span class="p">(</span><span class="n">response</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="n">_http_chunks</span><span class="o">.</span><span class="n">conditional_fetch</span> <span class="o">=</span> <span class="n">_http_conditional_fetch</span>
+<span class="sd">&quot;&quot;&quot;Advertise the built-in transport&#39;s revalidation capability on the fetcher itself.</span>
+
+<span class="sd">:func:`_revalidate` looks for a ``conditional_fetch`` attribute and asks no</span>
+<span class="sd">questions about what the fetcher *is*. Attaching it here rather than</span>
+<span class="sd">special-casing the built-in by identity means the built-in and a custom</span>
+<span class="sd">transport reach revalidation through exactly one code path — and a transport</span>
+<span class="sd">that does not set the attribute is simply never asked, which is the documented</span>
+<span class="sd">&quot;cannot revalidate, therefore re-fetch&quot; case rather than a separate branch.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_drain</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">chunk_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield ``response``&#39;s body in chunks, closing it when done.&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">response</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">chunk_size</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">yield</span> <span class="n">chunk</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validators_of</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validators</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The cache validators an HTTP response offered, if any.&quot;&quot;&quot;</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;headers&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Validators</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">Validators</span><span class="p">(</span>
+        <span class="n">etag</span><span class="o">=</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ETag&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">last_modified</span><span class="o">=</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Last-Modified&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_validators_for</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fetcher</span><span class="p">:</span> <span class="n">UrlFetcher</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Validators</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validators to record alongside a freshly-stored ``url``.</span>
+
+<span class="sd">    Only ``file://`` can produce them without a second request; an HTTP</span>
+<span class="sd">    transport&#39;s response headers are not visible through the plain</span>
+<span class="sd">    :data:`UrlFetcher` seam (it yields bytes, not a response), so an HTTP URL</span>
+<span class="sd">    records none on first fetch and earns them on its first *revalidation*,</span>
+<span class="sd">    which does see the response. Recording nothing is the safe state: no</span>
+<span class="sd">    validators means :func:`_revalidate` returns ``None`` and the next read</span>
+<span class="sd">    re-fetches.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local</span> <span class="o">=</span> <span class="n">_file_path_of</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_file_validators</span><span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="k">if</span> <span class="n">local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Validators</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_store_chunks</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">chunks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span> <span class="n">store</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ContentRef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream ``chunks`` into ``store``; return the ContentRef.</span>
 
 <span class="sd">    The byte count is accumulated *during* the stream, so falaw itself never</span>
 <span class="sd">    holds the payload. Note that **peak process memory is still ~2x the asset**</span>
@@ -508,7 +980,7 @@
     <span class="n">counter</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">counted</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">fetcher</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">:</span>
             <span class="n">counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
             <span class="k">yield</span> <span class="n">chunk</span>
 
@@ -516,15 +988,7 @@
         <span class="n">content_hash</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">put_blob_stream</span><span class="p">(</span><span class="n">counted</span><span class="p">())</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — re-raised as a typed falaw error</span>
         <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Could not fetch asset bytes from </span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. falaw needs the &quot;</span>
-            <span class="s2">&quot;bytes to content-address the artifact, and fal-served URLs expire &quot;</span>
-            <span class="s2">&quot;and are then permanently deleted. If you are running an offline &quot;</span>
-            <span class="s2">&quot;test suite whose stubbed responses carry made-up URLs, install a &quot;</span>
-            <span class="s2">&quot;fake transport (`falaw.testing.fake_assets`, or &quot;</span>
-            <span class="s2">&quot;`falaw.content.using_url_fetcher`) rather than reaching for the &quot;</span>
-            <span class="s2">&quot;network.&quot;</span><span class="p">,</span>
-            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
-            <span class="n">cause</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+            <span class="n">_FETCH_FAILED</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">url</span><span class="p">),</span> <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">),</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">cause</span><span class="o">=</span><span class="n">e</span>
         <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="k">if</span> <span class="n">counter</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">FalAssetFetchError</span><span class="p">(</span>
@@ -547,7 +1011,46 @@
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">digest</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_remember_ref</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="n">ContentRef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_IndexRecord</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One ``url_index`` entry: the remembered hash plus how to recheck it.&quot;&quot;&quot;</span>
+
+    <span class="n">ref</span><span class="p">:</span> <span class="n">ContentRef</span>
+    <span class="n">validators</span><span class="p">:</span> <span class="n">Validators</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_remembered_record</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_IndexRecord</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The full index entry for ``url`` — hash *and* validators.</span>
+
+<span class="sd">    Records written before thorwhalen/falaw#23 have no validator fields and</span>
+<span class="sd">    read back with empty :class:`Validators`. That needs no migration and is</span>
+<span class="sd">    not a compatibility shim: an entry with no validators is exactly an entry</span>
+<span class="sd">    falaw cannot revalidate, which already means &quot;re-fetch&quot;. The old records</span>
+<span class="sd">    degrade into the correct behaviour rather than a special case.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_IndexRecord</span><span class="p">(</span>
+            <span class="n">ref</span><span class="o">=</span><span class="n">ContentRef</span><span class="p">(</span>
+                <span class="n">content_hash</span><span class="o">=</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;content_hash&quot;</span><span class="p">],</span>
+                <span class="n">bytes_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;bytes_size&quot;</span><span class="p">]),</span>
+            <span class="p">),</span>
+            <span class="n">validators</span><span class="o">=</span><span class="n">Validators</span><span class="p">(</span>
+                <span class="n">etag</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;etag&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">last_modified</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;last_modified&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — a corrupt hint is a miss, never a failure</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_remember_ref</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ref</span><span class="p">:</span> <span class="n">ContentRef</span><span class="p">,</span> <span class="n">validators</span><span class="p">:</span> <span class="n">Validators</span> <span class="o">=</span> <span class="n">Validators</span><span class="p">()</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_url_index_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.part&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -556,6 +1059,8 @@
                 <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
                 <span class="s2">&quot;content_hash&quot;</span><span class="p">:</span> <span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span><span class="p">,</span>
                 <span class="s2">&quot;bytes_size&quot;</span><span class="p">:</span> <span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span><span class="p">,</span>
+                <span class="s2">&quot;etag&quot;</span><span class="p">:</span> <span class="n">validators</span><span class="o">.</span><span class="n">etag</span><span class="p">,</span>
+                <span class="s2">&quot;last_modified&quot;</span><span class="p">:</span> <span class="n">validators</span><span class="o">.</span><span class="n">last_modified</span><span class="p">,</span>
             <span class="p">},</span>
             <span class="n">f</span><span class="p">,</span>
         <span class="p">)</span>

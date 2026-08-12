@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.session &mdash; falaw 0.0.32 documentation</title>
+  <title>falaw.degrade &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -101,7 +101,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">falaw.session</li>
+      <li class="breadcrumb-item active">falaw.degrade</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -110,52 +110,81 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for falaw.session</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Session: optional stateful controller over a sequence of falaw operations.</span>
+  <h1>Source code for falaw.degrade</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Where falaw sends &quot;I carried on, but you should know&quot; — one collection point.</span>
 
-<span class="sd">Plain function calls work without a session. Sessions exist to make multi-step</span>
-<span class="sd">flows ergonomic --- a working directory, a result history, and a journal</span>
-<span class="sd">binding that future-you (or another agent) can read.</span>
+<span class="sd">falaw deliberately degrades rather than failing in several places: a failed</span>
+<span class="sd">asset fetch becomes a URL-only artifact instead of discarding a render fal has</span>
+<span class="sd">already billed, and an unreadable origin falls back to bytes already in the</span>
+<span class="sd">store instead of losing the artifact. Every one of those is a decision the</span>
+<span class="sd">caller would want to hear about, and none of them should stop the run.</span>
+
+<span class="sd">``warnings.warn`` alone is the wrong channel for two reasons, both learned:</span>
+
+<span class="sd">* **It deduplicates.** Python&#39;s default filter shows a given message once per</span>
+<span class="sd">  location per process, so on a long-lived server the second and every</span>
+<span class="sd">  subsequent stale serve of the same URL is *silent*.</span>
+<span class="sd">* **It cannot be collected.** Under ``execute_plan(concurrency=N)`` a</span>
+<span class="sd">  speculative probe&#39;s complaint interleaves with real ones, and</span>
+<span class="sd">  ``warnings.catch_warnings`` is documented as not thread-safe — it mutates</span>
+<span class="sd">  process-global filter state, so one call suppressing its own noise would</span>
+<span class="sd">  suppress another call&#39;s genuine warning at random.</span>
+
+<span class="sd">Hence a :class:`~contextvars.ContextVar` sink. Set inside a unit of work it is</span>
+<span class="sd">visible only to that unit (each pool task runs in its own context copy), and</span>
+<span class="sd">when nothing has set one the message falls through to ``warnings.warn``.</span>
+
+<span class="sd">This lives in its own module, below both :mod:`falaw.plan` and</span>
+<span class="sd">:mod:`falaw.content`, because **both** produce degradations and neither may</span>
+<span class="sd">import the other at module scope.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">.journal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Journal</span><span class="p">,</span> <span class="n">_default_journal</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 
 
-<div class="viewcode-block" id="Session">
-<a class="viewcode-back" href="../../module_docs/falaw/session.html#falaw.Session">[docs]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A working session for a sequence of falaw operations.</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;deferred_degrade_warnings&quot;</span><span class="p">,</span> <span class="s2">&quot;emit_degradation&quot;</span><span class="p">]</span>
 
-<span class="sd">    &gt;&gt;&gt; import tempfile</span>
-<span class="sd">    &gt;&gt;&gt; s = Session(output_dir=tempfile.mkdtemp())</span>
-<span class="sd">    &gt;&gt;&gt; s.history</span>
-<span class="sd">    []</span>
+
+<span class="n">DEGRADE_WARNING_SINK</span><span class="p">:</span> <span class="s2">&quot;ContextVar[Optional[list]]&quot;</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">&quot;falaw_degrade_warning_sink&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;The list collecting degradation messages, or ``None`` to warn directly.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="deferred_degrade_warnings">
+<a class="viewcode-back" href="../../module_docs/falaw/degrade.html#falaw.degrade.deferred_degrade_warnings">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deferred_degrade_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect degradation messages into a list instead of warning.&quot;&quot;&quot;</span>
+    <span class="n">sink</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">sink</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="emit_degradation">
+<a class="viewcode-back" href="../../module_docs/falaw/degrade.html#falaw.degrade.emit_degradation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">emit_degradation</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Report that falaw degraded rather than failed.</span>
+
+<span class="sd">    Into the active sink if there is one, else straight to ``warnings.warn``.</span>
+<span class="sd">    Every degradation in falaw goes through here so that none of them can be</span>
+<span class="sd">    the one that escapes collection — the more severe the degradation, the</span>
+<span class="sd">    worse it is for it to be the escapee.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">)</span>
-    <span class="n">journal</span><span class="p">:</span> <span class="n">Journal</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">_default_journal</span><span class="p">)</span>
-    <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Result</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Result</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">latest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Result</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">history</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">kind</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">assets</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">r</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="n">sink</span> <span class="o">=</span> <span class="n">DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">sink</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sink</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
 
 </pre></div>
 

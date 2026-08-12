@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.31 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -61,6 +61,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
@@ -181,6 +182,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.canonical</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_BACKEND</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.degrade</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEGRADE_WARNING_SINK</span><span class="p">,</span>
+    <span class="n">deferred_degrade_warnings</span><span class="p">,</span>
+    <span class="n">emit_degradation</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.outcomes</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallOutcome</span><span class="p">,</span> <span class="n">ExecutionReport</span>
 
 
@@ -1177,29 +1183,11 @@
     <span class="k">return</span> <span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">),</span> <span class="kc">False</span>
 
 
-<span class="n">_DEGRADE_WARNING_SINK</span><span class="p">:</span> <span class="s2">&quot;ContextVar[Optional[list]]&quot;</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
-    <span class="s2">&quot;falaw_degrade_warning_sink&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Where :func:`_content_ref_or_none` sends its complaint instead of warning.</span>
-
-<span class="sd">A :class:`~contextvars.ContextVar` and **not** ``warnings.catch_warnings``,</span>
-<span class="sd">which mutates process-global filter state and is documented as not thread-safe:</span>
-<span class="sd">under ``concurrency &gt; 1`` one call&#39;s speculative cache probe would suppress</span>
-<span class="sd">another call&#39;s genuine warning, at random. A ContextVar set inside a unit of</span>
-<span class="sd">work is visible only to that unit — each pool task runs in its own context copy</span>
-<span class="sd">(see ``copy_context().run`` in :func:`_run_plan`).</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-
-<span class="nd">@contextmanager</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">_deferred_degrade_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect falaw&#39;s own degrade warnings instead of emitting them.&quot;&quot;&quot;</span>
-    <span class="n">sink</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">token</span> <span class="o">=</span> <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">yield</span> <span class="n">sink</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+<span class="c1"># The sink lives in `falaw.degrade` because `falaw.content` degrades too and</span>
+<span class="c1"># cannot import this module at scope. Re-bound here as the historical names so</span>
+<span class="c1"># the surrounding code and its tests keep reading the same way.</span>
+<span class="n">_DEGRADE_WARNING_SINK</span> <span class="o">=</span> <span class="n">DEGRADE_WARNING_SINK</span>
+<span class="n">_deferred_degrade_warnings</span> <span class="o">=</span> <span class="n">deferred_degrade_warnings</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_content_ref_or_none</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_store</span><span class="p">,</span> <span class="n">asset_fetcher</span><span class="p">):</span>
@@ -1224,11 +1212,7 @@
             <span class="s2">&quot;Chained calls downstream of it cannot be cache-reused, and the &quot;</span>
             <span class="s2">&quot;artifact dies with the URL.&quot;</span>
         <span class="p">)</span>
-        <span class="n">sink</span> <span class="o">=</span> <span class="n">_DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">sink</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sink</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">emit_degradation</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">store</span>
 
 

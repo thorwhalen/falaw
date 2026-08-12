@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.session &mdash; falaw 0.0.32 documentation</title>
+  <title>falaw.degrade &mdash; falaw 0.0.32 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -24,8 +24,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="falaw.testing" href="testing.html" />
-    <link rel="prev" title="falaw.scene" href="scene.html" /> 
+    <link rel="next" title="falaw.errors" href="errors.html" />
+    <link rel="prev" title="falaw.cost" href="cost.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -64,7 +64,11 @@
 <li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
 <li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
-<li class="toctree-l1"><a class="reference internal" href="degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.degrade</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.degrade.deferred_degrade_warnings"><code class="docutils literal notranslate"><span class="pre">deferred_degrade_warnings()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.degrade.emit_degradation"><code class="docutils literal notranslate"><span class="pre">emit_degradation()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
@@ -85,10 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.session</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#falaw.session.Session"><code class="docutils literal notranslate"><span class="pre">Session</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
 <li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
 </ul>
 
@@ -106,9 +107,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">falaw.session</li>
+      <li class="breadcrumb-item active">falaw.degrade</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/module_docs/falaw/session.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/module_docs/falaw/degrade.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -116,22 +117,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-falaw.session">
-<span id="falaw-session"></span><h1>falaw.session<a class="headerlink" href="#module-falaw.session" title="Link to this heading"></a></h1>
-<p>Session: optional stateful controller over a sequence of falaw operations.</p>
-<p>Plain function calls work without a session. Sessions exist to make multi-step
-flows ergonomic — a working directory, a result history, and a journal
-binding that future-you (or another agent) can read.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="falaw.session.Session">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.session.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">journal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="journal.html#falaw.journal.Journal" title="falaw.journal.Journal"><span class="pre">Journal</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="results.html#falaw.results.Result" title="falaw.results.Result"><span class="pre">Result</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/session.html#Session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.session.Session" title="Link to this definition"></a></dt>
-<dd><p>A working session for a sequence of falaw operations.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">history</span>
-<span class="go">[]</span>
-</pre></div>
-</div>
+  <section id="module-falaw.degrade">
+<span id="falaw-degrade"></span><h1>falaw.degrade<a class="headerlink" href="#module-falaw.degrade" title="Link to this heading"></a></h1>
+<p>Where falaw sends “I carried on, but you should know” — one collection point.</p>
+<p>falaw deliberately degrades rather than failing in several places: a failed
+asset fetch becomes a URL-only artifact instead of discarding a render fal has
+already billed, and an unreadable origin falls back to bytes already in the
+store instead of losing the artifact. Every one of those is a decision the
+caller would want to hear about, and none of them should stop the run.</p>
+<p><code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code> alone is the wrong channel for two reasons, both learned:</p>
+<ul class="simple">
+<li><p><strong>It deduplicates.</strong> Python’s default filter shows a given message once per
+location per process, so on a long-lived server the second and every
+subsequent stale serve of the same URL is <em>silent</em>.</p></li>
+<li><p><strong>It cannot be collected.</strong> Under <code class="docutils literal notranslate"><span class="pre">execute_plan(concurrency=N)</span></code> a
+speculative probe’s complaint interleaves with real ones, and
+<code class="docutils literal notranslate"><span class="pre">warnings.catch_warnings</span></code> is documented as not thread-safe — it mutates
+process-global filter state, so one call suppressing its own noise would
+suppress another call’s genuine warning at random.</p></li>
+</ul>
+<p>Hence a <code class="xref py py-class docutils literal notranslate"><span class="pre">ContextVar</span></code> sink. Set inside a unit of work it is
+visible only to that unit (each pool task runs in its own context copy), and
+when nothing has set one the message falls through to <code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code>.</p>
+<p>This lives in its own module, below both <a class="reference internal" href="plan.html#module-falaw.plan" title="falaw.plan"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.plan</span></code></a> and
+<a class="reference internal" href="content.html#module-falaw.content" title="falaw.content"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.content</span></code></a>, because <strong>both</strong> produce degradations and neither may
+import the other at module scope.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.degrade.deferred_degrade_warnings">
+<span class="sig-prename descclassname"><span class="pre">falaw.degrade.</span></span><span class="sig-name descname"><span class="pre">deferred_degrade_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/degrade.html#deferred_degrade_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.degrade.deferred_degrade_warnings" title="Link to this definition"></a></dt>
+<dd><p>Collect degradation messages into a list instead of warning.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.degrade.emit_degradation">
+<span class="sig-prename descclassname"><span class="pre">falaw.degrade.</span></span><span class="sig-name descname"><span class="pre">emit_degradation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/degrade.html#emit_degradation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.degrade.emit_degradation" title="Link to this definition"></a></dt>
+<dd><p>Report that falaw degraded rather than failed.</p>
+<p>Into the active sink if there is one, else straight to <code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code>.
+Every degradation in falaw goes through here so that none of them can be
+the one that escapes collection — the more severe the degradation, the
+worse it is for it to be the escapee.</p>
 </dd></dl>
 
 </section>
@@ -140,8 +164,8 @@ binding that future-you (or another agent) can read.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="scene.html" class="btn btn-neutral float-left" title="falaw.scene" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="testing.html" class="btn btn-neutral float-right" title="falaw.testing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cost.html" class="btn btn-neutral float-left" title="falaw.cost" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="errors.html" class="btn btn-neutral float-right" title="falaw.errors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
