@@ -365,6 +365,7 @@ def materialize_asset(
         remembered_ref,
         write_blob_to_file,
     )
+    from .degrade import emit_degradation
     from .errors import FalAssetFetchError
 
     hint = None if refresh else remembered_ref(url)
@@ -380,7 +381,7 @@ def materialize_asset(
 
     try:
         ref = content_ref_for_url(url, store=store, fetcher=fetcher, refresh=refresh)
-    except FalAssetFetchError:
+    except FalAssetFetchError as e:
         # Circle 1 as a *fallback* rather than a shortcut. For a mutable URL we
         # had to try the origin first — returning the old file while a newer one
         # was one request away is falaw#23 — but having tried and found the
@@ -388,11 +389,10 @@ def materialize_asset(
         # store is prunable and fal URLs expire, so a materialized file
         # routinely outlives both.
         if local_hint_path is not None and os.path.exists(local_hint_path):
-            warnings.warn(
-                f"Could not re-read {url!r}; returning the copy materialized "
-                "earlier. If that URL is mutable, this file may be superseded.",
-                UserWarning,
-                stacklevel=2,
+            emit_degradation(
+                f"{url!r} could not be re-read ({e}); returning the copy "
+                "materialized earlier. If that URL is mutable, this file may "
+                "be superseded."
             )
             return local_hint_path
         raise

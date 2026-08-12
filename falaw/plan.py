@@ -69,6 +69,11 @@ from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Iterator, Literal, Optional
 
 from .canonical import DFLT_BACKEND
+from .degrade import (
+    DEGRADE_WARNING_SINK,
+    deferred_degrade_warnings,
+    emit_degradation,
+)
 from .outcomes import CallOutcome, ExecutionReport
 
 
@@ -1032,29 +1037,11 @@ def _execute_call(
     return converter(raw, call), False
 
 
-_DEGRADE_WARNING_SINK: "ContextVar[Optional[list]]" = ContextVar(
-    "falaw_degrade_warning_sink", default=None
-)
-"""Where :func:`_content_ref_or_none` sends its complaint instead of warning.
-
-A :class:`~contextvars.ContextVar` and **not** ``warnings.catch_warnings``,
-which mutates process-global filter state and is documented as not thread-safe:
-under ``concurrency > 1`` one call's speculative cache probe would suppress
-another call's genuine warning, at random. A ContextVar set inside a unit of
-work is visible only to that unit — each pool task runs in its own context copy
-(see ``copy_context().run`` in :func:`_run_plan`).
-"""
-
-
-@contextmanager
-def _deferred_degrade_warnings() -> Iterator[list]:
-    """Collect falaw's own degrade warnings instead of emitting them."""
-    sink: list = []
-    token = _DEGRADE_WARNING_SINK.set(sink)
-    try:
-        yield sink
-    finally:
-        _DEGRADE_WARNING_SINK.reset(token)
+# The sink lives in `falaw.degrade` because `falaw.content` degrades too and
+# cannot import this module at scope. Re-bound here as the historical names so
+# the surrounding code and its tests keep reading the same way.
+_DEGRADE_WARNING_SINK = DEGRADE_WARNING_SINK
+_deferred_degrade_warnings = deferred_degrade_warnings
 
 
 def _content_ref_or_none(url: str, content_store, asset_fetcher):
@@ -1079,11 +1066,7 @@ def _content_ref_or_none(url: str, content_store, asset_fetcher):
             "Chained calls downstream of it cannot be cache-reused, and the "
             "artifact dies with the URL."
         )
-        sink = _DEGRADE_WARNING_SINK.get()
-        if sink is None:
-            warnings.warn(message, UserWarning, stacklevel=4)
-        else:
-            sink.append(message)
+        emit_degradation(message, stacklevel=4)
         return None, store
 
 

@@ -92,6 +92,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import warnings
 import urllib.error
@@ -103,6 +104,7 @@ from dataclasses import dataclass
 from typing import Callable, Iterable, Iterator, Optional
 
 from .cache import _cache_dir
+from .degrade import emit_degradation
 from .errors import FalAssetFetchError
 
 
@@ -134,8 +136,51 @@ revalidation round-trip per asset. Adding a host that is *not* immutable
 re-introduces thorwhalen/falaw#23, so add only what you mint yourself.
 """
 
-IMMUTABLE_URL_HOST_SUFFIXES = (".fal.media", ".fal.run")
-"""Subdomain suffixes covered by :data:`IMMUTABLE_URL_HOSTS` (``v3b.fal.media``)."""
+_FETCH_FAILED = (
+    "Could not fetch asset bytes from {url}: {error}. falaw needs the bytes to "
+    "content-address the artifact, and fal-served URLs expire and are then "
+    "permanently deleted. If you are running an offline test suite whose "
+    "stubbed responses carry made-up URLs, install a fake transport "
+    "(`falaw.testing.fake_assets`, or `falaw.content.using_url_fetcher`) rather "
+    "than reaching for the network."
+)
+"""The one fetch-failure message.
+
+Shared by the eager path (a transport that fails at request time) and the lazy
+one (a transport that fails mid-stream). They used to differ, and the eager one
+— which the built-in transport now always takes, because a conditional request
+calls `urlopen` before returning chunks — was the terse one, losing exactly the
+guidance `falaw.testing` exists to give.
+"""
+
+GONE_HTTP_STATUSES = frozenset({404, 410})
+"""Statuses that mean the asset is gone, rather than momentarily unreachable.
+
+The whole list, deliberately. ``5xx``, ``429`` and every transport error are
+*transient* until proven otherwise, and serving stored bytes in response to one
+is how a superseded content hash gets reported as current forever.
+"""
+
+_NETLOC_FORBIDDEN = ("\\", "%", "@", " ", "\t", "\n", "\r", "\x00")
+"""Characters that disqualify a netloc from ever being judged immutable.
+
+Not a hostname-validity rule — a *parser-agreement* rule. Each of these is read
+differently by Python's ``urlsplit`` and by a WHATWG-conformant client
+(``requests``/``urllib3``), so a netloc containing one means falaw's idea of the
+host and the transport's idea of the host may differ. ``@`` is included even
+though Python handles it consistently: userinfo has no legitimate role in a
+media URL, and every spoof of the form ``https://fal.media@evil.example/x``
+depends on it.
+"""
+
+_HOSTNAME_RE = re.compile(r"[a-z0-9]([a-z0-9.-]*[a-z0-9])?")
+"""A plain DNS name. Anything else is refused by :func:`is_immutable_url`.
+
+Deliberately narrow. The job is not to validate hostnames but to guarantee that
+falaw's idea of the host and the transport's idea of the host cannot diverge —
+which they do the moment a netloc contains a character Python treats as data
+and a WHATWG-conformant client treats as a delimiter.
+"""
 
 CONTENT_STORE_DIRNAME = "content"
 """Sub-directory of the falaw cache holding the default content store."""
@@ -290,27 +335,68 @@ def is_immutable_url(url: str) -> bool:
     """Whether ``url`` is guaranteed never to serve different bytes later.
 
     True only for hosts falaw knows mint a fresh URL per upload —
-    :data:`IMMUTABLE_URL_HOSTS` and :data:`IMMUTABLE_URL_HOST_SUFFIXES`, which
-    is fal's own CDN out of the box. **Everything else is mutable**, including
-    ``file://``: a locally-rendered clip re-rendered to the same path is the
-    textbook case of one URL serving two different things.
+    :data:`IMMUTABLE_URL_HOSTS`, which is fal's own CDN out of the box, and any
+    **subdomain** of one. **Everything else is mutable**, including ``file://``:
+    a locally-rendered clip re-rendered to the same path is the textbook case of
+    one URL serving two different things.
 
     The default is the safe one on purpose. Guessing "probably immutable" for
     an unknown host is what thorwhalen/falaw#23 was: a changed input producing
     an unchanged content address, silently, with the stale hash flowing into
     ``Artifact.asset_id`` and every downstream cache key.
 
+    Two rules make this a *security* boundary rather than a string comparison,
+    and both were added after a review reproduced falaw#23 against the first
+    cut of this function:
+
+    1. **The host must be a plain DNS name.** ``urlsplit().hostname`` is not
+       what an HTTP client resolves. Python accepts a backslash (and ``%2F``)
+       inside a netloc, while WHATWG-conformant clients — including
+       ``requests``/``urllib3`` — treat them as *delimiters*. So
+       ``http://127.0.0.1:8000\\@fal.media/x`` parses here with hostname
+       ``fal.media`` and is fetched from ``127.0.0.1``. Anything outside
+       ``[a-z0-9.-]`` is therefore refused outright.
+    2. **Matching is label-wise, never by raw suffix.** ``endswith(".fal.media")``
+       is true of ``evil.com\\.fal.media``; ``host == h or host.endswith("." + h)``
+       is not.
+
     >>> is_immutable_url("https://v3b.fal.media/files/x.png")
+    True
+    >>> is_immutable_url("https://fal.media/files/x.png")
     True
     >>> is_immutable_url("https://example.com/reference.png")
     False
     >>> is_immutable_url("file:///tmp/render.mp4")
     False
+
+    A host that merely *contains* a trusted name is not that host, however it
+    is spelled:
+
+    >>> is_immutable_url("https://fal.media@evil.example/x.png")
+    False
+    >>> is_immutable_url("https://notfal.media/x.png")
+    False
+    >>> is_immutable_url("http://127.0.0.1:8000\\\\@fal.media/x.png")
+    False
     """
-    host = (urllib.parse.urlsplit(url).hostname or "").lower()
-    if not host:
+    split = urllib.parse.urlsplit(url)
+    # Judge the *raw* netloc first. `split.hostname` has already made a choice
+    # about where the host ends, and that choice is the one an attacker
+    # controls: Python splits userinfo on the last `@` and treats `\` as data,
+    # so `http://127.0.0.1:8000\@fal.media/x` hands back `fal.media` while
+    # requests/urllib3 fetch from `127.0.0.1`. Any netloc carrying a character
+    # two conformant parsers can read differently is refused before the host is
+    # even looked at — and userinfo is refused outright, because a media URL has
+    # no use for it and its only role here is to move the apparent host.
+    if not split.netloc or any(c in split.netloc for c in _NETLOC_FORBIDDEN):
         return False
-    return host in IMMUTABLE_URL_HOSTS or host.endswith(IMMUTABLE_URL_HOST_SUFFIXES)
+    host = (split.hostname or "").lower().rstrip(".")
+    if not host or not _HOSTNAME_RE.fullmatch(host):
+        return False
+    return any(
+        host == trusted or host.endswith("." + trusted)
+        for trusted in IMMUTABLE_URL_HOSTS
+    )
 
 
 def content_ref_for_url(
@@ -383,28 +469,63 @@ def content_ref_for_url(
     validators = record.validators if have_blob else Validators()
     try:
         outcome = _read(url, fetcher, validators)
-        if outcome.not_modified:
-            return record.ref
-        ref = _store_chunks(url, outcome.chunks or (), store)
-    except FalAssetFetchError:
-        # The origin is gone, but we already hold the bytes. Serving them is the
-        # falaw#14 guarantee — "a months-old cache hit still yields a usable
+    except FalAssetFetchError as e:
+        # The origin is **gone**, and we already hold the bytes. Serving them is
+        # the falaw#14 guarantee — "a months-old cache hit still yields a usable
         # artifact instead of a dead link" — and it does not reintroduce
-        # falaw#23: we are here *because* the fetch failed, so there is no newer
-        # version being shadowed. Staleness is only a lie when the truth was
-        # available and we did not look.
-        if have_blob:
-            warnings.warn(
-                f"Could not re-read {url!r} to confirm it is unchanged; serving "
-                f"the {record.ref.bytes_size} bytes falaw stored earlier. If that "
-                "URL is mutable, this content hash may name superseded bytes.",
-                UserWarning,
-                stacklevel=2,
+        # falaw#23: there is no newer version being shadowed, because there is
+        # no newer version.
+        #
+        # Only for a *definitive* absence, though. An earlier cut caught every
+        # error here, which meant a timeout, a 500, a 429 or a rate-limit made
+        # falaw report the superseded hash as current — on that call and every
+        # later one. That inverts this fallback's own justification: the truth
+        # was available, falaw looked, and answered from memory anyway.
+        if have_blob and _is_definitively_gone(e):
+            emit_degradation(
+                f"{url!r} is gone from its origin ({e}); serving the "
+                f"{record.ref.bytes_size} bytes falaw stored earlier. If that "
+                "URL was mutable, this content hash may name superseded bytes."
             )
             return record.ref
         raise
+    if outcome.not_modified:
+        # Believe "unchanged" only when there is something unchanged to serve.
+        # `have_blob` gates *sending* validators, but a transport is not
+        # obliged to be correct, and this module's own thesis — an unverifiable
+        # claim is not evidence — applies at least as much to an injected
+        # transport as to an index entry falaw wrote itself.
+        if not have_blob:
+            raise FalAssetFetchError(
+                f"Transport answered 'not modified' for {url!r}, but falaw holds "
+                "no bytes for it. A conditional_fetch may only answer "
+                "not_modified to validators it was given, and none were sent.",
+                url=url,
+            )
+        return record.ref
+    # Outside the `try`: a failure to *store* is not the origin being gone. An
+    # earlier cut had `_store_chunks` inside it, so a full disk — the exact
+    # condition `falaw.prune` exists for — discarded bytes already in hand and
+    # returned the previous content hash for them.
+    ref = _store_chunks(url, outcome.chunks or (), store)
     _remember_ref(url, ref, outcome.validators)
     return ref
+
+
+def _is_definitively_gone(error: FalAssetFetchError) -> bool:
+    """Whether ``error`` proves the asset no longer exists at its origin.
+
+    True only for an answer that cannot be transient: HTTP ``404``/``410``, or a
+    local file that is not there. A timeout, a refused connection, a ``5xx``, a
+    ``429`` and a DNS failure are all **false** — they say the origin could not
+    be *reached*, which is a different claim from the asset being gone, and
+    treating them alike is what let a stale hash be reported as current
+    indefinitely.
+    """
+    cause = getattr(error, "cause", None)
+    if isinstance(cause, urllib.error.HTTPError):
+        return cause.code in GONE_HTTP_STATUSES
+    return isinstance(cause, FileNotFoundError)
 
 
 def _conditional_capability(fetcher: UrlFetcher):
@@ -417,11 +538,26 @@ def _conditional_capability(fetcher: UrlFetcher):
     Looking only at the callable would find nothing, and every mutable URL in
     every downstream suite would re-download forever while appearing to work.
     """
-    capability = getattr(fetcher, "conditional_fetch", None)
-    if capability is not None:
-        return capability
-    owner = getattr(fetcher, "__self__", None)
-    return None if owner is None else getattr(owner, "conditional_fetch", None)
+    for candidate in (
+        fetcher,
+        getattr(fetcher, "__self__", None),
+        _partial_target(fetcher),
+    ):
+        capability = getattr(candidate, "conditional_fetch", None)
+        if callable(capability):
+            return capability
+    return None
+
+
+def _partial_target(fetcher):
+    """The callable wrapped by a :func:`functools.partial`, if that is what this is.
+
+    ``partial(assets.chunks, chunk_size=4096)`` is a natural way to install the
+    documented fake, and it hides both the attribute and ``__self__``. Losing
+    the capability there is silent and costs a full download per read.
+    """
+    inner = getattr(fetcher, "func", None)
+    return None if inner is None else getattr(inner, "__self__", inner)
 
 
 def _read(url: str, fetcher: UrlFetcher, validators: Validators) -> ConditionalOutcome:
@@ -436,24 +572,32 @@ def _read(url: str, fetcher: UrlFetcher, validators: Validators) -> ConditionalO
     rather than the fix.
 
     A transport without the capability still works; it simply never gets a cheap
-    answer. Eager failures are wrapped so the caller sees one error type whether
-    the transport failed at request time or mid-stream.
+    answer. **So does one whose capability is not the capability**: the lookup is
+    duck-typed, so an unrelated ``conditional_fetch``, a wrong signature, or a
+    ``MagicMock`` (which auto-creates any attribute, and whose every return value
+    is truthy) all reach here. Anything that does not hand back a real
+    :class:`ConditionalOutcome` is therefore treated as *no capability* and falls
+    through to a plain fetch — never as a "not modified" to be believed.
     """
     conditional = _conditional_capability(fetcher)
-    if conditional is None:
-        return ConditionalOutcome(
-            not_modified=False,
-            chunks=fetcher(url),
-            validators=_validators_for(url, fetcher),
-        )
-    try:
-        return conditional(url, validators)
-    except FalAssetFetchError:
-        raise
-    except Exception as e:  # noqa: BLE001 — normalized to falaw's typed error
-        raise FalAssetFetchError(
-            f"Could not fetch asset bytes from {url!r}: {e}.", url=url, cause=e
-        ) from e
+    if conditional is not None:
+        try:
+            outcome = conditional(url, validators)
+        except FalAssetFetchError:
+            raise
+        except TypeError:
+            outcome = None  # not the capability we meant; fall through
+        except Exception as e:  # noqa: BLE001 — normalized to falaw's typed error
+            raise FalAssetFetchError(
+                _FETCH_FAILED.format(url=repr(url), error=e), url=url, cause=e
+            ) from e
+        if isinstance(outcome, ConditionalOutcome):
+            return outcome
+    return ConditionalOutcome(
+        not_modified=False,
+        chunks=fetcher(url),
+        validators=_validators_for(url, fetcher),
+    )
 
 
 def remembered_ref(url: str) -> Optional[ContentRef]:
@@ -557,18 +701,31 @@ def _file_path_of(url: str) -> Optional[str]:
 
 
 def _file_validators(path: str) -> Validators:
-    """A synthetic validator for a local file: its ``(mtime_ns, size)``.
+    """A synthetic validator for a local file: ``(mtime_ns, ctime_ns, size)``.
 
     ``file://`` has no ETag, and locally-rendered media is exactly the mutable
-    case — re-rendering a clip to the same path leaves the URL identical and
-    the bytes different. ``(mtime_ns, size)`` is what a filesystem can answer
-    without reading the file, which is the whole point of a validator.
+    case — re-rendering a clip to the same path leaves the URL identical and the
+    bytes different. These three are what a filesystem answers *without reading
+    the file*, which is the whole point of a validator.
+
+    **This is a heuristic and it can collide**, which the fallback below cannot:
+    a same-length rewrite that also preserves the timestamps reads as unchanged.
+    ``ctime_ns`` is included precisely because it narrows that a lot — it is the
+    inode's own change time, which the kernel updates on any metadata write and
+    which ``cp -p`` / ``rsync -t`` / ``git checkout`` / ``tar -x`` / ``os.utime``
+    cannot forge, so the classic "restored a file and kept its mtime" case is
+    caught. What remains uncovered is a same-length in-place rewrite on a
+    filesystem with coarse timestamp granularity (HFS+ 1 s, FAT 2 s, some
+    network mounts) inside one tick.
+
+    If that matters for your data, pass ``refresh=True``, or do not address
+    mutable local media by path.
     """
     try:
         st = os.stat(path)
     except OSError:
         return Validators()
-    return Validators(etag=f"file:{st.st_mtime_ns}:{st.st_size}")
+    return Validators(etag=f"file:{st.st_mtime_ns}:{st.st_ctime_ns}:{st.st_size}")
 
 
 def _http_conditional_fetch(
@@ -600,9 +757,16 @@ def _http_conditional_fetch(
     try:
         response = urllib.request.urlopen(request)  # noqa: S310 (https URLs)
     except urllib.error.HTTPError as e:
-        if e.code == 304:
-            return ConditionalOutcome(not_modified=True)
-        raise
+        # `HTTPError` *is* the response object, socket and all. Closing it is
+        # not tidiness: a 304 is the cheap path this whole feature exists for,
+        # so leaking a connection on every hit would make the optimisation cost
+        # more than the download it avoids.
+        try:
+            if e.code == 304:
+                return ConditionalOutcome(not_modified=True)
+            raise
+        finally:
+            e.close()
     return ConditionalOutcome(
         not_modified=False,
         chunks=_drain(response, chunk_size),
@@ -681,15 +845,7 @@ def _store_chunks(url: str, chunks: Iterable[bytes], store) -> ContentRef:
         content_hash = store.put_blob_stream(counted())
     except Exception as e:  # noqa: BLE001 — re-raised as a typed falaw error
         raise FalAssetFetchError(
-            f"Could not fetch asset bytes from {url!r}: {e}. falaw needs the "
-            "bytes to content-address the artifact, and fal-served URLs expire "
-            "and are then permanently deleted. If you are running an offline "
-            "test suite whose stubbed responses carry made-up URLs, install a "
-            "fake transport (`falaw.testing.fake_assets`, or "
-            "`falaw.content.using_url_fetcher`) rather than reaching for the "
-            "network.",
-            url=url,
-            cause=e,
+            _FETCH_FAILED.format(url=repr(url), error=e), url=url, cause=e
         ) from e
     if counter[0] == 0:
         raise FalAssetFetchError(

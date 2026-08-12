@@ -234,6 +234,15 @@ class FakeAssets:
         """
         self.by_url: dict[str, Optional[bytes]] = {}
         self.fetched: list[str] = []
+        self.revalidated: list[str] = []
+        """URLs answered with a cheap "unchanged" — no body transferred.
+
+        Separate from :attr:`fetched` because the two are the *point* of
+        falaw#23 and a suite must be able to tell them apart. Without this, "we
+        revalidated cheaply" and "we never asked at all" are indistinguishable,
+        and every cheap-path assertion in the suite is equally satisfied by the
+        un-fixed code that simply trusted its index.
+        """
         self.synthetic_prefix = synthetic_prefix
         self.fake_non_network_urls = fake_non_network_urls
 
@@ -327,8 +336,10 @@ class FakeAssets:
             raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)  # type: ignore[arg-type]
         current = Validators(etag=_etag_of(data))
         if validators and validators.etag == current.etag:
-            # Not recorded in `fetched`: no body crossed the wire, which is
-            # exactly what a caller asserting "did not refetch" means.
+            # Recorded in `revalidated`, not `fetched`: a request happened, but
+            # no body crossed the wire — which is exactly what a caller
+            # asserting "did not refetch" means, and distinct from not asking.
+            self.revalidated.append(url)
             return ConditionalOutcome(not_modified=True)
         return ConditionalOutcome(
             not_modified=False,
