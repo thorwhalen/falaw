@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.30 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.31 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=61a342a2"></script>
+      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -76,6 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
@@ -159,6 +160,13 @@
 
 
 <span class="c1"># --- cache root -----------------------------------------------------------</span>
+
+<span class="n">ASSETS_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;assets&quot;</span>
+<span class="sd">&quot;&quot;&quot;Sub-directory of the falaw cache holding :func:`materialize_asset` copies.</span>
+
+<span class="sd">Named here rather than in :mod:`falaw.prune` because :func:`_asset_path` is</span>
+<span class="sd">what decides the layout; the prune side reads this so the two cannot drift.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -491,7 +499,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Where :func:`materialize_asset` puts the bytes for ``content_hash``.&quot;&quot;&quot;</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">_infer_ext_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key_hint</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">key_hint</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}{</span><span class="n">content_hash</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="s2">&quot;assets&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="n">ASSETS_DIRNAME</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_infer_ext_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -516,19 +524,42 @@
 <div class="viewcode-block" id="cache_stats">
 <a class="viewcode-back" href="../../module_docs/falaw/cache.html#falaw.cache_stats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cache_stats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quick summary of the cache: entry count and disk usage.&quot;&quot;&quot;</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">_cache_dir</span><span class="p">()</span>
-    <span class="n">entries</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">total_bytes</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-            <span class="n">entries</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="s2">&quot;manifest.json&quot;</span><span class="p">)</span>
-            <span class="n">total_bytes</span> <span class="o">+=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quick summary of the cache: entry count, disk usage, and where it went.</span>
+
+<span class="sd">    ``areas`` is the part worth reading. Since falaw#14 the cache holds the</span>
+<span class="sd">    *bytes* of every generated asset, so a total on its own cannot distinguish</span>
+<span class="sd">    gigabytes of irreplaceable blobs from gigabytes of ``assets/`` copies that</span>
+<span class="sd">    cost nothing to regenerate — and only the second is safe to reclaim without</span>
+<span class="sd">    thinking. Each area&#39;s economics, and the primitives that reclaim it, are in</span>
+<span class="sd">    :mod:`falaw.prune`.</span>
+
+<span class="sd">    ``size_bytes`` is every byte under the cache root, unchanged in meaning from</span>
+<span class="sd">    before the breakdown existed: the ``other`` area absorbs whatever the named</span>
+<span class="sd">    areas do not claim, so the areas always sum to the whole.</span>
+
+<span class="sd">    (``+SKIP``\\ ed — it reads the caller&#39;s real cache, a multi-gigabyte walk on</span>
+<span class="sd">    the production box. :mod:`tests.test_prune` pins this against a throwaway</span>
+<span class="sd">    cache instead.)</span>
+
+<span class="sd">    &gt;&gt;&gt; stats = cache_stats()                        # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; sorted(stats[&quot;areas&quot;])                       # doctest: +SKIP</span>
+<span class="sd">    [&#39;assets&#39;, &#39;content&#39;, &#39;manifests&#39;, &#39;other&#39;, &#39;scenes&#39;, &#39;url_index&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Local import: `falaw.prune` imports `_cache_dir` from this module, so a</span>
+    <span class="c1"># module-scope import would be a cycle — the same reason</span>
+    <span class="c1"># `materialize_asset` imports `falaw.content` inside the function body.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.prune</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_usage</span>
+
+    <span class="n">usage</span> <span class="o">=</span> <span class="n">cache_usage</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="n">root</span><span class="p">,</span>
-        <span class="s2">&quot;manifest_entries&quot;</span><span class="p">:</span> <span class="n">entries</span><span class="p">,</span>
-        <span class="s2">&quot;size_bytes&quot;</span><span class="p">:</span> <span class="n">total_bytes</span><span class="p">,</span>
-        <span class="s2">&quot;size_mb&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_bytes</span> <span class="o">/</span> <span class="mi">1_000_000</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+        <span class="s2">&quot;manifest_entries&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="s2">&quot;manifests&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span>
+        <span class="s2">&quot;size_bytes&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_bytes</span><span class="p">,</span>
+        <span class="s2">&quot;size_mb&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_megabytes</span><span class="p">,</span>
+        <span class="s2">&quot;areas&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="s2">&quot;size_mb&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">megabytes</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">usage</span><span class="o">.</span><span class="n">areas</span>
+        <span class="p">},</span>
     <span class="p">}</span></div>
 
 </pre></div>

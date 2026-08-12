@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; falaw 0.0.30 documentation</title>
+  <title>&lt;no title&gt; &mdash; falaw 0.0.31 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=61a342a2"></script>
+      <script src="_static/documentation_options.js?v=c5dbc6bb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -77,6 +77,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/results.html">falaw.results</a></li>
@@ -114,8 +115,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw.html">falaw</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.AccountStatus"><code class="docutils literal notranslate"><span class="pre">AccountStatus</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.AreaUsage"><code class="docutils literal notranslate"><span class="pre">AreaUsage</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Asset"><code class="docutils literal notranslate"><span class="pre">Asset</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Beat"><code class="docutils literal notranslate"><span class="pre">Beat</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.CacheUsage"><code class="docutils literal notranslate"><span class="pre">CacheUsage</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.CallOutcome"><code class="docutils literal notranslate"><span class="pre">CallOutcome</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.CallPlan"><code class="docutils literal notranslate"><span class="pre">CallPlan</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Character"><code class="docutils literal notranslate"><span class="pre">Character</span></code></a></li>
@@ -141,6 +144,8 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.ModelRecord"><code class="docutils literal notranslate"><span class="pre">ModelRecord</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Plan"><code class="docutils literal notranslate"><span class="pre">Plan</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.ProgressEvent"><code class="docutils literal notranslate"><span class="pre">ProgressEvent</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.PruneCandidate"><code class="docutils literal notranslate"><span class="pre">PruneCandidate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.PruneReport"><code class="docutils literal notranslate"><span class="pre">PruneReport</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Scene"><code class="docutils literal notranslate"><span class="pre">Scene</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.Session"><code class="docutils literal notranslate"><span class="pre">Session</span></code></a></li>
@@ -154,6 +159,7 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.cache_get"><code class="docutils literal notranslate"><span class="pre">cache_get()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.cache_put"><code class="docutils literal notranslate"><span class="pre">cache_put()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.cache_stats"><code class="docutils literal notranslate"><span class="pre">cache_stats()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.cache_usage"><code class="docutils literal notranslate"><span class="pre">cache_usage()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.cached_call_fal"><code class="docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.call_fal"><code class="docutils literal notranslate"><span class="pre">call_fal()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.call_plan_from_dict"><code class="docutils literal notranslate"><span class="pre">call_plan_from_dict()</span></code></a></li>
@@ -199,6 +205,9 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.plan_llm_complete"><code class="docutils literal notranslate"><span class="pre">plan_llm_complete()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.plan_text_to_speech"><code class="docutils literal notranslate"><span class="pre">plan_text_to_speech()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.plan_to_dict"><code class="docutils literal notranslate"><span class="pre">plan_to_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.prune_assets"><code class="docutils literal notranslate"><span class="pre">prune_assets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.prune_content"><code class="docutils literal notranslate"><span class="pre">prune_content()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.prune_manifests"><code class="docutils literal notranslate"><span class="pre">prune_manifests()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_full_docs"><code class="docutils literal notranslate"><span class="pre">refresh_full_docs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_llms"><code class="docutils literal notranslate"><span class="pre">refresh_llms()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_models_from_corpus"><code class="docutils literal notranslate"><span class="pre">refresh_models_from_corpus()</span></code></a></li>
@@ -257,6 +266,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/cache.html">falaw.cache</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cache.html#falaw.cache.ASSETS_DIRNAME"><code class="docutils literal notranslate"><span class="pre">ASSETS_DIRNAME</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cache.html#falaw.cache.cache_get"><code class="docutils literal notranslate"><span class="pre">cache_get()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cache.html#falaw.cache.cache_put"><code class="docutils literal notranslate"><span class="pre">cache_put()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/cache.html#falaw.cache.cache_stats"><code class="docutils literal notranslate"><span class="pre">cache_stats()</span></code></a></li>
@@ -419,11 +429,23 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.call_plan_to_dict"><code class="docutils literal notranslate"><span class="pre">call_plan_to_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.execute"><code class="docutils literal notranslate"><span class="pre">execute()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.execute_isolated"><code class="docutils literal notranslate"><span class="pre">execute_isolated()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.extract_first_url"><code class="docutils literal notranslate"><span class="pre">extract_first_url()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.make_call_plan"><code class="docutils literal notranslate"><span class="pre">make_call_plan()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.plan_dependencies"><code class="docutils literal notranslate"><span class="pre">plan_dependencies()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.plan_from_dict"><code class="docutils literal notranslate"><span class="pre">plan_from_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.plan_hash"><code class="docutils literal notranslate"><span class="pre">plan_hash()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/plan.html#falaw.plan.plan_to_dict"><code class="docutils literal notranslate"><span class="pre">plan_to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/prune.html">falaw.prune</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.AreaUsage"><code class="docutils literal notranslate"><span class="pre">AreaUsage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.CacheUsage"><code class="docutils literal notranslate"><span class="pre">CacheUsage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.PruneCandidate"><code class="docutils literal notranslate"><span class="pre">PruneCandidate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.PruneReport"><code class="docutils literal notranslate"><span class="pre">PruneReport</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.cache_usage"><code class="docutils literal notranslate"><span class="pre">cache_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.prune_assets"><code class="docutils literal notranslate"><span class="pre">prune_assets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.prune_content"><code class="docutils literal notranslate"><span class="pre">prune_content()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/prune.html#falaw.prune.prune_manifests"><code class="docutils literal notranslate"><span class="pre">prune_manifests()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/refresh.html">falaw.refresh</a><ul>

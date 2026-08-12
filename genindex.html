@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.30 documentation</title>
+  <title>Index &mdash; falaw 0.0.31 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=61a342a2"></script>
+      <script src="_static/documentation_options.js?v=c5dbc6bb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -76,6 +76,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/registry.html">falaw.registry</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/results.html">falaw.results</a></li>
@@ -172,12 +173,24 @@
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.apply_note_to_beat">(in module falaw.operations.llm)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.apply_note_to_scene">apply_note_to_scene() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.apply_note_to_scene">(in module falaw.operations.llm)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw.html#falaw.CacheUsage.area">area() (falaw.CacheUsage method)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.CacheUsage.area">(falaw.prune.CacheUsage method)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.AreaUsage">AreaUsage (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.AreaUsage">(class in falaw.prune)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw.html#falaw.CallPlan.arguments">arguments (falaw.CallPlan attribute)</a>
@@ -204,6 +217,8 @@
         <li><a href="module_docs/falaw/results.html#falaw.results.Asset">(class in falaw.results)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/cache.html#falaw.cache.ASSETS_DIRNAME">ASSETS_DIRNAME (in module falaw.cache)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -314,6 +329,12 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan.cache_status">(falaw.plan.CallPlan attribute)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.cache_usage">cache_usage() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.cache_usage">(in module falaw.prune)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.cached_call_fal">cached_call_fal() (in module falaw)</a>
 
       <ul>
@@ -322,6 +343,12 @@
       </ul></li>
       <li><a href="module_docs/falaw/plan.html#falaw.plan.CacheStatus">CacheStatus (in module falaw.plan)</a>
 </li>
+      <li><a href="module_docs/falaw.html#falaw.CacheUsage">CacheUsage (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.CacheUsage">(class in falaw.prune)</a>
+</li>
+      </ul></li>
       <li><a href="module_docs/falaw.html#falaw.CallOutcome.call">call (falaw.CallOutcome attribute)</a>
 
       <ul>
@@ -358,14 +385,14 @@
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.CallOutcome">(class in falaw.outcomes)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.CallPlan">CallPlan (class in falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan">(class in falaw.plan)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.CallStatus">CallStatus (in module falaw.outcomes)</a>
 </li>
       <li><a href="module_docs/falaw/canonical.html#falaw.canonical.canonical_blob">canonical_blob() (in module falaw.canonical)</a>
@@ -602,6 +629,8 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan.expected_duration_s">(falaw.plan.CallPlan attribute)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/plan.html#falaw.plan.extract_first_url">extract_first_url() (in module falaw.plan)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.extract_models_from_corpus">extract_models_from_corpus() (in module falaw)</a>
 
       <ul>
@@ -772,8 +801,6 @@
         <li><a href="module_docs/falaw/operations.html#module-falaw.operations">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations._plan
 
@@ -781,6 +808,8 @@
         <li><a href="module_docs/falaw/operations/_plan.html#module-falaw.operations._plan">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     falaw.operations.audio
 
@@ -842,6 +871,13 @@
 
       <ul>
         <li><a href="module_docs/falaw/plan.html#module-falaw.plan">module</a>
+</li>
+      </ul></li>
+      <li>
+    falaw.prune
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#module-falaw.prune">module</a>
 </li>
       </ul></li>
       <li>
@@ -914,6 +950,12 @@
 </li>
       <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.FREE_TAG">FREE_TAG (in module falaw.bridges.mcp)</a>
 </li>
+      <li><a href="module_docs/falaw/prune.html#falaw.prune.PruneReport.freed_bytes">freed_bytes (falaw.prune.PruneReport property)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw.html#falaw.PruneReport.freed_bytes">(falaw.PruneReport property)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -1178,6 +1220,8 @@
 </li>
         <li><a href="module_docs/falaw/plan.html#module-falaw.plan">falaw.plan</a>
 </li>
+        <li><a href="module_docs/falaw/prune.html#module-falaw.prune">falaw.prune</a>
+</li>
         <li><a href="module_docs/falaw/refresh.html#module-falaw.refresh">falaw.refresh</a>
 </li>
         <li><a href="module_docs/falaw/registry.html#module-falaw.registry">falaw.registry</a>
@@ -1307,8 +1351,6 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.plan_from_dict">(in module falaw.plan)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.plan_generate_image">plan_generate_image() (in module falaw)</a>
 
       <ul>
@@ -1327,6 +1369,8 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.plan_hash">(in module falaw.plan)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/canonical.html#falaw.canonical.plan_identity_payload">plan_identity_payload() (in module falaw.canonical)</a>
 </li>
       <li><a href="module_docs/falaw.html#falaw.plan_image_to_video">plan_image_to_video() (in module falaw)</a>
@@ -1369,6 +1413,36 @@
 
       <ul>
         <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent">(class in falaw.events)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.prune_assets">prune_assets() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.prune_assets">(in module falaw.prune)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.prune_content">prune_content() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.prune_content">(in module falaw.prune)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.prune_manifests">prune_manifests() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.prune_manifests">(in module falaw.prune)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.PruneCandidate">PruneCandidate (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.PruneCandidate">(class in falaw.prune)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.PruneReport">PruneReport (class in falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.PruneReport">(class in falaw.prune)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1499,14 +1573,14 @@
         <li><a href="module_docs/falaw.html#falaw.CostEstimate.source">(falaw.CostEstimate attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.CallOutcome.status">status (falaw.CallOutcome attribute)</a>
 
       <ul>
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.CallOutcome.status">(falaw.outcomes.CallOutcome attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/account.html#falaw.account.AccountStatus.status_code">status_code (falaw.account.AccountStatus attribute)</a>
 
       <ul>
@@ -1531,10 +1605,18 @@
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.ExecutionReport.succeeded">(falaw.outcomes.ExecutionReport property)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/falaw.html#falaw.ExecutionReport.summary">summary() (falaw.ExecutionReport method)</a>
+      <li><a href="module_docs/falaw.html#falaw.CacheUsage.summary">summary() (falaw.CacheUsage method)</a>
 
       <ul>
+        <li><a href="module_docs/falaw.html#falaw.ExecutionReport.summary">(falaw.ExecutionReport method)</a>
+</li>
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.ExecutionReport.summary">(falaw.outcomes.ExecutionReport method)</a>
+</li>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.CacheUsage.summary">(falaw.prune.CacheUsage method)</a>
+</li>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.PruneReport.summary">(falaw.prune.PruneReport method)</a>
+</li>
+        <li><a href="module_docs/falaw.html#falaw.PruneReport.summary">(falaw.PruneReport method)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw/base.html#falaw.base.ModelRecord.supported_resolutions">supported_resolutions (falaw.base.ModelRecord attribute)</a>
@@ -1571,18 +1653,24 @@
         <li><a href="module_docs/falaw/operations/video.html#falaw.operations.video.text_to_video">(in module falaw.operations.video)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.CallPlan.tool">tool (falaw.CallPlan attribute)</a>
 
       <ul>
         <li><a href="module_docs/falaw/plan.html#falaw.plan.CallPlan.tool">(falaw.plan.CallPlan attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.ToolSpec">ToolSpec (class in falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/base.html#falaw.base.ToolSpec">(class in falaw.base)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.CacheUsage.total_bytes">total_bytes (falaw.CacheUsage property)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/prune.html#falaw.prune.CacheUsage.total_bytes">(falaw.prune.CacheUsage property)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw.html#falaw.Plan.total_cost_usd">total_cost_usd (falaw.Plan property)</a>

@@ -1,0 +1,457 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.prune &mdash; falaw 0.0.31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=c5dbc6bb"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.refresh" href="refresh.html" />
+    <link rel="prev" title="falaw.plan" href="plan.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan.html">falaw.plan</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.prune</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.AreaUsage"><code class="docutils literal notranslate"><span class="pre">AreaUsage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.CacheUsage"><code class="docutils literal notranslate"><span class="pre">CacheUsage</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.prune.CacheUsage.area"><code class="docutils literal notranslate"><span class="pre">CacheUsage.area()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.prune.CacheUsage.summary"><code class="docutils literal notranslate"><span class="pre">CacheUsage.summary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.prune.CacheUsage.total_bytes"><code class="docutils literal notranslate"><span class="pre">CacheUsage.total_bytes</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.PruneCandidate"><code class="docutils literal notranslate"><span class="pre">PruneCandidate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.PruneReport"><code class="docutils literal notranslate"><span class="pre">PruneReport</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.prune.PruneReport.freed_bytes"><code class="docutils literal notranslate"><span class="pre">PruneReport.freed_bytes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.prune.PruneReport.summary"><code class="docutils literal notranslate"><span class="pre">PruneReport.summary()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.cache_usage"><code class="docutils literal notranslate"><span class="pre">cache_usage()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.prune_assets"><code class="docutils literal notranslate"><span class="pre">prune_assets()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.prune_content"><code class="docutils literal notranslate"><span class="pre">prune_content()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.prune.prune_manifests"><code class="docutils literal notranslate"><span class="pre">prune_manifests()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.prune</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/prune.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.prune">
+<span id="falaw-prune"></span><h1>falaw.prune<a class="headerlink" href="#module-falaw.prune" title="Link to this heading"></a></h1>
+<p>Capacity management for the falaw cache: see what is on disk, and reclaim it.</p>
+<p>Before thorwhalen/falaw#14 the cache held kilobyte JSON manifests. It now
+content-addresses every media result, so it also holds the <strong>bytes</strong> of every
+generated image, clip and audio track. On any machine that has rendered a real
+project that is gigabytes, and on the production box (a 40 GB volume) it is a
+capacity question rather than a cosmetic one.</p>
+<p>Nothing here runs automatically, and that is the design rather than an omission.
+<strong>Deleting a blob is a spending decision</strong>: <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> treats a
+cache entry it cannot turn back into bytes as a <em>miss</em> and re-executes it, so
+disk reclaimed today is re-billed the next time that beat renders. Every prune
+is therefore <code class="docutils literal notranslate"><span class="pre">dry_run=True</span></code> by default and returns a <a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">PruneReport</span></code></a>
+that says — before anything is removed — how many cache entries the prune would
+put back on the invoice.</p>
+<p>The cache has six areas, with very different economics — and only one of them
+is genuinely cheap to reclaim:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">manifests</span></code></dt><dd><p>The fal responses, keyed by call. Small. Dropping one <strong>re-bills that
+call</strong>, unconditionally.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">content</span></code></dt><dd><p>The content-addressed blobs (falaw#14). This is where the gigabytes are.
+Dropping one re-bills every call whose asset URL has since expired — fal
+deletes expired files permanently, so the blob was the last copy.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">assets</span></code></dt><dd><p><a class="reference internal" href="../falaw.html#falaw.materialize_asset" title="falaw.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.materialize_asset()</span></code></a> output — a <em>copy</em> of a blob, not a hard
+link (deliberately; see <a class="reference internal" href="content.html#falaw.content.write_blob_to_file" title="falaw.content.write_blob_to_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.write_blob_to_file()</span></code></a>). It
+doubles the on-disk cost of every materialized asset and is the <strong>cheapest</strong>
+thing to reclaim: while the blob survives, re-materializing is a local copy
+and costs nothing.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">url_index</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">content</span> <span class="pre">hash</span></code> hints. Tiny — and <strong>not</strong> droppable freely, despite
+the name. <a class="reference internal" href="content.html#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.content_ref_for_url()</span></code></a> reaches a blob <em>only</em>
+through <a class="reference internal" href="content.html#falaw.content.remembered_ref" title="falaw.content.remembered_ref"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.remembered_ref()</span></code></a>, so deleting this index orphans
+the entire <code class="docutils literal notranslate"><span class="pre">content</span></code> area: every entry whose fal URL has since expired
+re-<strong>renders</strong>, and the bytes it needed are still on disk, unreachable.
+Nothing here prunes it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">scenes</span></code></dt><dd><p>Saved Scene IR. Not media and not a cache — it is <em>authored input</em>, so
+losing one is lost work rather than a re-render. Nothing here prunes it.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">other</span></code></dt><dd><p>Whatever the named areas do not claim: a crashed write’s <code class="docutils literal notranslate"><span class="pre">.part</span></code>
+leftover, or a directory a future falaw feature adds without telling this
+module. Present so that the totals cannot silently under-report.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>What is actually on disk, broken down by area (<code class="docutils literal notranslate"><span class="pre">+SKIP</span></code>ed because it reads
+the caller’s real cache, which on the production box is a multi-gigabyte walk —
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">tests.test_prune</span></code> pins the same behaviour against a throwaway one):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">usage</span> <span class="o">=</span> <span class="n">cache_usage</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">usage</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
+<span class="go">[&#39;assets&#39;, &#39;content&#39;, &#39;manifests&#39;, &#39;other&#39;, &#39;scenes&#39;, &#39;url_index&#39;]</span>
+</pre></div>
+</div>
+<p>A prune is a dry run unless you say otherwise, and refuses to run unbounded
+(this one raises before touching the disk, so it is safe to execute):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">prune_content</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">ValueError</span>: <span class="n">prune_content needs a bound: pass older_than= and/or max_bytes=...</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.prune.AreaUsage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">AreaUsage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/prune.html#AreaUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.AreaUsage" title="Link to this definition"></a></dt>
+<dd><p>Disk usage of one cache area.</p>
+<p><code class="docutils literal notranslate"><span class="pre">entries</span></code> counts the area’s own unit — cache entries for <code class="docutils literal notranslate"><span class="pre">manifests</span></code>,
+blobs for <code class="docutils literal notranslate"><span class="pre">content</span></code>, files for <code class="docutils literal notranslate"><span class="pre">assets</span></code> and <code class="docutils literal notranslate"><span class="pre">url_index</span></code> — not files
+on disk, which is why it is reported next to <code class="docutils literal notranslate"><span class="pre">bytes</span></code> rather than derived
+from it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">path</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> when the area has no directory of its own. That is the
+case for <code class="docutils literal notranslate"><span class="pre">manifests</span></code> (scattered across two-character shard directories at
+the cache root) and for <code class="docutils literal notranslate"><span class="pre">other</span></code>. It is deliberately not the cache root:
+a caller reaching for <code class="docutils literal notranslate"><span class="pre">rmtree(usage.area(...).path)</span></code> would then destroy
+the content store along with it.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.prune.CacheUsage">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">CacheUsage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">areas</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.prune.AreaUsage" title="falaw.prune.AreaUsage"><span class="pre">AreaUsage</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/prune.html#CacheUsage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.CacheUsage" title="Link to this definition"></a></dt>
+<dd><p>Where the falaw cache’s disk is going, by area.</p>
+<p>The whole point of the breakdown: <code class="docutils literal notranslate"><span class="pre">size_bytes</span></code> alone cannot tell you
+whether you are looking at gigabytes of irreplaceable blobs or gigabytes of
+<code class="docutils literal notranslate"><span class="pre">assets/</span></code> copies that cost nothing to regenerate.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.prune.CacheUsage.area">
+<span class="sig-name descname"><span class="pre">area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.prune.AreaUsage" title="falaw.prune.AreaUsage"><span class="pre">AreaUsage</span></a></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#CacheUsage.area"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.CacheUsage.area" title="Link to this definition"></a></dt>
+<dd><p>The <a class="reference internal" href="#falaw.prune.AreaUsage" title="falaw.prune.AreaUsage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AreaUsage</span></code></a> named <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – no such area. The valid names are <code class="xref py py-data docutils literal notranslate"><span class="pre">AREA_NAMES</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.prune.CacheUsage.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#CacheUsage.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.CacheUsage.summary" title="Link to this definition"></a></dt>
+<dd><p>One human-readable line per area, largest first.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.prune.CacheUsage.total_bytes">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">total_bytes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#falaw.prune.CacheUsage.total_bytes" title="Link to this definition"></a></dt>
+<dd><p>Every byte under the cache root.</p>
+<p>Equal to a full walk of the root, because <code class="docutils literal notranslate"><span class="pre">other</span></code> absorbs whatever the
+named areas do not claim. That identity is the point: a capacity report
+whose total is “the sum of the areas I thought to enumerate” silently
+under-reports the moment falaw grows a directory nobody added here, and
+under-reporting is the one direction a capacity tool cannot afford.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.prune.PruneCandidate">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">PruneCandidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_modified</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/prune.html#PruneCandidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.PruneCandidate" title="Link to this definition"></a></dt>
+<dd><p>One thing a prune would delete (or did).</p>
+<p><code class="docutils literal notranslate"><span class="pre">last_modified</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> when the age could not be determined — a
+non-filesystem blob backend, or a manifest too corrupt to read. Such a
+candidate is never selected by <code class="docutils literal notranslate"><span class="pre">older_than</span></code> (an unprovable age is not
+evidence of staleness) and is evicted last under <code class="docutils literal notranslate"><span class="pre">max_bytes</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.prune.PruneReport">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">PruneReport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.prune.PruneCandidate" title="falaw.prune.PruneCandidate"><span class="pre">PruneCandidate</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deleted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.prune.PruneCandidate" title="falaw.prune.PruneCandidate"><span class="pre">PruneCandidate</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rebillable_entries</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unreferenced_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/prune.html#PruneReport"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.PruneReport" title="Link to this definition"></a></dt>
+<dd><p>What a prune removed, or — with <code class="docutils literal notranslate"><span class="pre">dry_run=True</span></code> — would remove.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rebillable_entries</span></code> is the number this exists for: cache entries that
+will <strong>cost money again</strong> because of this prune. Its meaning is exact per
+area, and each is a different claim:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">manifests</span></code> — every dropped entry re-bills, so it equals the candidate
+count.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code> — entries whose recorded response names an asset that resolves
+(through the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">hash</span></code> index) to a blob being dropped. Those become
+<em>unmaterializable</em> from cache; they re-download if fal still serves the
+URL and re-render if it does not, and falaw cannot tell which from here.
+It mirrors the predicate <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> applies to a hit from
+the <strong>built-in</strong> converter. It is therefore an <em>upper</em> bound, not an exact
+population: with a custom <code class="docutils literal notranslate"><span class="pre">artifact_converter=</span></code> the entry is never
+dropped (it returns a broken artifact instead), and with
+<code class="docutils literal notranslate"><span class="pre">fetch_bytes=False</span></code> dropping the blob changes nothing. Both errors are
+overcounts — the safe direction for a number you read before spending.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assets</span></code> — only the copies whose blob is <em>also</em> gone. While the blob
+survives, re-materializing is a local copy and costs nothing.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">unreferenced_candidates</span></code> is the other half of the story, and only
+<code class="docutils literal notranslate"><span class="pre">content</span></code> populates it: blobs that <strong>no manifest points at</strong>. falaw cannot
+tell whether such a blob is garbage or the last copy of something
+irreplaceable — <a class="reference internal" href="../falaw.html#falaw.materialize_asset" title="falaw.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.materialize_asset()</span></code></a> puts reference images and
+locally-rendered <code class="docutils literal notranslate"><span class="pre">file://</span></code> media in the same store, and those never had a
+fal response behind them. Counting them as <code class="docutils literal notranslate"><span class="pre">rebillable</span></code> would be wrong
+(no cache entry re-bills), but reporting nothing would tell an operator the
+prune is free when it may be destroying the only copy of a reference image.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.prune.PruneReport.freed_bytes">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">freed_bytes</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><a class="headerlink" href="#falaw.prune.PruneReport.freed_bytes" title="Link to this definition"></a></dt>
+<dd><p>Bytes actually freed — or, under <code class="docutils literal notranslate"><span class="pre">dry_run</span></code>, that would be freed.</p>
+<p>Sums <code class="docutils literal notranslate"><span class="pre">deleted</span></code>, <strong>not</strong> <code class="docutils literal notranslate"><span class="pre">candidates</span></code>. A deletion that failed (a
+read-only volume, a permission error) leaves its bytes on disk, and a
+capacity tool that reports them as reclaimed tells an operator staring
+at a full disk that the problem is solved when it is not.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="falaw.prune.PruneReport.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#PruneReport.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.PruneReport.summary" title="Link to this definition"></a></dt>
+<dd><p>A human-readable line, phrased in the tense the run actually was.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.prune.cache_usage">
+<span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">cache_usage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.prune.CacheUsage" title="falaw.prune.CacheUsage"><span class="pre">CacheUsage</span></a></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#cache_usage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.cache_usage" title="Link to this definition"></a></dt>
+<dd><p>Disk usage of the falaw cache, broken down by area.</p>
+<p>The structured form behind <a class="reference internal" href="../falaw.html#falaw.cache_stats" title="falaw.cache_stats"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.cache_stats()</span></code></a>. Read the module
+docstring for what each area costs to reclaim.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.prune.prune_assets">
+<span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">prune_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">older_than</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><span class="pre">PruneReport</span></a></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#prune_assets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.prune_assets" title="Link to this definition"></a></dt>
+<dd><p>Reclaim materialized asset copies — the cheapest disk in the cache (falaw#22).</p>
+<p><code class="docutils literal notranslate"><span class="pre">assets/</span></code> holds a <strong>copy</strong> of each blob rather than a hard link, which is
+deliberate (<a class="reference internal" href="content.html#falaw.content.write_blob_to_file" title="falaw.content.write_blob_to_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.write_blob_to_file()</span></code></a> explains why a link
+would let a consumer corrupt the content store) but doubles the on-disk cost
+of every materialized asset. That makes this the prune to reach for first:
+while a blob survives, re-materializing its asset is a local copy and costs
+nothing, so <code class="docutils literal notranslate"><span class="pre">rebillable_entries</span></code> counts only the copies whose blob is
+<em>also</em> gone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>older_than</strong> – drop copies last written more than this ago — seconds, or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code>.</p></li>
+<li><p><strong>max_bytes</strong> – drop oldest-first until the area fits in this budget.</p></li>
+<li><p><strong>dry_run</strong> – report without deleting. Default, deliberately.</p></li>
+<li><p><strong>store</strong> – injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>, used only to ask whether
+each dropped copy still has a blob behind it; defaults to
+<a class="reference internal" href="content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>with <code class="docutils literal notranslate"><span class="pre">area=&quot;assets&quot;</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport">PruneReport</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – neither bound was given.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.prune.prune_content">
+<span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">prune_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">older_than</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><span class="pre">PruneReport</span></a></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#prune_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.prune_content" title="Link to this definition"></a></dt>
+<dd><p>Reclaim content-addressed blobs — the gigabytes (falaw#22).</p>
+<p>This is the <strong>expensive</strong> prune. A blob is the last copy of an asset once
+fal has expired its URL (“expired files are permanently deleted and cannot
+be recovered”), so dropping one can turn a free cache hit into a re-rendered
+clip. The report says how many entries that applies to <em>before</em> you commit;
+read <code class="docutils literal notranslate"><span class="pre">rebillable_entries</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>older_than</strong> – drop blobs last written more than this ago — seconds, or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code>.</p></li>
+<li><p><strong>max_bytes</strong> – drop oldest-first until the area fits in this budget.</p></li>
+<li><p><strong>dry_run</strong> – report without deleting. Default, deliberately.</p></li>
+<li><p><strong>store</strong> – injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
+<a class="reference internal" href="content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>with <code class="docutils literal notranslate"><span class="pre">area=&quot;content&quot;</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport">PruneReport</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – neither bound was given — see <code class="xref py py-func docutils literal notranslate"><span class="pre">_require_a_bound()</span></code>.</p>
+</dd>
+</dl>
+<p>Both bounds may be combined; a blob selected by either is dropped.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">prune_content</span><span class="p">(</span><span class="n">older_than</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">90</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">dry_run</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.prune.prune_manifests">
+<span class="sig-prename descclassname"><span class="pre">falaw.prune.</span></span><span class="sig-name descname"><span class="pre">prune_manifests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">older_than</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">timedelta</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><span class="pre">PruneReport</span></a></span></span><a class="reference internal" href="../../_modules/falaw/prune.html#prune_manifests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.prune.prune_manifests" title="Link to this definition"></a></dt>
+<dd><p>Reclaim cache entries — the fal responses themselves (falaw#22).</p>
+<p>Manifests are kilobytes, so this is rarely where the disk is; it is here
+because a stale <em>entry</em> is its own problem — it pins a model version and a
+price you may no longer want served from cache.</p>
+<p>Unlike <a class="reference internal" href="#falaw.prune.prune_content" title="falaw.prune.prune_content"><code class="xref py py-func docutils literal notranslate"><span class="pre">prune_content()</span></code></a>, the cost is unconditional: every dropped
+entry re-bills its call on the next run, so <code class="docutils literal notranslate"><span class="pre">rebillable_entries</span></code> always
+equals the candidate count.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>older_than</strong> – drop entries stored more than this ago — seconds, or a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code>. Read from the manifest’s own
+<code class="docutils literal notranslate"><span class="pre">stored_at</span></code>, falling back to file mtime.</p></li>
+<li><p><strong>max_bytes</strong> – drop oldest-first until the area fits in this budget.</p></li>
+<li><p><strong>dry_run</strong> – report without deleting. Default, deliberately.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>with <code class="docutils literal notranslate"><span class="pre">area=&quot;manifests&quot;</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport">PruneReport</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – neither bound was given.</p>
+</dd>
+</dl>
+<p>Only the manifest is removed; blobs are shared by content hash across
+entries and are never dropped from here — the same rule
+<a class="reference internal" href="../falaw.html#falaw.drop_cache_entry" title="falaw.drop_cache_entry"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.drop_cache_entry()</span></code></a> follows.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plan.html" class="btn btn-neutral float-left" title="falaw.plan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="refresh.html" class="btn btn-neutral float-right" title="falaw.refresh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
