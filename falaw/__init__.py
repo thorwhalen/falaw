@@ -41,6 +41,16 @@ from .content import (
     using_url_fetcher,
 )
 from .core import call_fal, current_fal_key, using_fal_credentials
+from .prune import (
+    AreaUsage,
+    CacheUsage,
+    PruneCandidate,
+    PruneReport,
+    cache_usage,
+    prune_assets,
+    prune_content,
+    prune_manifests,
+)
 from .errors import (
     FalAccountLocked,
     FalAssetFetchError,
@@ -201,9 +211,17 @@ __all__ = [
     "apply_note_to_beat",
     "apply_note_to_scene",
     "beat_content_hash",
+    "AreaUsage",
+    "CacheUsage",
+    "PruneCandidate",
+    "PruneReport",
     "cache_get",
     "cache_put",
     "cache_stats",
+    "cache_usage",
+    "prune_assets",
+    "prune_content",
+    "prune_manifests",
     "drop_cache_entry",
     "cached_call_fal",
     "content_ref_for_url",

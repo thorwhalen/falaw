@@ -1105,7 +1105,7 @@ def _make_usability_check(*, fetch_bytes: bool):
             return True
         if artifact.bytes_size > 0:
             return True
-        return _extract_first_url(raw) is None
+        return extract_first_url(raw) is None
 
     return usable
 
@@ -1443,7 +1443,7 @@ def _artifact_from_response(
     from lacing.artifact import _now_rt
     from lacing.model import Provenance
 
-    url = _extract_first_url(raw)
+    url = extract_first_url(raw)
     duration = _extract_duration_s(raw)
     mime = _extract_content_type(raw)
     path = None
@@ -1568,12 +1568,12 @@ def _materialize_text_to_cache(content: str, kind: str) -> tuple[str, str]:
 
     from lacing import hash_bytes
 
-    from .cache import _cache_dir
+    from .cache import ASSETS_DIRNAME, _cache_dir
 
     data = content.encode("utf-8")
     asset_id = hash_bytes(data)
     ext = ".json" if kind == "json" else ".txt"
-    assets_dir = os.path.join(_cache_dir(), "assets")
+    assets_dir = os.path.join(_cache_dir(), ASSETS_DIRNAME)
     os.makedirs(assets_dir, exist_ok=True)
     path = os.path.join(assets_dir, f"llm-{asset_id}{ext}")
     if not os.path.exists(path):
@@ -1582,8 +1582,14 @@ def _materialize_text_to_cache(content: str, kind: str) -> tuple[str, str]:
     return path, asset_id
 
 
-def _extract_first_url(raw: dict) -> Optional[str]:
-    """Find the first asset URL in a fal response, regardless of shape."""
+def extract_first_url(raw: dict) -> Optional[str]:
+    """Find the first asset URL in a fal response, regardless of shape.
+
+    Public (no underscore) because it is now used from :mod:`falaw.prune` as
+    well: deciding whether pruning a blob makes a cache entry unmaterializable
+    is the *same* question this answers for ``execute``, and the two must not
+    drift into two opinions about what a response's asset is.
+    """
     if not isinstance(raw, dict):
         return None
     images = raw.get("images")

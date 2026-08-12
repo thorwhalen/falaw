@@ -124,6 +124,54 @@ concatenate_clips(
 )
 ```
 
+### The cache holds bytes now --- keep an eye on the disk
+
+Since falaw#14 the cache content-addresses every result, so it stores the
+**bytes** of every image, clip and audio track, not just JSON manifests. On a
+machine that has rendered a real project that is gigabytes.
+
+```python
+import falaw
+
+print(falaw.cache_usage().summary())  # per-area breakdown, largest first
+```
+
+Six areas, and only one of them is cheap to reclaim:
+
+| area | dropping one costs | prunable |
+|---|---|---|
+| `assets` | **nothing**, while the blob survives (it is a *copy*) --- reclaim here first | yes |
+| `content` | a **re-render**, for any call whose fal URL has since expired | yes |
+| `manifests` | a **re-billed call**, unconditionally | yes |
+| `url_index` | **the whole content area.** Blobs are reachable *only* through this index, so deleting it orphans them: expired-URL entries re-render while their bytes sit unreachable on disk | no |
+| `scenes` | authored Scene IR --- lost work, not a re-render | no |
+| `other` | unknown; falaw did not put it there | no |
+
+So eviction is a spending decision, and nothing runs automatically. Every
+prune is a dry run unless you say otherwise, and refuses to run unbounded
+(or with a non-positive `older_than`, which is almost always a computed-zero
+bug that would wipe the area):
+
+```python
+from datetime import timedelta
+
+report = falaw.prune_assets(older_than=timedelta(days=30))  # dry run
+print(report.summary())
+falaw.prune_assets(older_than=timedelta(days=30), dry_run=False)
+```
+
+**Read the two warning numbers before passing `dry_run=False`:**
+
+- `report.rebillable_entries` --- cache entries the prune puts back on the
+  invoice (an upper bound).
+- `report.unreferenced_candidates` --- blobs **no cache entry points at**.
+  falaw cannot tell garbage from the last copy of a reference image you
+  materialized, so it reports them rather than calling the prune free.
+
+`report.freed_bytes` counts what was actually deleted, so a failed deletion
+does not read as reclaimed space. `prune_content` and `prune_manifests` take
+the same arguments; `max_bytes=N` evicts oldest-first until the area fits.
+
 ## Read the journal first
 
 Before novel work, glance at recent entries --- past sessions may have
