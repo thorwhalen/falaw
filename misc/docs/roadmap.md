@@ -62,6 +62,18 @@ pass.
 nothing in falaw** (`rg 'ArtifactStore|put_blob' falaw/` returns nothing). Use it; do not write a
 second blob store here.
 
+**The index's soundness condition — enforced, not documented (falaw#23).** The `url -> hash` index
+is only sound for URLs that cannot re-point at different bytes, which was true of fal's and merely
+*advised* for everything else (`refresh=True`, plus a docstring). `materialize_asset` is public and
+reached with caller-supplied URLs from five sites in reelee, so the advice was one forgotten keyword
+from a changed input producing an unchanged content address. falaw now decides per URL:
+`is_immutable_url` trusts fal outright, everything else revalidates (conditional `GET` with the
+recorded `ETag`/`Last-Modified`; `(mtime, size)` for `file://`, which matters because a re-rendered
+clip keeps its path). When falaw *cannot* check it re-fetches — an unverifiable hint is not
+evidence — and when the origin is **gone** it falls back to the stored bytes, which is falaw#14's
+guarantee and does not conflict: staleness is only a lie when the truth was available and falaw did
+not look.
+
 **The bill content addressing came with — landed (falaw#22).** Storing bytes made the cache a
 capacity question: `cache_stats()` reported one total over a tree that is now mostly media, which
 cannot distinguish gigabytes of irreplaceable blobs from gigabytes of `assets/` copies that cost

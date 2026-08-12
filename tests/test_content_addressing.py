@@ -350,9 +350,38 @@ def test_stored_bytes_survive_an_expired_url(fal, fake_assets):
     fake_assets.fail("http://cdn/ephemeral.png")  # fal deleted it
     fake_assets.fetched.clear()
 
+    with pytest.warns(UserWarning, match="is gone from its origin|could not be re-read"):
+        (again,) = execute_plan(_image_plan())
+
+    # `http://cdn/...` is not a fal host, so falaw asks the origin before
+    # reusing the stored bytes (falaw#23) — and falls back to them when the
+    # origin is gone, which is the guarantee this test exists for. The
+    # no-request-at-all version of this property is the fal-URL test below.
+    assert fake_assets.fetched == ["http://cdn/ephemeral.png"]
+    assert again.asset_id == first.asset_id
+    assert again.bytes_size == len(IMG_A)
+
+
+def test_an_expired_fal_url_costs_no_request_at_all(fal, fake_assets):
+    """The production shape of the property above.
+
+    fal mints a URL per upload, so its hint can be trusted outright: the
+    months-old hit is served from the store with **zero** requests. This is what
+    keeps re-executing a 200-shot plan free, and it is why falaw#23's
+    revalidation is scoped to hosts falaw does not know to be immutable.
+    """
+    from falaw import execute_plan
+
+    fal.next_image_url = "https://v3b.fal.media/files/ephemeral.png"
+    fake_assets.serve("https://v3b.fal.media/files/ephemeral.png", IMG_A)
+    (first,) = execute_plan(_image_plan())
+
+    fake_assets.fail("https://v3b.fal.media/files/ephemeral.png")
+    fake_assets.fetched.clear()
+
     (again,) = execute_plan(_image_plan())
 
-    assert fake_assets.fetched == [], "the bytes are already stored; do not refetch"
+    assert fake_assets.fetched == [], "a fal URL's hint needs no revalidation"
     assert again.asset_id == first.asset_id
     assert again.bytes_size == len(IMG_A)
 
@@ -722,29 +751,96 @@ def test_materialize_asset_short_circuits_on_an_existing_local_file(fake_assets)
     fake_assets.fail("http://cdn/clip.mp4")  # expired
     fake_assets.fetched.clear()
 
-    again = materialize_asset("http://cdn/clip.mp4")
+    with pytest.warns(UserWarning, match="is gone from its origin|could not be re-read"):
+        again = materialize_asset("http://cdn/clip.mp4")
+
+    assert again == first
+    assert open(again, "rb").read() == IMG_A
+    # For a mutable URL circle 1 is a *fallback*, not a shortcut: falaw asks the
+    # origin first (falaw#23 — returning the old file while a newer one is one
+    # request away is the bug) and returns the local copy once that fails.
+    assert fake_assets.fetched == ["http://cdn/clip.mp4"]
+
+
+def test_materialize_asset_short_circuits_without_a_request_for_a_fal_url(fake_assets):
+    """Circle 1 stays a pure shortcut where the hint is trustworthy."""
+    import shutil as _shutil
+
+    from falaw import materialize_asset
+    from falaw.cache import _cache_dir
+    from falaw.content import CONTENT_STORE_DIRNAME
+
+    url = "https://v3b.fal.media/files/clip.mp4"
+    fake_assets.serve(url, IMG_A)
+    first = materialize_asset(url)
+
+    _shutil.rmtree(os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME))  # pruned
+    fake_assets.fail(url)  # expired
+    fake_assets.fetched.clear()
+
+    again = materialize_asset(url)
 
     assert again == first
     assert open(again, "rb").read() == IMG_A
     assert fake_assets.fetched == []
 
 
-def test_materialize_asset_refresh_re_reads_a_mutable_url(fake_assets):
-    """``refresh=True`` is the escape hatch for a URL that is not immutable."""
+def test_a_mutable_url_that_changed_yields_the_new_bytes(fake_assets):
+    """falaw#23, the whole point: a changed input must change the content address.
+
+    This is the exact scenario the issue reproduced. It used to return IMG_A
+    forever with zero network access — a changed input producing an unchanged
+    content hash, which then flowed into ``Artifact.asset_id`` and every
+    downstream cache key. No ``refresh=`` needed: falaw revalidates on its own,
+    because a caller who has to *know* their URL is mutable is a caller who will
+    eventually forget.
+    """
     from lacing import hash_bytes
 
     from falaw import materialize_asset
 
     fake_assets.serve("http://host/reference.png", IMG_A)
-    materialize_asset("http://host/reference.png")
+    before = materialize_asset("http://host/reference.png")
+    assert open(before, "rb").read() == IMG_A
 
     fake_assets.serve("http://host/reference.png", IMG_B)  # changed behind us
-    stale = materialize_asset("http://host/reference.png")
-    fresh = materialize_asset("http://host/reference.png", refresh=True)
+    after = materialize_asset("http://host/reference.png")
 
-    assert open(stale, "rb").read() == IMG_A, "the hint index is trusted by default"
-    assert os.path.basename(fresh).startswith(hash_bytes(IMG_B))
-    assert open(fresh, "rb").read() == IMG_B
+    assert open(after, "rb").read() == IMG_B
+    assert os.path.basename(after).startswith(hash_bytes(IMG_B))
+    assert after != before, "a changed asset must get a new content address"
+
+
+def test_an_unchanged_mutable_url_is_revalidated_not_re_downloaded(fake_assets):
+    """The cheap half: one conditional request, no payload, same hash.
+
+    Without this, host-scoping alone would make every reference image a full
+    download on every call — correct, but the reason the issue called ETag
+    revalidation "the right end state" rather than a nice-to-have.
+    """
+    from falaw import materialize_asset
+
+    fake_assets.serve("http://host/reference.png", IMG_A)
+    first = materialize_asset("http://host/reference.png")
+    fake_assets.fetched.clear()
+
+    again = materialize_asset("http://host/reference.png")
+
+    assert again == first
+    assert fake_assets.fetched == [], "a 304 must not transfer the body"
+
+
+def test_refresh_still_forces_a_re_read(fake_assets):
+    """The escape hatch survives, for an origin that lies about its validators."""
+    from falaw import materialize_asset
+
+    fake_assets.serve("http://host/reference.png", IMG_A)
+    materialize_asset("http://host/reference.png")
+    fake_assets.fetched.clear()
+
+    materialize_asset("http://host/reference.png", refresh=True)
+
+    assert fake_assets.fetched == ["http://host/reference.png"]
 
 
 def test_materialize_asset_uses_its_injected_fetcher(fake_assets):
