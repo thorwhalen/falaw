@@ -49,6 +49,13 @@ from .canonical import DFLT_BACKEND, cache_key_payload, canonical_blob, ensure_c
 
 # --- cache root -----------------------------------------------------------
 
+ASSETS_DIRNAME = "assets"
+"""Sub-directory of the falaw cache holding :func:`materialize_asset` copies.
+
+Named here rather than in :mod:`falaw.prune` because :func:`_asset_path` is
+what decides the layout; the prune side reads this so the two cannot drift.
+"""
+
 
 def _cache_dir() -> str:
     base = (
@@ -362,7 +369,7 @@ def _asset_path(url: str, key_hint: str, content_hash: str) -> str:
     """Where :func:`materialize_asset` puts the bytes for ``content_hash``."""
     ext = _infer_ext_from_url(url)
     fname = f"{key_hint + '-' if key_hint else ''}{content_hash}{ext}"
-    return os.path.join(_cache_dir(), "assets", fname)
+    return os.path.join(_cache_dir(), ASSETS_DIRNAME, fname)
 
 
 def _infer_ext_from_url(url: str) -> str:
@@ -385,17 +392,34 @@ def _infer_ext_from_url(url: str) -> str:
 
 
 def cache_stats() -> dict:
-    """Quick summary of the cache: entry count and disk usage."""
-    root = _cache_dir()
-    entries = 0
-    total_bytes = 0
-    for dirpath, _dirs, files in os.walk(root):
-        for f in files:
-            entries += int(f == "manifest.json")
-            total_bytes += os.path.getsize(os.path.join(dirpath, f))
+    """Quick summary of the cache: entry count, disk usage, and where it went.
+
+    ``areas`` is the part worth reading. Since falaw#14 the cache holds the
+    *bytes* of every generated asset, so a total on its own cannot distinguish
+    gigabytes of irreplaceable blobs from gigabytes of ``assets/`` copies that
+    cost nothing to regenerate — and only the second is safe to reclaim without
+    thinking. Each area's economics, and the primitives that reclaim it, are in
+    :mod:`falaw.prune`.
+
+    >>> stats = cache_stats()
+    >>> sorted(stats["areas"])
+    ['assets', 'content', 'manifests', 'url_index']
+    >>> stats["size_bytes"] == sum(a["bytes"] for a in stats["areas"].values())
+    True
+    """
+    # Local import: `falaw.prune` imports `_cache_dir` from this module, so a
+    # module-scope import would be a cycle — the same reason
+    # `materialize_asset` imports `falaw.content` inside the function body.
+    from .prune import cache_usage
+
+    usage = cache_usage()
     return {
-        "root": root,
-        "manifest_entries": entries,
-        "size_bytes": total_bytes,
-        "size_mb": round(total_bytes / 1_000_000, 2),
+        "root": usage.root,
+        "manifest_entries": usage.area("manifests").entries,
+        "size_bytes": usage.total_bytes,
+        "size_mb": usage.total_megabytes,
+        "areas": {
+            a.name: {"entries": a.entries, "bytes": a.bytes, "size_mb": a.megabytes}
+            for a in usage.areas
+        },
     }

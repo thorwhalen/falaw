@@ -124,6 +124,43 @@ concatenate_clips(
 )
 ```
 
+### The cache holds bytes now --- keep an eye on the disk
+
+Since falaw#14 the cache content-addresses every result, so it stores the
+**bytes** of every image, clip and audio track, not just JSON manifests. On a
+machine that has rendered a real project that is gigabytes.
+
+```python
+import falaw
+
+print(falaw.cache_usage().summary())  # per-area breakdown, largest first
+```
+
+Four areas, and only one is cheap to reclaim:
+
+| area | dropping one costs |
+|---|---|
+| `assets` | **nothing**, while the blob survives (it is a *copy*) --- reclaim here first |
+| `url_index` | a re-download; it is a pure hint |
+| `content` | a **re-render**, for any call whose fal URL has since expired |
+| `manifests` | a **re-billed call**, unconditionally |
+
+So eviction is a spending decision, and nothing runs automatically. Every
+prune is a dry run unless you say otherwise, and refuses to run unbounded:
+
+```python
+from datetime import timedelta
+
+report = falaw.prune_assets(older_than=timedelta(days=30))  # dry run
+print(report.summary())
+falaw.prune_assets(older_than=timedelta(days=30), dry_run=False)
+```
+
+**Read `report.rebillable_entries` before passing `dry_run=False`.** It is the
+number of cache entries the prune puts back on the invoice. `prune_content`
+and `prune_manifests` take the same arguments; `max_bytes=N` evicts
+oldest-first until the area fits a budget.
+
 ## Read the journal first
 
 Before novel work, glance at recent entries --- past sessions may have
@@ -305,7 +342,9 @@ Render a Shot: a still (storyboard) or short clip if `as_video=True` (image-to-v
 
 ### `falaw.render_scene`
 
-Render an entire Scene: every Shot + every Beat, with caching so unchanged units are no-ops. Returns a manifest dict with per-beat and per-shot results, plus aggregate counts. Pass `force=True` to bypass the cache.
+Render an entire Scene: every Shot + every Beat, with caching so unchanged units are no-ops. Returns a manifest dict with per-beat and per-shot results, plus aggregate counts. Pass `force=True` to bypass the cache. `concurrency=N` (default 1) runs N units in parallel through a thread pool. For live progress, use `iter_render_scene(scene, concurrency=N)` which yields `(kind, result)` pairs as each unit completes.
+
+Subscribe to progress events with `falaw.subscribe(callback)` (callback gets `ProgressEvent(kind, application, call_id, message, pct, elapsed_s)`); kinds include `queued`, `progress`, `log`, `done`, `error`, and `cache_hit`. Use `estimate_scene_cost(scene)` to get a USD `CostRollup` before kicking off a render — useful for budget gating.
 
 
 ### `falaw.text_to_video`

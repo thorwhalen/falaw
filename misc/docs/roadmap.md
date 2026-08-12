@@ -62,6 +62,15 @@ pass.
 nothing in falaw** (`rg 'ArtifactStore|put_blob' falaw/` returns nothing). Use it; do not write a
 second blob store here.
 
+**The bill content addressing came with — landed (falaw#22).** Storing bytes made the cache a
+capacity question: `cache_stats()` reported one total over a tree that is now mostly media, which
+cannot distinguish gigabytes of irreplaceable blobs from gigabytes of `assets/` copies that cost
+nothing to regenerate. `falaw.prune` adds the breakdown (`cache_usage`) and three bounded,
+`dry_run`-by-default primitives (`prune_content` / `prune_manifests` / `prune_assets`). The
+design constraint worth remembering: **eviction is a spending decision**, because `execute` treats
+an unmaterializable entry as a miss and re-executes it — so every report states, before deleting
+anything, how many entries the prune puts back on the invoice.
+
 **Downstream in sibling repos** (do not attempt them from falaw):
 
 - `lacing.Provenance.was_derived_from` is `list[UUID]` (`lacing/model.py:86`) and cannot hold a

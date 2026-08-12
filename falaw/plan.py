@@ -1105,7 +1105,7 @@ def _make_usability_check(*, fetch_bytes: bool):
             return True
         if artifact.bytes_size > 0:
             return True
-        return _extract_first_url(raw) is None
+        return extract_first_url(raw) is None
 
     return usable
 
@@ -1443,7 +1443,7 @@ def _artifact_from_response(
     from lacing.artifact import _now_rt
     from lacing.model import Provenance
 
-    url = _extract_first_url(raw)
+    url = extract_first_url(raw)
     duration = _extract_duration_s(raw)
     mime = _extract_content_type(raw)
     path = None
@@ -1582,8 +1582,14 @@ def _materialize_text_to_cache(content: str, kind: str) -> tuple[str, str]:
     return path, asset_id
 
 
-def _extract_first_url(raw: dict) -> Optional[str]:
-    """Find the first asset URL in a fal response, regardless of shape."""
+def extract_first_url(raw: dict) -> Optional[str]:
+    """Find the first asset URL in a fal response, regardless of shape.
+
+    Public (no underscore) because it is now used from :mod:`falaw.prune` as
+    well: deciding whether pruning a blob makes a cache entry unmaterializable
+    is the *same* question this answers for ``execute``, and the two must not
+    drift into two opinions about what a response's asset is.
+    """
     if not isinstance(raw, dict):
         return None
     images = raw.get("images")
