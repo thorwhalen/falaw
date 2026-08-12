@@ -86,6 +86,7 @@ The classes and context managers here need no pytest; only the fixtures do.
 
 from __future__ import annotations
 
+import hashlib
 import socket
 import urllib.error
 import urllib.parse
@@ -171,6 +172,11 @@ def is_network_url(url: str) -> bool:
     (False, False)
     """
     return urllib.parse.urlparse(url).scheme not in NON_NETWORK_SCHEMES
+
+
+def _etag_of(data: bytes) -> str:
+    """A well-behaved origin's ETag: derived from the body, so it changes with it."""
+    return f'"{hashlib.sha256(data).hexdigest()[:32]}"'
 
 
 class FakeAssets:
@@ -266,13 +272,69 @@ class FakeAssets:
 
             yield from _http_chunks(url, chunk_size=chunk_size)
             return
+        data = self._bytes_or_404(url)
+        for offset in range(0, len(data), chunk_size):
+            yield data[offset : offset + chunk_size]
+
+    def _bytes_or_404(self, url: str) -> bytes:
         data = self.by_url.get(url)
         if url not in self.by_url:
             data = self.synthetic(url)
         if data is None:
             raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)  # type: ignore[arg-type]
-        for offset in range(0, len(data), chunk_size):
-            yield data[offset : offset + chunk_size]
+        return data
+
+    def etag_for(self, url: str) -> str:
+        """The ETag this fake serves for ``url`` — a digest of its current bytes.
+
+        A well-behaved origin's ETag changes exactly when the body does, so
+        deriving it from the served bytes is the most faithful fake available:
+        :meth:`serve`-ing different bytes at the same URL flips it, and serving
+        the same bytes twice does not.
+        """
+        return _etag_of(self._bytes_or_404(url))
+
+    def conditional_fetch(
+        self, url: str, validators, *, chunk_size: int = DFLT_CHUNK_SIZE
+    ):
+        """Answer a revalidation — the capability falaw#23 asks a transport for.
+
+        Present so a downstream suite exercises the **cheap** path rather than
+        the fallback. Without it falaw can never confirm a mutable URL is
+        unchanged, so it re-fetches on every call: correct, but it would mean no
+        test in the ecosystem ever covers the ``304`` branch, and any suite
+        asserting "did not refetch" for a non-fal URL would fail for a reason
+        that has nothing to do with what it is testing.
+
+        Deferred to :meth:`chunks` for a URL this fake does not handle, so a
+        real ``file://`` still reaches the real filesystem.
+        """
+        from .content import ConditionalOutcome, Validators
+
+        if not self.handles(url):
+            from .content import _http_conditional_fetch
+
+            return _http_conditional_fetch(url, validators, chunk_size=chunk_size)
+        data = self.by_url.get(url)
+        if url not in self.by_url:
+            data = self.synthetic(url)
+        if data is None:
+            # A request that reached the origin and failed **is** a fetch, and
+            # must appear in `fetched`: falaw degrades a failed fetch to a
+            # warning, so a suite asserting on the exception alone would go
+            # green having tested nothing.
+            self.fetched.append(url)
+            raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)  # type: ignore[arg-type]
+        current = Validators(etag=_etag_of(data))
+        if validators and validators.etag == current.etag:
+            # Not recorded in `fetched`: no body crossed the wire, which is
+            # exactly what a caller asserting "did not refetch" means.
+            return ConditionalOutcome(not_modified=True)
+        return ConditionalOutcome(
+            not_modified=False,
+            chunks=self.chunks(url, chunk_size=chunk_size),
+            validators=current,
+        )
 
 
 @contextmanager

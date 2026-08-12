@@ -23,16 +23,25 @@ This module is the single place falaw turns a URL into a content hash. It
 * streams the bytes into a :class:`lacing.ArtifactStore` blob store — which is
   content-addressed, ``dol``-backed and swappable (in-memory / directory /
   object store) — rather than growing a second blob store of its own;
-* remembers ``url -> (content_hash, bytes_size)`` in a small on-disk index, so
-  re-executing an already-cached plan does **not** re-download anything. The
-  index is a *hint*, never an identity, and it is only **sound for immutable
-  URLs**. It is sound for fal's own, because fal guarantees a URL is minted per
-  upload and therefore never re-points at different bytes. It is *not* sound
-  for an arbitrary caller-supplied URL reached through
-  :func:`falaw.cache.materialize_asset` — a mutable ``https://…/reference.png``
-  that changes behind our back keeps resolving to the old hash. Pass
-  ``refresh=True`` when the URL is not known to be immutable
-  (thorwhalen/falaw#23 tracks making that automatic via ETag revalidation);
+* remembers ``url -> (content_hash, bytes_size, validators)`` in a small
+  on-disk index, so re-executing an already-cached plan does **not** re-download
+  anything. The index is a *hint*, never an identity, and it is only **sound for
+  immutable URLs** — so falaw decides, per URL, whether it may be trusted
+  (thorwhalen/falaw#23):
+
+  - a **fal-served** URL is trusted outright, because fal guarantees a URL is
+    minted per upload and therefore never re-points at different bytes;
+  - **anything else** — an arbitrary caller-supplied ``https://…/reference.png``
+    reached through :func:`falaw.cache.materialize_asset`, or a ``file://`` clip
+    that gets re-rendered to the same path — is **revalidated** before reuse: a
+    conditional request replaying the recorded ``ETag`` / ``Last-Modified``, or
+    a ``(mtime, size)`` check for a local file. ``304`` costs a round-trip and
+    no payload; a changed asset yields a changed content hash, as it must.
+
+  When falaw *cannot* check — no validators recorded, or an injected transport
+  with no conditional-request support — it re-fetches rather than trusting. An
+  unverifiable hint is not evidence. :func:`is_immutable_url` is the predicate,
+  and :data:`IMMUTABLE_URL_HOSTS` is where you add a host you mint yourself;
 * serves the bytes from the store after the URL has expired, so a months-old
   cache hit still yields a usable artifact instead of a dead link.
 
@@ -84,6 +93,9 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import warnings
+import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from contextlib import contextmanager
@@ -95,11 +107,14 @@ from .errors import FalAssetFetchError
 
 
 __all__ = [
+    "ConditionalOutcome",
     "ContentRef",
     "UrlFetcher",
+    "Validators",
     "content_ref_for_url",
     "default_content_store",
     "default_url_fetcher",
+    "is_immutable_url",
     "remembered_ref",
     "using_url_fetcher",
     "write_blob_to_file",
@@ -108,6 +123,19 @@ __all__ = [
 
 DFLT_CHUNK_SIZE = 1 << 16
 """Bytes per read when streaming a remote asset into the blob store."""
+
+IMMUTABLE_URL_HOSTS = {"fal.media", "fal.run"}
+"""Hosts whose URLs are minted per upload and never re-point at other bytes.
+
+A **mutable** set, deliberately: a deployment that serves generated media from
+its own immutable-by-construction store (content-addressed object storage, a
+CDN with digest-named keys) adds its host here rather than paying a
+revalidation round-trip per asset. Adding a host that is *not* immutable
+re-introduces thorwhalen/falaw#23, so add only what you mint yourself.
+"""
+
+IMMUTABLE_URL_HOST_SUFFIXES = (".fal.media", ".fal.run")
+"""Subdomain suffixes covered by :data:`IMMUTABLE_URL_HOSTS` (``v3b.fal.media``)."""
 
 CONTENT_STORE_DIRNAME = "content"
 """Sub-directory of the falaw cache holding the default content store."""
@@ -197,6 +225,40 @@ def using_url_fetcher(fetcher: UrlFetcher) -> Iterator[UrlFetcher]:
 
 
 @dataclass(frozen=True, slots=True)
+class Validators:
+    """What an origin gave us to ask "are these bytes still current?" cheaply.
+
+    ``etag`` and ``last_modified`` are the HTTP response headers of the same
+    names, replayed as ``If-None-Match`` / ``If-Modified-Since`` on the next
+    read. A ``file://`` URL has neither, so falaw synthesises an ``etag`` from
+    the file's ``(mtime_ns, size)`` — see :func:`_file_validators`. Falsy when
+    the origin offered nothing, which is the case falaw must treat as
+    "cannot revalidate", never as "unchanged".
+    """
+
+    etag: str = ""
+    last_modified: str = ""
+
+    def __bool__(self) -> bool:
+        return bool(self.etag or self.last_modified)
+
+
+@dataclass(frozen=True, slots=True)
+class ConditionalOutcome:
+    """The result of asking an origin whether a URL's bytes changed.
+
+    Either ``not_modified`` (the remembered content hash still stands, at the
+    cost of one round-trip and no payload), or the **new** bytes — carried here
+    rather than re-requested, because a caller that discovers staleness has
+    already paid for the response body.
+    """
+
+    not_modified: bool
+    chunks: Optional[Iterable[bytes]] = None
+    validators: "Validators" = Validators()
+
+
+@dataclass(frozen=True, slots=True)
 class ContentRef:
     """A content-addressed handle on some bytes falaw has materialized.
 
@@ -224,30 +286,78 @@ def default_content_store():
     )
 
 
+def is_immutable_url(url: str) -> bool:
+    """Whether ``url`` is guaranteed never to serve different bytes later.
+
+    True only for hosts falaw knows mint a fresh URL per upload —
+    :data:`IMMUTABLE_URL_HOSTS` and :data:`IMMUTABLE_URL_HOST_SUFFIXES`, which
+    is fal's own CDN out of the box. **Everything else is mutable**, including
+    ``file://``: a locally-rendered clip re-rendered to the same path is the
+    textbook case of one URL serving two different things.
+
+    The default is the safe one on purpose. Guessing "probably immutable" for
+    an unknown host is what thorwhalen/falaw#23 was: a changed input producing
+    an unchanged content address, silently, with the stale hash flowing into
+    ``Artifact.asset_id`` and every downstream cache key.
+
+    >>> is_immutable_url("https://v3b.fal.media/files/x.png")
+    True
+    >>> is_immutable_url("https://example.com/reference.png")
+    False
+    >>> is_immutable_url("file:///tmp/render.mp4")
+    False
+    """
+    host = (urllib.parse.urlsplit(url).hostname or "").lower()
+    if not host:
+        return False
+    return host in IMMUTABLE_URL_HOSTS or host.endswith(IMMUTABLE_URL_HOST_SUFFIXES)
+
+
 def content_ref_for_url(
     url: str,
     *,
     store=None,
     fetcher: Optional[UrlFetcher] = None,
     refresh: bool = False,
+    assume_immutable: Optional[bool] = None,
 ) -> ContentRef:
     """Materialize ``url``'s bytes into ``store`` and return their content hash.
 
-    Idempotent and download-free on repeat: the ``url -> ContentRef`` index is
-    consulted first, and a remembered reference whose blob is still present is
-    returned without touching the network. That is what makes re-executing an
-    already-cached plan free rather than re-downloading every clip.
+    Idempotent and cheap on repeat, but *how* cheap depends on whether the URL
+    can change behind falaw's back — and falaw decides that rather than asking
+    the caller to know (thorwhalen/falaw#23):
+
+    1. **Immutable URL** (fal's own — see :func:`is_immutable_url`) with a
+       remembered hash whose blob is present: returned immediately, **no
+       network**. This is what makes re-executing an already-cached plan free
+       rather than re-downloading every clip.
+    2. **Mutable URL** with a remembered hash: falaw **revalidates** — a
+       conditional ``GET`` replaying the recorded ``ETag`` / ``Last-Modified``
+       (for ``file://``, a ``(mtime, size)`` comparison). A ``304`` costs one
+       round-trip and no payload; a ``200`` means the bytes really changed and
+       the new ones are stored, so the content hash changes with them.
+    3. **No usable answer** — nothing remembered, no validators recorded, or a
+       transport that cannot make conditional requests: a plain fetch.
+
+    Step 3 is the important default. A transport that cannot revalidate makes
+    falaw **re-fetch**, never trust: an unverifiable hint is not evidence.
 
     Args:
-        url: The remote asset URL (typically fal's CDN).
+        url: The asset URL. ``file://`` is supported and treated as mutable.
         store: Injected :class:`lacing.ArtifactStore`; defaults to
             :func:`default_content_store`.
         fetcher: Injected byte source; defaults to :func:`default_url_fetcher`
             (the built-in ``urllib`` transport unless :func:`using_url_fetcher`
-            has installed another).
-        refresh: Ignore the remembered reference and re-fetch. Only useful when
-            you suspect the index is wrong — fal URLs are per-upload, so the
-            same URL never legitimately serves different bytes.
+            has installed another). To support revalidation, a custom transport
+            exposes a ``conditional_fetch(url, validators) -> ConditionalOutcome``
+            attribute; without one it is simply never asked.
+        refresh: Skip every shortcut and re-fetch unconditionally. Rarely needed
+            now that mutable URLs revalidate on their own — keep it for a URL
+            whose origin lies about its validators.
+        assume_immutable: Override the host-based decision. ``True`` restores
+            the old unconditional trust (use for a host you mint yourself, and
+            prefer adding it to :data:`IMMUTABLE_URL_HOSTS`); ``False`` forces
+            revalidation even for fal.
 
     Raises:
         FalAssetFetchError: the bytes could not be retrieved, or the response
@@ -255,13 +365,95 @@ def content_ref_for_url(
             a silent zero-byte "artifact" is the failure mode this guards.
     """
     store = default_content_store() if store is None else store
-    if not refresh:
-        remembered = remembered_ref(url)
-        if remembered is not None and store.has_blob(remembered.content_hash):
-            return remembered
-    ref = _fetch_into_store(url, store, fetcher or default_url_fetcher())
-    _remember_ref(url, ref)
+    fetcher = fetcher or default_url_fetcher()
+    record = None if refresh else _remembered_record(url)
+    have_blob = record is not None and store.has_blob(record.ref.content_hash)
+
+    if have_blob:
+        immutable = (
+            is_immutable_url(url) if assume_immutable is None else assume_immutable
+        )
+        if immutable:
+            return record.ref
+
+    # Offer validators only when the blob is actually here. A `304` is an
+    # instruction to serve the copy you already have, so asking for one without
+    # a copy would earn an answer carrying no bytes and nothing to fall back on
+    # — the HTTP rule for `If-None-Match`, and the same reason for it.
+    validators = record.validators if have_blob else Validators()
+    try:
+        outcome = _read(url, fetcher, validators)
+        if outcome.not_modified:
+            return record.ref
+        ref = _store_chunks(url, outcome.chunks or (), store)
+    except FalAssetFetchError:
+        # The origin is gone, but we already hold the bytes. Serving them is the
+        # falaw#14 guarantee — "a months-old cache hit still yields a usable
+        # artifact instead of a dead link" — and it does not reintroduce
+        # falaw#23: we are here *because* the fetch failed, so there is no newer
+        # version being shadowed. Staleness is only a lie when the truth was
+        # available and we did not look.
+        if have_blob:
+            warnings.warn(
+                f"Could not re-read {url!r} to confirm it is unchanged; serving "
+                f"the {record.ref.bytes_size} bytes falaw stored earlier. If that "
+                "URL is mutable, this content hash may name superseded bytes.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return record.ref
+        raise
+    _remember_ref(url, ref, outcome.validators)
     return ref
+
+
+def _conditional_capability(fetcher: UrlFetcher):
+    """``fetcher``'s conditional-request capability, or ``None``.
+
+    Checks the callable, and — when it is a **bound method** — the object it is
+    bound to. That second lookup is not a nicety: the documented way to install
+    :class:`falaw.testing.FakeAssets` is ``using_url_fetcher(assets.chunks)``,
+    which hands falaw a bound method while the capability lives on the instance.
+    Looking only at the callable would find nothing, and every mutable URL in
+    every downstream suite would re-download forever while appearing to work.
+    """
+    capability = getattr(fetcher, "conditional_fetch", None)
+    if capability is not None:
+        return capability
+    owner = getattr(fetcher, "__self__", None)
+    return None if owner is None else getattr(owner, "conditional_fetch", None)
+
+
+def _read(url: str, fetcher: UrlFetcher, validators: Validators) -> ConditionalOutcome:
+    """Read ``url``, offering ``validators`` for a cheap "unchanged" answer.
+
+    One entry point for both the first read and a revalidation, and that is
+    deliberate: routing the *first* fetch through ``conditional_fetch`` too (with
+    empty validators, which no origin can match) is what records an ``ETag`` in
+    the first place. The plain :data:`UrlFetcher` seam yields bytes and not a
+    response, so a transport reached only through it can never earn validators —
+    and would then re-download forever, which is option 1 of thorwhalen/falaw#23
+    rather than the fix.
+
+    A transport without the capability still works; it simply never gets a cheap
+    answer. Eager failures are wrapped so the caller sees one error type whether
+    the transport failed at request time or mid-stream.
+    """
+    conditional = _conditional_capability(fetcher)
+    if conditional is None:
+        return ConditionalOutcome(
+            not_modified=False,
+            chunks=fetcher(url),
+            validators=_validators_for(url, fetcher),
+        )
+    try:
+        return conditional(url, validators)
+    except FalAssetFetchError:
+        raise
+    except Exception as e:  # noqa: BLE001 — normalized to falaw's typed error
+        raise FalAssetFetchError(
+            f"Could not fetch asset bytes from {url!r}: {e}.", url=url, cause=e
+        ) from e
 
 
 def remembered_ref(url: str) -> Optional[ContentRef]:
@@ -275,18 +467,14 @@ def remembered_ref(url: str) -> Optional[ContentRef]:
     Public because it is the cheap pre-check that lets a caller answer "do I
     already have this?" without a network round-trip — see
     :func:`falaw.cache.materialize_asset`.
+
+    **It says nothing about whether the URL still serves those bytes.** For a
+    mutable URL that question needs :func:`content_ref_for_url`, which
+    revalidates; this is the raw recorded value, and trusting it for a
+    non-:func:`is_immutable_url` URL is thorwhalen/falaw#23.
     """
-    path = _url_index_path(url)
-    if not os.path.exists(path):
-        return None
-    try:
-        with open(path) as f:
-            record = json.load(f)
-        return ContentRef(
-            content_hash=record["content_hash"], bytes_size=int(record["bytes_size"])
-        )
-    except Exception:  # noqa: BLE001 — a corrupt hint is a miss, never a failure
-        return None
+    record = _remembered_record(url)
+    return None if record is None else record.ref
 
 
 def write_blob_to_file(content_hash: str, path: str, *, store=None) -> str:
@@ -360,8 +548,118 @@ def _http_chunks(url: str, *, chunk_size: int = DFLT_CHUNK_SIZE) -> Iterator[byt
             yield chunk
 
 
-def _fetch_into_store(url: str, store, fetcher: UrlFetcher) -> ContentRef:
-    """Stream ``url`` through ``fetcher`` into ``store``; return the ContentRef.
+def _file_path_of(url: str) -> Optional[str]:
+    """The local path behind a ``file://`` URL, or ``None`` if it is not one."""
+    split = urllib.parse.urlsplit(url)
+    if split.scheme != "file":
+        return None
+    return urllib.request.url2pathname(split.path)
+
+
+def _file_validators(path: str) -> Validators:
+    """A synthetic validator for a local file: its ``(mtime_ns, size)``.
+
+    ``file://`` has no ETag, and locally-rendered media is exactly the mutable
+    case — re-rendering a clip to the same path leaves the URL identical and
+    the bytes different. ``(mtime_ns, size)`` is what a filesystem can answer
+    without reading the file, which is the whole point of a validator.
+    """
+    try:
+        st = os.stat(path)
+    except OSError:
+        return Validators()
+    return Validators(etag=f"file:{st.st_mtime_ns}:{st.st_size}")
+
+
+def _http_conditional_fetch(
+    url: str, validators: Validators, *, chunk_size: int = DFLT_CHUNK_SIZE
+) -> ConditionalOutcome:
+    """Conditional read for the built-in transport. See :data:`UrlFetcher`.
+
+    Attached to :func:`_http_chunks` as its ``conditional_fetch`` attribute, so
+    the built-in transport advertises the capability through the same duck-typed
+    seam a custom transport uses — rather than :func:`_revalidate` special-casing
+    it by identity.
+    """
+    local = _file_path_of(url)
+    if local is not None:
+        current = _file_validators(local)
+        if current and current == validators:
+            return ConditionalOutcome(not_modified=True)
+        return ConditionalOutcome(
+            not_modified=False,
+            chunks=_http_chunks(url, chunk_size=chunk_size),
+            validators=current,
+        )
+
+    request = urllib.request.Request(url)
+    if validators.etag:
+        request.add_header("If-None-Match", validators.etag)
+    if validators.last_modified:
+        request.add_header("If-Modified-Since", validators.last_modified)
+    try:
+        response = urllib.request.urlopen(request)  # noqa: S310 (https URLs)
+    except urllib.error.HTTPError as e:
+        if e.code == 304:
+            return ConditionalOutcome(not_modified=True)
+        raise
+    return ConditionalOutcome(
+        not_modified=False,
+        chunks=_drain(response, chunk_size),
+        validators=_validators_of(response),
+    )
+
+
+_http_chunks.conditional_fetch = _http_conditional_fetch
+"""Advertise the built-in transport's revalidation capability on the fetcher itself.
+
+:func:`_revalidate` looks for a ``conditional_fetch`` attribute and asks no
+questions about what the fetcher *is*. Attaching it here rather than
+special-casing the built-in by identity means the built-in and a custom
+transport reach revalidation through exactly one code path — and a transport
+that does not set the attribute is simply never asked, which is the documented
+"cannot revalidate, therefore re-fetch" case rather than a separate branch.
+"""
+
+
+def _drain(response, chunk_size: int) -> Iterator[bytes]:
+    """Yield ``response``'s body in chunks, closing it when done."""
+    with response:
+        while True:
+            chunk = response.read(chunk_size)
+            if not chunk:
+                return
+            yield chunk
+
+
+def _validators_of(response) -> Validators:
+    """The cache validators an HTTP response offered, if any."""
+    headers = getattr(response, "headers", None)
+    if headers is None:
+        return Validators()
+    return Validators(
+        etag=headers.get("ETag") or "",
+        last_modified=headers.get("Last-Modified") or "",
+    )
+
+
+def _validators_for(url: str, fetcher: UrlFetcher) -> Validators:
+    """Validators to record alongside a freshly-stored ``url``.
+
+    Only ``file://`` can produce them without a second request; an HTTP
+    transport's response headers are not visible through the plain
+    :data:`UrlFetcher` seam (it yields bytes, not a response), so an HTTP URL
+    records none on first fetch and earns them on its first *revalidation*,
+    which does see the response. Recording nothing is the safe state: no
+    validators means :func:`_revalidate` returns ``None`` and the next read
+    re-fetches.
+    """
+    local = _file_path_of(url)
+    return _file_validators(local) if local is not None else Validators()
+
+
+def _store_chunks(url: str, chunks: Iterable[bytes], store) -> ContentRef:
+    """Stream ``chunks`` into ``store``; return the ContentRef.
 
     The byte count is accumulated *during* the stream, so falaw itself never
     holds the payload. Note that **peak process memory is still ~2x the asset**
@@ -375,7 +673,7 @@ def _fetch_into_store(url: str, store, fetcher: UrlFetcher) -> ContentRef:
     counter = [0]
 
     def counted() -> Iterator[bytes]:
-        for chunk in fetcher(url):
+        for chunk in chunks:
             counter[0] += len(chunk)
             yield chunk
 
@@ -414,7 +712,46 @@ def _url_index_path(url: str) -> str:
     return os.path.join(d, f"{digest}.json")
 
 
-def _remember_ref(url: str, ref: ContentRef) -> None:
+@dataclass(frozen=True, slots=True)
+class _IndexRecord:
+    """One ``url_index`` entry: the remembered hash plus how to recheck it."""
+
+    ref: ContentRef
+    validators: Validators
+
+
+def _remembered_record(url: str) -> Optional[_IndexRecord]:
+    """The full index entry for ``url`` — hash *and* validators.
+
+    Records written before thorwhalen/falaw#23 have no validator fields and
+    read back with empty :class:`Validators`. That needs no migration and is
+    not a compatibility shim: an entry with no validators is exactly an entry
+    falaw cannot revalidate, which already means "re-fetch". The old records
+    degrade into the correct behaviour rather than a special case.
+    """
+    path = _url_index_path(url)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path) as f:
+            record = json.load(f)
+        return _IndexRecord(
+            ref=ContentRef(
+                content_hash=record["content_hash"],
+                bytes_size=int(record["bytes_size"]),
+            ),
+            validators=Validators(
+                etag=record.get("etag") or "",
+                last_modified=record.get("last_modified") or "",
+            ),
+        )
+    except Exception:  # noqa: BLE001 — a corrupt hint is a miss, never a failure
+        return None
+
+
+def _remember_ref(
+    url: str, ref: ContentRef, validators: Validators = Validators()
+) -> None:
     path = _url_index_path(url)
     tmp = f"{path}.{uuid.uuid4().hex[:8]}.part"
     with open(tmp, "w") as f:
@@ -423,6 +760,8 @@ def _remember_ref(url: str, ref: ContentRef) -> None:
                 "url": url,
                 "content_hash": ref.content_hash,
                 "bytes_size": ref.bytes_size,
+                "etag": validators.etag,
+                "last_modified": validators.last_modified,
             },
             f,
         )

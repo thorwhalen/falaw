@@ -124,6 +124,34 @@ concatenate_clips(
 )
 ```
 
+### Reference images and local files: falaw checks, you don't have to
+
+falaw caches `url -> content hash`, but only a **fal** URL can be trusted
+outright (fal mints one per upload, so it never re-points at other bytes).
+Anything else --- a reference image on your own server, a `file://` clip you
+re-rendered to the same path --- is **revalidated** before reuse:
+
+```python
+falaw.materialize_asset("https://mysite.com/reference.png")
+# changed on the server? you get the new bytes and a new content hash.
+# unchanged? one conditional request, no download.
+```
+
+You do **not** need to pass `refresh=True` for a mutable URL any more. If falaw
+cannot check (the origin offers no `ETag`/`Last-Modified`, or you injected a
+transport with no conditional-request support) it re-downloads rather than
+trusting a hint it cannot verify. If the origin is *gone*, it falls back to the
+bytes it already stored and warns.
+
+Serving your own media from an immutable-by-construction store? Add the host so
+falaw skips the check:
+
+```python
+from falaw.content import IMMUTABLE_URL_HOSTS
+
+IMMUTABLE_URL_HOSTS.add("cdn.mysite.com")  # only if you mint URLs per upload
+```
+
 ### The cache holds bytes now --- keep an eye on the disk
 
 Since falaw#14 the cache content-addresses every result, so it stores the

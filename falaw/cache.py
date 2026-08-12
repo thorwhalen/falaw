@@ -317,16 +317,26 @@ def materialize_asset(
     URLs serving identical bytes resolve to one file. The extension is a
     presentational hint for ffmpeg/PIL; the SHA-256 is the address.
 
-    Repeat calls are free, in three widening circles — this is what makes it
+    Repeat calls are cheap, in three widening circles — this is what makes it
     safe to call from a loop over 200 shots:
 
-    1. the file is already on disk here (no store lookup, no network);
-    2. the bytes are in the content store (no network) — so it still works
-       after fal has expired the URL;
+    1. the file is already on disk here (no store lookup, no network) —
+       **immutable URLs only**, see below;
+    2. the bytes are in the content store (no network, or one validating
+       round-trip) — so it still works after fal has expired the URL;
     3. otherwise, one download.
 
     Circle 1 matters on its own: the content store is prunable, so an asset
     can survive as a materialized file after its blob is gone.
+
+    **Circle 1 is taken only when the URL cannot change** — that is,
+    :func:`falaw.content.is_immutable_url` — because reaching it requires
+    trusting the ``url -> hash`` index to name the *current* bytes, and for an
+    arbitrary caller-supplied URL it does not (thorwhalen/falaw#23). A mutable
+    URL goes to circle 2, where :func:`falaw.content.content_ref_for_url`
+    revalidates before reusing anything; when the bytes really are unchanged
+    that costs one conditional request and still no download, and when they
+    have changed you get the new file instead of silently getting the old one.
 
     Args:
         url: the remote asset URL. ``file://`` is supported and is used
@@ -337,10 +347,9 @@ def materialize_asset(
         fetcher: injected byte source (``url -> Iterable[bytes]``); defaults to
             the ``urllib``-based one. The seam for custom transport (auth
             headers, retries) and for a hermetic test suite.
-        refresh: re-fetch even when a remembered content hash exists. Pass this
-            for a **mutable** URL — the ``url -> hash`` hint index assumes the
-            URL is immutable, which is true of fal's own but not of an
-            arbitrary one.
+        refresh: re-fetch unconditionally, skipping every circle. Rarely needed
+            now: a mutable URL revalidates on its own (falaw#23), so this is for
+            an origin that lies about its validators.
 
     Raises:
         falaw.errors.FalAssetFetchError: the bytes could not be retrieved.
@@ -350,15 +359,43 @@ def materialize_asset(
     """
     # Local import: ``falaw.content`` imports ``_cache_dir`` from this module,
     # so importing it at module scope would be a cycle.
-    from .content import content_ref_for_url, remembered_ref, write_blob_to_file
+    from .content import (
+        content_ref_for_url,
+        is_immutable_url,
+        remembered_ref,
+        write_blob_to_file,
+    )
+    from .errors import FalAssetFetchError
 
-    if not refresh:
-        hint = remembered_ref(url)
-        if hint is not None:
-            path = _asset_path(url, key_hint, hint.content_hash)
-            if os.path.exists(path):
-                return path
-    ref = content_ref_for_url(url, store=store, fetcher=fetcher, refresh=refresh)
+    hint = None if refresh else remembered_ref(url)
+    local_hint_path = (
+        None if hint is None else _asset_path(url, key_hint, hint.content_hash)
+    )
+    if (
+        local_hint_path is not None
+        and is_immutable_url(url)
+        and os.path.exists(local_hint_path)
+    ):
+        return local_hint_path
+
+    try:
+        ref = content_ref_for_url(url, store=store, fetcher=fetcher, refresh=refresh)
+    except FalAssetFetchError:
+        # Circle 1 as a *fallback* rather than a shortcut. For a mutable URL we
+        # had to try the origin first — returning the old file while a newer one
+        # was one request away is falaw#23 — but having tried and found the
+        # origin gone, a file sitting right here beats failing. The content
+        # store is prunable and fal URLs expire, so a materialized file
+        # routinely outlives both.
+        if local_hint_path is not None and os.path.exists(local_hint_path):
+            warnings.warn(
+                f"Could not re-read {url!r}; returning the copy materialized "
+                "earlier. If that URL is mutable, this file may be superseded.",
+                UserWarning,
+                stacklevel=2,
+            )
+            return local_hint_path
+        raise
     path = _asset_path(url, key_hint, ref.content_hash)
     if os.path.exists(path):
         return path
