@@ -568,6 +568,9 @@ def execute(
             ``content_store`` / ``fetch_bytes`` / ``asset_fetcher``, which
             configure the built-in converter only — passing both raises, rather
             than silently ignoring the ones a custom converter cannot honour.
+            Converters do not own ``cost_usd``: the executor stamps it from
+            the observed run outcome after conversion, overwriting whatever
+            the converter set (falaw#26).
         content_store: Injected :class:`lacing.ArtifactStore` that media bytes
             are materialized into. Defaults to
             :func:`falaw.content.default_content_store` (a directory store
