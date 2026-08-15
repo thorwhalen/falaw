@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw &mdash; falaw 0.0.32 documentation</title>
+  <title>falaw &mdash; falaw 0.0.33 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=f2234cd1"></script>
+      <script src="../_static/documentation_options.js?v=565bc8c8"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -1607,7 +1607,10 @@ converter handles the common shapes (<code class="docutils literal notranslate">
 <code class="docutils literal notranslate"><span class="pre">{video:</span> <span class="pre">{url}}</span></code>, <code class="docutils literal notranslate"><span class="pre">{audio:</span> <span class="pre">{url}}</span></code>). Mutually exclusive with
 <code class="docutils literal notranslate"><span class="pre">content_store</span></code> / <code class="docutils literal notranslate"><span class="pre">fetch_bytes</span></code> / <code class="docutils literal notranslate"><span class="pre">asset_fetcher</span></code>, which
 configure the built-in converter only — passing both raises, rather
-than silently ignoring the ones a custom converter cannot honour.</p></li>
+than silently ignoring the ones a custom converter cannot honour.
+Converters do not own <code class="docutils literal notranslate"><span class="pre">cost_usd</span></code>: the executor stamps it from
+the observed run outcome after conversion, overwriting whatever
+the converter set (falaw#26).</p></li>
 <li><p><strong>content_store</strong> – Injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code> that media bytes
 are materialized into. Defaults to
 <a class="reference internal" href="falaw/content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a> (a directory store

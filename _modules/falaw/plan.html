@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.32 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.33 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f2234cd1"></script>
+      <script src="../../_static/documentation_options.js?v=565bc8c8"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -260,6 +260,18 @@
     <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Free-form labels for downstream consumers. Conventional keys:</span>
 <span class="sd">    ``shot_id``, ``beat_id``, ``character_name``, ``strategy``.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Every cost sum and the executor&#39;s per-artifact stamp read this</span>
+        <span class="c1"># field unvalidated (Artifact enforces ge=0, but model_copy skips</span>
+        <span class="c1"># validation), so the refusal lives at the SSOT. `not (x &gt;= 0)`</span>
+        <span class="c1"># also catches NaN.</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_cost_usd</span>
+        <span class="k">if</span> <span class="n">cost</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">cost</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;estimated_cost_usd must be a non-negative number or None, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">cost</span><span class="si">!r}</span><span class="s2"> for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
     <span class="c1"># -- predicted-billable cost --------------------------------------------</span>
 
@@ -606,7 +618,10 @@
 <span class="c1"># --- execution --------------------------------------------------------------</span>
 
 
-<span class="c1"># Type for the per-call result-to-Artifact converter.</span>
+<span class="c1"># Type for the per-call result-to-Artifact converter. Converters own the</span>
+<span class="c1"># artifact&#39;s *content* fields; ``cost_usd`` is not theirs to set — the executor</span>
+<span class="c1"># stamps it from the observed run outcome after conversion (falaw#26), because</span>
+<span class="c1"># only the executor knows whether the response was served from cache.</span>
 <span class="n">ResultToArtifact</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">,</span> <span class="n">CallPlan</span><span class="p">],</span> <span class="s2">&quot;Artifact&quot;</span><span class="p">]</span>  <span class="c1"># noqa: F821</span>
 
 
@@ -695,6 +710,9 @@
 <span class="sd">            ``content_store`` / ``fetch_bytes`` / ``asset_fetcher``, which</span>
 <span class="sd">            configure the built-in converter only — passing both raises, rather</span>
 <span class="sd">            than silently ignoring the ones a custom converter cannot honour.</span>
+<span class="sd">            Converters do not own ``cost_usd``: the executor stamps it from</span>
+<span class="sd">            the observed run outcome after conversion, overwriting whatever</span>
+<span class="sd">            the converter set (falaw#26).</span>
 <span class="sd">        content_store: Injected :class:`lacing.ArtifactStore` that media bytes</span>
 <span class="sd">            are materialized into. Defaults to</span>
 <span class="sd">            :func:`falaw.content.default_content_store` (a directory store</span>
@@ -1130,7 +1148,8 @@
 <span class="sd">    ``cache_hit`` is *observed*, not predicted: it says this call was served</span>
 <span class="sd">    from a cache entry that proved usable, which is what run-level cost</span>
 <span class="sd">    accounting must be based on (a plan-time ``cache_status`` can be wrong in</span>
-<span class="sd">    both directions).</span>
+<span class="sd">    both directions). The returned artifact&#39;s ``cost_usd`` is stamped from</span>
+<span class="sd">    this observed outcome too — see :func:`_stamp_observed_cost`.</span>
 
 <span class="sd">    Split out of the loop because a cache hit is not unconditionally usable:</span>
 <span class="sd">    the response may name an asset fal has since deleted, whose bytes are not</span>
@@ -1157,7 +1176,7 @@
                 <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">deferred</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
                 <span class="n">emit_cache_hit</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">on_event</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">artifact</span><span class="p">,</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">_stamp_observed_cost</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">call</span><span class="p">,</span> <span class="n">cache_hit</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="kc">True</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Dropping the falaw cache entry for </span><span class="si">{</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="si">!r}</span><span class="s2">: its &quot;</span>
                 <span class="s2">&quot;recorded result names an asset that can no longer be read &quot;</span>
@@ -1180,7 +1199,30 @@
         <span class="n">raw</span> <span class="o">=</span> <span class="n">get_backend_executor</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">)(</span>
             <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">wire_args</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span>
         <span class="p">)</span>
-    <span class="k">return</span> <span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">),</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">_stamp_observed_cost</span><span class="p">(</span><span class="n">converter</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">call</span><span class="p">),</span> <span class="n">call</span><span class="p">,</span> <span class="n">cache_hit</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_stamp_observed_cost</span><span class="p">(</span><span class="n">artifact</span><span class="p">,</span> <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cache_hit</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return ``artifact`` with ``cost_usd`` set from the run&#39;s *observed* outcome.</span>
+
+<span class="sd">    The converter cannot know whether its response came from the cache — its</span>
+<span class="sd">    contract is ``(raw, call)`` and nothing more — so the executor owns the</span>
+<span class="sd">    stamp, overwriting whatever any converter (custom ones included) wrote.</span>
+<span class="sd">    Before this, ``cost_usd`` was the plan-time ``billable_cost_usd`` peek: a</span>
+<span class="sd">    call planned as a miss that ran as a hit carried the full price of a call</span>
+<span class="sd">    that cost nothing, and a planned hit whose entry had to be dropped and</span>
+<span class="sd">    re-billed carried ``None`` (falaw#26).</span>
+
+<span class="sd">    - observed cache hit → ``0.0`` — a *known* zero, nothing was billed;</span>
+<span class="sd">    - observed miss, priced model → ``call.estimated_cost_usd``;</span>
+<span class="sd">    - observed miss, unpriced model → ``None`` — unknown, never &quot;free&quot;.</span>
+
+<span class="sd">    Still an estimate on a miss (prices come from the cost tables, not a</span>
+<span class="sd">    vendor receipt) — run-level truth with the unknown-price flag lives on</span>
+<span class="sd">    :class:`~falaw.ExecutionReport`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">cache_hit</span> <span class="k">else</span> <span class="n">call</span><span class="o">.</span><span class="n">estimated_cost_usd</span>
+    <span class="k">return</span> <span class="n">artifact</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;cost_usd&quot;</span><span class="p">:</span> <span class="n">cost</span><span class="p">})</span>
 
 
 <span class="c1"># The sink lives in `falaw.degrade` because `falaw.content` degrades too and</span>
@@ -1628,7 +1670,11 @@
         <span class="n">duration_s</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span>
         <span class="n">mime</span><span class="o">=</span><span class="n">mime</span><span class="p">,</span>
         <span class="n">provenance</span><span class="o">=</span><span class="n">prov</span><span class="p">,</span>
-        <span class="n">cost_usd</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">billable_cost_usd</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="c1"># ``None`` = unknown. The executor overwrites this with the observed</span>
+        <span class="c1"># outcome (see ``_stamp_observed_cost``); a direct conversion outside</span>
+        <span class="c1"># ``execute`` has no run outcome, and honestly reports &quot;unknown&quot;</span>
+        <span class="c1"># rather than the plan-time guess it used to carry (falaw#26).</span>
+        <span class="n">cost_usd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">producer_call_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># set by orchestrators that thread through call_id</span>
     <span class="p">)</span>
 
