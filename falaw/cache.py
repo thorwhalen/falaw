@@ -71,7 +71,11 @@ def _cache_dir() -> str:
 
 
 def _key(
-    application: str, arguments: Mapping[str, Any], *, backend: str = DFLT_BACKEND
+    application: str,
+    arguments: Mapping[str, Any],
+    *,
+    backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> str:
     # No `default=str` fallback: a hashing function that guesses is a hashing
     # function that collides (falaw#17). Non-canonicalisable arguments raise
@@ -81,7 +85,11 @@ def _key(
     # `backend` joins the key only when non-default (falaw#15), so every
     # existing "fal" entry keeps its exact key.
     return hashlib.sha256(
-        canonical_blob(cache_key_payload(application, arguments, backend=backend))
+        canonical_blob(
+            cache_key_payload(
+                application, arguments, backend=backend, key_extra=key_extra
+            )
+        )
     ).hexdigest()
 
 
@@ -100,10 +108,16 @@ def _manifest_path(key: str) -> str:
 
 
 def cache_get(
-    application: str, arguments: Mapping[str, Any], *, backend: str = DFLT_BACKEND
+    application: str,
+    arguments: Mapping[str, Any],
+    *,
+    backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> Optional[dict]:
     """Return the raw fal response if cached, else None."""
-    path = _manifest_path(_key(application, arguments, backend=backend))
+    path = _manifest_path(
+        _key(application, arguments, backend=backend, key_extra=key_extra)
+    )
     if not os.path.exists(path):
         return None
     with open(path) as f:
@@ -119,6 +133,7 @@ def cache_put(
     note: str = "",
     wire_arguments: Optional[Mapping[str, Any]] = None,
     backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> str:
     """Persist a fal response. Returns the entry directory path.
 
@@ -143,7 +158,7 @@ def cache_put(
     ``json.dump`` would leave a permanently unparseable entry — a cache that
     poisons itself under exactly the fan-out it exists to make cheap.
     """
-    key = _key(application, arguments, backend=backend)
+    key = _key(application, arguments, backend=backend, key_extra=key_extra)
     d = _entry_dir(key)
     manifest = {
         "key": key,
@@ -182,7 +197,11 @@ def _unlink_quietly(path: str) -> None:
 
 
 def drop_cache_entry(
-    application: str, arguments: Mapping[str, Any], *, backend: str = DFLT_BACKEND
+    application: str,
+    arguments: Mapping[str, Any],
+    *,
+    backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> bool:
     """Delete the cache entry for ``(application, arguments)``. Returns whether one existed.
 
@@ -196,7 +215,9 @@ def drop_cache_entry(
     Only the manifest is removed. Blobs in the content store are shared by
     content hash across entries and are never dropped from here.
     """
-    path = _manifest_path(_key(application, arguments, backend=backend))
+    path = _manifest_path(
+        _key(application, arguments, backend=backend, key_extra=key_extra)
+    )
     if not os.path.exists(path):
         return False
     os.remove(path)
@@ -232,6 +253,7 @@ def cached_call_fal(
     refresh: bool = False,
     on_event=None,
     backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> dict:
     """Call a fal model, but reuse the cached response when present.
 
@@ -265,7 +287,7 @@ def cached_call_fal(
     # — raising there loses a response fal has already billed for.
     ensure_canonical(dict(key_args), context="key_arguments")
     if not refresh:
-        hit = cache_get(application, key_args, backend=backend)
+        hit = cache_get(application, key_args, backend=backend, key_extra=key_extra)
         if hit is not None:
             emit_cache_hit(application, on_event)
             return hit
@@ -277,6 +299,7 @@ def cached_call_fal(
             raw,
             wire_arguments=None if key_arguments is None else arguments,
             backend=backend,
+            key_extra=key_extra,
         )
     except Exception as e:
         # A paid result is never discarded (see falaw.plan.execute's failure
@@ -289,7 +312,9 @@ def cached_call_fal(
         # refresh on every later call.
         if refresh:
             try:
-                drop_cache_entry(application, key_args, backend=backend)
+                drop_cache_entry(
+                    application, key_args, backend=backend, key_extra=key_extra
+                )
             except OSError:
                 pass
         warnings.warn(
