@@ -466,3 +466,21 @@ def test_testing_module_doctests_pass():
         optionflags=doctest.NORMALIZE_WHITESPACE | doctest.ELLIPSIS,
     )
     assert result.failed == 0
+
+
+def test_the_live_gate_is_opt_in_not_key_presence(monkeypatch):
+    """A developer shell with FAL_KEY exported must not be able to spend on a
+    bare ``pytest`` — the gate arms only on an explicit FALAW_LIVE_API=1
+    (fleet policy after a real near-spend; reelee#260's family)."""
+    from tests.conftest import _live_api_skip_reason
+
+    monkeypatch.delenv("CI", raising=False)
+    monkeypatch.setenv("FAL_KEY", "k")
+    monkeypatch.delenv("FALAW_LIVE_API", raising=False)
+    assert _live_api_skip_reason() is not None  # key alone must not arm it
+
+    monkeypatch.setenv("FALAW_LIVE_API", "1")
+    assert _live_api_skip_reason() is None  # the explicit yes
+
+    monkeypatch.setenv("CI", "true")
+    assert _live_api_skip_reason() is not None  # CI always wins

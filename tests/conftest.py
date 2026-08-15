@@ -40,14 +40,28 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         "live_api: test calls the real fal.ai API. Gets the real asset "
-        "transport and no network guard; skipped in CI and without FAL_KEY.",
+        "transport and no network guard; runs ONLY with FALAW_LIVE_API=1 "
+        "(and FAL_KEY) set, never in CI.",
     )
 
 
 def _live_api_skip_reason() -> str | None:
-    """Why ``live_api`` tests should not run here, or ``None`` to run them."""
+    """Why ``live_api`` tests should not run here, or ``None`` to run them.
+
+    Opt-IN by polarity, not opt-out: a developer shell with FAL_KEY exported
+    and no CI variable is indistinguishable from an environment that never
+    intended to spend, so "key present" must not be the switch. The gate the
+    fleet converged on after a real near-spend (reelee#260's family): a
+    bare ``pytest`` is always offline; ``FALAW_LIVE_API=1`` is the explicit
+    "yes, bill me" signal. The absent-variable case is the safe case.
+    """
     if os.environ.get("CI"):
         return "live_api tests never run in CI (would risk real spend)"
+    if os.environ.get("FALAW_LIVE_API") != "1":
+        return (
+            "live_api tests are opt-in: set FALAW_LIVE_API=1 (and FAL_KEY) "
+            "to run them — a bare pytest must never be able to spend"
+        )
     if not os.environ.get("FAL_KEY"):
         return "live_api tests need FAL_KEY in the environment"
     return None
