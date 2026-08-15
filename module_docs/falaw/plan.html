@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.34 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.35 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=9dd25805"></script>
+      <script src="../../_static/documentation_options.js?v=39aadc1c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -90,6 +90,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.cache_status"><code class="docutils literal notranslate"><span class="pre">CallPlan.cache_status</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.estimated_cost_usd"><code class="docutils literal notranslate"><span class="pre">CallPlan.estimated_cost_usd</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.expected_duration_s"><code class="docutils literal notranslate"><span class="pre">CallPlan.expected_duration_s</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.key_extra"><code class="docutils literal notranslate"><span class="pre">CallPlan.key_extra</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.metadata"><code class="docutils literal notranslate"><span class="pre">CallPlan.metadata</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.output_kind"><code class="docutils literal notranslate"><span class="pre">CallPlan.output_kind</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.plan.CallPlan.tool"><code class="docutils literal notranslate"><span class="pre">CallPlan.tool</span></code></a></li>
@@ -242,7 +243,7 @@ from miss for cost — both are billed.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="falaw.plan.CallPlan">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CallPlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">tool:</span> <span class="pre">str,</span> <span class="pre">application:</span> <span class="pre">str,</span> <span class="pre">backend:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'fal',</span> <span class="pre">arguments:</span> <span class="pre">dict,</span> <span class="pre">output_kind:</span> <span class="pre">~typing.Literal['image',</span> <span class="pre">'video',</span> <span class="pre">'audio',</span> <span class="pre">'json',</span> <span class="pre">'text',</span> <span class="pre">'binary'],</span> <span class="pre">estimated_cost_usd:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">cache_status:</span> <span class="pre">~typing.Literal['hit',</span> <span class="pre">'miss',</span> <span class="pre">'stale',</span> <span class="pre">'unknown']</span> <span class="pre">=</span> <span class="pre">'unknown',</span> <span class="pre">expected_duration_s:</span> <span class="pre">tuple[float,</span> <span class="pre">float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">metadata:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/plan.html#CallPlan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.CallPlan" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.plan.</span></span><span class="sig-name descname"><span class="pre">CallPlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">tool:</span> <span class="pre">str,</span> <span class="pre">application:</span> <span class="pre">str,</span> <span class="pre">backend:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'fal',</span> <span class="pre">arguments:</span> <span class="pre">dict,</span> <span class="pre">output_kind:</span> <span class="pre">~typing.Literal['image',</span> <span class="pre">'video',</span> <span class="pre">'audio',</span> <span class="pre">'json',</span> <span class="pre">'text',</span> <span class="pre">'binary'],</span> <span class="pre">estimated_cost_usd:</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">cache_status:</span> <span class="pre">~typing.Literal['hit',</span> <span class="pre">'miss',</span> <span class="pre">'stale',</span> <span class="pre">'unknown']</span> <span class="pre">=</span> <span class="pre">'unknown',</span> <span class="pre">expected_duration_s:</span> <span class="pre">tuple[float,</span> <span class="pre">float]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">metadata:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">key_extra:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/plan.html#CallPlan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan.CallPlan" title="Link to this definition"></a></dt>
 <dd><p>A single planned fal call. Pure data — no API contact yet.</p>
 <p><code class="docutils literal notranslate"><span class="pre">application</span></code> and <code class="docutils literal notranslate"><span class="pre">arguments</span></code> are the <em>exact</em> tuple
 <code class="docutils literal notranslate"><span class="pre">cached_call_fal(application,</span> <span class="pre">arguments)</span></code> would take, so a Plan can be
@@ -303,6 +304,19 @@ populated (callers can distinguish “free” from “unknown”).</p>
 duration contract is known. Plan-level validators can check that the
 requested duration fits this range and raise <code class="xref py py-class docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code>
 <em>before</em> the call instead of letting it silently truncate.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.plan.CallPlan.key_extra">
+<span class="sig-name descname"><span class="pre">key_extra</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></span><a class="headerlink" href="#falaw.plan.CallPlan.key_extra" title="Link to this definition"></a></dt>
+<dd><p>Identity beyond the wire arguments — entries that change what the call
+<em>produces</em> without appearing in <code class="docutils literal notranslate"><span class="pre">arguments</span></code>. Participates in the
+per-call cache key AND <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code>, under omit-if-empty (an empty dict
+leaves every existing key byte-identical). Unlike <code class="docutils literal notranslate"><span class="pre">metadata</span></code>, which is
+deliberately identity-free labelling, putting something here says “a
+cached result minted without this value must not be reused”. First
+customer: nw’s Transform <code class="docutils literal notranslate"><span class="pre">impl_version</span></code> (nw#27) — “same interface,
+changed behaviour” must miss the cache without renaming anything.</p>
 </dd></dl>
 
 <dl class="py attribute">

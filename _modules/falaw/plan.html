@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.34 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.35 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=9dd25805"></script>
+      <script src="../../_static/documentation_options.js?v=39aadc1c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -262,6 +262,16 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Free-form labels for downstream consumers. Conventional keys:</span>
 <span class="sd">    ``shot_id``, ``beat_id``, ``character_name``, ``strategy``.&quot;&quot;&quot;</span>
 
+    <span class="n">key_extra</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Identity beyond the wire arguments — entries that change what the call</span>
+<span class="sd">    *produces* without appearing in ``arguments``. Participates in the</span>
+<span class="sd">    per-call cache key AND ``plan_hash``, under omit-if-empty (an empty dict</span>
+<span class="sd">    leaves every existing key byte-identical). Unlike ``metadata``, which is</span>
+<span class="sd">    deliberately identity-free labelling, putting something here says &quot;a</span>
+<span class="sd">    cached result minted without this value must not be reused&quot;. First</span>
+<span class="sd">    customer: nw&#39;s Transform ``impl_version`` (nw#27) — &quot;same interface,</span>
+<span class="sd">    changed behaviour&quot; must miss the cache without renaming anything.&quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Every cost sum and the executor&#39;s per-artifact stamp read this</span>
         <span class="c1"># field unvalidated (Artifact enforces ge=0, but model_copy skips</span>
@@ -431,6 +441,7 @@
             <span class="k">else</span> <span class="kc">None</span>
         <span class="p">),</span>
         <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="s2">&quot;key_extra&quot;</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">key_extra</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -456,6 +467,7 @@
         <span class="n">cache_status</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache_status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
         <span class="n">expected_duration_s</span><span class="o">=</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="n">key_extra</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key_extra&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span>
     <span class="p">)</span></div>
 
 
@@ -552,7 +564,11 @@
     <span class="n">blob</span> <span class="o">=</span> <span class="n">canonical_blob</span><span class="p">(</span>
         <span class="p">[</span>
             <span class="n">plan_identity_payload</span><span class="p">(</span>
-                <span class="n">c</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">tool</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">backend</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span>
+                <span class="n">tool</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span>
+                <span class="n">backend</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                <span class="n">key_extra</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span>
         <span class="p">]</span>
@@ -1200,7 +1216,12 @@
     <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_get</span>
 
-        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">key_args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span>
+            <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+            <span class="n">key_args</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+            <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Speculative: the conversion may turn out to be unusable, in which</span>
             <span class="c1"># case its own complaints are noise the caller must not see (we are</span>
@@ -1222,7 +1243,12 @@
                 <span class="ne">UserWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">drop_cache_entry</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">key_args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">)</span>
+            <span class="n">drop_cache_entry</span><span class="p">(</span>
+                <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+                <span class="n">key_args</span><span class="p">,</span>
+                <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span>
             <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
             <span class="n">wire_args</span><span class="p">,</span>
@@ -1230,6 +1256,7 @@
             <span class="n">refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
             <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+            <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">raw</span> <span class="o">=</span> <span class="n">get_backend_executor</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">)(</span>
@@ -1538,7 +1565,11 @@
 
     <span class="n">blob</span> <span class="o">=</span> <span class="n">canonical_blob</span><span class="p">(</span>
         <span class="n">plan_identity_payload</span><span class="p">(</span>
-            <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span> <span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="n">tool</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span>
+            <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+            <span class="n">call</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span>
+            <span class="n">tool</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+            <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
     <span class="n">synthetic_id</span> <span class="o">=</span> <span class="n">hash_bytes</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
