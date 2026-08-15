@@ -222,16 +222,18 @@ def test_plan_with_explicit_model_id_pins_application(monkeypatch):
     assert p.estimated_cost_usd == pytest.approx(0.80)
 
 
-def test_plan_image_to_video_uses_per_call_cost_for_hailuo(monkeypatch):
-    """Hailuo Pro is per_call ($0.50/clip) — duration_s shouldn't multiply cost."""
+def test_plan_image_to_video_prices_hailuo_by_the_second(monkeypatch):
+    """Hailuo Pro is per_second per fal's rate card ($0.08/s) — duration
+    multiplies cost now; the docs-era $0.50/clip was the ~6s default
+    approximated as per_call (falaw#18)."""
     from falaw import plan_image_to_video
 
     p = plan_image_to_video(
         image_url="http://x/img.png",
         model_id="fal-ai/minimax/hailuo-02/pro/image-to-video",
-        duration_s=8.0,  # ignored for per_call pricing
+        duration_s=8.0,
     )
-    assert p.estimated_cost_usd == pytest.approx(0.50)
+    assert p.estimated_cost_usd == pytest.approx(0.64)
 
 
 def test_plan_text_to_speech_builds_tts_call():

@@ -229,6 +229,41 @@ class Plan:
             c.estimated_cost_usd is None and c.cache_status != "hit" for c in self.calls
         )
 
+    @property
+    def known_cost_usd(self) -> float:
+        """The priced part of :attr:`total_cost_usd` — same number today,
+        but honest by construction.
+
+        ``total_cost_usd`` coerces unpriced calls to ``$0.00`` so sums stay
+        well-defined; a cumulative budget gate that reads it alone will
+        under-quote (400 unpriceable video calls total $0.00). Read this
+        together with :attr:`unknown_call_count`: the true cost is
+        ``known_cost_usd`` *plus an unknown amount* spread over that many
+        calls, and a correct gate refuses when the count is nonzero rather
+        than pretending the unknown part is free (falaw#18).
+        """
+        return sum(
+            (
+                c.estimated_cost_usd
+                for c in self.calls
+                if c.cache_status != "hit" and c.estimated_cost_usd is not None
+            ),
+            0.0,
+        )
+
+    @property
+    def unknown_call_count(self) -> int:
+        """How many billable calls carry no price at all.
+
+        The countable form of :attr:`has_unknown_costs` — see
+        :attr:`known_cost_usd` for the budget-gate arithmetic it enables.
+        """
+        return sum(
+            1
+            for c in self.calls
+            if c.cache_status != "hit" and c.estimated_cost_usd is None
+        )
+
     def with_call_replaced(self, index: int, new_call: CallPlan) -> "Plan":
         """Return a new Plan with ``calls[index]`` replaced."""
         new_calls = list(self.calls)
