@@ -934,9 +934,7 @@ def _run_plan(
                 if outcome.artifact is not None and deps[index]:
                     outcome = _outcome_with_lineage(
                         outcome,
-                        upstream=tuple(
-                            artifacts[j] for j in sorted(deps[index])
-                        ),
+                        upstream=tuple(artifacts[j] for j in sorted(deps[index])),
                     )
                 record(outcome)
                 if outcomes[index].status == "failed" and halt_on_failure:
