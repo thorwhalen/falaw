@@ -466,7 +466,10 @@ def make_call_plan(
 # --- execution --------------------------------------------------------------
 
 
-# Type for the per-call result-to-Artifact converter.
+# Type for the per-call result-to-Artifact converter. Converters own the
+# artifact's *content* fields; ``cost_usd`` is not theirs to set — the executor
+# stamps it from the observed run outcome after conversion (falaw#26), because
+# only the executor knows whether the response was served from cache.
 ResultToArtifact = Callable[[dict, CallPlan], "Artifact"]  # noqa: F821
 
 
@@ -984,7 +987,8 @@ def _execute_call(
     ``cache_hit`` is *observed*, not predicted: it says this call was served
     from a cache entry that proved usable, which is what run-level cost
     accounting must be based on (a plan-time ``cache_status`` can be wrong in
-    both directions).
+    both directions). The returned artifact's ``cost_usd`` is stamped from
+    this observed outcome too — see :func:`_stamp_observed_cost`.
 
     Split out of the loop because a cache hit is not unconditionally usable:
     the response may name an asset fal has since deleted, whose bytes are not
@@ -1011,7 +1015,7 @@ def _execute_call(
                 for message in deferred:
                     warnings.warn(message, UserWarning, stacklevel=3)
                 emit_cache_hit(call.application, on_event)
-                return artifact, True
+                return _stamp_observed_cost(artifact, call, cache_hit=True), True
             warnings.warn(
                 f"Dropping the falaw cache entry for {call.application!r}: its "
                 "recorded result names an asset that can no longer be read "
@@ -1034,7 +1038,30 @@ def _execute_call(
         raw = get_backend_executor(call.backend)(
             call.application, wire_args, on_event=on_event
         )
-    return converter(raw, call), False
+    return _stamp_observed_cost(converter(raw, call), call, cache_hit=False), False
+
+
+def _stamp_observed_cost(artifact, call: CallPlan, *, cache_hit: bool):
+    """Return ``artifact`` with ``cost_usd`` set from the run's *observed* outcome.
+
+    The converter cannot know whether its response came from the cache — its
+    contract is ``(raw, call)`` and nothing more — so the executor owns the
+    stamp, overwriting whatever any converter (custom ones included) wrote.
+    Before this, ``cost_usd`` was the plan-time ``billable_cost_usd`` peek: a
+    call planned as a miss that ran as a hit carried the full price of a call
+    that cost nothing, and a planned hit whose entry had to be dropped and
+    re-billed carried ``None`` (falaw#26).
+
+    - observed cache hit → ``0.0`` — a *known* zero, nothing was billed;
+    - observed miss, priced model → ``call.estimated_cost_usd``;
+    - observed miss, unpriced model → ``None`` — unknown, never "free".
+
+    Still an estimate on a miss (prices come from the cost tables, not a
+    vendor receipt) — run-level truth with the unknown-price flag lives on
+    :class:`~falaw.ExecutionReport`.
+    """
+    cost = 0.0 if cache_hit else call.estimated_cost_usd
+    return artifact.model_copy(update={"cost_usd": cost})
 
 
 # The sink lives in `falaw.degrade` because `falaw.content` degrades too and
@@ -1479,7 +1506,11 @@ def _artifact_from_response(
         duration_s=duration,
         mime=mime,
         provenance=prov,
-        cost_usd=call.billable_cost_usd or None,
+        # ``None`` = unknown. The executor overwrites this with the observed
+        # outcome (see ``_stamp_observed_cost``); a direct conversion outside
+        # ``execute`` has no run outcome, and honestly reports "unknown"
+        # rather than the plan-time guess it used to carry (falaw#26).
+        cost_usd=None,
         producer_call_id=None,  # set by orchestrators that thread through call_id
     )
 
