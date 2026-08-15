@@ -930,11 +930,54 @@ def _run_plan(
             done, _ = _wait_first(in_flight)
             for future in done:
                 index = in_flight.pop(future)
-                record(_outcome_from_future(plan.calls[index], index, future))
+                outcome = _outcome_from_future(plan.calls[index], index, future)
+                if outcome.artifact is not None and deps[index]:
+                    outcome = _outcome_with_lineage(
+                        outcome,
+                        upstream=tuple(
+                            artifacts[j] for j in sorted(deps[index])
+                        ),
+                    )
+                record(outcome)
                 if outcomes[index].status == "failed" and halt_on_failure:
                     halted = True
 
     return ExecutionReport(outcomes=tuple(outcomes))  # type: ignore[arg-type]
+
+
+def _outcome_with_lineage(outcome: CallOutcome, *, upstream: tuple) -> CallOutcome:
+    """Stamp the outcome's artifact with its upstream artifact lineage.
+
+    The D5 payoff (lacing#14): ``was_derived_from`` gains the ``asset_id`` of
+    every artifact this call consumed via ``"<from N>"`` placeholders, read
+    straight off the Plan's dependency DAG. Executor-owned like the cost
+    stamp — the converter contract ``(raw, call)`` cannot know the plan
+    graph. A degraded upstream's ``asset_id`` (a response digest) is still
+    the identity of that upstream record and is included; its
+    ``bytes_size == 0`` remains the degradation marker. Dry runs are not
+    stamped (their placeholders are never resolved).
+
+    Content-addressed by construction: a byte-identical upstream
+    regeneration produces the same ``asset_id``, so the recorded edge — and
+    anything comparing along it (nw's freshness, once it consumes artifact
+    edges) — survives regeneration. That is the property URL-based
+    references could never have (falaw#14).
+    """
+    from dataclasses import replace as _dc_replace
+
+    ids = [a.asset_id for a in upstream if a is not None]
+    artifact = outcome.artifact
+    if not ids or artifact is None:
+        return outcome
+    prov = artifact.provenance
+    present = {str(ref) for ref in prov.was_derived_from}
+    merged = list(prov.was_derived_from) + [i for i in ids if i not in present]
+    if merged == list(prov.was_derived_from):
+        return outcome
+    stamped = artifact.model_copy(
+        update={"provenance": prov.model_copy(update={"was_derived_from": merged})}
+    )
+    return _dc_replace(outcome, artifact=stamped)
 
 
 def _outcome_from_future(call: CallPlan, index: int, future) -> CallOutcome:
