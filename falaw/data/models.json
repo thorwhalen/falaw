@@ -6,7 +6,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/audio-isolation"
+    "docs_url": "https://fal.ai/models/fal-ai/elevenlabs/audio-isolation",
+    "cost_estimate": {
+      "kind": "per_second",
+      "amount": 0.0016666666666666668,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15, converted from unit 'minutes'",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/ai-avatar",
@@ -20,10 +27,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/ai-avatar",
     "cost_estimate": {
       "kind": "per_second",
-      "amount": 0.05,
+      "amount": 0.2,
       "currency": "USD",
-      "notes": "Generic ai-avatar: ~$0.05/s when it works. Note: known to hang.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Generic ai-avatar: ~$0.05/s when it works. Note: known to hang.",
+      "source": "api"
     }
   },
   {
@@ -62,7 +69,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/ideogram/v3/reframe"
+    "docs_url": "https://fal.ai/models/fal-ai/ideogram/v3/reframe",
+    "cost_estimate": {
+      "kind": "per_image",
+      "amount": 0.03,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/birefnet/v2",
@@ -96,8 +110,8 @@
       "kind": "per_megapixel",
       "amount": 0.025,
       "currency": "USD",
-      "notes": "Flux dev: ~$0.025/MP. Default 1024x1024 ≈ $0.026/image.",
-      "source": "docs"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Flux dev: ~$0.025/MP. Default 1024x1024 ≈ $0.026/image.",
+      "source": "api"
     }
   },
   {
@@ -110,10 +124,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/ideogram/v3",
     "cost_estimate": {
       "kind": "per_image",
-      "amount": 0.06,
+      "amount": 0.03,
       "currency": "USD",
-      "notes": "Ideogram v3: per-image pricing in the ~$0.06 range.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Ideogram v3: per-image pricing in the ~$0.06 range.",
+      "source": "api"
     }
   },
   {
@@ -123,7 +137,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/recraft/v3/text-to-image"
+    "docs_url": "https://fal.ai/models/fal-ai/recraft/v3/text-to-image",
+    "cost_estimate": {
+      "kind": "per_image",
+      "amount": 0.04,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/flux/schnell",
@@ -139,8 +160,8 @@
       "kind": "per_megapixel",
       "amount": 0.003,
       "currency": "USD",
-      "notes": "Flux schnell: cheapest tier; ~$0.003/MP.",
-      "source": "docs"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Flux schnell: cheapest tier; ~$0.003/MP.",
+      "source": "api"
     }
   },
   {
@@ -150,7 +171,14 @@
     "aliases": [],
     "quality_tier": "fast",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/hidream-i1-fast"
+    "docs_url": "https://fal.ai/models/fal-ai/hidream-i1-fast",
+    "cost_estimate": {
+      "kind": "per_megapixel",
+      "amount": 0.01,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/sana/sprint",
@@ -159,7 +187,14 @@
     "aliases": [],
     "quality_tier": "fast",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/sana/sprint"
+    "docs_url": "https://fal.ai/models/fal-ai/sana/sprint",
+    "cost_estimate": {
+      "kind": "per_megapixel",
+      "amount": 0.0025,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/flux-pro/v1.1",
@@ -175,8 +210,8 @@
       "kind": "per_megapixel",
       "amount": 0.04,
       "currency": "USD",
-      "notes": "Flux Pro v1.1: ~$0.04/MP. Used by muvid environment-render quality=high.",
-      "source": "docs"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Flux Pro v1.1: ~$0.04/MP. Used by muvid environment-render quality=high.",
+      "source": "api"
     }
   },
   {
@@ -190,11 +225,11 @@
     "cost_hint": "high",
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro/v1.1-ultra",
     "cost_estimate": {
-      "kind": "per_megapixel",
+      "kind": "per_image",
       "amount": 0.06,
       "currency": "USD",
-      "notes": "Flux Pro Ultra: ~$0.06/MP (estimate; verify on next billing audit).",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Flux Pro Ultra: ~$0.06/MP (estimate; verify on next billing audit).",
+      "source": "api"
     }
   },
   {
@@ -204,7 +239,14 @@
     "aliases": [],
     "quality_tier": "ultra",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/imagen4/preview/ultra"
+    "docs_url": "https://fal.ai/models/fal-ai/imagen4/preview/ultra",
+    "cost_estimate": {
+      "kind": "per_image",
+      "amount": 0.06,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/flux-kontext/dev",
@@ -231,7 +273,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/omnigen-v2"
+    "docs_url": "https://fal.ai/models/fal-ai/omnigen-v2",
+    "cost_estimate": {
+      "kind": "per_megapixel",
+      "amount": 0.15,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/bytedance/seededit/v3/edit-image",
@@ -245,10 +294,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/bytedance/seededit/v3/edit-image",
     "cost_estimate": {
       "kind": "per_image",
-      "amount": 0.05,
+      "amount": 0.03,
       "currency": "USD",
-      "notes": "ByteDance SeedEdit v3: ~$0.05/edit.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: ByteDance SeedEdit v3: ~$0.05/edit.",
+      "source": "api"
     }
   },
   {
@@ -263,10 +312,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/flux-pro/kontext/max",
     "cost_estimate": {
       "kind": "per_image",
-      "amount": 0.1,
+      "amount": 0.08,
       "currency": "USD",
-      "notes": "Flux Pro Kontext Max: highest-tier edit; ~$0.10/edit.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Flux Pro Kontext Max: highest-tier edit; ~$0.10/edit.",
+      "source": "api"
     }
   },
   {
@@ -280,11 +329,11 @@
     "cost_hint": "medium",
     "docs_url": "https://fal.ai/models/fal-ai/minimax/hailuo-02/pro/image-to-video",
     "cost_estimate": {
-      "kind": "per_call",
-      "amount": 0.5,
+      "kind": "per_second",
+      "amount": 0.08,
       "currency": "USD",
-      "notes": "Hailuo Pro: per-clip pricing (~$0.50/clip), NOT per-second. Output is fixed ~5.87s regardless of requested duration. Use per_call kind.",
-      "source": "docs"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Hailuo Pro: per-clip pricing (~$0.50/clip), NOT per-second. Output is fixed ~5.87s regardless of requested duration. Use per_call kind.",
+      "source": "api"
     },
     "max_clip_seconds": 6.0,
     "single_character_recommended": false,
@@ -347,10 +396,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/kling-video/v2.1/master/image-to-video",
     "cost_estimate": {
       "kind": "per_second",
-      "amount": 0.35,
+      "amount": 0.28,
       "currency": "USD",
-      "notes": "Kling 2.1 master i2v: ~$0.35/s (ultra tier).",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Kling 2.1 master i2v: ~$0.35/s (ultra tier).",
+      "source": "api"
     },
     "max_clip_seconds": 10.0,
     "single_character_recommended": false,
@@ -369,10 +418,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/ai-avatar/multi",
     "cost_estimate": {
       "kind": "per_second",
-      "amount": 0.05,
+      "amount": 0.2,
       "currency": "USD",
-      "notes": "ai-avatar multi: ~$0.05/s. Same hang-warning as ai-avatar.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: ai-avatar multi: ~$0.05/s. Same hang-warning as ai-avatar.",
+      "source": "api"
     }
   },
   {
@@ -398,10 +447,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/sync-lipsync/v2",
     "cost_estimate": {
       "kind": "per_second",
-      "amount": 0.1,
+      "amount": 0.05,
       "currency": "USD",
-      "notes": "Sync Lipsync v2: ~$0.10/s for clip re-sync.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15, converted from unit 'minutes'; was: Sync Lipsync v2: ~$0.10/s for clip re-sync.",
+      "source": "api"
     }
   },
   {
@@ -416,10 +465,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/any-llm",
     "cost_estimate": {
       "kind": "per_call",
-      "amount": 0.01,
+      "amount": 0.001,
       "currency": "USD",
-      "notes": "Approximate per-completion cost; true price is per-token and varies with the chosen model and prompt/response length. Reconcile against billing.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Approximate per-completion cost; true price is per-token and varies with the chosen model and prompt/response length. Reconcile against billing.",
+      "source": "api"
     }
   },
   {
@@ -429,7 +478,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/any-llm/vision"
+    "docs_url": "https://fal.ai/models/fal-ai/any-llm/vision",
+    "cost_estimate": {
+      "kind": "per_call",
+      "amount": 0.01,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/diffrhythm",
@@ -440,7 +496,14 @@
     ],
     "quality_tier": "balanced",
     "cost_hint": "low",
-    "docs_url": "https://fal.ai/models/fal-ai/diffrhythm"
+    "docs_url": "https://fal.ai/models/fal-ai/diffrhythm",
+    "cost_estimate": {
+      "kind": "per_second",
+      "amount": 0.001,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15, converted from unit '10 seconds'",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/mmaudio-v2/text-to-audio",
@@ -449,7 +512,14 @@
     "aliases": [],
     "quality_tier": "balanced",
     "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/mmaudio-v2/text-to-audio"
+    "docs_url": "https://fal.ai/models/fal-ai/mmaudio-v2/text-to-audio",
+    "cost_estimate": {
+      "kind": "per_second",
+      "amount": 0.001,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/lyria2",
@@ -460,7 +530,14 @@
     ],
     "quality_tier": "high",
     "cost_hint": "medium",
-    "docs_url": "https://fal.ai/models/fal-ai/lyria2"
+    "docs_url": "https://fal.ai/models/fal-ai/lyria2",
+    "cost_estimate": {
+      "kind": "per_second",
+      "amount": 0.0033333333333333335,
+      "currency": "USD",
+      "notes": "fal pricing API, fetched 2026-08-15, converted from unit '30 seconds'",
+      "source": "api"
+    }
   },
   {
     "id": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
@@ -500,10 +577,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/veo3",
     "cost_estimate": {
       "kind": "per_second",
-      "amount": 0.5,
+      "amount": 0.4,
       "currency": "USD",
-      "notes": "Veo 3 (Google): premium text-to-video, ~$0.50/s.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Veo 3 (Google): premium text-to-video, ~$0.50/s.",
+      "source": "api"
     },
     "max_clip_seconds": 8.0,
     "single_character_recommended": false,
@@ -580,10 +657,10 @@
     "docs_url": "https://fal.ai/models/fal-ai/clarity-upscaler",
     "cost_estimate": {
       "kind": "per_megapixel",
-      "amount": 0.05,
+      "amount": 0.03,
       "currency": "USD",
-      "notes": "Clarity upscaler: priced by output megapixels.",
-      "source": "approximate"
+      "notes": "fal pricing API, fetched 2026-08-15; was: Clarity upscaler: priced by output megapixels.",
+      "source": "api"
     }
   },
   {

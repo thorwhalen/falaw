@@ -345,16 +345,20 @@ def test_priced_models_loaded_from_data_json():
         )
 
 
-def test_hailuo_uses_per_call_pricing():
-    """Hailuo Pro is priced per-clip (fixed ~5.87s output), not per-second."""
+def test_hailuo_uses_per_second_pricing_from_the_vendor_rate_card():
+    """Hailuo Pro is billed per video second per fal's pricing API ($0.08/s —
+    consistent with the old hand-written '$0.50/clip at the ~6s default').
+    The docs-era per_call record was the approximation (falaw#18)."""
     from falaw.registry import _load_models
 
     _load_models.cache_clear()
     hailuo = _load_models()["fal-ai/minimax/hailuo-02/pro/image-to-video"]
     assert hailuo.cost_estimate is not None
-    assert hailuo.cost_estimate.kind == "per_call"
-    cost = estimate_call_cost(hailuo)
-    assert cost is not None and cost > 0
+    assert hailuo.cost_estimate.kind == "per_second"
+    assert hailuo.cost_estimate.source == "api"
+    assert estimate_call_cost(hailuo) is None  # no duration -> unpriceable
+    cost = estimate_call_cost(hailuo, seconds=6.0)
+    assert cost is not None and cost == pytest.approx(0.48)
 
 
 def test_omnihuman_per_second_pricing_matches_empirical():
