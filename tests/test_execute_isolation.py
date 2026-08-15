@@ -370,6 +370,21 @@ def test_an_unpriced_miss_stamps_unknown_never_free(fal):
     assert report.outcomes[0].artifact.cost_usd is None
 
 
+@pytest.mark.parametrize("bad", [-1.0, float("nan")])
+def test_a_negative_or_nan_price_is_refused_at_the_callplan(bad):
+    """The executor stamps ``estimated_cost_usd`` onto artifacts via
+    ``model_copy``, which skips Artifact's ``ge=0`` validation — so the
+    refusal must live where the number enters: the CallPlan."""
+    with pytest.raises(ValueError, match="non-negative"):
+        CallPlan(
+            tool="t",
+            application="m/bad",
+            arguments={},
+            output_kind="image",
+            estimated_cost_usd=bad,
+        )
+
+
 def test_the_executor_owns_the_cost_stamp_not_the_converter(fal):
     """A converter that invents a price is overwritten: cost is a fact about
     the call's *execution*, which only the executor observes."""

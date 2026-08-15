@@ -146,6 +146,18 @@ class CallPlan:
     """Free-form labels for downstream consumers. Conventional keys:
     ``shot_id``, ``beat_id``, ``character_name``, ``strategy``."""
 
+    def __post_init__(self) -> None:
+        # Every cost sum and the executor's per-artifact stamp read this
+        # field unvalidated (Artifact enforces ge=0, but model_copy skips
+        # validation), so the refusal lives at the SSOT. `not (x >= 0)`
+        # also catches NaN.
+        cost = self.estimated_cost_usd
+        if cost is not None and not (cost >= 0):
+            raise ValueError(
+                f"estimated_cost_usd must be a non-negative number or None, "
+                f"got {cost!r} for {self.application!r}."
+            )
+
     # -- predicted-billable cost --------------------------------------------
 
     @property
