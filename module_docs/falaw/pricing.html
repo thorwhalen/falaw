@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.pricing &mdash; falaw 0.0.34 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=9dd25805"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.prune" href="prune.html" />
+    <link rel="prev" title="falaw.plan" href="plan.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan.html">falaw.plan</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.pricing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.pricing.MAX_429_RETRIES"><code class="docutils literal notranslate"><span class="pre">MAX_429_RETRIES</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.pricing.MAX_IDS_PER_REQUEST"><code class="docutils literal notranslate"><span class="pre">MAX_IDS_PER_REQUEST</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.pricing.PRICING_URL"><code class="docutils literal notranslate"><span class="pre">PRICING_URL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.pricing.fetch_model_prices"><code class="docutils literal notranslate"><span class="pre">fetch_model_prices()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.pricing.refresh_model_prices"><code class="docutils literal notranslate"><span class="pre">refresh_model_prices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="prune.html">falaw.prune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.pricing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/pricing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.pricing">
+<span id="falaw-pricing"></span><h1>falaw.pricing<a class="headerlink" href="#module-falaw.pricing" title="Link to this heading"></a></h1>
+<p>Read fal’s pricing API into <code class="docutils literal notranslate"><span class="pre">models.json</span></code> cost estimates (falaw#18).</p>
+<p>19 of the catalogue’s 40 models carry no structured <code class="docutils literal notranslate"><span class="pre">cost_estimate</span></code>, so
+<code class="docutils literal notranslate"><span class="pre">Plan.has_unknown_costs</span></code> — correctly — forces approval on nearly every
+plan. fal publishes the real numbers (<code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/v1/models/pricing</span></code>), and this
+module turns them into catalogue entries with <code class="docutils literal notranslate"><span class="pre">source=&quot;api&quot;</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">refresh_model_prices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">refresh_model_prices</span><span class="p">()</span>          <span class="c1"># dry-run: reports, writes nothing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summary</span> <span class="o">=</span> <span class="n">refresh_model_prices</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>   <span class="c1"># persists to models.json</span>
+</pre></div>
+</div>
+<p>Design rules, in order of importance:</p>
+<ul class="simple">
+<li><p><strong>This is a refresh job, not a runtime lookup.</strong> <code class="docutils literal notranslate"><span class="pre">plan_*</span></code> never touches
+the network; plans price themselves from the committed catalogue.</p></li>
+<li><p><strong>An unmapped billing unit is recorded, never guessed.</strong> fal’s <code class="docutils literal notranslate"><span class="pre">unit</span></code> is
+a free string (“image”, “megapixel”, GPU/compute units, …); only units with
+an unambiguous <code class="xref py py-data docutils literal notranslate"><span class="pre">CostKind</span></code> mapping become estimates. A
+GPU-second is machine time, not output time — mapping it to <code class="docutils literal notranslate"><span class="pre">per_second</span></code>
+would misprice by the model’s realtime factor, so it stays unpriced and
+visible in the summary instead.</p></li>
+<li><p><strong>The API wins, loudly.</strong> A hand-written price the API disagrees with is
+overwritten, and the delta is reported — stale pricing data is the normal
+case, not the exception.</p></li>
+</ul>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.pricing.MAX_429_RETRIES">
+<span class="sig-prename descclassname"><span class="pre">falaw.pricing.</span></span><span class="sig-name descname"><span class="pre">MAX_429_RETRIES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></span><a class="headerlink" href="#falaw.pricing.MAX_429_RETRIES" title="Link to this definition"></a></dt>
+<dd><p>Attempts per request before giving up on a rate-limited endpoint.</p>
+<p>The bisection around unknown ids multiplies request count, and the live
+endpoint rate-limits aggressively — a refresh job should wait its turn,
+not die halfway with a partial price table.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.pricing.MAX_IDS_PER_REQUEST">
+<span class="sig-prename descclassname"><span class="pre">falaw.pricing.</span></span><span class="sig-name descname"><span class="pre">MAX_IDS_PER_REQUEST</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></span><a class="headerlink" href="#falaw.pricing.MAX_IDS_PER_REQUEST" title="Link to this definition"></a></dt>
+<dd><p>The endpoint’s documented per-request cap on <code class="docutils literal notranslate"><span class="pre">endpoint_id</span></code> values.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.pricing.PRICING_URL">
+<span class="sig-prename descclassname"><span class="pre">falaw.pricing.</span></span><span class="sig-name descname"><span class="pre">PRICING_URL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://api.fal.ai/v1/models/pricing'</span></span><a class="headerlink" href="#falaw.pricing.PRICING_URL" title="Link to this definition"></a></dt>
+<dd><p>fal’s unit-pricing endpoint. Accepts 1-50 <code class="docutils literal notranslate"><span class="pre">endpoint_id</span></code> values per call.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.pricing.fetch_model_prices">
+<span class="sig-prename descclassname"><span class="pre">falaw.pricing.</span></span><span class="sig-name descname"><span class="pre">fetch_model_prices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_get</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/pricing.html#fetch_model_prices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.pricing.fetch_model_prices" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{endpoint_id:</span> <span class="pre">{&quot;unit_price&quot;,</span> <span class="pre">&quot;unit&quot;,</span> <span class="pre">&quot;currency&quot;}}</span></code> from fal’s API.</p>
+<p>Batches requests at <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> ids (the endpoint caps at
+<a class="reference internal" href="#falaw.pricing.MAX_IDS_PER_REQUEST" title="falaw.pricing.MAX_IDS_PER_REQUEST"><code class="xref py py-data docutils literal notranslate"><span class="pre">MAX_IDS_PER_REQUEST</span></code></a>). Ids the API does not know are simply
+absent from the result — the caller decides what absence means. That
+takes work: the live endpoint answers a batch containing even one
+unknown id with a blanket 404, so a failed batch is bisected down to
+the ids that actually price (O(unknown x log batch) extra requests).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.pricing.refresh_model_prices">
+<span class="sig-prename descclassname"><span class="pre">falaw.pricing.</span></span><span class="sig-name descname"><span class="pre">refresh_model_prices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_get</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">today</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/pricing.html#refresh_model_prices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.pricing.refresh_model_prices" title="Link to this definition"></a></dt>
+<dd><p>Refresh <code class="docutils literal notranslate"><span class="pre">models.json</span></code> cost estimates from fal’s pricing API.</p>
+<p>Returns a summary dict; <code class="docutils literal notranslate"><span class="pre">write=False</span></code> (default) reports what would
+change without touching the file. <code class="docutils literal notranslate"><span class="pre">models_path</span></code> and <code class="docutils literal notranslate"><span class="pre">today</span></code> exist
+for tests (the fetch date lands in each estimate’s <code class="docutils literal notranslate"><span class="pre">notes</span></code>).</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="plan.html" class="btn btn-neutral float-left" title="falaw.plan" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="prune.html" class="btn btn-neutral float-right" title="falaw.prune" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -33,6 +33,7 @@
    module_docs/falaw/operations/video
    module_docs/falaw/outcomes
    module_docs/falaw/plan
+   module_docs/falaw/pricing
    module_docs/falaw/prune
    module_docs/falaw/refresh
    module_docs/falaw/registry

@@ -1,0 +1,4 @@
+falaw.pricing
+=============
+.. automodule:: falaw.pricing
+   :members:
