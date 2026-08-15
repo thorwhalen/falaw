@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.36 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.37 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=0e525676"></script>
+      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -1077,11 +1077,54 @@
             <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_wait_first</span><span class="p">(</span><span class="n">in_flight</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
                 <span class="n">index</span> <span class="o">=</span> <span class="n">in_flight</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">future</span><span class="p">)</span>
-                <span class="n">record</span><span class="p">(</span><span class="n">_outcome_from_future</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="p">,</span> <span class="n">future</span><span class="p">))</span>
+                <span class="n">outcome</span> <span class="o">=</span> <span class="n">_outcome_from_future</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">index</span><span class="p">,</span> <span class="n">future</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">deps</span><span class="p">[</span><span class="n">index</span><span class="p">]:</span>
+                    <span class="n">outcome</span> <span class="o">=</span> <span class="n">_outcome_with_lineage</span><span class="p">(</span>
+                        <span class="n">outcome</span><span class="p">,</span>
+                        <span class="n">upstream</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span>
+                            <span class="n">artifacts</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">deps</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="n">record</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">outcomes</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span> <span class="ow">and</span> <span class="n">halt_on_failure</span><span class="p">:</span>
                     <span class="n">halted</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">ExecutionReport</span><span class="p">(</span><span class="n">outcomes</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">outcomes</span><span class="p">))</span>  <span class="c1"># type: ignore[arg-type]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_outcome_with_lineage</span><span class="p">(</span><span class="n">outcome</span><span class="p">:</span> <span class="n">CallOutcome</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">upstream</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stamp the outcome&#39;s artifact with its upstream artifact lineage.</span>
+
+<span class="sd">    The D5 payoff (lacing#14): ``was_derived_from`` gains the ``asset_id`` of</span>
+<span class="sd">    every artifact this call consumed via ``&quot;&lt;from N&gt;&quot;`` placeholders, read</span>
+<span class="sd">    straight off the Plan&#39;s dependency DAG. Executor-owned like the cost</span>
+<span class="sd">    stamp — the converter contract ``(raw, call)`` cannot know the plan</span>
+<span class="sd">    graph. A degraded upstream&#39;s ``asset_id`` (a response digest) is still</span>
+<span class="sd">    the identity of that upstream record and is included; its</span>
+<span class="sd">    ``bytes_size == 0`` remains the degradation marker. Dry runs are not</span>
+<span class="sd">    stamped (their placeholders are never resolved).</span>
+
+<span class="sd">    Content-addressed by construction: a byte-identical upstream</span>
+<span class="sd">    regeneration produces the same ``asset_id``, so the recorded edge — and</span>
+<span class="sd">    anything comparing along it (nw&#39;s freshness, once it consumes artifact</span>
+<span class="sd">    edges) — survives regeneration. That is the property URL-based</span>
+<span class="sd">    references could never have (falaw#14).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span> <span class="k">as</span> <span class="n">_dc_replace</span>
+
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">asset_id</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">upstream</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">artifact</span> <span class="o">=</span> <span class="n">outcome</span><span class="o">.</span><span class="n">artifact</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ids</span> <span class="ow">or</span> <span class="n">artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">outcome</span>
+    <span class="n">prov</span> <span class="o">=</span> <span class="n">artifact</span><span class="o">.</span><span class="n">provenance</span>
+    <span class="n">present</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">prov</span><span class="o">.</span><span class="n">was_derived_from</span><span class="p">}</span>
+    <span class="n">merged</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">prov</span><span class="o">.</span><span class="n">was_derived_from</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ids</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">present</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">merged</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">prov</span><span class="o">.</span><span class="n">was_derived_from</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">outcome</span>
+    <span class="n">stamped</span> <span class="o">=</span> <span class="n">artifact</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+        <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;provenance&quot;</span><span class="p">:</span> <span class="n">prov</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;was_derived_from&quot;</span><span class="p">:</span> <span class="n">merged</span><span class="p">})}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_dc_replace</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">artifact</span><span class="o">=</span><span class="n">stamped</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_outcome_from_future</span><span class="p">(</span><span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">future</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallOutcome</span><span class="p">:</span>
