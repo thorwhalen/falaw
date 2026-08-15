@@ -12,6 +12,7 @@ import sys
 import threading
 import types
 import warnings
+from dataclasses import replace
 from typing import Optional
 
 import pytest
@@ -322,6 +323,83 @@ def test_an_unpriced_cache_hit_is_not_an_unknown_cost(fal):
 
     assert second.outcomes[0].cache_hit is True
     assert second.has_unknown_costs is False
+
+
+# --- the per-artifact cost stamp (falaw#26) ----------------------------------
+
+
+def test_an_artifact_from_a_run_hit_carries_zero_not_the_planned_price(fal):
+    """A call planned as a miss that runs as a hit must not carry a price.
+
+    ``Artifact.cost_usd`` used to be the plan-time ``billable_cost_usd`` peek,
+    so exactly this case stamped the full price onto a call that cost nothing
+    — and nw sums that field into one named ``cost_usd_actual`` (falaw#26).
+    """
+    plan = Plan(calls=(_image("m/a"),))
+    first = execute_plan_isolated(plan)
+    assert first.outcomes[0].artifact.cost_usd == pytest.approx(0.025)
+
+    second = execute_plan_isolated(plan)  # the plan still believes "miss"
+
+    assert second.outcomes[0].cache_hit is True
+    assert second.outcomes[0].artifact.cost_usd == 0.0  # a known zero
+
+
+def test_an_artifact_from_a_rebilled_planned_hit_carries_the_price(fal):
+    """The other direction of falaw#26: planned ``"hit"``, but the entry is
+    gone at run time (evicted since planning), so the call re-bills — the
+    artifact must say so instead of the ``None`` the stale plan implied."""
+    stale = replace(_image("m/rebill"), cache_status="hit")
+
+    report = execute_plan_isolated(Plan(calls=(stale,)))
+
+    assert report.outcomes[0].cache_hit is False
+    assert report.outcomes[0].artifact.cost_usd == pytest.approx(0.025)
+
+
+def test_an_unpriced_miss_stamps_unknown_never_free(fal):
+    """``None`` (no price known) must survive to the artifact — stamping
+    ``0.0`` would launder "we do not know" into "it was free"."""
+    unpriced = CallPlan(
+        tool="t", application="m/x", arguments={"prompt": "p"}, output_kind="image"
+    )
+
+    report = execute_plan_isolated(Plan(calls=(unpriced,)))
+
+    assert report.outcomes[0].cache_hit is False
+    assert report.outcomes[0].artifact.cost_usd is None
+
+
+@pytest.mark.parametrize("bad", [-1.0, float("nan")])
+def test_a_negative_or_nan_price_is_refused_at_the_callplan(bad):
+    """The executor stamps ``estimated_cost_usd`` onto artifacts via
+    ``model_copy``, which skips Artifact's ``ge=0`` validation — so the
+    refusal must live where the number enters: the CallPlan."""
+    with pytest.raises(ValueError, match="non-negative"):
+        CallPlan(
+            tool="t",
+            application="m/bad",
+            arguments={},
+            output_kind="image",
+            estimated_cost_usd=bad,
+        )
+
+
+def test_the_executor_owns_the_cost_stamp_not_the_converter(fal):
+    """A converter that invents a price is overwritten: cost is a fact about
+    the call's *execution*, which only the executor observes."""
+
+    def opinionated(raw, call):
+        from falaw.plan import _artifact_from_response
+
+        artifact = _artifact_from_response(raw, call)
+        return artifact.model_copy(update={"cost_usd": 99.0})
+
+    report = execute_plan_isolated(
+        Plan(calls=(_image("m/a"),)), artifact_converter=opinionated
+    )
+
+    assert report.outcomes[0].artifact.cost_usd == pytest.approx(0.025)
 
 
 @pytest.mark.parametrize("concurrency", [1, 2])
