@@ -146,6 +146,16 @@ class CallPlan:
     """Free-form labels for downstream consumers. Conventional keys:
     ``shot_id``, ``beat_id``, ``character_name``, ``strategy``."""
 
+    key_extra: dict = field(default_factory=dict)
+    """Identity beyond the wire arguments — entries that change what the call
+    *produces* without appearing in ``arguments``. Participates in the
+    per-call cache key AND ``plan_hash``, under omit-if-empty (an empty dict
+    leaves every existing key byte-identical). Unlike ``metadata``, which is
+    deliberately identity-free labelling, putting something here says "a
+    cached result minted without this value must not be reused". First
+    customer: nw's Transform ``impl_version`` (nw#27) — "same interface,
+    changed behaviour" must miss the cache without renaming anything."""
+
     def __post_init__(self) -> None:
         # Every cost sum and the executor's per-artifact stamp read this
         # field unvalidated (Artifact enforces ge=0, but model_copy skips
@@ -306,6 +316,7 @@ def call_plan_to_dict(call: CallPlan) -> dict:
             else None
         ),
         "metadata": call.metadata,
+        "key_extra": call.key_extra,
     }
 
 
@@ -328,6 +339,7 @@ def call_plan_from_dict(d: dict) -> CallPlan:
         cache_status=d.get("cache_status", "unknown"),
         expected_duration_s=(tuple(duration) if duration is not None else None),
         metadata=dict(d.get("metadata") or {}),
+        key_extra=dict(d.get("key_extra") or {}),
     )
 
 
@@ -415,7 +427,11 @@ def plan_hash(plan: Plan) -> str:
     blob = canonical_blob(
         [
             plan_identity_payload(
-                c.application, c.arguments, tool=c.tool, backend=c.backend
+                c.application,
+                c.arguments,
+                tool=c.tool,
+                backend=c.backend,
+                key_extra=c.key_extra or None,
             )
             for c in plan.calls
         ]
@@ -1053,7 +1069,12 @@ def _execute_call(
     if use_cache:
         from .cache import cache_get
 
-        hit = cache_get(call.application, key_args, backend=call.backend)
+        hit = cache_get(
+            call.application,
+            key_args,
+            backend=call.backend,
+            key_extra=call.key_extra or None,
+        )
         if hit is not None:
             # Speculative: the conversion may turn out to be unusable, in which
             # case its own complaints are noise the caller must not see (we are
@@ -1075,7 +1096,12 @@ def _execute_call(
                 UserWarning,
                 stacklevel=3,
             )
-            drop_cache_entry(call.application, key_args, backend=call.backend)
+            drop_cache_entry(
+                call.application,
+                key_args,
+                backend=call.backend,
+                key_extra=call.key_extra or None,
+            )
         raw = cached_call_fal(
             call.application,
             wire_args,
@@ -1083,6 +1109,7 @@ def _execute_call(
             refresh=True,
             on_event=on_event,
             backend=call.backend,
+            key_extra=call.key_extra or None,
         )
     else:
         raw = get_backend_executor(call.backend)(
@@ -1388,7 +1415,11 @@ def _synthetic_artifact(call: CallPlan):
 
     blob = canonical_blob(
         plan_identity_payload(
-            call.application, call.arguments, tool=call.tool, backend=call.backend
+            call.application,
+            call.arguments,
+            tool=call.tool,
+            backend=call.backend,
+            key_extra=call.key_extra or None,
         )
     )
     synthetic_id = hash_bytes(blob)

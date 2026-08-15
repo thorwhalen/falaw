@@ -206,6 +206,7 @@ def cache_key_payload(
     arguments: Mapping[str, Any],
     *,
     backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> dict:
     """``{app, args}`` — what the per-call content-addressed cache keys on.
 
@@ -215,10 +216,18 @@ def cache_key_payload(
     docstring for why that asymmetry, not unconditional inclusion, is the
     safe choice. A field that changes what the call **produces** must be
     added here AND in :func:`plan_identity_payload`.
+
+    ``key_extra`` joins under the same omit-if-empty rule: identity a caller
+    declares beyond the wire arguments (nw#27's Transform ``impl_version`` is
+    the first customer — "same interface, changed behaviour" must miss the
+    cache without renaming anything). Empty means absent, so every key ever
+    issued without one is unchanged.
     """
     payload = {"app": application, "args": dict(arguments)}
     if backend != DFLT_BACKEND:
         payload["backend"] = backend
+    if key_extra:
+        payload["key_extra"] = dict(key_extra)
     return payload
 
 
@@ -228,17 +237,20 @@ def plan_identity_payload(
     *,
     tool: Optional[str],
     backend: str = DFLT_BACKEND,
+    key_extra: Optional[Mapping[str, Any]] = None,
 ) -> dict:
     """``{app, args, tool}`` — the structural form behind ``plan_hash`` and
     the dry-run artifact id.
 
     Includes ``tool`` so a re-plan of the same request is recognizable as the
     same *plan* even though the cache would treat the calls identically.
-    ``backend`` joins the payload under the same omit-if-default rule as
-    :func:`cache_key_payload`; keep the two functions adjacent so adding a
-    field to one is an explicit decision about the other.
+    ``backend`` and ``key_extra`` join the payload under the same
+    omit-if-default rule as :func:`cache_key_payload`; keep the two functions
+    adjacent so adding a field to one is an explicit decision about the other.
     """
     payload = {"app": application, "args": dict(arguments), "tool": tool}
     if backend != DFLT_BACKEND:
         payload["backend"] = backend
+    if key_extra:
+        payload["key_extra"] = dict(key_extra)
     return payload
