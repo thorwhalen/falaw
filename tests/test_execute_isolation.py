@@ -878,3 +878,47 @@ def test_new_modules_doctests_pass():
         )
         assert result.attempted > 0, f"{module.__name__} has no examples to run"
         assert result.failed == 0, f"{module.__name__} has failing examples"
+
+
+# --- artifact lineage (lacing#14 / D5) ---------------------------------------
+
+
+def test_a_chained_artifact_records_its_upstream_asset_ids(fal):
+    """The D5 payoff: was_derived_from carries the consumed artifacts'
+    content-addressed asset_ids, read off the plan DAG by the executor."""
+    plan = Plan(calls=(_image("m/a"), _video("m/v", source=0)))
+
+    report = execute_plan_isolated(plan)
+
+    image, video = (o.artifact for o in report.outcomes)
+    assert list(image.provenance.was_derived_from) == []
+    assert list(video.provenance.was_derived_from) == [image.asset_id]
+
+
+def test_a_multi_dependency_call_records_every_upstream(fal):
+    lipsync = CallPlan(
+        tool="lipsync",
+        application="m/l",
+        arguments={"video_url": "<from 0>", "audio_url": "<from 1>"},
+        output_kind="video",
+        estimated_cost_usd=0.1,
+    )
+    plan = Plan(calls=(_image("m/a"), _image("m/b"), lipsync))
+
+    report = execute_plan_isolated(plan)
+
+    a, b, lip = (o.artifact for o in report.outcomes)
+    assert list(lip.provenance.was_derived_from) == [a.asset_id, b.asset_id]
+
+
+def test_cache_hits_are_stamped_too(fal):
+    """A hit's artifact is re-converted from the cached raw each run; its
+    lineage is this run's upstream slots, stamped the same way."""
+    plan = Plan(calls=(_image("m/a"), _video("m/v", source=0)))
+    execute_plan_isolated(plan)
+
+    second = execute_plan_isolated(plan)
+
+    image, video = (o.artifact for o in second.outcomes)
+    assert second.outcomes[1].cache_hit is True
+    assert list(video.provenance.was_derived_from) == [image.asset_id]
