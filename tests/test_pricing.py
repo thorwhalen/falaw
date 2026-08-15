@@ -154,6 +154,78 @@ class TestRefresh:
         # dry-run: the file was not touched at all
         assert "cost_estimate" not in json.loads(open(path).read())[0]
 
+    @pytest.mark.parametrize(
+        "row, reason_fragment",
+        [
+            ({"unit_price": -0.5, "unit": "image"}, "not a positive"),
+            ({"unit_price": 0, "unit": "image"}, "not a positive"),
+            ({"unit_price": float("nan"), "unit": "image"}, "not a positive"),
+            ({"unit": "image"}, "no unit_price"),
+            ({"unit_price": 0.1, "unit": "image", "currency": "EUR"}, "not USD"),
+        ],
+    )
+    def test_a_bogus_api_row_is_rejected_loudly_not_stamped(
+        self, tmp_path, row, reason_fragment
+    ):
+        """A negative/NaN price would make every later CallPlan refuse at
+        plan time; a zero would plan as known-free through every spend gate;
+        non-USD would be summed as USD. None may reach the catalogue."""
+        old = {"kind": "per_image", "amount": 0.05, "source": "approximate"}
+        path = _catalogue(tmp_path, [_record("m/bogus", cost_estimate=dict(old))])
+        http = _stub_http({"m/bogus": row})
+
+        summary = refresh_model_prices(
+            write=True, api_key="k", http_get=http, models_path=path
+        )
+
+        assert reason_fragment in summary["rejected_rows"]["m/bogus"]
+        (rec,) = json.loads(open(path).read())
+        assert rec["cost_estimate"] == old  # untouched
+
+    def test_an_equal_price_restamp_is_reported_and_preserves_the_old_note(
+        self, tmp_path
+    ):
+        """Same numbers still means a real write (source, notes, date). It
+        must show in the dry-run summary, and a hand-written operational
+        note must survive the restamp instead of vanishing."""
+        old = {
+            "kind": "per_image",
+            "amount": 0.03,
+            "source": "docs",
+            "notes": "KNOWN TO HANG on >4MP inputs",
+        }
+        path = _catalogue(tmp_path, [_record("m/a", cost_estimate=dict(old))])
+        http = _stub_http({"m/a": {"unit_price": 0.03, "unit": "image"}})
+
+        summary = refresh_model_prices(
+            write=True, api_key="k", http_get=http, models_path=path, today="2026-08-15"
+        )
+
+        assert summary["restamped"] == ["m/a"]
+        assert summary["price_deltas"] == []
+        (rec,) = json.loads(open(path).read())
+        assert rec["cost_estimate"]["source"] == "api"
+        assert "KNOWN TO HANG" in rec["cost_estimate"]["notes"]
+        assert "2026-08-15" in rec["cost_estimate"]["notes"]
+
+    def test_an_equal_amount_empirical_record_is_left_entirely_alone(self, tmp_path):
+        old = {
+            "kind": "per_second",
+            "amount": 0.10,
+            "source": "empirical",
+            "notes": "measured 2026-08-01",
+        }
+        path = _catalogue(tmp_path, [_record("m/e", cost_estimate=dict(old))])
+        http = _stub_http({"m/e": {"unit_price": 0.10, "unit": "seconds"}})
+
+        summary = refresh_model_prices(
+            write=True, api_key="k", http_get=http, models_path=path
+        )
+
+        assert summary["restamped"] == [] and summary["price_deltas"] == []
+        (rec,) = json.loads(open(path).read())
+        assert rec["cost_estimate"] == old
+
     def test_dry_run_is_the_default(self, tmp_path):
         path = _catalogue(tmp_path, [_record("m/a")])
         before = open(path).read()

@@ -93,6 +93,43 @@ def _cost_rule_for_unit(unit: str) -> "Optional[tuple[str, float]]":
     return None
 
 
+def _row_problem(row: dict) -> Optional[str]:
+    """Why an API price row cannot be stamped, or ``None`` when it can.
+
+    The catalogue is what every plan prices itself from, so a bad row is
+    refused here — loudly, in the summary — rather than discovered later as
+    a plan-time refusal (negative/NaN), an unmetered known-free call (zero),
+    or a mis-summed currency.
+    """
+    raw = row.get("unit_price")
+    if raw is None:
+        return "row has no unit_price"
+    try:
+        amount = float(raw)
+    except (TypeError, ValueError):
+        return f"unit_price {raw!r} is not a number"
+    if not (amount > 0):  # also catches NaN
+        return f"unit_price {raw!r} is not a positive number"
+    currency = str(row.get("currency", "USD"))
+    if currency != "USD":
+        return f"currency {currency!r} is not USD (estimator sums USD only)"
+    return None
+
+
+def _stamp_notes(stamp: str, *, converted: str, old: Optional[dict]) -> str:
+    """The refreshed estimate's ``notes``, preserving a human's prior note.
+
+    Hand-written notes can carry operational warnings; replacing them with a
+    fetch stamp would erase them invisibly. A previous *API* stamp is just
+    an older version of this line and is not chained.
+    """
+    base = f"fal pricing API, fetched {stamp}{converted}"
+    old_notes = (old or {}).get("notes", "")
+    if old_notes and (old or {}).get("source") != "api":
+        return f"{base}; was: {old_notes}"
+    return base
+
+
 # Injectable HTTP seam: callable(url, params: list[tuple[str, str]],
 # headers: dict) -> parsed JSON body, or None for HTTP 404. Params are
 # (key, value) pairs because the live endpoint accepts the repeated-key
@@ -202,6 +239,11 @@ def _fetch_batch(
         cursor = body.get("next_cursor")
         if not body.get("has_more") or cursor is None:
             return
+        previous = [value for key, value in params if key == "cursor"]
+        if previous and previous[0] == str(cursor):
+            # A server repeating the same cursor with has_more=True would
+            # spin this loop forever; trust the data, not the vendor.
+            return
         params = [("endpoint_id", endpoint) for endpoint in batch] + [
             ("cursor", str(cursor))
         ]
@@ -232,8 +274,11 @@ def refresh_model_prices(
 
     newly_priced: list[str] = []
     overwritten: list[dict] = []
+    restamped: list[str] = []
+    rejected_rows: dict[str, str] = {}
     unmapped: dict[str, str] = {}
     missing_from_api: list[str] = []
+    stamped_ids: set = set()
 
     for record in records:
         row = prices.get(record["id"])
@@ -246,40 +291,61 @@ def refresh_model_prices(
             # Recorded, never guessed; any existing estimate is kept.
             unmapped[record["id"]] = unit
             continue
+        problem = _row_problem(row)
+        if problem is not None:
+            # A bogus row must not poison the catalogue: a negative or NaN
+            # price makes every later CallPlan for the model refuse at plan
+            # time, a zero plans as known-free and sails through spend
+            # gates, and a non-USD amount would be summed as USD downstream.
+            rejected_rows[record["id"]] = problem
+            continue
         kind, multiplier = rule
         converted = "" if multiplier == 1.0 else f", converted from unit {unit!r}"
+        old = record.get("cost_estimate")
         new_estimate = {
             "kind": kind,
             "amount": float(row["unit_price"]) * multiplier,
             "currency": str(row.get("currency", "USD")),
-            "notes": f"fal pricing API, fetched {stamp}{converted}",
+            "notes": _stamp_notes(stamp, converted=converted, old=old),
             "source": "api",
         }
-        old = record.get("cost_estimate")
+        if old is not None and old.get("source") == "empirical":
+            # A measured real bill outranks the rate card (which may cover
+            # a different resolution/config tier). The issue's rule: API
+            # outranks *approximate*, not empirical. A disagreement is
+            # still a signal worth surfacing; agreement changes nothing.
+            if (old.get("kind"), old.get("amount")) != (kind, new_estimate["amount"]):
+                overwritten.append(
+                    {
+                        "id": record["id"],
+                        "old": {k: old.get(k) for k in ("kind", "amount", "source")},
+                        "new": {"kind": kind, "amount": new_estimate["amount"]},
+                        "kept": "empirical",
+                    }
+                )
+            continue
         if old is None:
             newly_priced.append(record["id"])
         elif (old.get("kind"), old.get("amount")) != (kind, new_estimate["amount"]):
-            delta = {
-                "id": record["id"],
-                "old": {k: old.get(k) for k in ("kind", "amount", "source")},
-                "new": {"kind": kind, "amount": new_estimate["amount"]},
-            }
-            if old.get("source") == "empirical":
-                # A measured real bill outranks the rate card (which may
-                # cover a different resolution/config tier); the
-                # disagreement is still a signal worth surfacing. The
-                # issue's rule: API outranks *approximate*, not empirical.
-                delta["kept"] = "empirical"
-                overwritten.append(delta)
-                continue
-            overwritten.append(delta)
+            overwritten.append(
+                {
+                    "id": record["id"],
+                    "old": {k: old.get(k) for k in ("kind", "amount", "source")},
+                    "new": {"kind": kind, "amount": new_estimate["amount"]},
+                }
+            )
+        else:
+            # Same numbers, but source/notes/date still change on disk — a
+            # real write that must show in the dry-run, not slip through
+            # invisibly.
+            restamped.append(record["id"])
         record["cost_estimate"] = new_estimate
+        stamped_ids.add(record["id"])
 
-    # Validate every stamped estimate loads as a CostEstimate before any write.
+    # Every estimate this refresh stamped must load as a CostEstimate
+    # before anything is written.
     for record in records:
-        if record["id"] in newly_priced or record["id"] in (
-            d["id"] for d in overwritten
-        ):
+        if record["id"] in stamped_ids:
             CostEstimate(**record["cost_estimate"])
 
     summary = {
@@ -287,6 +353,8 @@ def refresh_model_prices(
         "priced_by_api": len(prices),
         "newly_priced": sorted(newly_priced),
         "price_deltas": overwritten,
+        "restamped": sorted(restamped),
+        "rejected_rows": rejected_rows,
         "unmapped_units": unmapped,
         "missing_from_api": sorted(missing_from_api),
         "write": write,
@@ -307,7 +375,8 @@ def refresh_model_prices(
             kind="note",
             text=(
                 f"refresh_model_prices: {len(newly_priced)} newly priced, "
-                f"{len(overwritten)} overwritten, "
+                f"{len(overwritten)} overwritten, {len(restamped)} restamped, "
+                f"{len(rejected_rows)} rejected rows, "
                 f"{len(unmapped)} unmapped units"
             ),
             tags=("refresh", "cost"),
