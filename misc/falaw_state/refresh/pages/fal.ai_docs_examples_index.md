@@ -7,6 +7,14 @@
 > Step-by-step tutorials and code examples for building with fal
 
 export const ExampleCard = ({title, description, image, href, dateAdded}) => {
+  const [resolvedHref, setResolvedHref] = useState(href);
+  useEffect(() => {
+    if (!href?.startsWith("/") || href.startsWith("/docs/")) return;
+    const path = window.location.pathname;
+    if (path === "/docs" || path.startsWith("/docs/")) {
+      setResolvedHref(`/docs${href}`);
+    }
+  }, [href]);
   let isNew = false;
   if (dateAdded) {
     const added = new Date(dateAdded);
@@ -15,7 +23,7 @@ export const ExampleCard = ({title, description, image, href, dateAdded}) => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     isNew = diffDays <= 30;
   }
-  return <a href={href} className="group block no-underline" style={{
+  return <a href={resolvedHref} className="group block no-underline" style={{
     border: 'none',
     outline: 'none'
   }}>
@@ -214,7 +222,7 @@ export const SERVERLESS_EXAMPLES = [{
   title: "Migrate External Docker Server",
   description: "Migrate your existing Docker-based inference server to fal.",
   image: "https://v3b.fal.media/files/b/panda/LqyVE8NElm_vf-t27Yfkz_6c1dd3323df343e4a3ec968d8f67024c.jpg",
-  href: "/examples/integrations/migrate-external-docker-server",
+  href: "/documentation/development/migrate-external-docker-server",
   dateAdded: null
 }, {
   title: "Migrate from Modal",

@@ -6,21 +6,21 @@
 
 > Access 1,000+ production-ready AI models through simple API calls
 
-Model APIs gives you instant access to state-of-the-art AI models for image, video, audio, and multimodal generation. Every model is already optimized and production-ready, so you can [authenticate](/documentation/model-apis/authentication) and start generating immediately.
+Model APIs gives you instant access to state-of-the-art AI models for image, video, audio, and multimodal generation. Every model is already optimized and production-ready, so you can [authenticate](/docs/documentation/model-apis/authentication) and start generating immediately.
 
-Each model runs on fal's infrastructure with automatic scaling, [queue-based reliability](/documentation/model-apis/inference/queue), and [pay-per-use billing](/documentation/model-apis/pricing). You call them the same way whether you use the [Python or JavaScript client](/documentation/model-apis/inference/client-setup) or raw HTTP. If you need to deploy your own model instead, see [Serverless](/documentation/serverless).
+Each model runs on fal's infrastructure with automatic scaling, [queue-based reliability](/docs/documentation/model-apis/inference/queue), and [pay-per-use billing](/docs/documentation/model-apis/pricing). You call them the same way whether you use the [Python or JavaScript client](/docs/documentation/model-apis/inference/client-setup) or raw HTTP. If you need to deploy your own model instead, see [Serverless](/docs/documentation/serverless).
 
 ## Quick Example
 
-Generate an image in three lines of code. Install the client, set your [API key](/documentation/model-apis/authentication), and call a model.
+Generate an image in three lines of code. Install the client, set your [API key](/docs/documentation/model-apis/authentication), and call a model.
 
 <CodeGroup>
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe(
-      "fal-ai/nano-banana-2", arguments={"prompt": "a futuristic cityscape at sunset"}
-  )
+  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
+      "prompt": "a futuristic cityscape at sunset"
+  })
   print(result["images"][0]["url"])
   ```
 
@@ -41,21 +41,21 @@ Generate an image in three lines of code. Install the client, set your [API key]
   ```
 </CodeGroup>
 
-The response includes a [CDN URL](/documentation/model-apis/fal-cdn) for the generated image, along with metadata like dimensions and seed. Every model follows the same pattern: send inputs as JSON, receive outputs as JSON with media URLs.
+The response includes a [CDN URL](/docs/documentation/model-apis/fal-cdn) for the generated image, along with metadata like dimensions and seed. Every model follows the same pattern: send inputs as JSON, receive outputs as JSON with media URLs.
 
 ## How It Works
 
-Every model on fal is exposed as an HTTP endpoint. You can call it directly, or go through the [queue](/documentation/model-apis/inference/queue) for automatic retries, status tracking, and scaling. There are several calling patterns depending on your use case.
+Every model on fal is exposed as an HTTP endpoint. You can call it directly, or go through the [queue](/docs/documentation/model-apis/inference/queue) for automatic retries, status tracking, and scaling. There are several calling patterns depending on your use case.
 
-**[Direct (`run`)](/documentation/model-apis/inference/synchronous)** sends a synchronous HTTP request to `fal.run` and returns the result directly. This is the simplest approach for quick scripts and prototyping.
+**[Direct (`run`)](/docs/documentation/model-apis/inference/synchronous)** sends a synchronous HTTP request to `fal.run` and returns the result directly. This is the simplest approach for quick scripts and prototyping.
 
-**[Subscribe](/documentation/model-apis/inference/synchronous)** uses the queue under the hood but handles polling automatically, so it feels synchronous. This is what the Quick Example above uses.
+**[Subscribe](/docs/documentation/model-apis/inference/synchronous)** uses the queue under the hood but handles polling automatically, so it feels synchronous. This is what the Quick Example above uses.
 
-**[Asynchronous (`submit`)](/documentation/model-apis/inference/queue)** gives you full control over the queue. Submit a request and return immediately, then poll for status or receive results via [webhook](/documentation/model-apis/inference/webhooks). This is the recommended approach for production workloads with parallel processing.
+**[Asynchronous (`submit`)](/docs/documentation/model-apis/inference/queue)** gives you full control over the queue. Submit a request and return immediately, then poll for status or receive results via [webhook](/docs/documentation/model-apis/inference/webhooks). This is the recommended approach for production workloads with parallel processing.
 
-**[Streaming](/documentation/model-apis/inference/streaming)** delivers output progressively as the model generates it. This is useful for LLMs that produce tokens incrementally, or for showing generation progress in a UI.
+**[Streaming](/docs/documentation/model-apis/inference/streaming)** delivers output progressively as the model generates it. This is useful for LLMs that produce tokens incrementally, or for showing generation progress in a UI.
 
-**[`realtime()`](/documentation/model-apis/inference/real-time)** uses WebSockets for persistent connections, bypassing the queue entirely for sub-100ms latency. Only available for models with an explicit real-time endpoint.
+**[`realtime()`](/docs/documentation/model-apis/inference/real-time)** uses WebSockets for persistent connections, bypassing the queue entirely for sub-100ms latency. Only available for models with an explicit real-time endpoint.
 
 ## What You Can Generate
 
@@ -120,11 +120,11 @@ The [model gallery](https://fal.ai/models) has 1,000+ models spanning several ca
 ### Audio and Speech
 
 <CardGroup cols={3}>
-  <Card title="Chatterbox TTS" href="https://fal.ai/models/fal-ai/chatterbox/text-to-speech" img="https://fal.media/files/rabbit/FzzCnGuQNXLOEYuQq8CE8_7afb3290e0de46d5a7e4d13495938e3f.jpg">
+  <Card title="Chatterbox TTS" href="https://fal.ai/models/fal-ai/chatterbox/text-to-speech" img="https://v3.fal.media/files/rabbit/FzzCnGuQNXLOEYuQq8CE8_7afb3290e0de46d5a7e4d13495938e3f.jpg">
     Natural text-to-speech from Resemble AI
   </Card>
 
-  <Card title="MiniMax Speech-02 HD" href="https://fal.ai/models/fal-ai/minimax/speech-02-hd" img="https://fal.media/files/panda/A-mMZvJzo3C_kFbO7NmMi_28b71bd757bf4319973fb209c96453f9.jpg">
+  <Card title="MiniMax Speech-02 HD" href="https://fal.ai/models/fal-ai/minimax/speech-02-hd" img="https://v3.fal.media/files/panda/A-mMZvJzo3C_kFbO7NmMi_28b71bd757bf4319973fb209c96453f9.jpg">
     High-quality multi-voice text-to-speech
   </Card>
 
@@ -149,24 +149,24 @@ The [model gallery](https://fal.ai/models) has 1,000+ models spanning several ca
   Browse 1,000+ models across image, video, audio, 3D, and more
 </Card>
 
-Every model page on fal.ai includes a [Playground](/documentation/model-apis/playground) for testing, full API documentation with [input/output schemas](/documentation/model-apis/common-parameters), [pricing](/documentation/model-apis/pricing), and ready-to-copy code examples.
+Every model page on fal.ai includes a [Playground](/docs/documentation/model-apis/playground) for testing, full API documentation with [input/output schemas](/docs/documentation/model-apis/common-parameters), [pricing](/docs/documentation/model-apis/pricing), and ready-to-copy code examples.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Playground" icon="play" href="/documentation/model-apis/playground">
+  <Card title="Playground" icon="play" href="/docs/documentation/model-apis/playground">
     Test and compare models interactively before integrating
   </Card>
 
-  <Card title="Inference" icon="server" href="/documentation/model-apis/inference">
+  <Card title="Inference" icon="server" href="/docs/documentation/model-apis/inference">
     Learn the different ways to call models
   </Card>
 
-  <Card title="Client Setup" icon="code" href="/documentation/model-apis/inference/client-setup">
+  <Card title="Client Setup" icon="code" href="/docs/documentation/model-apis/inference/client-setup">
     Install and configure the fal client for Python, JavaScript, and more
   </Card>
 
-  <Card title="Examples" icon="flask" href="/examples">
+  <Card title="Examples" icon="flask" href="/docs/examples">
     Step-by-step tutorials for image, video, and audio generation
   </Card>
 </CardGroup>

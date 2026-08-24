@@ -6,7 +6,7 @@
 
 > Test your fal App endpoints programmatically using AppClient, which deploys an ephemeral instance and runs your tests against live infrastructure.
 
-Before [deploying to production](/documentation/deployment/deploy-to-production), you want to verify that your endpoints produce correct outputs, handle edge cases gracefully, and perform within acceptable latency. The `AppClient` in the fal SDK gives you a way to do this programmatically -- it deploys your app to fal's serverless infrastructure in ephemeral mode, runs your tests against the live endpoints (including GPU execution, `setup()`, and the full request pipeline), and cleans up the deployment when testing is complete.
+Before [deploying to production](/docs/documentation/deployment/deploy-to-production), you want to verify that your endpoints produce correct outputs, handle edge cases gracefully, and perform within acceptable latency. The `AppClient` in the fal SDK gives you a way to do this programmatically -- it deploys your app to fal's serverless infrastructure in ephemeral mode, runs your tests against the live endpoints (including GPU execution, `setup()`, and the full request pipeline), and cleans up the deployment when testing is complete.
 
 This means your tests run against the real environment your app will use in production, not a mocked local version. If your model loads correctly in `setup()`, processes inputs through your endpoint, and returns valid outputs, you can be confident the deployed version will behave the same way. You can integrate these tests into your CI pipeline to catch regressions before they reach production.
 
@@ -35,11 +35,9 @@ Now you can write comprehensive tests for this app:
 ```python theme={null}
 def test_myapp():
     with fal.app.AppClient.connect(MyApp) as client:
-        result = client.generate_image(
-            prompt="A cat holding a sign that says hello world"
-        )
+        result = client.generate_image(prompt="A cat holding a sign that says hello world")
         assert result is not None
-        assert hasattr(result, "url")
+        assert hasattr(result, 'url')
 ```
 
 ## Running locally with `fal run --local`

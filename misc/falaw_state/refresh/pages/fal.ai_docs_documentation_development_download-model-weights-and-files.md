@@ -6,9 +6,9 @@
 
 > Download model weights, datasets, and external files to your runner using fal toolkit utilities and Hugging Face best practices.
 
-Most AI applications need to download model weights or datasets before they can serve requests. This page covers the fal toolkit utilities for downloading files (`download_file` and `download_model_weights`), as well as best practices for optimizing Hugging Face downloads on fal's infrastructure. All downloaded files should be stored on [persistent storage](/documentation/development/use-persistent-storage) at `/data` so they are cached across runner restarts.
+Most AI applications need to download model weights or datasets before they can serve requests. This page covers the fal toolkit utilities for downloading files (`download_file` and `download_model_weights`), as well as best practices for optimizing Hugging Face downloads on fal's infrastructure. All downloaded files should be stored on [persistent storage](/docs/documentation/development/use-persistent-storage) at `/data` so they are cached across runner restarts.
 
-These download operations typically happen inside your [setup()](/documentation/development/app-lifecycle) method, which runs once when a new runner starts. Faster downloads mean shorter cold starts, so the optimization techniques in this guide directly affect your app's responsiveness when scaling up. For broader cold start strategies beyond downloads, see [Optimizing Cold Starts](/documentation/serverless/optimizations/optimize-cold-starts).
+These download operations typically happen inside your [setup()](/docs/documentation/development/app-lifecycle) method, which runs once when a new runner starts. Faster downloads mean shorter cold starts, so the optimization techniques in this guide directly affect your app's responsiveness when scaling up. For broader cold start strategies beyond downloads, see [Optimizing Cold Starts](/docs/documentation/serverless/optimizations/optimize-cold-starts).
 
 ## Downloading Files
 
@@ -99,7 +99,11 @@ There are 3 ways to speed up downloads:
   os.environ["HF_XET_CHUNK_CACHE_SIZE_BYTES"] = "1000000000000"
   os.environ["HF_XET_NUM_CONCURRENT_RANGE_GETS"] = "32"
 
-  snapshot_download(repo_id=model_id, local_dir=model_dir, max_workers=32)
+  snapshot_download(
+      repo_id=model_id,
+      local_dir=model_dir,
+      max_workers=32
+  )
   ```
 
 * Download many models in parallel: when downloading multiple models, it helps to start a separate Fal run for each one. The different source IP address reduces the risk of rate limiting.
@@ -134,12 +138,12 @@ Hugging face models are typically split into multiple files, and loading them ha
 
 It is advisable to pre-read all the files in parallel which will create missing caches concurrently, at much higher speeds.
 
-Please refer to [Sequential vs parallel reading](./use-persistent-storage#sequential-vs-parallel-reading).
+Please refer to [Parallel File Loading](/docs/documentation/serverless/optimizations/parallel-file-loading).
 
 ## Caching Compiled Kernels
 
 Once your model weights are stored on `/data`, you can also cache compiled PyTorch kernels to `/data/inductor-caches/`. This is particularly useful for models using `torch.compile()`, as it avoids recompiling kernels on every worker startup.
 
 <Tip>
-  Learn how to share compiled kernels across workers in [Optimize Startup with Compiled Caches](/documentation/serverless/optimizations/optimize-startup-with-compiled-caches).
+  Learn how to share compiled kernels across workers in [Optimize Startup with Compiled Caches](/docs/documentation/serverless/optimizations/optimize-startup-with-compiled-caches).
 </Tip>

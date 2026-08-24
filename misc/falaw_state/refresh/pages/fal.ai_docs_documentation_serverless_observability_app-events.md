@@ -9,7 +9,7 @@
 App Events gives you a chronological timeline of everything that happens to your application -- who deployed, when runners started or failed, and what configuration changed. Use it to debug incidents, audit team activity, and understand your app's lifecycle.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=222&end=278&autoplay=1'><img src='/docs/images/video-thumbs/app-events.jpg' alt='App Events - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=222&end=278&autoplay=1'><img src='/docs/docs/images/video-thumbs/app-events.jpg' alt='App Events - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## What You Can Track
@@ -35,20 +35,18 @@ curl "https://rest.fal.ai/applications/your-username/your-app/events?since=2026-
 
 ### Parameters
 
-| Parameter    | Description                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `since`      | Start time (ISO 8601)                                           |
-| `until`      | End time (ISO 8601)                                             |
-| `categories` | Filter by event type (e.g., `runner_started`, `config_changed`) |
-| `page`       | Page number                                                     |
-| `size`       | Events per page                                                 |
+| Parameter    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `since`      | Start time (ISO 8601)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `until`      | End time (ISO 8601)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `categories` | Filter by event category. Repeat the parameter to pass several. Runner values are `runner_started`, `runner_pending`, `runner_docker_pull`, `runner_setup`, `runner_finished`, `runner_failed`, `runner_startup_failure`, `runner_draining`, `runner_stopping`; deployment values are `deployment_started`, `deployment_ended`, `deployment_failed`, `deployment_rolling_started`, `deployment_rolling_ended`, `deployment_rolling_failed`, `deployment_rolling_rolled_back`, `deployment_recreate_applied`; config changes are `config_changed`. |
 
 <CardGroup cols={2}>
-  <Card title="Error Analytics" icon="arrow-right" href="/documentation/serverless/observability/error-analytics">
+  <Card title="Error Analytics" icon="arrow-right" href="/docs/documentation/serverless/observability/error-analytics">
     Analyze error patterns across your apps
   </Card>
 
-  <Card title="Slack Notifications" icon="arrow-right" href="/documentation/serverless/observability/slack-notifications">
+  <Card title="Slack Notifications" icon="arrow-right" href="/docs/documentation/serverless/observability/slack-notifications">
     Get notified when runners fail
   </Card>
 </CardGroup>

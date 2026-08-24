@@ -6,9 +6,9 @@
 
 > Create an API key to authenticate your requests to fal
 
-Most requests to fal require authentication. You need an API key to call any model on the [Model APIs](/documentation/model-apis/overview), deploy your own with [Serverless](/documentation/serverless), or access any private or shared endpoint. The only exception is endpoints deployed with `app_auth = "public"`, which accept unauthenticated requests.
+Most requests to fal require authentication. You need an API key to call any model on the [Model APIs](/docs/documentation/model-apis/overview), deploy your own with [Serverless](/docs/documentation/serverless), or access any private or shared endpoint. The only exception is endpoints deployed with `app_auth = "public"`, which accept unauthenticated requests.
 
-API keys are tied to accounts, not people. If you are working under a [team](/documentation/setting-up/teams), the key belongs to that team and all members share it. The [fal client libraries](/documentation/model-apis/inference/client-setup) read your key automatically from the `FAL_KEY` environment variable, so once it is set, every SDK call and CLI command authenticates without extra configuration.
+API keys are tied to accounts, not people. If you are working under a [team](/docs/documentation/setting-up/teams), the key belongs to that team and all members share it. The [fal client libraries](/docs/documentation/model-apis/inference/client-setup) read your key automatically from the `FAL_KEY` environment variable, so once it is set, every SDK call and CLI command authenticates without extra configuration.
 
 ## Create Your API Key
 
@@ -53,7 +53,6 @@ Or configure it directly in code:
   # The client automatically reads FAL_KEY from environment
   # Or you can set it explicitly:
   import os
-
   os.environ["FAL_KEY"] = "your-api-key-here"
   ```
 
@@ -76,8 +75,8 @@ When creating a key, you'll choose a scope that controls what the key can access
 
 | Scope     | Use Case                                                                                                                                                                                                                           |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **API**   | Calling any model on fal, including Model APIs and your own deployed endpoints. Also grants access to API-scoped [Platform APIs](/api-reference/platform-apis/index).                                                              |
-| **ADMIN** | Everything in API, plus CLI operations (`fal deploy`, `fal run`), managing apps, and accessing admin-scoped [Platform APIs](/api-reference/platform-apis/index). Use this for [Serverless](/documentation/serverless) deployments. |
+| **API**   | Calling any model on fal, including Model APIs and your own deployed endpoints. Also grants access to API-scoped [Platform APIs](/docs/api-reference/platform-apis/index).                                                              |
+| **ADMIN** | Everything in API, plus CLI operations (`fal deploy`, `fal run`), managing apps, and accessing admin-scoped [Platform APIs](/docs/api-reference/platform-apis/index). Use this for [Serverless](/docs/documentation/serverless) deployments. |
 
 <Note>
   If you're not sure which to choose, start with **API** scope. You can always create an additional **ADMIN** key later if you need to deploy models.

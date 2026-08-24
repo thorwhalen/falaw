@@ -8,7 +8,7 @@
 
 Every model on the [fal Marketplace](https://fal.ai/models) is a `fal.App` running on Serverless. You can publish your own app to the marketplace, making it callable by any fal user who authenticates with their own API key and pays for their own usage.
 
-Publishing involves deploying your app in `shared` auth mode, defining billable units so callers are charged correctly, and working with the fal team to get listed. Before publishing, your app should be [deployed](/documentation/deployment/deploy-to-production) and stable, [scaled](/documentation/deployment/scaling-configuration) for your expected traffic, and have [health checks](/documentation/development/add-health-check-endpoint) and [analytics](/documentation/serverless/observability/app-analytics) enabled.
+Publishing involves deploying your app in `shared` auth mode, defining billable units so callers are charged correctly, and working with the fal team to get listed. Before publishing, your app should be [deployed](/docs/documentation/deployment/deploy-to-production) and stable, [scaled](/docs/documentation/deployment/scaling-configuration) for your expected traffic, and have [health checks](/docs/documentation/development/add-health-check-endpoint) and [analytics](/docs/documentation/serverless/observability/app-analytics) enabled.
 
 ## Set your app to shared mode
 
@@ -54,8 +54,12 @@ response.headers["x-fal-billable-units"] = str(input.num_images)
 Scale the charge with output resolution. Higher resolutions cost proportionally more:
 
 ```python theme={null}
-resolution_factor = math.ceil((image_size.width * image_size.height) / (1024 * 1024))
-response.headers["x-fal-billable-units"] = str(resolution_factor * input.num_images)
+resolution_factor = math.ceil(
+    (image_size.width * image_size.height) / (1024 * 1024)
+)
+response.headers["x-fal-billable-units"] = str(
+    resolution_factor * input.num_images
+)
 ```
 
 **Per video second**
@@ -93,11 +97,11 @@ Once your app is deployed in shared mode with billable units configured, contact
 After listing, callers see your model's pricing on its page and the `X-Fal-Billable-Units` header in every response, so they can track their usage programmatically.
 
 <CardGroup cols={2}>
-  <Card title="Deploy to Production" href="/documentation/deployment/deploy-to-production">
+  <Card title="Deploy to Production" href="/docs/documentation/deployment/deploy-to-production">
     Deployment strategies and authentication modes.
   </Card>
 
-  <Card title="Model APIs Pricing" href="/documentation/model-apis/pricing">
+  <Card title="Model APIs Pricing" href="/docs/documentation/model-apis/pricing">
     How marketplace model pricing works from the caller's perspective.
   </Card>
 </CardGroup>

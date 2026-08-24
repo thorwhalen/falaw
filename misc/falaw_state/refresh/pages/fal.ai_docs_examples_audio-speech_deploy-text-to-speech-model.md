@@ -114,11 +114,7 @@ fal auth login
 
 
   class JapaneseRequest(BaseModel):
-      prompt: str = Field(
-          examples=[
-              "夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"
-          ]
-      )
+      prompt: str = Field(examples=["夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"])
       voice: Literal[
           "jf_alpha",
           "jf_gongitsune",
@@ -361,7 +357,7 @@ class AmEnglishRequest(BaseModel):
         ],
     )
     voice: Literal[
-        "af_heart",  # American Female voices
+        "af_heart",    # American Female voices
         "af_alloy",
         "af_aoede",
         "af_bella",
@@ -372,7 +368,7 @@ class AmEnglishRequest(BaseModel):
         "af_river",
         "af_sarah",
         "af_sky",
-        "am_adam",  # American Male voices
+        "am_adam",     # American Male voices
         "am_echo",
         "am_eric",
         "am_fenrir",
@@ -393,7 +389,6 @@ class AmEnglishRequest(BaseModel):
         description="Speed of the generated audio. Default is 1.0.",
     )
 
-
 class BrEnglishRequest(BaseModel):
     prompt: str = Field(
         examples=[
@@ -401,11 +396,11 @@ class BrEnglishRequest(BaseModel):
         ]
     )
     voice: Literal[
-        "bf_alice",  # British Female voices
+        "bf_alice",    # British Female voices
         "bf_emma",
         "bf_isabella",
         "bf_lily",
-        "bm_daniel",  # British Male voices
+        "bm_daniel",   # British Male voices
         "bm_fable",
         "bm_george",
         "bm_lewis",
@@ -420,19 +415,16 @@ class BrEnglishRequest(BaseModel):
         description="Speed of the generated audio. Default is 1.0.",
     )
 
-
 class JapaneseRequest(BaseModel):
     prompt: str = Field(
-        examples=[
-            "夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"
-        ]
+        examples=["夢を追いかけることを恐れないでください。努力すれば、必ず道は開けます！"]
     )
     voice: Literal[
-        "jf_alpha",  # Japanese Female voices
+        "jf_alpha",    # Japanese Female voices
         "jf_gongitsune",
         "jf_nezumi",
         "jf_tebukuro",
-        "jm_kumo",  # Japanese Male voices
+        "jm_kumo",     # Japanese Male voices
     ] = Field(
         examples=["jf_alpha"],
         description="Voice ID for the desired voice.",
@@ -458,7 +450,6 @@ class AmEngOutput(BaseModel):
         ],
     )
 
-
 class BrEngOutput(BaseModel):
     audio: File = Field(
         description="The generated audio",
@@ -468,7 +459,6 @@ class BrEngOutput(BaseModel):
             )
         ],
     )
-
 
 class JapaneseOutput(BaseModel):
     audio: File = Field(
@@ -565,7 +555,7 @@ async def _generate(
             audio=File.from_path(
                 f.name,
                 content_type="audio/wav",
-                repository="cdn",  # Upload to CDN for fast access
+                repository="cdn"  # Upload to CDN for fast access
             )
         )
 ```
@@ -576,9 +566,10 @@ Define language-specific endpoints using the shared generation logic:
 
 ```python theme={null}
 @fal.endpoint("/")
-async def generate(self, request: AmEnglishRequest, response: Response) -> AmEngOutput:
+async def generate(
+    self, request: AmEnglishRequest, response: Response
+) -> AmEngOutput:
     return await self._generate(request, response, language="American English")
-
 
 @fal.endpoint("/american-english")
 async def generate_am_english(
@@ -586,13 +577,11 @@ async def generate_am_english(
 ) -> AmEngOutput:
     return await self._generate(request, response, language="American English")
 
-
 @fal.endpoint("/british-english")
 async def generate_br_english(
     self, request: BrEnglishRequest, response: Response
 ) -> BrEngOutput:
     return await self._generate(request, response, language="British English")
-
 
 @fal.endpoint("/japanese")
 async def generate_japanese(
@@ -645,7 +634,7 @@ with tempfile.NamedTemporaryFile(suffix=".wav") as f:
         audio=File.from_path(
             f.name,
             content_type="audio/wav",
-            repository="cdn",  # Auto-upload to CDN
+            repository="cdn"  # Auto-upload to CDN
         )
     )
 ```
@@ -667,22 +656,14 @@ self.pipelines = {
 ```python theme={null}
 # American English voices
 voice: Literal[
-    "af_heart",
-    "af_alloy",
-    "af_aoede",  # Female
-    "am_adam",
-    "am_echo",
-    "am_eric",  # Male
+    "af_heart", "af_alloy", "af_aoede",  # Female
+    "am_adam", "am_echo", "am_eric",     # Male
 ]
 
 # British English voices
 voice: Literal[
-    "bf_alice",
-    "bf_emma",
-    "bf_lily",  # Female
-    "bm_daniel",
-    "bm_george",
-    "bm_lewis",  # Male
+    "bf_alice", "bf_emma", "bf_lily",    # Female
+    "bm_daniel", "bm_george", "bm_lewis" # Male
 ]
 ```
 
@@ -740,8 +721,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "Hello, this is a test of American English text-to-speech!",
         "voice": "af_heart",
-        "speed": 1.2,
-    },
+        "speed": 1.2
+    }
 )
 ```
 
@@ -753,8 +734,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "Cheerio! This is British English text-to-speech.",
         "voice": "bf_alice",
-        "speed": 1.0,
-    },
+        "speed": 1.0
+    }
 )
 ```
 
@@ -766,8 +747,8 @@ result = await fal_client.submit_async(
     arguments={
         "prompt": "こんにちは、これは日本語の音声合成です。",
         "voice": "jf_alpha",
-        "speed": 0.9,
-    },
+        "speed": 0.9
+    }
 )
 ```
 
@@ -794,7 +775,7 @@ for i, (gs, ps, audio) in enumerate(generator):
 
 ```python theme={null}
 machine_type = "L"  # CPU is sufficient and cost-effective
-keep_alive = 3000  # Longer keep-alive reduces cold starts
+keep_alive=3000     # Longer keep-alive reduces cold starts
 ```
 
 ## Key Takeaways

@@ -6,14 +6,13 @@
 
 > Built-in environment variables that fal injects into every runner, covering authentication, app identity, region, lifecycle state, and storage.
 
-fal automatically injects several environment variables into every [runner](/documentation/deployment/runners) when it starts. These provide your app with authentication credentials, identity information, lifecycle state, and storage paths without any configuration. You access them via `os.getenv()` just like any other environment variable.
+fal automatically injects several environment variables into every [runner](/docs/documentation/deployment/runners) when it starts. These provide your app with authentication credentials, identity information, lifecycle state, and storage paths without any configuration. You access them via `os.getenv()` just like any other environment variable.
 
-These platform variables are separate from your own [secrets](/documentation/development/manage-secrets-securely), which you configure manually and which are also injected as environment variables. Platform variables are always present on every runner; secrets are specific to what you've set. Both are available at runtime (in `setup()` and endpoint handlers) but not during the image build stage.
+These platform variables are separate from your own [secrets](/docs/documentation/development/manage-secrets-securely), which you configure manually and which are also injected as environment variables. Platform variables are always present on every runner; secrets are specific to what you've set. Both are available at runtime (in `setup()` and endpoint handlers) but not during the image build stage.
 
 ```python theme={null}
 import os
 import fal
-
 
 class MyApp(fal.App):
     def setup(self):
@@ -33,15 +32,19 @@ class MyApp(fal.App):
 The `FAL_KEY` variable is set automatically when your app runs with privileged access (the default for deployed apps). The fal client SDKs read it automatically, so you can call other fal endpoints without any additional configuration.
 
 ```python theme={null}
+import fal
 import fal_client
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
 
 class MyApp(fal.App):
     @fal.endpoint("/")
-    def run(self, prompt: str):
-        result = fal_client.subscribe(
-            "fal-ai/flux/schnell", arguments={"prompt": prompt}
-        )
+    def run(self, input: Input):
+        result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
+            "prompt": input.prompt
+        })
         return result
 ```
 
@@ -66,12 +69,13 @@ class MyApp(fal.App):
 | `FAL_HOST`          | The fal API host (e.g., `api.fal.ai`)                      |
 | `FAL_REGION`        | The region where the runner is executing (e.g., `us-east`) |
 
-These are useful for structured logging, metrics tagging, and conditional logic. For example, you might log the runner ID and region with every request so you can correlate issues in the [dashboard](/documentation/serverless/observability/monitor-performance).
+These are useful for structured logging, metrics tagging, and conditional logic. For example, you might log the runner ID and region with every request so you can correlate issues in the [dashboard](/docs/documentation/serverless/observability/monitor-performance).
 
 ```python theme={null}
 import os
 import logging
 
+import fal
 
 class MyApp(fal.App):
     def setup(self):
@@ -89,11 +93,12 @@ class MyApp(fal.App):
 | ------------------ | --------------------------------- | ------------------------------------------- |
 | `FAL_RUNNER_STATE` | `SETUP`, `RUNNING`, `TERMINATING` | The current phase of the runner's lifecycle |
 
-fal sets this variable at each stage of the [runner lifecycle](/documentation/development/app-lifecycle): `SETUP` during `setup()`, `RUNNING` while serving requests, and `TERMINATING` after a shutdown signal is received. You can read it to make decisions in shared code paths, but for handling shutdown gracefully, use the [`handle_exit()` and `teardown()` methods](/documentation/development/app-lifecycle) on your App class instead of raw signal handlers.
+fal sets this variable at each stage of the [runner lifecycle](/docs/documentation/development/app-lifecycle): `SETUP` during `setup()`, `RUNNING` while serving requests, and `TERMINATING` after a shutdown signal is received. You can read it to make decisions in shared code paths, but for handling shutdown gracefully, use the [`handle_exit()` and `teardown()` methods](/docs/documentation/development/app-lifecycle) on your App class instead of raw signal handlers.
 
 ```python theme={null}
 import os
 
+import fal
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -114,13 +119,13 @@ class MyApp(fal.App):
 
 | Variable  | Value                      | Description                                                                                                                   |
 | --------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `HF_HOME` | `/data/.cache/huggingface` | Hugging Face cache directory, persisted across runners via [/data storage](/documentation/development/use-persistent-storage) |
+| `HF_HOME` | `/data/.cache/huggingface` | Hugging Face cache directory, persisted across runners via [/data storage](/docs/documentation/development/use-persistent-storage) |
 
-fal sets `HF_HOME` to a path on the [persistent /data filesystem](/documentation/development/use-persistent-storage) so that Hugging Face models are automatically cached across runner restarts. The first runner downloads the model weights, and subsequent runners reuse the cached files without re-downloading.
+fal sets `HF_HOME` to a path on the [persistent /data filesystem](/docs/documentation/development/use-persistent-storage) so that Hugging Face models are automatically cached across runner restarts. The first runner downloads the model weights, and subsequent runners reuse the cached files without re-downloading.
 
 ```python theme={null}
+import fal
 from transformers import AutoModel
-
 
 class MyApp(fal.App):
     def setup(self):
@@ -131,8 +136,8 @@ class MyApp(fal.App):
 
 ## User Secrets
 
-Any [secrets](/documentation/development/manage-secrets-securely) you configure are also injected as environment variables alongside the platform variables listed above.
+Any [secrets](/docs/documentation/development/manage-secrets-securely) you configure are also injected as environment variables alongside the platform variables listed above.
 
-<Card title="Managing Secrets" href="/documentation/development/manage-secrets-securely">
+<Card title="Managing Secrets" href="/docs/documentation/development/manage-secrets-securely">
   Set, update, and scope secrets per environment via CLI, Dashboard, or Python SDK
 </Card>

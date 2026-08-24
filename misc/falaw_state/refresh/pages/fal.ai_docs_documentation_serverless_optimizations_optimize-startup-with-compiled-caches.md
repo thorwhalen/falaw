@@ -9,7 +9,7 @@
 When using `torch.compile()` with PyTorch models, the first run compiles optimized CUDA kernels, which can take significant time. By sharing these compiled kernels across workers, you can dramatically reduce startup latency for subsequent workers.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=732&end=775&autoplay=1'><img src='/docs/images/video-thumbs/optimize-startup-with-compiled-caches.jpg' alt='Kernel Caching - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=732&end=775&autoplay=1'><img src='/docs/docs/images/video-thumbs/optimize-startup-with-compiled-caches.jpg' alt='Kernel Caching - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## The Problem
@@ -33,12 +33,11 @@ The simplest way to use Inductor caching is with the `synchronized_inductor_cach
 ```python theme={null}
 from fal.toolkit import synchronized_inductor_cache
 
-
 class MyApp(fal.App):
     def setup(self):
         # Load model
         self.model = load_model()
-
+        
         # Wrap compilation + warmup in cache context
         with synchronized_inductor_cache("my-model/v1"):
             self.model = torch.compile(self.model)
@@ -117,7 +116,6 @@ import fal
 from fal.toolkit import Image, synchronized_inductor_cache
 from pydantic import BaseModel, Field
 
-
 class Input(BaseModel):
     prompt: str = Field(
         description="Text prompt for image generation",
@@ -132,10 +130,8 @@ class Input(BaseModel):
         description="Image height",
     )
 
-
 class Output(BaseModel):
     image: Image
-
 
 class SDTurbo(fal.App):
     machine_type = "GPU-H100"
@@ -155,7 +151,7 @@ class SDTurbo(fal.App):
         import ctypes
         import os
         from nvidia.cuda_nvrtc import lib as nvrtc_lib
-
+        
         nvrtc_lib_path = os.path.dirname(nvrtc_lib.__file__)
         nvrtc_lib_so = os.path.join(nvrtc_lib_path, "libnvrtc.so.12")
         ctypes.CDLL(nvrtc_lib_so, mode=ctypes.RTLD_GLOBAL)
@@ -176,7 +172,7 @@ class SDTurbo(fal.App):
             print("Compiling UNet with torch.compile()...")
             self.pipeline.unet = torch.compile(
                 self.pipeline.unet,
-                mode="default",
+                mode="default",  
                 dynamic=True,
             )
 
@@ -191,7 +187,7 @@ class SDTurbo(fal.App):
                     guidance_scale=0.0,  # SD-Turbo doesn't use guidance
                 )
             print("Warmup complete!")
-
+            
             # Prevent recompilation and CUDA graphs threading issues
             self.pipeline.unet.forward = torch._dynamo.run(self.pipeline.unet.forward)
 
@@ -231,16 +227,15 @@ For more control over cache loading and syncing, you can use the explicit API:
 ```python theme={null}
 from fal.toolkit import load_inductor_cache, sync_inductor_cache
 
-
 class MyApp(fal.App):
     def setup(self):
         # Load existing cache (if available)
         dir_hash = load_inductor_cache("my-model/v1")
-
+        
         # Compile and warmup
         self.model = torch.compile(self.model)
         self.warmup()
-
+        
         # Sync back any new kernels
         sync_inductor_cache("my-model/v1", dir_hash)
 ```
@@ -358,13 +353,13 @@ with synchronized_inductor_cache("model/v1"):
 ```python theme={null}
 # ❌ Without dynamic - compiles separately for each shape
 model = torch.compile(model, mode="max-autotune")
-warmup(512, 512)  # Compiles for 512x512
+warmup(512, 512)   # Compiles for 512x512
 # Later: different size triggers recompilation
 generate(768, 768)  # Recompiles for 768x768!
 
 # ✅ With dynamic - handles shape variations
 model = torch.compile(model, mode="max-autotune", dynamic=True)
-warmup(512, 512)  # Compiles with dynamic shapes
+warmup(512, 512)   # Compiles with dynamic shapes
 generate(768, 768)  # Uses cached kernels! ✓
 ```
 
@@ -387,7 +382,6 @@ Enable verbose logging to see what PyTorch is doing:
 
 ```python theme={null}
 import os
-
 os.environ["TORCH_LOGS"] = "recompiles"
 os.environ["TORCHINDUCTOR_VERBOSE"] = "1"
 
@@ -397,15 +391,15 @@ os.environ["TORCHINDUCTOR_VERBOSE"] = "1"
 ## See Also
 
 <CardGroup cols={2}>
-  <Card title="Optimize Model Performance" icon="rocket" href="/serverless/optimizations/optimize-model-performance">
+  <Card title="Optimize Model Performance" icon="rocket" href="/docs/serverless/optimizations/optimize-model-performance">
     Learn about torch.compile and the `optimize()` helper
   </Card>
 
-  <Card title="Use Persistent Storage" icon="database" href="/serverless/development/use-persistent-storage">
+  <Card title="Use Persistent Storage" icon="database" href="/docs/serverless/development/use-persistent-storage">
     Understand the `/data` directory for persistent storage
   </Card>
 
-  <Card title="Deploy Multi-GPU Inference" icon="server" href="/serverless/tutorials/deploy-multi-gpu-inference">
+  <Card title="Deploy Multi-GPU Inference" icon="server" href="/docs/serverless/tutorials/deploy-multi-gpu-inference">
     Deploy large compiled models across multiple GPUs
   </Card>
 </CardGroup>

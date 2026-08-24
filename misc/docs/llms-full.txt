@@ -634,7 +634,7 @@ Data handling practices including information collection, data storage and secur
 - Enterprise inquiries: enterprise@fal.ai
 
 **Technical Support**:
-- Documentation: docs.fal.ai
+- Documentation: https://fal.ai/docs/documentation
 - Community: Discord server
 - Enterprise support: support@fal.ai
 

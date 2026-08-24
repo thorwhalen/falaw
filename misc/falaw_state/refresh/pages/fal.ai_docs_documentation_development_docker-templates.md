@@ -6,9 +6,9 @@
 
 > Production-ready Dockerfile templates and optimization tips for fal Serverless.
 
-This page provides ready-to-use Dockerfile templates for common deployment patterns and covers best practices for building efficient container images on fal. If you are new to custom containers on fal, start with [Use a Custom Container Image](/documentation/development/use-custom-container-image) for the core setup.
+This page provides ready-to-use Dockerfile templates for common deployment patterns and covers best practices for building efficient container images on fal. If you are new to custom containers on fal, start with [Use a Custom Container Image](/docs/documentation/development/use-custom-container-image) for the core setup.
 
-For optimizing container images specifically for cold start performance (layer ordering, image size reduction, FlashPack), see [Optimize Container Images](/documentation/serverless/optimizations/optimize-container-images).
+For optimizing container images specifically for cold start performance (layer ordering, image size reduction, FlashPack), see [Optimize Container Images](/docs/documentation/serverless/optimizations/optimize-container-images).
 
 ## Templates
 
@@ -140,7 +140,7 @@ COPY --from=builder /root/.local /root/.local
 
 ### Store model weights on /data, not in the image
 
-Download model weights to [persistent storage](/documentation/development/use-persistent-storage) (`/data`) in your `setup()` method rather than baking them into the Docker image. This keeps your image small, speeds up container pulls, and allows weights to be cached across runner restarts.
+Download model weights to [persistent storage](/docs/documentation/development/use-persistent-storage) (`/data`) in your `setup()` method rather than baking them into the Docker image. This keeps your image small, speeds up container pulls, and allows weights to be cached across runner restarts.
 
 ## Common Issues
 

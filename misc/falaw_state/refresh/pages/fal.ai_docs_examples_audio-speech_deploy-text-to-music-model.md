@@ -74,7 +74,7 @@ fal auth login
   """,
           ],
           ui={
-              "field": "textarea",  # Set the input field to textarea for better user experience
+              "field": "textarea", # Set the input field to textarea for better user experience
           },
       )
       reference_audio_url: str = Field(
@@ -84,9 +84,7 @@ fal auth login
           examples=[
               "https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav",
           ],
-          ui={
-              "important": True
-          },  # Mark as important to not list it in the advanced options section
+          ui={"important": True}, # Mark as important to not list it in the advanced options section
       )
       style_prompt: str = Field(
           title="Style Prompt",
@@ -176,7 +174,6 @@ fal auth login
 
       return result
 
-
   # Custom Docker Image to install apt packages like espeak-ng
   DOCKER_STRING = """
   FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
@@ -232,9 +229,7 @@ fal auth login
       min_concurrency = 1
       max_concurrency = 2
       app_name = "diffrhythm"
-      image = fal.ContainerImage.from_dockerfile_str(
-          DOCKER_STRING
-      )  # Use the custom Docker image
+      image = fal.ContainerImage.from_dockerfile_str(DOCKER_STRING)  # Use the custom Docker image
       machine_type = "GPU-H100"
 
       def setup(self):
@@ -261,7 +256,7 @@ fal auth login
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/diffrhythm/g2p/sources/g2p_chinese_model/poly_bert_model.onnx",
               target_dir=f"{repo_path}/diffrhythm/g2p/sources/g2p_chinese_model",
           )
-
+          
           # Download eval model files required by prepare_model
           download_file(
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/pretrained/eval.yaml",
@@ -271,13 +266,13 @@ fal auth login
               "https://huggingface.co/spaces/ASLP-lab/DiffRhythm/resolve/main/pretrained/eval.safetensors",
               target_dir=f"{repo_path}/pretrained",
           )
-
+          
           from diffrhythm.infer.infer_utils import prepare_model
 
           device = "cuda"
           # Load model with max_frames=6144 (supports both 95s and 285s durations)
-          self.cfm, self.tokenizer, self.muq, self.vae, self.eval_model, self.eval_muq = (
-              prepare_model(max_frames=6144, device=device)
+          self.cfm, self.tokenizer, self.muq, self.vae, self.eval_model, self.eval_muq = prepare_model(
+              max_frames=6144, device=device
           )
           # Compile the model for better performance
           self.cfm = torch.compile(self.cfm)
@@ -363,19 +358,13 @@ fal auth login
                       raise FieldException(
                           "style_prompt", "The style prompt could not be processed."
                       )
-
+              
               # Import and call get_negative_style_prompt
               from diffrhythm.infer.infer_utils import get_negative_style_prompt
-
               negative_style_prompt = get_negative_style_prompt("cuda")
 
               latent_prompt, pred_frames = get_reference_latent(
-                  "cuda",
-                  max_frames,
-                  edit=False,
-                  pred_segments=None,
-                  ref_song=ref_audio_path,
-                  vae_model=self.vae,
+                  "cuda", max_frames, edit=False, pred_segments=None, ref_song=ref_audio_path, vae_model=self.vae
               )
               batch_infer_num = 3  # Number of songs to generate for selection
               # inference returns (sample_rate, audio_array) when file_type='wav'
@@ -822,7 +811,6 @@ def _generate(self, input: TextToMusicInput, response: Response) -> Output:
 
         return Output(audio=File.from_path(output_path))
 
-
 @fal.endpoint("/")
 def generate(self, input: TextToMusicInput, response: Response) -> Output:
     return self._generate(input, response)
@@ -867,7 +855,10 @@ repo_path = clone_repository(
 
 ```python theme={null}
 # Download external files
-download_file("https://example.com/model.bin", target_dir="/path/to/target")
+download_file(
+    "https://example.com/model.bin",
+    target_dir="/path/to/target"
+)
 
 # Use temporary directories for processing
 with tempfile.TemporaryDirectory() as output_dir:
@@ -933,7 +924,7 @@ result = await fal_client.submit_async(
         "reference_audio_url": "https://example.com/reference.wav",
         "music_duration": "95s",
         "num_inference_steps": 32,
-    },
+    }
 )
 
 # Download the generated audio

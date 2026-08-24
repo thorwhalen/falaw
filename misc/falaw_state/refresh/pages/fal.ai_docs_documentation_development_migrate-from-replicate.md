@@ -8,7 +8,7 @@
 
 If you have been running models on Replicate using [Cog](https://github.com/replicate/cog), this guide shows how to convert your Cog model to a `fal.App`. The core idea is similar: both platforms package a model with its dependencies and expose a predict/generate interface. The main differences are that fal uses a Python class instead of a `cog.yaml` + `predict.py` pattern, and fal builds containers from a requirements list or Dockerfile rather than relying on Cog's build system.
 
-For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/documentation/development/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Modal](/documentation/development/migrate-from-modal) or [Migrate from RunPod](/documentation/development/migrate-from-runpod).
+For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/docs/documentation/development/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Modal](/docs/documentation/development/migrate-from-modal) or [Migrate from RunPod](/docs/documentation/development/migrate-from-runpod).
 
 ## Concept Mapping
 
@@ -51,7 +51,6 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     import torch
     from diffusers import StableDiffusionXLPipeline
 
-
     class Predictor(BasePredictor):
         def setup(self):
             self.pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -73,14 +72,11 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
     from pydantic import BaseModel, Field
     from fal.toolkit import Image
 
-
     class Input(BaseModel):
         prompt: str = Field(description="Text prompt")
 
-
     class Output(BaseModel):
         image: Image
-
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -105,7 +101,7 @@ The most common Cog pattern is a `Predictor` class with `setup()` and `predict()
 
 Key differences in the fal version:
 
-The `cog.yaml` is replaced by class attributes (`machine_type`, `requirements`). The `cog.Path` output is replaced by `fal.toolkit.Image`, which automatically uploads the image to the [fal CDN](/documentation/model-apis/fal-cdn) and returns a URL. Inputs use standard Pydantic models instead of Cog's `Input()` type hints. Imports happen inside `setup()` so they run on the remote runner, not on your local machine (see [Serialization and Build](/documentation/development/app-lifecycle#serialization-and-build) for why).
+The `cog.yaml` is replaced by class attributes (`machine_type`, `requirements`). The `cog.Path` output is replaced by `fal.toolkit.Image`, which automatically uploads the image to the [fal CDN](/docs/documentation/model-apis/fal-cdn) and returns a URL. Inputs use standard Pydantic models instead of Cog's `Input()` type hints. Imports happen inside `setup()` so they run on the remote runner, not on your local machine (see [Serialization and Build](/docs/documentation/development/app-lifecycle#serialization-and-build) for why).
 
 ## Using Your Existing Cog Dockerfile
 
@@ -127,7 +123,6 @@ Then reference the Dockerfile in your fal app:
 import fal
 from fal.container import ContainerImage
 
-
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile("Dockerfile")
@@ -147,7 +142,7 @@ class MyApp(fal.App):
         return {"image": image}
 ```
 
-For most migrations, the `requirements` list approach is simpler and avoids dealing with Cog's generated Dockerfile. Use the Dockerfile approach only when you have system-level dependencies or a specific CUDA version that cannot be expressed through pip packages. See [Custom Container Images](/documentation/development/use-custom-container-image) for the full guide.
+For most migrations, the `requirements` list approach is simpler and avoids dealing with Cog's generated Dockerfile. Use the Dockerfile approach only when you have system-level dependencies or a specific CUDA version that cannot be expressed through pip packages. See [Custom Container Images](/docs/documentation/development/use-custom-container-image) for the full guide.
 
 <Note>
   `cog debug` is a hidden debugging command with no stability guarantees from the Cog team. The generated Dockerfile format may change between Cog versions.
@@ -155,8 +150,13 @@ For most migrations, the `requirements` list approach is simpler and avoids deal
 
 ## Deploying and Calling
 
+Validate your app with `fal run` before you deploy. It runs the app on a temporary worker — executing `setup()` and your endpoints exactly as production will — so import errors and model-loading failures surface locally instead of as a production crashloop:
+
 ```bash theme={null}
-# Deploy
+# Validate locally first
+fal run my_app.py::MyApp
+
+# Then deploy to a persistent URL
 fal deploy my_app.py::MyApp
 ```
 
@@ -164,14 +164,14 @@ fal deploy my_app.py::MyApp
 # Call your deployed app
 import fal_client
 
-result = fal_client.subscribe(
-    "your-username/my-app", arguments={"prompt": "a sunset over mountains"}
-)
+result = fal_client.subscribe("your-username/my-app", arguments={
+    "prompt": "a sunset over mountains"
+})
 print(result["image"]["url"])
 ```
 
-For the full range of calling patterns including async queue, streaming, and webhooks, see [Calling Your Endpoints](/documentation/development/calling-your-endpoints).
+For the full range of calling patterns including async queue, streaming, and webhooks, see [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints).
 
 ## Next Steps
 
-Once you have migrated your model, the [App Lifecycle](/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/documentation/serverless/observability/app-analytics).
+Once you have migrated your model, the [App Lifecycle](/docs/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/docs/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/docs/documentation/serverless/observability/app-analytics).

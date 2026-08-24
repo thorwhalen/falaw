@@ -20,4 +20,4 @@ Join our Discord community for discussions and updates: [Discord](https://discor
 
 ## Quickstart Guide
 
-New to fal.ai? Check out our [Quickstart Guide](/serverless/getting-started/quick-start) to get started quickly.
+New to fal.ai? Check out our [Quickstart Guide](/docs/serverless/getting-started/quick-start) to get started quickly.

@@ -6,9 +6,9 @@
 
 > Add a health check endpoint to your fal app so the platform can detect and replace unhealthy runners.
 
-Health check endpoints let fal verify that your [runners](/documentation/deployment/runners) are functioning correctly. When a health check fails repeatedly, fal automatically terminates the unhealthy runner and provisions a new one. This is useful for apps that depend on external services, database connections, or other resources that can become unavailable during a runner's lifetime.
+Health check endpoints let fal verify that your [runners](/docs/documentation/deployment/runners) are functioning correctly. When a health check fails repeatedly, fal automatically terminates the unhealthy runner and provisions a new one. This is useful for apps that depend on external services, database connections, or other resources that can become unavailable during a runner's lifetime.
 
-You define a health check by adding an `@fal.endpoint` with the `health_check` parameter. The endpoint should be lightweight and raise an exception if the runner is in an unrecoverable state. For more on how runners start up and shut down, see [App Lifecycle](/documentation/development/app-lifecycle). For how status codes affect runner lifecycle and retries, see [Retries and Error Handling](/documentation/serverless/reliability/retries).
+You define a health check by adding an `@fal.endpoint` with the `health_check` parameter. The endpoint should be lightweight and raise an exception if the runner is in an unrecoverable state. For more on how runners start up and shut down, see [App Lifecycle](/docs/documentation/development/app-lifecycle). For how status codes affect runner lifecycle and retries, see [Retries and Error Handling](/docs/documentation/serverless/reliability/retries).
 
 ## Basic Usage
 
@@ -18,10 +18,8 @@ Use the `health_check` keyword argument in the `@fal.endpoint()` decorator to de
 import fal
 from pydantic import BaseModel
 
-
 class HealthResponse(BaseModel):
     status: str
-
 
 class MyApp(fal.App):
     def setup(self):

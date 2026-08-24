@@ -85,9 +85,7 @@ Alternatively, you can use a Dockerfile path to specify the Dockerfile location:
 
 ```python theme={null}
 import pathlib
-
 PWD = Path(__file__).resolve().parent
-
 
 class Test(fal.App):
     image = ContainerImage.from_dockerfile(f"{PWD}/Dockerfile")
@@ -101,4 +99,4 @@ To run the app, save the code to a file (e.g., `test_container.py`) and execute 
 fal run test_container.py
 ```
 
-This example demonstrates how to leverage Docker containers in fal, enabling customized execution environments for your apps. For more details and advanced usage, refer to the [fal Container Documentation](/serverless/development/use-custom-container-image).
+This example demonstrates how to leverage Docker containers in fal, enabling customized execution environments for your apps. For more details and advanced usage, refer to the [fal Container Documentation](/docs/serverless/development/use-custom-container-image).

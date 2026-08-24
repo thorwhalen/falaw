@@ -15,7 +15,6 @@ You can set scaling parameters in three ways.
 ```python theme={null}
 import fal
 
-
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     max_multiplexing = 1
@@ -42,7 +41,7 @@ fal apps scale myapp \
 
 ### Via Dashboard
 
-Navigate to [**Dashboard > Apps > \[your-app\]**](https://fal.ai/dashboard/apps) and adjust scaling parameters from the app settings.
+Navigate to [**Dashboard > Apps > \[your-app\]**](https://fal.ai/dashboard/apps) and adjust scaling parameters from the app settings. You can change the machine type here too -- see [Changing Machine Types](/docs/documentation/deployment/machine-types#changing-machine-types) for how existing runners behave.
 
 ***
 
@@ -69,10 +68,10 @@ These affect **correctness** -- changing them without updating code can break yo
 * **`startup_timeout`**: Depends on what your `setup()` does. Only the code author knows the right value.
 * **`machine_type`**: Your model is sized for specific GPU memory. Switching GPUs without code changes risks OOM crashes.
 
-You can change these via CLI for **immediate but temporary** testing, but they **reset to code values on the next deploy**.
+You can change these via CLI or dashboard for **immediate but temporary** testing, but they **reset to code values on the next deploy**.
 
 <Warning>
-  CLI changes to code-specific params take effect immediately but reset on deploy. To make changes permanent, update your application code.
+  CLI and dashboard changes to code-specific params take effect immediately but reset on deploy. To make changes permanent, update your application code.
 </Warning>
 
 ***
@@ -111,6 +110,6 @@ class MyApp(fal.App):
 4. **Deploy with reset** (`fal deploy --reset-scale`):
    * `min_concurrency=1`, `keep_alive=60` (reset to code)
 
-<Card title="Parameter Reference" icon="arrow-right" href="/documentation/deployment/scale-your-application">
+<Card title="Parameter Reference" icon="arrow-right" href="/docs/documentation/deployment/scale-your-application">
   See what each scaling parameter does
 </Card>

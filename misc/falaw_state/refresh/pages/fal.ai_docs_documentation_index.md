@@ -53,20 +53,20 @@
   </div>
 
   <CardGroup cols={3}>
-    <Card title="Model APIs" icon="cube" href="/documentation/model-apis/overview" className="fal-feature-card">
+    <Card title="Model APIs" icon="cube" href="/docs/documentation/model-apis/overview" className="fal-feature-card">
       **Call 1,000+ models with one API.** Image, video, audio, and multimodal generation. Optimized and production-ready.
     </Card>
 
-    <Card title="Serverless" icon="rocket" href="/documentation/serverless" className="fal-feature-card">
+    <Card title="Serverless" icon="rocket" href="/docs/documentation/serverless" className="fal-feature-card">
       **Deploy your own models.** Same infrastructure, same autoscaling, same reliability. From zero to thousands of GPUs.
     </Card>
 
-    <Card title="Compute" icon="microchip" href="/documentation/compute" className="fal-feature-card">
+    <Card title="Compute" icon="microchip" href="/docs/documentation/compute" className="fal-feature-card">
       **Dedicated GPU instances.** Full SSH access for training, fine-tuning, and persistent workloads.
     </Card>
   </CardGroup>
 
-  <Card title="Platform APIs" icon="layer-group" href="/api-reference/platform-apis">
+  <Card title="Platform APIs" icon="layer-group" href="/docs/api-reference/platform-apis">
     REST APIs for model metadata, pricing, usage tracking, logs, files, and metrics
   </Card>
 
@@ -78,8 +78,8 @@
     ```python Python theme={null}
     import fal_client
 
-    result = fal_client.subscribe(
-        "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+    result = fal_client.subscribe("fal-ai/nano-banana-2", 
+        arguments={"prompt": "a sunset over mountains"}
     )
     print(result["images"][0]["url"])
     ```
@@ -101,9 +101,9 @@
     ```
   </CodeGroup>
 
-  Every model supports [synchronous and async queue](/documentation/model-apis/inference) calls out of the box. Many also support [streaming](/documentation/model-apis/inference/streaming) and [real-time WebSocket](/documentation/model-apis/inference/real-time) connections. You can compare models side-by-side in the [Sandbox](https://fal.ai/sandbox) before committing to one.
+  Every model supports [synchronous and async queue](/docs/documentation/model-apis/inference) calls out of the box. Many also support [streaming](/docs/documentation/model-apis/inference/streaming) and [real-time WebSocket](/docs/documentation/model-apis/inference/real-time) connections. You can compare models side-by-side in the [Sandbox](https://fal.ai/sandbox) before committing to one.
 
-  <Card title="Model APIs Quickstart" icon="arrow-right" href="/documentation/model-apis/overview">
+  <Card title="Model APIs Quickstart" icon="arrow-right" href="/docs/documentation/model-apis/overview">
     Browse models, see pricing, and start generating
   </Card>
 
@@ -111,30 +111,33 @@
 
   ## Deploy Your Own Models
 
-  For teams that need to run custom models, proprietary pipelines, or fine-tuned variants, [fal Serverless](/documentation/serverless) lets you deploy on the same engine that powers the Marketplace. fal has been running this infrastructure for over 3 years, and every model on the platform goes through the same lifecycle below.
+  For teams that need to run custom models, proprietary pipelines, or fine-tuned variants, [fal Serverless](/docs/documentation/serverless) lets you deploy on the same engine that powers the Marketplace. fal has been running this infrastructure for over 3 years, and every model on the platform goes through the same lifecycle below.
 
   <Steps>
     <Step title="Develop">
-      A [fal.App](/documentation/development/app-setup) is a Python class where your `setup()` method runs once per [runner](/documentation/deployment/runners) to load model weights and initialize resources. Your [`@fal.endpoint`](/documentation/development/handle-inputs-and-outputs) methods then serve incoming [requests](/documentation/deployment/requests) using the initialized state. You declare hardware needs and [environment](/documentation/development/container-setup) alongside your code, so infrastructure is versioned with your app.
+      A [fal.App](/docs/documentation/development/app-setup) is a Python class where your `setup()` method runs once per [runner](/docs/documentation/deployment/runners) to load model weights and initialize resources. Your [`@fal.endpoint`](/docs/documentation/development/handle-inputs-and-outputs) methods then serve incoming [requests](/docs/documentation/deployment/requests) using the initialized state. You declare hardware needs and [environment](/docs/documentation/development/container-setup) alongside your code, so infrastructure is versioned with your app.
 
       ```python theme={null}
       import fal
+      from pydantic import BaseModel
 
+      class Input(BaseModel):
+          prompt: str
 
       class MyModel(fal.App):
           machine_type = "GPU-H100"
-
+          
           def setup(self):
               self.model = load_my_model()
-
+          
           @fal.endpoint("/")
-          def generate(self, prompt: str):
-              return self.model(prompt)
+          def generate(self, input: Input):
+              return self.model(input.prompt)
       ```
     </Step>
 
     <Step title="Test">
-      [`fal run`](/documentation/development/getting-started/quick-start) spins up a cloud GPU [runner](/documentation/deployment/runners) and gives you a temporary URL so you can test on the same hardware you'll use in production. It also generates a [playground UI](/documentation/model-apis/playground) automatically. For CI, [`AppClient`](/documentation/development/test-models-and-endpoints) lets you run tests against ephemeral deployments.
+      [`fal run`](/docs/documentation/development/getting-started/quick-start) spins up a cloud GPU [runner](/docs/documentation/deployment/runners) and gives you a temporary URL so you can test on the same hardware you'll use in production. It also generates a [playground UI](/docs/documentation/model-apis/playground) automatically. For CI, [`AppClient`](/docs/documentation/development/test-models-and-endpoints) lets you run tests against ephemeral deployments.
 
       ```bash theme={null}
       fal run my_app.py
@@ -142,7 +145,7 @@
     </Step>
 
     <Step title="Deploy">
-      [`fal deploy`](/documentation/deployment/deploy-to-production) creates a persistent, authenticated endpoint with autoscaling and built-in [retries](/documentation/serverless/reliability/retries). Every deploy creates a new revision for instant [rollbacks](/documentation/deployment/rollbacks). For staging and production separation, fal supports [multiple environments](/documentation/deployment/manage-environments) per app.
+      [`fal deploy`](/docs/documentation/deployment/deploy-to-production) creates a persistent, authenticated endpoint with autoscaling and built-in [retries](/docs/documentation/serverless/reliability/retries). Every deploy creates a new revision for instant [rollbacks](/docs/documentation/deployment/rollbacks). For staging and production separation, fal supports [multiple environments](/docs/documentation/deployment/manage-environments) per app.
 
       ```bash theme={null}
       fal deploy my_app.py
@@ -150,11 +153,11 @@
     </Step>
 
     <Step title="Observe">
-      The [dashboard](https://fal.ai/dashboard) gives you real-time logs, request-level [analytics](/documentation/serverless/observability/app-analytics), and [error tracking](/documentation/serverless/observability/error-analytics) out of the box. Trace individual requests, spot latency regressions, and monitor runner utilization. For external stacks, fal supports [Prometheus metrics](/documentation/serverless/observability/exporting-metrics) and [log drains](/documentation/serverless/observability/log-drains) to Datadog, Splunk, and Elasticsearch.
+      The [dashboard](https://fal.ai/dashboard) gives you real-time logs, request-level [analytics](/docs/documentation/serverless/observability/app-analytics), and [error tracking](/docs/documentation/serverless/observability/error-analytics) out of the box. Trace individual requests, spot latency regressions, and monitor runner utilization. For external stacks, fal supports [Prometheus metrics](/docs/documentation/serverless/observability/exporting-metrics) and [log drains](/docs/documentation/serverless/observability/log-drains) to any HTTPS endpoint.
     </Step>
 
     <Step title="Scale">
-      fal scales [runners](/documentation/deployment/runners) from zero to thousands of GPUs based on demand, with a multi-layer [caching](/documentation/deployment/caching) system that reduces cold starts over time. [Scaling parameters](/documentation/deployment/scale-your-application) let you control the tradeoff: `min_concurrency` keeps runners warm, `max_concurrency` caps spend, and `concurrency_buffer` pre-warms ahead of spikes. See [optimizing cold starts](/documentation/serverless/optimizations/optimize-cold-starts) and [machine types](/documentation/deployment/machine-types) for latency-sensitive workloads.
+      fal scales [runners](/docs/documentation/deployment/runners) from zero to thousands of GPUs based on demand, with a multi-layer [caching](/docs/documentation/deployment/caching) system that reduces cold starts over time. [Scaling parameters](/docs/documentation/deployment/scale-your-application) let you control the tradeoff: `min_concurrency` keeps runners warm, `max_concurrency` caps spend, and `concurrency_buffer` pre-warms ahead of spikes. See [optimizing cold starts](/docs/documentation/serverless/optimizations/optimize-cold-starts) and [machine types](/docs/documentation/deployment/machine-types) for latency-sensitive workloads.
 
       ```python theme={null}
       class MyModel(fal.App):
@@ -165,7 +168,7 @@
     </Step>
 
     <Step title="Distribute">
-      Endpoints start as private. You can deploy in `public` mode for open access, or [`shared` mode](/documentation/deployment/deploy-to-production) where callers pay for their own usage. To list on the [Marketplace](https://fal.ai/models) for broader distribution and revenue, see [publishing to the marketplace](/documentation/serverless/publishing-to-marketplace).
+      Endpoints start as private. You can deploy in `public` mode for open access, or [`shared` mode](/docs/documentation/deployment/deploy-to-production) where callers pay for their own usage. To list on the [Marketplace](https://fal.ai/models) for broader distribution and revenue, see [publishing to the marketplace](/docs/documentation/serverless/publishing-to-marketplace).
 
       ```python theme={null}
       class MyModel(fal.App):
@@ -174,7 +177,7 @@
     </Step>
   </Steps>
 
-  <Card title="Serverless Quickstart" icon="arrow-right" href="/documentation/development/getting-started/quick-start">
+  <Card title="Serverless Quickstart" icon="arrow-right" href="/docs/documentation/development/getting-started/quick-start">
     Deploy your first model in minutes
   </Card>
 
@@ -182,7 +185,7 @@
 
   ## Train Your Own Models
 
-  For training runs, fine-tuning, and workloads that need sustained GPU access, [fal Compute](/documentation/compute) gives you dedicated instances with full SSH control. No cold starts, no autoscaling, just raw GPU power billed at a fixed hourly rate.
+  For training runs, fine-tuning, and workloads that need sustained GPU access, [fal Compute](/docs/documentation/compute) gives you dedicated instances with full SSH control. No cold starts, no autoscaling, just raw GPU power billed at a fixed hourly rate.
 
   <CardGroup cols={2}>
     <Card title="H100 SXM" icon="microchip">
@@ -201,7 +204,7 @@
   | **Scaling**  | Manual                            | Automatic                          |
   | **Access**   | Full SSH                          | Managed runners                    |
 
-  <Card title="Compute Quickstart" icon="arrow-right" href="/documentation/compute/quickstart">
+  <Card title="Compute Quickstart" icon="arrow-right" href="/docs/documentation/compute/quickstart">
     Provision your first GPU instance in minutes
   </Card>
 </div>

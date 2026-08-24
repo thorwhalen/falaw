@@ -8,14 +8,13 @@
 
 Webhooks let you receive a notification at a URL you control when an asynchronous request completes, instead of polling the queue for results. This is especially useful for long-running tasks like model training or video generation where you don't want to keep a connection open. You can manage and monitor your webhook endpoints from the [Webhooks dashboard](https://fal.ai/dashboard/webhooks).
 
-Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a request to the [queue](/documentation/model-apis/inference/queue), and fal will POST the result to that URL when processing completes.
+Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a request to the [queue](/docs/documentation/model-apis/inference/queue), and fal will POST the result to that URL when processing completes.
 
 <CodeGroup>
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit(
-      "fal-ai/flux/dev",
+  handler = fal_client.submit("fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -26,8 +25,7 @@ Setting up a webhook is straightforward. Pass a `webhook_url` when submitting a 
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async(
-      "fal-ai/flux/dev",
+  handler = await fal_client.submit_async("fal-ai/flux/dev",
       arguments={"prompt": "Photo of a cute dog"},
       webhook_url="https://url.to.your.app/api/fal/webhook",
   )
@@ -140,7 +138,13 @@ For the webhook to include the payload, it must be valid JSON. So if there is an
 
 ### Retry policy
 
-Initial webhook deliveries have a 15-second timeout. If a delivery exceeds this time or fails to deliver the payload, it will retry 10 times in the span of 2 hours. Design your webhook handler to be idempotent and tolerate repeat deliveries for the same `request_id`.
+Your endpoint must respond with a `2xx` status code to acknowledge the delivery. The initial delivery attempt has a 15-second timeout; retried deliveries have a 120-second timeout. If a delivery times out, fails with a network error, or your endpoint responds with a `4xx` or `5xx` status, the delivery is retried with increasing backoff until the stored result expires — about 1 hour after the request completes, or about 6 minutes for results of 10 KB or more — up to a maximum of 31 retries. Design your webhook handler to be idempotent and tolerate repeat deliveries for the same `request_id`.
+
+<Warning>
+  Redirects are not followed. If your endpoint responds with a `3xx` status code, the delivery is treated as a permanent failure and is **not** retried. Set `webhook_url` to the final destination URL directly — common pitfalls include `http://` URLs that redirect to `https://` and paths that redirect to add or remove a trailing slash. Deliveries to URLs that resolve to a private, internal, or loopback IP address (for example `localhost`, or a hostname whose public DNS record points to an internal IP such as `10.0.0.5`) are likewise dropped permanently, before any request is sent. A hostname that fails to resolve at all is treated as a network error and retried.
+</Warning>
+
+If all delivery attempts fail, you can usually still [retrieve the result from the queue](/docs/documentation/model-apis/inference/queue#get-the-result) while it is retained — results larger than 1 MB, and results for requests with payload storage disabled, are only available until the stored result expires. You can see the most recent delivery attempt for each request in the [Webhooks dashboard](https://fal.ai/dashboard/webhooks); the status code shown may be blank for some failures, such as network errors.
 
 ### Webhook IP Ranges
 
@@ -255,7 +259,6 @@ Below are simplified functions to verify webhook signatures by passing the heade
     _jwks_cache = None
     _jwks_cache_time = 0
 
-
     def fetch_jwks() -> list:
         """Fetch and cache JWKS, refreshing after 24 hours."""
         global _jwks_cache, _jwks_cache_time
@@ -267,9 +270,12 @@ Below are simplified functions to verify webhook signatures by passing the heade
             _jwks_cache_time = current_time
         return _jwks_cache
 
-
     def verify_webhook_signature(
-        request_id: str, user_id: str, timestamp: str, signature_hex: str, body: bytes
+        request_id: str,
+        user_id: str,
+        timestamp: str,
+        signature_hex: str,
+        body: bytes
     ) -> bool:
         """
         Verify a webhook signature using provided headers and body.
@@ -301,7 +307,7 @@ Below are simplified functions to verify webhook signatures by passing the heade
                 request_id,
                 user_id,
                 timestamp,
-                hashlib.sha256(body).hexdigest(),
+                hashlib.sha256(body).hexdigest()
             ]
             if any(part is None for part in message_parts):
                 print("Missing required header value.")

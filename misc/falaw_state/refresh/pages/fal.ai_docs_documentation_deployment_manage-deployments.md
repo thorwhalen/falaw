@@ -21,7 +21,7 @@ This shows all your deployed models with their current status, versions, and bas
 You can assign custom tags to your apps from the [fal dashboard](https://fal.ai/dashboard) to keep your app list organized. Tags are visual labels — use them to group apps by team, project, model type, or any category that fits your workflow, then filter the app listing to quickly find what you need.
 
 <Info>
-  Tags are managed entirely through the dashboard UI — they don't isolate secrets, affect routing, or change app behavior. If you need isolated deployment stages (dev, staging, production) with separate secrets and endpoints, use [Environments](/serverless/deployment-operations/manage-environments) instead.
+  Tags are managed entirely through the dashboard UI — they don't isolate secrets, affect routing, or change app behavior. If you need isolated deployment stages (dev, staging, production) with separate secrets and endpoints, use [Environments](/docs/serverless/deployment-operations/manage-environments) instead.
 </Info>
 
 ## Managing Versions
@@ -32,6 +32,12 @@ Each deployment creates a new revision. List all revisions for a specific model:
 
 ```bash theme={null}
 fal apps list-rev myapp
+```
+
+Revisions can carry a freeform message and custom annotations set at deploy time — see [Annotating Deployments](/docs/documentation/deployment/deploy-to-production#annotating-deployments). Unlike [tags](#organizing-apps-with-tags), which group apps for dashboard organization, message and annotations describe a single revision. They don't appear in `fal apps list-rev` output — view and search them on the app's **Versions** page in the dashboard or fetch them via the [revisions API](/docs/platform-apis/v1/serverless/apps/revisions). For example, to stamp each revision with the current commit:
+
+```bash theme={null}
+fal deploy --message "$(git rev-parse --short HEAD) fix cold-start"
 ```
 
 ### Switching Between Revisions
@@ -52,7 +58,7 @@ After deployment, you can adjust scaling parameters without redeploying:
 fal apps scale myapp --min-concurrency 2 --max-concurrency 20
 ```
 
-For comprehensive scaling configuration and strategies, see [Scale Your Application](/serverless/deployment-operations/scale-your-application/).
+For comprehensive scaling configuration and strategies, see [Scale Your Application](/docs/serverless/deployment-operations/scale-your-application/).
 
 ## Monitoring Health
 
@@ -65,7 +71,7 @@ fal apps runners myapp
 ```
 
 <Info>
-  For detailed performance monitoring, metrics collection, and alerting strategies, see [Monitor Performance](/serverless/deployment-operations/monitor-performance/).
+  For detailed performance monitoring, metrics collection, and alerting strategies, see [Monitor Performance](/docs/serverless/deployment-operations/monitor-performance/).
 </Info>
 
 ## Removing Deployments

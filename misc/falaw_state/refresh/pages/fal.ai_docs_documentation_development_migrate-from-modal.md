@@ -8,7 +8,7 @@
 
 If you have been running AI models on Modal, this guide maps Modal concepts to their fal equivalents and shows how to convert your code. The core patterns are similar: both platforms use Python classes with lifecycle hooks and GPU configuration. The main differences are that fal uses HTTP endpoints instead of RPC, and fal manages container builds from a requirements list or Dockerfile rather than chaining image methods.
 
-For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/documentation/development/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Replicate](/documentation/development/migrate-from-replicate) or [Migrate from RunPod](/documentation/development/migrate-from-runpod).
+For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/docs/documentation/development/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Replicate](/docs/documentation/development/migrate-from-replicate) or [Migrate from RunPod](/docs/documentation/development/migrate-from-runpod).
 
 ## Concept Mapping
 
@@ -41,14 +41,11 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     app = modal.App()
     image = modal.Image.debian_slim().pip_install("torch", "transformers")
 
-
     @app.function(image=image, gpu="A100")
     def generate(prompt: str):
         from transformers import pipeline
-
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
-
 
     @app.local_entrypoint()
     def main():
@@ -61,14 +58,12 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     ```python theme={null}
     import fal
 
-
     @fal.function(
         requirements=["torch", "transformers"],
         machine_type="GPU-A100",
     )
     def generate(prompt: str):
         from transformers import pipeline
-
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
     ```
@@ -87,10 +82,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     import modal
 
     app = modal.App()
-    image = modal.Image.debian_slim().pip_install(
-        "torch", "diffusers", "transformers", "accelerate"
+    image = (
+        modal.Image.debian_slim()
+        .pip_install("torch", "diffusers", "transformers", "accelerate")
     )
-
 
     @app.cls(image=image, gpu="A100")
     class TextToImage:
@@ -113,7 +108,6 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
         def cleanup(self):
             del self.pipe
 
-
     @app.local_entrypoint()
     def main():
         result = TextToImage().generate.remote(prompt="a sunset")
@@ -124,7 +118,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     ```python theme={null}
     import fal
     from fal.toolkit import Image
+    from pydantic import BaseModel
 
+    class Input(BaseModel):
+        prompt: str
 
     class TextToImage(fal.App):
         machine_type = "GPU-A100"
@@ -140,8 +137,8 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
             ).to("cuda")
 
         @fal.endpoint("/")
-        def generate(self, prompt: str) -> dict:
-            image = self.pipe(prompt).images[0]
+        def generate(self, input: Input) -> dict:
+            image = self.pipe(input.prompt).images[0]
             return {"image": Image.from_pil(image)}
 
         def teardown(self):
@@ -160,6 +157,8 @@ modal deploy my_app.py
 fal deploy my_app.py::TextToImage
 ```
 
+On fal you can also validate the exact deployment locally before you ship it: `fal run my_app.py::TextToImage` boots the app on a temporary worker (running `setup()` and your endpoints just like production), so import and model-loading errors surface before they become a production crashloop.
+
 ### Calling Your App
 
 ```python theme={null}
@@ -168,10 +167,9 @@ TextToImage().generate.remote(prompt="a sunset")
 
 # fal
 import fal_client
-
-result = fal_client.subscribe(
-    "your-username/text-to-image", arguments={"prompt": "a sunset"}
-)
+result = fal_client.subscribe("your-username/text-to-image", arguments={
+    "prompt": "a sunset"
+})
 ```
 
 ***
@@ -202,18 +200,18 @@ Modal chains image methods (`Image.debian_slim().pip_install(...).apt_install(..
 ```python theme={null}
 # Modal
 image = (
-    modal.Image.debian_slim().apt_install("ffmpeg").pip_install("torch", "diffusers")
+    modal.Image.debian_slim()
+    .apt_install("ffmpeg")
+    .pip_install("torch", "diffusers")
 )
-
 
 # fal (simple)
 class MyApp(fal.App):
     requirements = ["torch", "diffusers"]
 
-
 # fal (Dockerfile)
+import fal
 from fal.container import ContainerImage
-
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -231,10 +229,9 @@ Modal uses named `Volume` objects mounted at specific paths. fal provides `/data
 # Modal
 volume = modal.Volume.from_name("model-cache")
 
-
 @app.cls(volumes={"/cache": volume})
-class MyModel: ...
-
+class MyModel:
+    ...
 
 # fal -- /data is always available, no configuration needed
 class MyModel(fal.App):
@@ -260,4 +257,4 @@ Both make secrets available via `os.environ["HF_TOKEN"]` in your code.
 
 ## Next Steps
 
-Once you have migrated your app, the [App Lifecycle](/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/documentation/serverless/observability/app-analytics).
+Once you have migrated your app, the [App Lifecycle](/docs/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/docs/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/docs/documentation/serverless/observability/app-analytics).

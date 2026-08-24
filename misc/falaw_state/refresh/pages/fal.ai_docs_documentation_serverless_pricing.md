@@ -25,7 +25,7 @@ Every runner transitions through the states below during its lifecycle. You are 
 
 5xx errors (HTTP 500+) are also not charged.
 
-See [Runners](/documentation/deployment/runners) for full details on each state and transitions.
+See [Runners](/docs/documentation/deployment/runners) for full details on each state and transitions.
 
 ## GPU count multiplier
 
@@ -38,7 +38,7 @@ Multi-GPU instances are billed as `gpu_count x duration`. For example, a runner 
     View your overall spend, invoices, and payment methods.
   </Card>
 
-  <Card title="App Analytics" icon="chart-bar" href="/documentation/serverless/observability/app-analytics">
+  <Card title="App Analytics" icon="chart-bar" href="/docs/documentation/serverless/observability/app-analytics">
     See per-app cost breakdown, request counts, and runner utilization.
   </Card>
 </CardGroup>

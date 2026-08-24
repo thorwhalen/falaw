@@ -6,9 +6,9 @@
 
 > Deploy a text-to-image AI model in under 5 minutes. This tutorial walks you through creating your own image generation API using Stable Diffusion XL.
 
-This tutorial builds on the [Quick Start](/documentation/development/getting-started/quick-start) by deploying a real AI model. You will create a text-to-image API powered by Stable Diffusion XL that runs on GPU infrastructure, loads model weights from Hugging Face, and returns generated images through a typed Pydantic schema. The result is a production-ready endpoint with a [Playground](/documentation/model-apis/playground) for browser-based testing.
+This tutorial builds on the [Quick Start](/docs/documentation/development/getting-started/quick-start) by deploying a real AI model. You will create a text-to-image API powered by Stable Diffusion XL that runs on GPU infrastructure, loads model weights from Hugging Face, and returns generated images through a typed Pydantic schema. The result is a production-ready endpoint with a [Playground](/docs/documentation/model-apis/playground) for browser-based testing.
 
-Along the way, you will encounter several concepts that are central to building Serverless apps: the [setup()](/documentation/development/app-lifecycle) hook for one-time model loading, the [keep\_alive](/documentation/deployment/scale-your-application) parameter for controlling runner lifetime, pip [requirements](/documentation/development/fal-runtime) for environment setup, and the [fal.toolkit.Image](/documentation/development/handle-inputs-and-outputs#image-output) class for returning media outputs. If any of these are new to you, the [Serverless Introduction](/documentation/serverless) provides a quick overview.
+Along the way, you will encounter several concepts that are central to building Serverless apps: the [setup()](/docs/documentation/development/app-lifecycle) hook for one-time model loading, the [keep\_alive](/docs/documentation/deployment/scale-your-application) parameter for controlling runner lifetime, pip [requirements](/docs/documentation/development/fal-runtime) for environment setup, and the [fal.toolkit.Image](/docs/documentation/development/handle-inputs-and-outputs#image-output) class for returning media outputs. If any of these are new to you, the [Serverless Introduction](/docs/documentation/serverless) provides a quick overview.
 
 ## Before You Start
 
@@ -45,17 +45,14 @@ import fal
 from pydantic import BaseModel, Field
 from fal.toolkit import Image
 
-
 class Input(BaseModel):
     prompt: str = Field(
         description="The prompt to generate an image from",
         examples=["A beautiful image of a cat"],
     )
 
-
 class Output(BaseModel):
     image: Image
-
 
 class MyApp(fal.App):
     keep_alive = 300
@@ -121,7 +118,7 @@ You can also use the playground URL to test through a browser interface.
 
 ## Step 5: Deploy Your Model
 
-Once you are satisfied with the results, deploy your app to create a persistent URL. Deployed apps scale automatically, with [runners](/documentation/deployment/runners) managed by fal's infrastructure. You can configure scaling behavior through parameters like `keep_alive`, `min_concurrency`, and `max_concurrency`. See [Scale Your Application](/documentation/deployment/scale-your-application) to learn more.
+Once you are satisfied with the results, deploy your app to create a persistent URL. Deployed apps scale automatically, with [runners](/docs/documentation/deployment/runners) managed by fal's infrastructure. You can configure scaling behavior through parameters like `keep_alive`, `min_concurrency`, and `max_concurrency`. See [Scale Your Application](/docs/documentation/deployment/scale-your-application) to learn more.
 
 ```bash theme={null}
 fal deploy image_generator.py::MyApp
@@ -164,8 +161,8 @@ Once deployed, call your image generator from any Python or JavaScript applicati
   </Tab>
 </Tabs>
 
-Replace `your-username/my-demo-app` with the endpoint ID shown after deploying. See [Calling Your Endpoints](/documentation/development/calling-your-endpoints) for all calling patterns including async queue, streaming, real-time, and webhooks.
+Replace `your-username/my-demo-app` with the endpoint ID shown after deploying. See [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints) for all calling patterns including async queue, streaming, real-time, and webhooks.
 
 ## Next Steps
 
-The [App Lifecycle](/documentation/development/app-lifecycle) page explains how apps are structured, where code runs, and how runners start up and shut down. To define richer input and output schemas (sliders, image uploads, multiple outputs), see [Handle Inputs and Outputs](/documentation/development/handle-inputs-and-outputs). For all the ways to call your deployed app from client code, including async queue, streaming, and real-time patterns, see [Calling Your Endpoints](/documentation/development/calling-your-endpoints).
+The [App Lifecycle](/docs/documentation/development/app-lifecycle) page explains how apps are structured, where code runs, and how runners start up and shut down. To define richer input and output schemas (sliders, image uploads, multiple outputs), see [Handle Inputs and Outputs](/docs/documentation/development/handle-inputs-and-outputs). For all the ways to call your deployed app from client code, including async queue, streaming, and real-time patterns, see [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints).

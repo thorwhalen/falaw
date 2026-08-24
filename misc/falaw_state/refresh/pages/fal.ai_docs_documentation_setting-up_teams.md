@@ -6,15 +6,16 @@
 
 > Create shared workspaces with their own API keys, deployments, and billing. Manage members, roles, and understand how request attribution works.
 
-Teams let multiple people share a single set of API keys, deployed apps, and billing on fal. Instead of each person managing their own [personal account](/documentation/setting-up/accounts-and-identity), a team acts as a shared workspace where everyone operates under the same identity. This is useful whether you are calling [Model APIs](/documentation/model-apis/overview) together or deploying your own models with [Serverless](/documentation/serverless).
+Teams let multiple people share a single set of API keys, deployed apps, and billing on fal. Instead of each person managing their own [personal account](/docs/documentation/setting-up/accounts-and-identity), a team acts as a shared workspace where everyone operates under the same identity. This is useful whether you are calling [Model APIs](/docs/documentation/model-apis/overview) together or deploying your own models with [Serverless](/docs/documentation/serverless).
 
-Teams can exist on their own (standalone) or as children of an [organization](/documentation/organizations/index). Standalone teams work well for small groups. Organizations add centralized policies, SSO, and cross-team visibility. Each team maintains its own API keys, secrets, deployed apps, and billing, completely separate from any member's personal account. For switching between your personal account and a team, see [Switching Between Accounts](/documentation/setting-up/accounts-and-identity#switching-between-accounts).
+Teams can exist on their own (standalone) or as children of an [organization](/docs/documentation/organizations/index). Standalone teams work well for small groups. Organizations add centralized policies, SSO, and cross-team visibility. Each team maintains its own API keys, secrets, deployed apps, and billing, completely separate from any member's personal account. For switching between your personal account and a team, see [Switching Between Accounts](/docs/documentation/setting-up/accounts-and-identity#switching-between-accounts).
 
 ## Creating a Team
 
 <Steps>
   <Step title="Open the team menu">
-    Click your account name in the top-left of the [Dashboard](https://fal.ai/dashboard) and select **Create Team**.
+    Click your account name in the top-left of the
+    [Dashboard](https://fal.ai/dashboard) and select **Create Team**.
   </Step>
 
   <Step title="Name your team">
@@ -22,7 +23,8 @@ Teams can exist on their own (standalone) or as children of an [organization](/d
   </Step>
 
   <Step title="Start using it">
-    You'll be switched to the new team automatically. Create API keys and invite members from here.
+    You'll be switched to the new team automatically. Create API keys and invite
+    members from here.
   </Step>
 </Steps>
 
@@ -64,16 +66,18 @@ Each team member is assigned one of three roles that control what they can do in
 | **Billing**   | View and manage billing: invoices, payment methods, credit purchases, and usage. Can also view API keys. Cannot invite members or change roles. |
 
 <Tip>
-  Start with **Admin** for team leads who need to manage keys and members. Use **Developer** for engineers who only need to deploy and monitor apps. Use **Billing** for finance team members who need usage and invoice access.
+  Start with **Admin** for team leads who need to manage keys and members. Use
+  **Developer** for engineers who only need to deploy and monitor apps. Use
+  **Billing** for finance team members who need usage and invoice access.
 </Tip>
 
 ## API Keys and Request Attribution
 
 Roles and key scopes are independent concepts. Roles control what a person can do in the dashboard (manage keys, billing, members). Key scopes control what the key itself can do programmatically (call models, deploy apps). A Developer-role member cannot create keys in the dashboard, but they can use the team's ADMIN-scoped key to run `fal deploy`.
 
-API keys are scoped to the team, not to individual members. Any team member can use a team API key, but only Admins can create or delete them. When creating a key, make sure you have the correct team selected in the top-left of the dashboard. See [Get Your API Key](/documentation/setting-up/accounts-and-identity#get-your-api-key) for the available scopes.
+API keys are scoped to the team, not to individual members. Any team member can use a team API key, but only Admins can create or delete them. When creating a key, make sure you have the correct team selected in the top-left of the dashboard. See [Get Your API Key](/docs/documentation/setting-up/accounts-and-identity#get-your-api-key) for the available scopes.
 
-How you authenticate affects how requests are attributed and what you see in the dashboard. When you use `fal auth login` and select a team, each request carries your individual identity within the team. This means the dashboard shows which team member made each request. When you use a team API key directly, requests are attributed to the team as a whole rather than to a specific member. Both methods access the same team resources and billing, but login-based authentication provides better per-user visibility in the dashboard and request history.
+How you authenticate affects how requests are attributed and what you see in the dashboard. When you use `fal auth login` and select a team, each request carries your individual identity within the team. This means the dashboard shows which team member made each request, unless your organization has restricted request view enabled. With restricted request view, members can see metadata for all team requests, request payloads are visible only to the member whose identity authenticated the request, logs are visible to that member and to the endpoint owner, and member attribution is hidden. When you use a team API key directly, requests are attributed to the team as a whole rather than to a specific member. Both methods access the same team resources and billing, but login-based authentication provides better per-user visibility in the dashboard and request history.
 
 The fal client SDKs (`fal_client` in Python, `@fal-ai/client` in JavaScript) support both methods automatically. The SDK checks for credentials in this order:
 
@@ -93,7 +97,9 @@ fal teams set my-team
 # Automatically uses your login-based identity (no FAL_KEY needed)
 import fal_client
 
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
+result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
+    "prompt": "a sunset"
+})
 ```
 
 If `FAL_KEY` is set, it takes priority over login tokens. To force login-based auth even when `FAL_KEY` is present, set `FAL_FORCE_AUTH_BY_USER=1`.
@@ -107,11 +113,11 @@ Team management happens on the [Members page](https://fal.ai/dashboard/members) 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Organizations" icon="building" href="/documentation/organizations/index">
+  <Card title="Organizations" icon="building" href="/docs/documentation/organizations/index">
     Enterprise policies, SSO, and multi-team management
   </Card>
 
-  <Card title="Access Controls" icon="shield" href="/documentation/organizations/access-controls">
+  <Card title="Access Controls" icon="shield" href="/docs/documentation/organizations/access-controls">
     Control which models your teams can access
   </Card>
 </CardGroup>

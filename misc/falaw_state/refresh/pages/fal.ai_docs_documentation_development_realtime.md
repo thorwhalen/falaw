@@ -8,7 +8,7 @@
 
 Realtime endpoints use WebSockets for bidirectional communication over a persistent connection. Once a client connects, it can send multiple inputs and receive results without the overhead of establishing new connections for each request. This makes them ideal for interactive applications like real-time image editing, live camera filters, or game-like experiences where latency between requests needs to be minimal.
 
-You define a realtime endpoint using the `@fal.realtime("/realtime")` decorator, which uses fal's binary msgpack protocol for efficient serialization. Callers connect using the [`realtime()` method](/documentation/model-apis/inference/real-time) in the fal client SDKs. For one-way progressive output from a single request (like showing diffusion steps), use [Streaming Endpoints](/documentation/development/streaming) instead -- they use SSE and are simpler when you don't need bidirectional communication.
+You define a realtime endpoint using the `@fal.realtime("/realtime")` decorator, which uses fal's binary msgpack protocol for efficient serialization. Callers connect using the [`realtime()` method](/docs/documentation/model-apis/inference/real-time) in the fal client SDKs. For one-way progressive output from a single request (like showing diffusion steps), use [Streaming Endpoints](/docs/documentation/development/streaming) instead -- they use SSE and are simpler when you don't need bidirectional communication.
 
 <Warning>
   WebSocket endpoints are not currently testable on the fal Playground. You can monitor your WebSocket endpoint activity through the **Logs** page in the fal dashboard.
@@ -16,7 +16,7 @@ You define a realtime endpoint using the `@fal.realtime("/realtime")` decorator,
 
 ## How Realtime Works
 
-Under a `fal.App`, the `@fal.realtime()` decorator makes your endpoint compatible with [fal's real-time clients](/documentation/model-apis/inference/real-time). It uses fal's binary msgpack protocol for efficient serialization and eliminates connection establishing overhead for repeated requests.
+Under a `fal.App`, the `@fal.realtime()` decorator makes your endpoint compatible with [fal's real-time clients](/docs/documentation/model-apis/inference/real-time). It uses fal's binary msgpack protocol for efficient serialization and eliminates connection establishing overhead for repeated requests.
 
 <Info>
   **Important:** The `fal_client.realtime()` method automatically connects to the `/realtime` path on your app. If you use `@fal.realtime()`, you **must** set the path to `/realtime` (e.g., `@fal.realtime("/realtime")`) for the client to connect successfully.
@@ -85,13 +85,11 @@ with fal_client.realtime("your-username/your-app-name") as connection:
 import asyncio
 import fal_client
 
-
 async def main():
     async with fal_client.realtime_async("your-username/your-app-name") as connection:
         await connection.send({"prompt": "Hello, world!"})
         result = await connection.recv()
         print(result)
-
 
 asyncio.run(main())
 ```
@@ -116,16 +114,12 @@ with fal_client.ws_connect("your-username/your-app-name", path="/echo") as ws:
 import asyncio
 import fal_client
 
-
 async def main():
-    async with fal_client.ws_connect_async(
-        "your-username/your-app-name", path="/echo"
-    ) as ws:
+    async with fal_client.ws_connect_async("your-username/your-app-name", path="/echo") as ws:
         await ws.send("Hello, world!")
         for _ in range(3):
             message = await ws.recv()
             print(message)
-
 
 asyncio.run(main())
 ```
@@ -139,14 +133,14 @@ asyncio.run(main())
 
 For applications that need direct video/audio streaming (webcam feeds, live game rendering), you can use WebRTC as the transport layer on top of fal's WebSocket infrastructure. WebRTC provides lower latency for media streams compared to sending frames over msgpack.
 
-The pattern uses `@fal.endpoint("/webrtc", is_websocket=True)` to handle WebRTC signaling, while the actual media flows peer-to-peer between the browser and your runner. For a higher-level wrapper that handles the signaling, tracks, and frame batching for you, see the experimental [World Model Accelerator (WMA)](/documentation/development/wma).
+The pattern uses `@fal.endpoint("/webrtc", is_websocket=True)` to handle WebRTC signaling, while the actual media flows peer-to-peer between the browser and your runner. For a higher-level wrapper that handles the signaling, tracks, and frame batching for you, see the experimental [World Model Accelerator (WMA)](/docs/documentation/development/wma).
 
 <CardGroup cols={2}>
-  <Card title="Real-time World Model" icon="globe" href="/examples/video-generation/deploy-realtime-world-model">
+  <Card title="Real-time World Model" icon="globe" href="/docs/examples/video-generation/deploy-realtime-world-model">
     Deploy a live world model with WebRTC video streaming
   </Card>
 
-  <Card title="Real-time Video-to-Video" icon="video" href="/examples/video-generation/deploy-realtime-video-to-video-model">
+  <Card title="Real-time Video-to-Video" icon="video" href="/docs/examples/video-generation/deploy-realtime-video-to-video-model">
     Run YOLO detections on a live webcam feed via WebRTC
   </Card>
 </CardGroup>
@@ -154,11 +148,11 @@ The pattern uses `@fal.endpoint("/webrtc", is_websocket=True)` to handle WebRTC 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Streaming Endpoints" icon="water" href="/documentation/development/streaming">
+  <Card title="Streaming Endpoints" icon="water" href="/docs/documentation/development/streaming">
     Stream progressive results (image previews, video updates) using SSE
   </Card>
 
-  <Card title="Real-time Client Docs" icon="book" href="/documentation/model-apis/inference/real-time">
+  <Card title="Real-time Client Docs" icon="book" href="/docs/documentation/model-apis/inference/real-time">
     Client library documentation for realtime connections
   </Card>
 </CardGroup>

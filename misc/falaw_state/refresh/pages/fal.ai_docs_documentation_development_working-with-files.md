@@ -6,29 +6,33 @@
 
 > Download input files and return generated outputs from your fal App using the toolkit's file types and download utilities.
 
-Most AI models consume files as input and produce files as output. A video upscaler takes a video URL and returns an enhanced video. An image generator takes a text prompt and returns images. Your [fal App](/documentation/getting-started/apps-and-execution) needs a way to download files that users provide, process them, and return the results as publicly accessible URLs. The `fal.toolkit` provides a set of file types and download utilities that handle all of this.
+Most AI models consume files as input and produce files as output. A video upscaler takes a video URL and returns an enhanced video. An image generator takes a text prompt and returns images. Your [fal App](/docs/documentation/getting-started/apps-and-execution) needs a way to download files that users provide, process them, and return the results as publicly accessible URLs. The `fal.toolkit` provides a set of file types and download utilities that handle all of this.
 
-The download utilities (`download_file`, `download_model_weights`) handle the input side: they download remote files to a local path on your runner, with built-in caching and streaming for large files. The file types (`File`, `Image`, `Video`, `Audio`) handle the output side: you create them from raw bytes, PIL images, or local files, and they automatically upload to [fal's CDN](/documentation/model-apis/fal-cdn) and return a public URL. Together, these cover the complete file I/O lifecycle for a request. For defining input and output schemas that the [Playground](/documentation/model-apis/playground) renders correctly, see [Handle Inputs and Outputs](/documentation/development/handle-inputs-and-outputs).
+The download utilities (`download_file`, `download_model_weights`) handle the input side: they download remote files to a local path on your runner, with built-in caching and streaming for large files. The file types (`File`, `Image`, `Video`, `Audio`) handle the output side: you create them from raw bytes, PIL images, or local files, and they automatically upload to [fal's CDN](/docs/documentation/model-apis/fal-cdn) and return a public URL. Together, these cover the complete file I/O lifecycle for a request. For defining input and output schemas that the [Playground](/docs/documentation/model-apis/playground) renders correctly, see [Handle Inputs and Outputs](/docs/documentation/development/handle-inputs-and-outputs).
 
 ## Downloading Input Files
 
 Users provide file inputs as URLs. The `download_file` function downloads them to a local path on your runner for processing. It handles large files efficiently by streaming in 64 MB chunks, and it writes to a temporary file first then renames atomically so you never end up with a partial file if the download fails.
 
 ```python theme={null}
+import fal
 from fal.toolkit import download_file
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    video_url: str
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
 
     @fal.endpoint("/")
-    def process(self, video_url: str) -> dict:
-        local_path = download_file(video_url, target_dir="/tmp/inputs")
+    def process(self, input: Input) -> dict:
+        local_path = download_file(input.video_url, target_dir="/tmp/inputs")
         result = self.model.process(str(local_path))
         return {"output": result}
 ```
 
-If `target_dir` is a relative path, it resolves relative to `/data` ([persistent storage](/documentation/development/use-persistent-storage)). So `download_file(url, target_dir="models/")` saves to `/data/models/`. The function also handles `data:` URIs automatically, decoding base64-encoded inline content without making a network request.
+If `target_dir` is a relative path, it resolves relative to `/data` ([persistent storage](/docs/documentation/development/use-persistent-storage)). So `download_file(url, target_dir="models/")` saves to `/data/models/`. The function also handles `data:` URIs automatically, decoding base64-encoded inline content without making a network request.
 
 ### Caching
 
@@ -71,18 +75,16 @@ path = download_file(url, target_dir="/tmp", filesize_limit=500)
 For the common pattern of downloading model weights to persistent storage, `download_model_weights` is a convenience wrapper around `download_file`. It stores files in `/data/.fal/model_weights/` using a hash of the URL as the directory name, so repeated calls with the same URL are cached automatically.
 
 ```python theme={null}
+import fal
 from fal.toolkit import download_model_weights
-
 
 class MyModel(fal.App):
     def setup(self):
-        weights_path = download_model_weights(
-            "https://huggingface.co/org/model/resolve/main/weights.bin"
-        )
+        weights_path = download_model_weights("https://huggingface.co/org/model/resolve/main/weights.bin")
         self.model = load_from_weights(weights_path)
 ```
 
-For more details on downloading and caching large model files, see [Download Model Weights](/documentation/development/download-model-weights-and-files).
+For more details on downloading and caching large model files, see [Download Model Weights](/docs/documentation/development/download-model-weights-and-files).
 
 ***
 
@@ -93,7 +95,10 @@ When your model generates a file, wrap it in one of the toolkit's file types bef
 ```python theme={null}
 import fal
 from fal.toolkit import Image
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -102,12 +107,56 @@ class MyModel(fal.App):
         self.pipe = load_model()
 
     @fal.endpoint("/")
-    def generate(self, prompt: str) -> dict:
-        pil_image = self.pipe(prompt).images[0]
+    def generate(self, input: Input) -> dict:
+        pil_image = self.pipe(input.prompt).images[0]
         return {"image": Image.from_pil(pil_image)}
 ```
 
-The returned object has a `.url` field containing the public CDN URL (e.g., `https://v3.fal.media/files/...`). These URLs are publicly accessible and subject to your [media expiration settings](/documentation/model-apis/media-expiration).
+The returned object has a `.url` field containing the public CDN URL (e.g., `https://v3b.fal.media/files/...`). These URLs are publicly accessible by default and subject to your [media expiration settings](/docs/documentation/model-apis/media-expiration). Access can also be restricted per request or per app -- see the next section.
+
+### Controlling Access to Returned Files
+
+Generated files are publicly readable by default. To restrict who can access them, use [File ACLs](/docs/documentation/model-apis/file-access-controls). There are two patterns inside an app:
+
+**Pattern 1: Pass through the caller's preference (recommended).** If the caller sets `X-Fal-Object-Lifecycle-Preference` on the inference request, that preference (including any `initial_acl`) flows through to the gateway and is applied automatically when your handler returns. No code changes required:
+
+```python theme={null}
+class MyApp(fal.App):
+    @fal.endpoint("/")
+    def predict(self, request):
+        pil = run_pipeline(request.prompt)
+        return {"image": Image.from_pil(pil)}  # caller's ACL auto-applied
+```
+
+**Pattern 2: Enforce a server-side ACL.** If your app needs every output to follow a default ACL regardless of what the caller passes (for example, an internal tool whose outputs must always be restricted to your team), set the lifecycle preference on the current request before constructing any file:
+
+```python theme={null}
+import fal
+from fal.ref import get_current_app
+from fal.toolkit import Image
+
+class MyApp(fal.App):
+    @fal.endpoint("/")
+    def predict(self, request):
+        ctx = get_current_app().current_request
+        ctx.lifecycle_preference = {
+            **(ctx.lifecycle_preference or {}),
+            "initial_acl": {
+                "default": "forbid",
+                "rules": [
+                    {"user": "alice", "decision": "allow"},
+                    {"user": "bob", "decision": "allow"},
+                ],
+            },
+        }
+
+        pil = run_pipeline(request.prompt)
+        return {"image": Image.from_pil(pil)}
+```
+
+The toolkit reads `current_app.current_request.lifecycle_preference` whenever it builds a file, so any `Image`, `Video`, `Audio`, or `File` returned after this assignment uses your enforced ACL. The override is scoped to the current request and reset by the framework on each new inference call. Spreading `**(ctx.lifecycle_preference or {})` preserves the caller's `expiration_duration_seconds` if they set one, so callers can still control retention even though they cannot widen access.
+
+For the full reference on ACL semantics (decisions, evaluation order, scope), see [File Access Controls](/docs/documentation/model-apis/file-access-controls).
 
 ### File Types and Methods
 
@@ -148,9 +197,7 @@ audio = Audio.from_path("/tmp/output.wav")
 audio = Audio.from_bytes(raw_bytes, content_type="audio/wav", file_name="output.wav")
 
 generic = File.from_path("/tmp/result.obj")
-generic = File.from_bytes(
-    data, content_type="application/octet-stream", file_name="model.glb"
-)
+generic = File.from_bytes(data, content_type="application/octet-stream", file_name="model.glb")
 ```
 
 ### The Type System and Playground
@@ -160,27 +207,30 @@ Using `Image`, `Video`, or `Audio` in your Pydantic output schema tells the Play
 ```python theme={null}
 from fal.toolkit import Image, Video, Audio
 
-
 class Output(BaseModel):
     image: Image
     video: Video
     audio: Audio
 ```
 
-For richer input schemas with file URL types that validate correctly, see the `FileInput` and `ImageInput` union types in [Handle Inputs and Outputs](/documentation/development/handle-inputs-and-outputs).
+For richer input schemas with file URL types that validate correctly, see the `FileInput` and `ImageInput` union types in [Handle Inputs and Outputs](/docs/documentation/development/handle-inputs-and-outputs).
 
 ### Compressed Files
 
 `CompressedFile` extends `File` with ZIP extraction support. When you iterate over a `CompressedFile` or call `glob()`, it automatically downloads and extracts the archive to a temporary directory.
 
 ```python theme={null}
+import fal
 from fal.toolkit import CompressedFile
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    archive_url: str
 
 class MyApp(fal.App):
     @fal.endpoint("/")
-    def process(self, archive_url: str) -> dict:
-        archive = CompressedFile(url=archive_url)
+    def process(self, input: Input) -> dict:
+        archive = CompressedFile(url=input.archive_url)
         png_files = list(archive.glob("*.png"))
         return {"file_count": len(png_files)}
 ```
@@ -193,25 +243,25 @@ The extracted directory is cleaned up automatically when the `CompressedFile` ob
 
 Your app works with two storage systems that serve different purposes. Understanding when to use each prevents common mistakes like storing temporary outputs in persistent storage or losing generated files after a runner shuts down.
 
-The [fal CDN](/documentation/model-apis/fal-cdn) is for generated outputs that you return to users. When you call `Image.from_pil()` or `File.from_path()`, the file is uploaded to the CDN and a public URL is returned. These URLs are accessible to anyone without authentication, and they expire according to your [media expiration settings](/documentation/model-apis/media-expiration). Each upload produces a unique URL with no shared namespace.
+The [fal CDN](/docs/documentation/model-apis/fal-cdn) is for generated outputs that you return to users. When you call `Image.from_pil()` or `File.from_path()`, the file is uploaded to the CDN and a public URL is returned. By default these URLs are accessible to anyone without authentication, but you can restrict access per request with [File ACLs](/docs/documentation/model-apis/file-access-controls). They expire according to your [media expiration settings](/docs/documentation/model-apis/media-expiration). Each upload produces a unique URL with no shared namespace.
 
-The `/data` directory is [persistent storage](/documentation/development/use-persistent-storage) mounted as a local filesystem on every runner. It is shared across all runners and all apps in your account. Use it for model weights, datasets, cached preprocessed files, and anything that should persist across requests and runner restarts. Files on `/data` are not URL-accessible and remain until you delete them.
+The `/data` directory is [persistent storage](/docs/documentation/development/use-persistent-storage) mounted as a local filesystem on every runner. It is shared across all runners and all apps in your account. Use it for model weights, datasets, cached preprocessed files, and anything that should persist across requests and runner restarts. Files on `/data` are not URL-accessible and remain until you delete them.
 
 For per-request temporary files that don't need to persist, use `/tmp`. It is local to each runner and cleared when the runner shuts down.
 
-|                 | CDN                                                                          | /data                             | /tmp                       |
-| --------------- | ---------------------------------------------------------------------------- | --------------------------------- | -------------------------- |
-| **Use for**     | Generated outputs returned to users                                          | Model weights, datasets, caches   | Per-request scratch files  |
-| **Persistence** | Subject to [expiration settings](/documentation/model-apis/media-expiration) | Permanent until deleted           | Cleared on runner shutdown |
-| **Shared**      | No (each upload is unique)                                                   | Yes (across all runners and apps) | No (per-runner)            |
-| **Access**      | Public URL, no auth                                                          | Local filesystem only             | Local filesystem only      |
+|                 | CDN                                                                                                 | /data                             | /tmp                       |
+| --------------- | --------------------------------------------------------------------------------------------------- | --------------------------------- | -------------------------- |
+| **Use for**     | Generated outputs returned to users                                                                 | Model weights, datasets, caches   | Per-request scratch files  |
+| **Persistence** | Subject to [expiration settings](/docs/documentation/model-apis/media-expiration)                        | Permanent until deleted           | Cleared on runner shutdown |
+| **Shared**      | No (each upload is unique)                                                                          | Yes (across all runners and apps) | No (per-runner)            |
+| **Access**      | Public URL by default, restrictable via [File ACLs](/docs/documentation/model-apis/file-access-controls) | Local filesystem only             | Local filesystem only      |
 
 <CardGroup cols={2}>
-  <Card title="fal CDN" href="/documentation/model-apis/fal-cdn">
+  <Card title="fal CDN" href="/docs/documentation/model-apis/fal-cdn">
     Uploading files from client code before calling a model
   </Card>
 
-  <Card title="Persistent Storage" href="/documentation/development/use-persistent-storage">
+  <Card title="Persistent Storage" href="/docs/documentation/development/use-persistent-storage">
     Managing persistent files on /data
   </Card>
 </CardGroup>

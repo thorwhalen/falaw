@@ -6,7 +6,7 @@
 
 > How billing works for fal Compute.
 
-Dedicated GPU instances (Compute) are billed per-hour at fixed rates by instance type. Unlike [Serverless](/documentation/serverless/pricing), Compute instances run continuously regardless of utilization. Pricing is configured per instance type and visible in the [dashboard](https://fal.ai/dashboard/compute).
+Dedicated GPU instances (Compute) are billed per-hour at fixed rates by instance type. Unlike [Serverless](/docs/documentation/serverless/pricing), Compute instances run continuously regardless of utilization. Pricing is configured per instance type and visible in the [dashboard](https://fal.ai/dashboard/compute).
 
 | Instance Type | Description                                    |
 | :------------ | :--------------------------------------------- |

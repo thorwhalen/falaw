@@ -9,15 +9,15 @@
 Complete reference documentation for all fal SDKs and tools.
 
 <CardGroup cols={3}>
-  <Card title="Client Libraries" icon="code" href="/api-reference/client-libraries">
+  <Card title="Client Libraries" icon="code" href="/docs/api-reference/client-libraries">
     Libraries for calling fal AI models from your applications
   </Card>
 
-  <Card title="CLI Reference" icon="terminal" href="/api-reference/cli">
+  <Card title="CLI Reference" icon="terminal" href="/docs/api-reference/cli">
     Command-line interface for deploying and managing fal applications
   </Card>
 
-  <Card title="Python SDK" icon="python" href="/api-reference/python-sdk/fal-app-reference">
+  <Card title="Python SDK" icon="python" href="/docs/api-reference/python-sdk/fal-app-reference">
     Tools for building and deploying serverless AI applications
   </Card>
 </CardGroup>

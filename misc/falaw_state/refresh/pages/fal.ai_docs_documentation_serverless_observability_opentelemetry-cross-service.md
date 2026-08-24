@@ -6,7 +6,7 @@
 
 > Propagate trace context between two fal apps so that preprocessing and inference appear as children of a single parent trace
 
-When a request passes through more than one fal app, each app creates its own spans by default and those spans appear as separate, unrelated traces in your backend. Passing W3C trace context between apps connects them under a single trace ID, so preprocessing and inference show up as children of one root span. For single-app tracing, see [Custom Traces](/documentation/serverless/observability/opentelemetry-traces).
+When a request passes through more than one fal app, each app creates its own spans by default and those spans appear as separate, unrelated traces in your backend. Passing W3C trace context between apps connects them under a single trace ID, so preprocessing and inference show up as children of one root span. For single-app tracing, see [Custom Traces](/docs/documentation/serverless/observability/opentelemetry-traces).
 
 ## How Context Propagation Works
 
@@ -25,7 +25,7 @@ fal deploy pipeline.py::TextToImageWorker
 fal deploy pipeline.py::ImagePipeline
 ```
 
-Both apps must have `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_HEADERS` set as fal secrets. See [Custom Traces](/documentation/serverless/observability/opentelemetry-traces#prerequisites) for backend options and how to store credentials.
+Both apps must have `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_HEADERS` set as fal secrets. See [Custom Traces](/docs/documentation/serverless/observability/opentelemetry-traces#prerequisites) for backend options and how to store credentials.
 
 ## Implementation
 
@@ -53,7 +53,6 @@ def setup_tracer(service_name: str):
 
 # App 1: ImagePipeline - validates and preprocesses the prompt, then calls TextToImageWorker
 
-
 class PipelineInput(BaseModel):
     prompt: str = Field(description="The prompt to generate an image from")
     worker_app: str = Field(description="Deployed app id of TextToImageWorker")
@@ -73,9 +72,7 @@ class ImagePipeline(fal.App):
     ]
 
     def setup(self):
-        from opentelemetry.trace.propagation.tracecontext import (
-            TraceContextTextMapPropagator,
-        )
+        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
         self.tracer, self.tracer_provider = setup_tracer("image-pipeline")
         self._propagator = TraceContextTextMapPropagator()
@@ -112,7 +109,6 @@ class ImagePipeline(fal.App):
 
 # App 2: TextToImageWorker - receives context and runs SDXL inference
 
-
 class WorkerInput(BaseModel):
     prompt: str
     trace_context: dict  # W3C traceparent injected by ImagePipeline
@@ -140,9 +136,7 @@ class TextToImageWorker(fal.App):
 
         import torch
         from diffusers import StableDiffusionXLPipeline
-        from opentelemetry.trace.propagation.tracecontext import (
-            TraceContextTextMapPropagator,
-        )
+        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
         self.tracer, self.tracer_provider = setup_tracer("text-to-image-worker")
         self._propagator = TraceContextTextMapPropagator()
@@ -205,11 +199,11 @@ The entity map shows both apps connected, and the span tree shows spans from bot
 ## What's Next
 
 <CardGroup cols={2}>
-  <Card title="Custom Traces" icon="code-branch" href="/documentation/serverless/observability/opentelemetry-traces">
+  <Card title="Custom Traces" icon="code-branch" href="/docs/documentation/serverless/observability/opentelemetry-traces">
     Instrument a single app with spans for each inference stage
   </Card>
 
-  <Card title="Production Configuration" icon="sliders" href="/documentation/serverless/observability/opentelemetry-production">
+  <Card title="Production Configuration" icon="sliders" href="/docs/documentation/serverless/observability/opentelemetry-production">
     Sampling, batch export tuning, and graceful flush on shutdown
   </Card>
 </CardGroup>

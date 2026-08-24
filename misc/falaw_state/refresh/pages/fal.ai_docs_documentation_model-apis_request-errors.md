@@ -8,7 +8,7 @@
 
 When a request fails due to infrastructure-level issues rather than model validation, the platform returns a structured error response with a machine-readable `error_type` field. These errors cover timeouts, runner crashes, scheduling failures, and connection problems that occur before or during request processing.
 
-Request errors use a different response format than [model validation errors](/documentation/model-apis/errors). Model errors return a `detail` array of typed error objects. Request errors return a flat object with `detail` as a human-readable string and `error_type` as a machine-readable category. The same value is also available in the `X-Fal-Error-Type` response header for programmatic access without parsing the body.
+Request errors use a different response format than [model validation errors](/docs/documentation/model-apis/errors). Model errors return a `detail` array of typed error objects. Request errors return a flat object with `detail` as a human-readable string and `error_type` as a machine-readable category. The same value is also available in the `X-Fal-Error-Type` response header for programmatic access without parsing the body.
 
 ## Response Structure
 
@@ -46,16 +46,16 @@ The `X-Fal-Error-Type` response header contains the same value as `error_type`.
 
 ## Handling Request Errors
 
-**For retry logic:** Use `error_type` to decide whether to retry. Runner and timeout errors (e.g., `runner_connection_timeout`, `startup_timeout`) are typically transient and worth retrying. Client errors (`client_disconnected`, `bad_request`) should not be retried. See [Retries and Error Handling](/documentation/serverless/reliability/retries) for how the platform handles retries automatically.
+**For retry logic:** Use `error_type` to decide whether to retry. Runner and timeout errors (e.g., `runner_connection_timeout`, `startup_timeout`) are typically transient and worth retrying. Client errors (`client_disconnected`, `bad_request`) should not be retried. See [Retries and Error Handling](/docs/documentation/serverless/reliability/retries) for how the platform handles retries automatically.
 
-**For monitoring:** The `error_type` is also available in [queue status responses](/documentation/model-apis/inference/queue#request-lifecycle) for failed requests, making it useful for tracking failure patterns in your [analytics dashboard](/documentation/serverless/observability/app-analytics).
+**For monitoring:** The `error_type` is also available in [queue status responses](/docs/documentation/model-apis/inference/queue#request-lifecycle) for failed requests, making it useful for tracking failure patterns in your [analytics dashboard](/docs/documentation/serverless/observability/app-analytics).
 
 <CardGroup cols={2}>
-  <Card title="Model Errors" icon="triangle-exclamation" href="/documentation/model-apis/errors">
+  <Card title="Model Errors" icon="triangle-exclamation" href="/docs/documentation/model-apis/errors">
     Validation errors from model inputs (images, video, audio)
   </Card>
 
-  <Card title="Retries" icon="rotate" href="/documentation/serverless/reliability/retries">
+  <Card title="Retries" icon="rotate" href="/docs/documentation/serverless/reliability/retries">
     How fal automatically retries failed requests
   </Card>
 </CardGroup>

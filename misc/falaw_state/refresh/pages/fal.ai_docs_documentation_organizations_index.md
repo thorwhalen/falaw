@@ -6,7 +6,7 @@
 
 > Centralized management for teams, billing, and model access across your company.
 
-Organizations give enterprise customers a parent account that manages multiple [teams](/documentation/setting-up/teams) under a single umbrella. While standalone teams work well for small groups, organizations add centralized policies, SSO enforcement, cross-team billing visibility, and model access controls. Every team within an organization maintains its own API keys, secrets, deployed apps, and billing, but inherits policies set at the organization level.
+Organizations give enterprise customers a parent account that manages multiple [teams](/docs/documentation/setting-up/teams) under a single umbrella. While standalone teams work well for small groups, organizations add centralized policies, SSO enforcement, cross-team billing visibility, and model access controls. Every team within an organization maintains its own API keys, secrets, deployed apps, and billing, but inherits policies set at the organization level.
 
 If you are already using teams on fal and need centralized control over team creation, member management, or which models your teams can access, an organization is the next step. Organizations are available on enterprise plans. Contact [sales](https://fal.ai/enterprise#contact-sales) to get started.
 
@@ -29,9 +29,9 @@ Organization admins have centralized control over the full team lifecycle. They 
 
 ## Request Visibility
 
-Organizations can enable **restricted request view** to limit team members to only seeing their own request payloads and logs. This is configured in the organization admin dashboard under "Restricted request view."
+Organizations can enable **restricted request view** from the organization admin dashboard. When enabled, team members can see metadata for all team requests, including the endpoint, status, timing, and cost, but access to request content is restricted.
 
-When enabled, the system tracks how each request was authenticated. When a team member views requests in the dashboard, they only see payloads for requests where their identity matches the request's authentication method.
+Request payloads are visible only to the member whose identity authenticated the request. Logs are visible to that member and to the owner of the endpoint. The dashboard does not show which member made a request.
 
 <Warning>
   **Playground and API key submissions behave differently under restricted view:**
@@ -44,16 +44,16 @@ When enabled, the system tracks how each request was authenticated. When a team 
 
 ## SSO Account Visibility
 
-Organizations with SSO can restrict whether users can access their personal fal account alongside their SSO-linked team account. This ensures users only interact through the organization's managed teams. See [Managing Teams](/documentation/organizations/managing-teams) for configuration details.
+Organizations with SSO can restrict whether users can access their personal fal account alongside their SSO-linked team account. This ensures users only interact through the organization's managed teams. See [Managing Teams](/docs/documentation/organizations/managing-teams) for configuration details.
 
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Managing Teams" icon="arrow-right" href="/documentation/organizations/managing-teams">
+  <Card title="Managing Teams" icon="arrow-right" href="/docs/documentation/organizations/managing-teams">
     Team lifecycle, member management, and org-wide policies
   </Card>
 
-  <Card title="Model Access Controls" icon="arrow-right" href="/documentation/organizations/access-controls">
+  <Card title="Model Access Controls" icon="arrow-right" href="/docs/documentation/organizations/access-controls">
     Restrict which models your teams can use
   </Card>
 </CardGroup>

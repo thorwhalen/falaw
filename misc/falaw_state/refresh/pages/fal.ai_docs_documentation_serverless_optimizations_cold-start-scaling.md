@@ -12,7 +12,7 @@ The most effective way to reduce cold starts is maintaining warm runners using s
 
 **Default:** 60 seconds
 
-Keep runners alive after their last request completes.
+Keep idle runners alive before shutdown. This applies after a runner finishes a request and when a newly started runner gets no request.
 
 ```python theme={null}
 class MyApp(fal.App):
@@ -22,10 +22,6 @@ class MyApp(fal.App):
 **Benefits:** Runners stay warm between requests, reduces cold starts for sporadic traffic
 
 **Trade-offs:** Longer keep\_alive = higher costs; shorter = more cold starts
-
-<Note>
-  For apps without `min_concurrency` or `concurrency_buffer`, a newly started runner that never picks up a request is shut down after 10 seconds instead of waiting for the full `keep_alive` period.
-</Note>
 
 ## `min_concurrency`
 
@@ -135,7 +131,7 @@ To reset all parameters back to code values, deploy with `--reset-scale`:
 fal deploy --reset-scale
 ```
 
-<Card title="Deploy Behavior & Priority" icon="arrow-right" href="/documentation/deployment/scale-your-application#deploy-behavior-and---reset-scale">
+<Card title="Deploy Behavior & Priority" icon="arrow-right" href="/docs/documentation/deployment/scale-your-application#deploy-behavior-and---reset-scale">
   Full explanation of how code, CLI, and dashboard settings interact
 </Card>
 
@@ -147,6 +143,6 @@ More warm runners = lower latency but higher cost. Balance based on your needs:
 * **Cost-sensitive apps**: Optimize cold start duration instead (container images, caching)
 * **Variable traffic**: Use buffers and scaling delays
 
-<Card title="Full Scaling Reference" icon="arrow-right" href="/documentation/deployment/scale-your-application">
+<Card title="Full Scaling Reference" icon="arrow-right" href="/docs/documentation/deployment/scale-your-application">
   Complete guide to scaling configuration including CLI and dashboard methods
 </Card>

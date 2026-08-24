@@ -6,7 +6,7 @@
 
 > Validation and content errors returned by models when inputs don't meet requirements.
 
-When a model rejects your input due to validation failures, content policy violations, or format issues, it returns a structured error response with typed error objects. These errors tell you exactly what went wrong with your input and how to fix it. For infrastructure-level errors (timeouts, runner failures), see [Request Errors](/documentation/model-apis/request-errors).
+When a model rejects your input due to validation failures, content policy violations, or format issues, it returns a structured error response with typed error objects. These errors tell you exactly what went wrong with your input and how to fix it. For infrastructure-level errors (timeouts, runner failures), see [Request Errors](/docs/documentation/model-apis/request-errors).
 
 <Warning>
   Some APIs are still being migrated to this error structure. Not all endpoints strictly follow the format documented below yet.
@@ -21,7 +21,7 @@ When an API request fails due to client-side input issues (like validation error
 The error response consists of:
 
 1. **HTTP Status Code:** Indicates the general category of the error (e.g., `500` for internal errors, `504` for timeouts).
-2. **Headers:** Includes required headers like `X-Fal-Retryable`.
+2. **Headers:** Includes required headers like `X-Fal-Needs-Retry`.
 3. **JSON Body:** Contains a `detail` field which is an array of `Error` objects.
 
 ### Error Object Structure
@@ -33,13 +33,13 @@ The `detail` field is an array where each object represents a specific error.
 | `loc`    | **\[REQUIRED]** An array indicating the location of the error (e.g., `["body", "field_name"]` for input validation, `["body"]` for general errors). The first item in the loc list will be the field where the error occurred, and if the field is a sub-model, subsequent items will be present to indicate the nested location of the error. |
 | `msg`    | **\[REQUIRED]** A human-readable description of the error. **Client code should not parse and rely on the msg field.**                                                                                                                                                                                                                         |
 | `type`   | **\[REQUIRED]** A unique, **machine-readable** string identifying the error category (e.g., `image_too_large`). Use this for conditional logic.                                                                                                                                                                                                |
-| `url`    | **\[REQUIRED]** A link to documentation about this specific error `type` (e.g., [https://docs.fal.ai/errors/#image\_too\_large\`](https://docs.fal.ai/errors/#image_too_large`)). Primarily for developers.                                                                                                                                    |
+| `url`    | **\[REQUIRED]** A link to documentation about this specific error `type` (e.g., `https://docs.fal.ai/errors#image_too_large`). Primarily for developers.                                                                                                                                                                                       |
 | `ctx`    | **\[OPTIONAL]** An object with additional structured, **machine-readable** context for the error `type` (e.g., `{"max_height": 1024, "max_width": 1024}` for `image_too_large`).                                                                                                                                                               |
 | `input`  | **\[OPTIONAL]** The input that caused the error.                                                                                                                                                                                                                                                                                               |
 
 ### Guidance
 
-* **For Machine Processing:** Rely on the `type` field for conditional logic. Use `ctx` for specific error details if available. Check the `X-Fal-Retryable` header for retry decisions.
+* **For Machine Processing:** Rely on the `type` field for conditional logic. Use `ctx` for specific error details if available. Check the `X-Fal-Needs-Retry` header for retry decisions.
 * **For Human Display:** Use the `msg` field to show error messages to end-users. **Client code should not parse and rely on the msg field.**
 * **For Documentation:** Use the `url` field to link to further documentation about the specific error. This is primarily intended for developers to get more detailed information about error handling and resolution.
 
@@ -47,7 +47,9 @@ The `detail` field is an array where each object represents a specific error.
 
 This document details the specific error types returned by the API, following the structure defined in the error specification. Each error type has a unique `type` string, a human-readable `msg`, and potentially a `ctx` object with more context.
 
-##### `internal_server_error`
+The sections below cover fal's first-party error types. Standard [Pydantic validation errors](https://docs.pydantic.dev/latest/errors/validation_errors/) (e.g., `string_type`, `int_parsing`, `enum`) are passed through with their original `type` string; treat any `type` not listed on this page as a non-retryable `422` validation error and rely on `msg` for the details.
+
+#### `internal_server_error`
 
 This error indicates an unexpected issue occurred on the server that prevented the request from being fulfilled.
 
@@ -61,13 +63,13 @@ This error indicates an unexpected issue occurred on the server that prevented t
     "loc": ["body"],
     "msg": "Internal server error",
     "type": "internal_server_error",
-    "url": "https://docs.fal.ai/errors/#internal_server_error",
+    "url": "https://docs.fal.ai/errors#internal_server_error",
     "input": { "prompt": "a cat" }
   }
 ]
 ```
 
-##### `generation_timeout`
+#### `generation_timeout`
 
 This error occurs when the requested operation took longer than the allowed time limit to complete.
 
@@ -81,13 +83,13 @@ This error occurs when the requested operation took longer than the allowed time
     "loc": ["body"],
     "msg": "Generation timeout",
     "type": "generation_timeout",
-    "url": "https://docs.fal.ai/errors/#generation_timeout",
+    "url": "https://docs.fal.ai/errors#generation_timeout",
     "input": { "prompt": "a very complex scene taking too long" }
   }
 ]
 ```
 
-##### `downstream_service_error`
+#### `downstream_service_error`
 
 This error signifies a problem when communicating with an external service required to fulfill the request.
 
@@ -101,13 +103,13 @@ This error signifies a problem when communicating with an external service requi
     "loc": ["body"],
     "msg": "Downstream service error",
     "type": "downstream_service_error",
-    "url": "https://docs.fal.ai/errors/#downstream_service_error",
+    "url": "https://docs.fal.ai/errors#downstream_service_error",
     "input": { "some_input": "value" }
   }
 ]
 ```
 
-##### `downstream_service_unavailable`
+#### `downstream_service_unavailable`
 
 This error indicates that a required third-party service (**including partner APIs**) is currently unavailable, preventing the request from being fulfilled.
 
@@ -121,13 +123,13 @@ This error indicates that a required third-party service (**including partner AP
     "loc": ["body"],
     "msg": "Downstream service unavailable",
     "type": "downstream_service_unavailable",
-    "url": "https://docs.fal.ai/errors/#downstream_service_unavailable",
+    "url": "https://docs.fal.ai/errors#downstream_service_unavailable",
     "input": { "prompt": "a cat" }
   }
 ]
 ```
 
-##### `content_policy_violation`
+#### `content_policy_violation`
 
 This error indicates that the provided input content (e.g., text prompt, uploaded image) could not be processed because it was flagged by automated safety systems as potentially violating usage policies or responsible AI guidelines.
 
@@ -151,13 +153,13 @@ Violations may include, but are not limited to:
     "loc": ["body", "prompt"],
     "msg": "The content could not be processed because it contained material flagged by a content checker.",
     "type": "content_policy_violation",
-    "url": "https://docs.fal.ai/errors/#content_policy_violation",
+    "url": "https://docs.fal.ai/errors#content_policy_violation",
     "input": "a prompt containing forbidden content"
   }
 ]
 ```
 
-##### `no_media_generated`
+#### `no_media_generated`
 
 This error indicates that the generation completed successfully but the model did not produce any media output for the given input. This can happen when the model is unable to generate a valid result from the provided prompt or parameters.
 
@@ -171,13 +173,73 @@ This error indicates that the generation completed successfully but the model di
     "loc": ["body"],
     "msg": "The model did not generate the expected output for this prompt.",
     "type": "no_media_generated",
-    "url": "https://docs.fal.ai/errors/#no_media_generated",
+    "url": "https://docs.fal.ai/errors#no_media_generated",
     "input": { "prompt": "a cat in a garden" }
   }
 ]
 ```
 
-##### `image_too_small`
+#### `value_error`
+
+This error indicates that the provided value for an input field failed validation and no more specific error type applies. The offending field is typically identified by `loc`, and `msg` describes why the value was rejected.
+
+* **Status Code:** 422
+* **Retryable:** `false`.
+* **Context (`ctx`):** None by default; may carry additional passthrough context from the validating service.
+
+```json theme={null}
+[
+  {
+    "loc": ["body", "images_data_url"],
+    "msg": "No valid images found in the archive. Expected PNG, JPG, JPEG, or WEBP files.",
+    "type": "value_error",
+    "url": "https://docs.fal.ai/errors#value_error",
+    "input": "https://example.com/images.zip"
+  }
+]
+```
+
+#### `input_value_error`
+
+This error indicates that the request as a whole could not be processed, when the failure is not attributable to a single input field (`loc` is `["body"]`). `msg` describes why the input was rejected.
+
+* **Status Code:** 422
+* **Retryable:** `false`.
+* **Context (`ctx`):** None
+
+```json theme={null}
+[
+  {
+    "loc": ["body"],
+    "msg": "Validation error from downstream service",
+    "type": "input_value_error",
+    "url": "https://docs.fal.ai/errors#input_value_error",
+    "input": { "prompt": "a cat" }
+  }
+]
+```
+
+#### `missing`
+
+This error indicates that a required input field was not provided. The missing field is identified by `loc`.
+
+* **Status Code:** 422
+* **Retryable:** `false`.
+* **Context (`ctx`):** None
+
+```json theme={null}
+[
+  {
+    "loc": ["body", "prompt"],
+    "msg": "Field 'prompt' is required but was not provided.",
+    "type": "missing",
+    "url": "https://docs.fal.ai/errors#missing",
+    "input": {}
+  }
+]
+```
+
+#### `image_too_small`
 
 This error indicates that the provided image dimensions are smaller than the required minimum.
 
@@ -193,7 +255,7 @@ This error indicates that the provided image dimensions are smaller than the req
     "loc": ["body", "image_url"],
     "msg": "Image too small",
     "type": "image_too_small",
-    "url": "https://docs.fal.ai/errors/#image_too_small",
+    "url": "https://docs.fal.ai/errors#image_too_small",
     "ctx": {
       "min_height": 512,
       "min_width": 512
@@ -203,7 +265,7 @@ This error indicates that the provided image dimensions are smaller than the req
 ]
 ```
 
-##### `image_too_large`
+#### `image_too_large`
 
 This error indicates that the provided image dimensions exceed the maximum allowed limits.
 
@@ -219,7 +281,7 @@ This error indicates that the provided image dimensions exceed the maximum allow
     "loc": ["body", "input_image"],
     "msg": "Image too large",
     "type": "image_too_large",
-    "url": "https://docs.fal.ai/errors/#image_too_large",
+    "url": "https://docs.fal.ai/errors#image_too_large",
     "ctx": {
       "max_height": 1024,
       "max_width": 1024
@@ -229,7 +291,7 @@ This error indicates that the provided image dimensions exceed the maximum allow
 ]
 ```
 
-##### `image_load_error`
+#### `image_load_error`
 
 This error occurs when the server failed to load or process the provided image, possibly due to corruption or an unsupported format.
 
@@ -243,13 +305,13 @@ This error occurs when the server failed to load or process the provided image, 
     "loc": ["body", "control_image"],
     "msg": "Image load error",
     "type": "image_load_error",
-    "url": "https://docs.fal.ai/errors/#image_load_error",
+    "url": "https://docs.fal.ai/errors#image_load_error",
     "input": "https://example.com/corrupted_image.webp"
   }
 ]
 ```
 
-##### `file_download_error`
+#### `file_download_error`
 
 This error indicates that the server failed to download a file specified by a URL in the input.
 Make sure the URL is publicly accessible and that the file is not behind a login or authentication wall.
@@ -264,13 +326,13 @@ Make sure the URL is publicly accessible and that the file is not behind a login
     "loc": ["body", "video_url"],
     "msg": "File download error",
     "type": "file_download_error",
-    "url": "https://docs.fal.ai/errors/#file_download_error",
+    "url": "https://docs.fal.ai/errors#file_download_error",
     "input": "https://private-server.com/file.mp4"
   }
 ]
 ```
 
-##### `face_detection_error`
+#### `face_detection_error`
 
 This error is raised when the system could not detect a face in the provided image, and face detection was required for the operation.
 
@@ -284,13 +346,13 @@ This error is raised when the system could not detect a face in the provided ima
     "loc": ["body", "face_image"],
     "msg": "Could not detect face in the image",
     "type": "face_detection_error",
-    "url": "https://docs.fal.ai/errors/#face_detection_error",
+    "url": "https://docs.fal.ai/errors#face_detection_error",
     "input": "https://example.com/landscape_no_face.jpg"
   }
 ]
 ```
 
-##### `file_too_large`
+#### `file_too_large`
 
 This error indicates that the provided file exceeds the maximum allowed size.
 
@@ -305,7 +367,7 @@ This error indicates that the provided file exceeds the maximum allowed size.
     "loc": ["body", "upload_file"],
     "msg": "File too large",
     "type": "file_too_large",
-    "url": "https://docs.fal.ai/errors/#file_too_large",
+    "url": "https://docs.fal.ai/errors#file_too_large",
     "ctx": {
       "max_size": 10485760 // 10MB
     },
@@ -314,7 +376,7 @@ This error indicates that the provided file exceeds the maximum allowed size.
 ]
 ```
 
-##### `greater_than`
+#### `greater_than`
 
 This error occurs when a numeric input value is not strictly greater than the specified threshold.
 
@@ -329,7 +391,7 @@ This error occurs when a numeric input value is not strictly greater than the sp
     "loc": ["body", "num_inference_steps"],
     "msg": "Input should be greater than 0",
     "type": "greater_than",
-    "url": "https://docs.fal.ai/errors/#greater_than",
+    "url": "https://docs.fal.ai/errors#greater_than",
     "ctx": {
       "gt": 0
     },
@@ -338,7 +400,7 @@ This error occurs when a numeric input value is not strictly greater than the sp
 ]
 ```
 
-##### `greater_than_equal`
+#### `greater_than_equal`
 
 This error occurs when a numeric input value is less than the specified threshold.
 
@@ -353,7 +415,7 @@ This error occurs when a numeric input value is less than the specified threshol
     "loc": ["body", "strength"],
     "msg": "Input should be greater than or equal to 0",
     "type": "greater_than_equal",
-    "url": "https://docs.fal.ai/errors/#greater_than_equal",
+    "url": "https://docs.fal.ai/errors#greater_than_equal",
     "ctx": {
       "ge": 0
     },
@@ -362,7 +424,7 @@ This error occurs when a numeric input value is less than the specified threshol
 ]
 ```
 
-##### `less_than`
+#### `less_than`
 
 This error occurs when a numeric input value is not strictly less than the specified threshold.
 
@@ -377,7 +439,7 @@ This error occurs when a numeric input value is not strictly less than the speci
     "loc": ["body", "negative_prompt_weight"],
     "msg": "Input should be less than 1",
     "type": "less_than",
-    "url": "https://docs.fal.ai/errors/#less_than",
+    "url": "https://docs.fal.ai/errors#less_than",
     "ctx": {
       "lt": 1.0
     },
@@ -386,7 +448,7 @@ This error occurs when a numeric input value is not strictly less than the speci
 ]
 ```
 
-##### `less_than_equal`
+#### `less_than_equal`
 
 This error occurs when a numeric input value is greater than the specified threshold.
 
@@ -401,7 +463,7 @@ This error occurs when a numeric input value is greater than the specified thres
     "loc": ["body", "guidance_scale"],
     "msg": "Input should be less than or equal to 20",
     "type": "less_than_equal",
-    "url": "https://docs.fal.ai/errors/#less_than_equal",
+    "url": "https://docs.fal.ai/errors#less_than_equal",
     "ctx": {
       "le": 20
     },
@@ -410,7 +472,7 @@ This error occurs when a numeric input value is greater than the specified thres
 ]
 ```
 
-##### `multiple_of`
+#### `multiple_of`
 
 This error indicates that a numeric input value is not a multiple of the required factor.
 
@@ -425,7 +487,7 @@ This error indicates that a numeric input value is not a multiple of the require
     "loc": ["body", "width"],
     "msg": "Input should be a multiple of 8",
     "type": "multiple_of",
-    "url": "https://docs.fal.ai/errors/#multiple_of",
+    "url": "https://docs.fal.ai/errors#multiple_of",
     "ctx": {
       "multiple_of": 8
     },
@@ -434,7 +496,7 @@ This error indicates that a numeric input value is not a multiple of the require
 ]
 ```
 
-##### `sequence_too_short`
+#### `sequence_too_short`
 
 This error occurs when a sequence (like a list or string) has fewer items/characters than the required minimum length.
 
@@ -449,7 +511,7 @@ This error occurs when a sequence (like a list or string) has fewer items/charac
     "loc": ["body", "prompts"],
     "msg": "Sequence should have at least 1 items",
     "type": "sequence_too_short",
-    "url": "https://docs.fal.ai/errors/#sequence_too_short",
+    "url": "https://docs.fal.ai/errors#sequence_too_short",
     "ctx": {
       "min_length": 1
     },
@@ -458,7 +520,7 @@ This error occurs when a sequence (like a list or string) has fewer items/charac
 ]
 ```
 
-##### `sequence_too_long`
+#### `sequence_too_long`
 
 This error occurs when a sequence (like a list or string) has more items/characters than the allowed maximum length.
 
@@ -473,7 +535,7 @@ This error occurs when a sequence (like a list or string) has more items/charact
     "loc": ["body", "controlnet_images"],
     "msg": "Sequence should have at most 4 items",
     "type": "sequence_too_long",
-    "url": "https://docs.fal.ai/errors/#sequence_too_long",
+    "url": "https://docs.fal.ai/errors#sequence_too_long",
     "ctx": {
       "max_length": 4
     },
@@ -482,7 +544,7 @@ This error occurs when a sequence (like a list or string) has more items/charact
 ]
 ```
 
-##### `one_of`
+#### `one_of`
 
 This error indicates that the input value provided for a field is not among the set of allowed values.
 
@@ -497,7 +559,7 @@ This error indicates that the input value provided for a field is not among the 
     "loc": ["body", "scheduler"],
     "msg": "Input should be 'EulerA' or 'DPM++'",
     "type": "one_of",
-    "url": "https://docs.fal.ai/errors/#one_of",
+    "url": "https://docs.fal.ai/errors#one_of",
     "ctx": {
       "expected": ["EulerA", "DPM++"]
     },
@@ -506,7 +568,7 @@ This error indicates that the input value provided for a field is not among the 
 ]
 ```
 
-##### `feature_not_supported`
+#### `feature_not_supported`
 
 This error is raised when the combination of input parameters requests a feature or mode that is not supported by the endpoint.
 
@@ -520,13 +582,13 @@ This error is raised when the combination of input parameters requests a feature
     "loc": ["body", "advanced_feature"],
     "msg": "Feature not supported",
     "type": "feature_not_supported",
-    "url": "https://docs.fal.ai/errors/#feature_not_supported",
+    "url": "https://docs.fal.ai/errors#feature_not_supported",
     "input": true
   }
 ]
 ```
 
-##### `invalid_archive`
+#### `invalid_archive`
 
 This error occurs when the provided archive file (e.g., .zip, .tar) cannot be read or processed, likely due to corruption or an unsupported format.
 
@@ -541,7 +603,7 @@ This error occurs when the provided archive file (e.g., .zip, .tar) cannot be re
     "loc": ["body", "training_data"],
     "msg": "Could not read or process the provided archive. Ensure it's a valid, non-corrupted archive.",
     "type": "invalid_archive",
-    "url": "https://docs.fal.ai/errors/#invalid_archive",
+    "url": "https://docs.fal.ai/errors#invalid_archive",
     "ctx": {
       "supported_extensions": [".zip", ".tar.gz"]
     },
@@ -550,7 +612,7 @@ This error occurs when the provided archive file (e.g., .zip, .tar) cannot be re
 ]
 ```
 
-##### `archive_file_count_below_minimum`
+#### `archive_file_count_below_minimum`
 
 This error indicates that the provided archive contains fewer files matching the required criteria (e.g., specific extensions) than the minimum required count.
 
@@ -567,7 +629,7 @@ This error indicates that the provided archive contains fewer files matching the
     "loc": ["body", "image_archive"],
     "msg": "Too few files in the archive. Expected at least 10 files with extensions .jpg, .png, found 8. Add more matching files to the archive.",
     "type": "archive_file_count_below_minimum",
-    "url": "https://docs.fal.ai/errors/#archive_file_count_below_minimum",
+    "url": "https://docs.fal.ai/errors#archive_file_count_below_minimum",
     "ctx": {
       "min_count": 10,
       "provided_count": 8,
@@ -578,7 +640,7 @@ This error indicates that the provided archive contains fewer files matching the
 ]
 ```
 
-##### `archive_file_count_exceeds_maximum`
+#### `archive_file_count_exceeds_maximum`
 
 This error indicates that the provided archive contains more files matching the required criteria (e.g., specific extensions) than the maximum allowed count.
 
@@ -595,7 +657,7 @@ This error indicates that the provided archive contains more files matching the 
     "loc": ["body", "image_archive"],
     "msg": "Too many files in the archive. Maximum is 100 files with extensions .jpg, .png, found 150. Remove 50 matching files from the archive.",
     "type": "archive_file_count_exceeds_maximum",
-    "url": "https://docs.fal.ai/errors/#archive_file_count_exceeds_maximum",
+    "url": "https://docs.fal.ai/errors#archive_file_count_exceeds_maximum",
     "ctx": {
       "max_count": 100,
       "provided_count": 150,
@@ -606,7 +668,7 @@ This error indicates that the provided archive contains more files matching the 
 ]
 ```
 
-##### `audio_duration_too_long`
+#### `audio_duration_too_long`
 
 This error indicates that the provided audio file exceeds the maximum allowed duration.
 
@@ -622,7 +684,7 @@ This error indicates that the provided audio file exceeds the maximum allowed du
     "loc": ["body", "audio_file"],
     "msg": "Audio duration exceeds the maximum allowed. Maximum is 60 seconds, provided is 90 seconds.",
     "type": "audio_duration_too_long",
-    "url": "https://docs.fal.ai/errors/#audio_duration_too_long",
+    "url": "https://docs.fal.ai/errors#audio_duration_too_long",
     "ctx": {
       "max_duration": 60,
       "provided_duration": 90
@@ -632,7 +694,7 @@ This error indicates that the provided audio file exceeds the maximum allowed du
 ]
 ```
 
-##### `audio_duration_too_short`
+#### `audio_duration_too_short`
 
 This error indicates that the provided audio file is shorter than the minimum required duration.
 
@@ -648,7 +710,7 @@ This error indicates that the provided audio file is shorter than the minimum re
     "loc": ["body", "audio_file"],
     "msg": "Audio duration is too short. Minimum is 5 seconds, provided is 2 seconds.",
     "type": "audio_duration_too_short",
-    "url": "https://docs.fal.ai/errors/#audio_duration_too_short",
+    "url": "https://docs.fal.ai/errors#audio_duration_too_short",
     "ctx": {
       "min_duration": 5,
       "provided_duration": 2
@@ -658,7 +720,7 @@ This error indicates that the provided audio file is shorter than the minimum re
 ]
 ```
 
-##### `unsupported_audio_format`
+#### `unsupported_audio_format`
 
 This error indicates that the audio file format is not supported by the endpoint.
 
@@ -673,7 +735,7 @@ This error indicates that the audio file format is not supported by the endpoint
     "loc": ["body", "audio_file"],
     "msg": "Unsupported audio format. Supported formats are .mp3, .wav, .ogg.",
     "type": "unsupported_audio_format",
-    "url": "https://docs.fal.ai/errors/#unsupported_audio_format",
+    "url": "https://docs.fal.ai/errors#unsupported_audio_format",
     "ctx": {
       "supported_formats": [".mp3", ".wav", ".ogg"]
     },
@@ -682,7 +744,7 @@ This error indicates that the audio file format is not supported by the endpoint
 ]
 ```
 
-##### `unsupported_image_format`
+#### `unsupported_image_format`
 
 This error indicates that the image file format is not supported by the endpoint.
 
@@ -697,7 +759,7 @@ This error indicates that the image file format is not supported by the endpoint
     "loc": ["body", "image"],
     "msg": "Unsupported image format. Supported formats are .jpg, .jpeg, .png, .webp.",
     "type": "unsupported_image_format",
-    "url": "https://docs.fal.ai/errors/#unsupported_image_format",
+    "url": "https://docs.fal.ai/errors#unsupported_image_format",
     "ctx": {
       "supported_formats": [".jpg", ".jpeg", ".png", ".webp"]
     },
@@ -706,7 +768,7 @@ This error indicates that the image file format is not supported by the endpoint
 ]
 ```
 
-##### `unsupported_video_format`
+#### `unsupported_video_format`
 
 This error indicates that the video file format is not supported by the endpoint.
 
@@ -721,7 +783,7 @@ This error indicates that the video file format is not supported by the endpoint
     "loc": ["body", "video_file"],
     "msg": "Unsupported video format. Supported formats are .mp4, .mov, .webm.",
     "type": "unsupported_video_format",
-    "url": "https://docs.fal.ai/errors/#unsupported_video_format",
+    "url": "https://docs.fal.ai/errors#unsupported_video_format",
     "ctx": {
       "supported_formats": [".mp4", ".mov", ".webm"]
     },
@@ -730,7 +792,7 @@ This error indicates that the video file format is not supported by the endpoint
 ]
 ```
 
-##### `video_duration_too_long`
+#### `video_duration_too_long`
 
 This error indicates that the provided video file exceeds the maximum allowed duration.
 
@@ -746,7 +808,7 @@ This error indicates that the provided video file exceeds the maximum allowed du
     "loc": ["body", "video_file"],
     "msg": "Video duration exceeds the maximum allowed. Maximum is 60 seconds, provided is 120 seconds.",
     "type": "video_duration_too_long",
-    "url": "https://docs.fal.ai/errors/#video_duration_too_long",
+    "url": "https://docs.fal.ai/errors#video_duration_too_long",
     "ctx": {
       "max_duration": 60,
       "provided_duration": 120
@@ -756,7 +818,7 @@ This error indicates that the provided video file exceeds the maximum allowed du
 ]
 ```
 
-##### `video_duration_too_short`
+#### `video_duration_too_short`
 
 This error indicates that the provided video file is shorter than the minimum required duration.
 
@@ -772,7 +834,7 @@ This error indicates that the provided video file is shorter than the minimum re
     "loc": ["body", "video_file"],
     "msg": "Video duration is too short. Minimum is 3 seconds, provided is 1 seconds.",
     "type": "video_duration_too_short",
-    "url": "https://docs.fal.ai/errors/#video_duration_too_short",
+    "url": "https://docs.fal.ai/errors#video_duration_too_short",
     "ctx": {
       "min_duration": 3,
       "provided_duration": 1
@@ -813,7 +875,7 @@ The response also includes an `X-Fal-Error-Type` header with the same value as `
 | Error Type                   | Description                                                                                                              | Typical Status Code |
 | :--------------------------- | :----------------------------------------------------------------------------------------------------------------------- | :------------------ |
 | `request_timeout`            | The request exceeded the allowed processing time.                                                                        | 504                 |
-| `startup_timeout`            | The runner did not start within the allowed time (see [Start Timeout](/model-apis/model-endpoints/queue#start-timeout)). | 504                 |
+| `startup_timeout`            | The runner did not start within the allowed time (see [Start Timeout](/docs/model-apis/model-endpoints/queue#start-timeout)). | 504                 |
 | `runner_scheduling_failure`  | No runner could be allocated to handle the request.                                                                      | 503                 |
 | `runner_connection_timeout`  | The connection to the runner timed out.                                                                                  | 503                 |
 | `runner_disconnected`        | The runner disconnected unexpectedly during processing.                                                                  | 503                 |
@@ -828,5 +890,5 @@ The response also includes an `X-Fal-Error-Type` header with the same value as `
 
 ### Guidance
 
-* **For retry logic:** Use `error_type` to decide whether to retry. Runner and timeout errors (e.g., `runner_connection_timeout`, `startup_timeout`) are typically transient and worth retrying. Client errors (`client_disconnected`, `bad_request`) should not be retried. See also [Automatic Retries](/model-apis/model-endpoints/reliability#automatic-retries).
-* **For monitoring:** The `error_type` is also available in [queue status responses](/model-apis/model-endpoints/queue#status-types) for failed requests, making it useful for tracking failure patterns.
+* **For retry logic:** Use `error_type` to decide whether to retry. Runner and timeout errors (e.g., `runner_connection_timeout`, `startup_timeout`) are typically transient and worth retrying. Client errors (`client_disconnected`, `bad_request`) should not be retried. See also [Automatic Retries](/docs/model-apis/model-endpoints/reliability#automatic-retries).
+* **For monitoring:** The `error_type` is also available in [queue status responses](/docs/model-apis/model-endpoints/queue#status-types) for failed requests, making it useful for tracking failure patterns.

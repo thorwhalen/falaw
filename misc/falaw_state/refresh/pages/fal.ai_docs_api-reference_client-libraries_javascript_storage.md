@@ -8,6 +8,32 @@
 
 ## Classes & Interfaces
 
+### StorageACLRule
+
+```typescript theme={null}
+interface StorageACLRule
+```
+
+<Accordion title="Properties" defaultOpen>
+  | Name       | Type                 | Description |
+  | :--------- | :------------------- | :---------- |
+  | `user`     | `string`             | -           |
+  | `decision` | `StorageACLDecision` | -           |
+</Accordion>
+
+### StorageACL
+
+```typescript theme={null}
+interface StorageACL
+```
+
+<Accordion title="Properties" defaultOpen>
+  | Name       | Type                 | Description |
+  | :--------- | :------------------- | :---------- |
+  | `default?` | `StorageACLDecision` | -           |
+  | `rules?`   | `StorageACLRule[]`   | -           |
+</Accordion>
+
 ### StorageSettings
 
 ```typescript theme={null}
@@ -17,9 +43,10 @@ interface StorageSettings
 Configuration for object lifecycle and storage behavior.
 
 <Accordion title="Properties" defaultOpen>
-  | Name        | Type               | Description                                                                                                                           |
-  | :---------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
-  | `expiresIn` | `ObjectExpiration` | The expiration time for the stored files (images, videos, etc.). You can specify one of the enumerated values or a number of seconds. |
+  | Name          | Type               | Description                                                                                                                           |
+  | :------------ | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+  | `expiresIn?`  | `ObjectExpiration` | The expiration time for the stored files (images, videos, etc.). You can specify one of the enumerated values or a number of seconds. |
+  | `initialAcl?` | `StorageACL`       | Optional ACL configuration applied to the uploaded object.                                                                            |
 </Accordion>
 
 ### StorageClient

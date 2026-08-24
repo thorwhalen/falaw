@@ -6,26 +6,29 @@
 
 > How to use fal's managed Python runtime to run your models.
 
-The fal runtime is the recommended way to define your app's environment. Instead of writing a Dockerfile, you list your pip dependencies in the `requirements` attribute and fal builds an optimized, cached environment for you. This approach handles CUDA setup, PyTorch index URLs, and environment isolation automatically based on your chosen [machine type](/documentation/deployment/machine-types).
+The fal runtime is the recommended way to define your app's environment. Instead of writing a Dockerfile, you list your pip dependencies in the `requirements` attribute and fal builds an optimized, cached environment for you. This approach handles CUDA setup, PyTorch index URLs, and environment isolation automatically based on your chosen [machine type](/docs/documentation/deployment/machine-types).
 
-If you need system-level packages, a specific base image, or a non-Python runtime, use a [custom container](/documentation/development/use-custom-container-image) instead. If you need to include local Python modules or clone external repositories, see [Import Code](/documentation/development/import-code). For an overview of when to use which approach, see [Environment and Runtime](/documentation/development/container-setup).
+If you need system-level packages, a specific base image, or a non-Python runtime, use a [custom container](/docs/documentation/development/use-custom-container-image) instead. If you need to include local Python packages, local modules, or external repositories, see [Import Code](/docs/documentation/development/import-code). For an overview of when to use which approach, see [Environment and Runtime](/docs/documentation/development/container-setup).
 
 ## Defining Requirements
 
-The `requirements` attribute in your `fal.App` class is where you specify the Python packages your model needs. fal ensures these are installed in the [runner's](/documentation/deployment/runners) environment before [setup()](/documentation/development/app-lifecycle#runner-startup) is called.
+The `requirements` attribute in your `fal.App` class is where you specify the Python packages your model needs. fal ensures these are installed in the [runner's](/docs/documentation/deployment/runners) environment before [setup()](/docs/documentation/development/app-lifecycle#runner-startup) is called.
 
 ```python theme={null}
 import fal
 
-
 class MyModel(fal.App):
     machine_type = "GPU-A100"
-
-    requirements = ["torch==2.4.0", "transformers", "diffusers", "accelerate"]
-
+    
+    requirements = [
+        "torch==2.4.0",
+        "transformers",
+        "diffusers",
+        "accelerate"
+    ]
+    
     def setup(self):
         import torch
-
         ...
 ```
 
@@ -132,7 +135,7 @@ requirements = [
 
   * Use short-lived tokens when possible
   * Consider hosting wheels on a storage service with pre-signed URLs
-  * Use [fal secrets](/documentation/development/manage-secrets-securely) for sensitive values in your app code
+  * Use [fal secrets](/docs/documentation/development/manage-secrets-securely) for sensitive values in your app code
 </Warning>
 
 ### Private PyPI Index
@@ -164,7 +167,6 @@ When you need different wheels for different Python versions or platforms, use a
 ```python theme={null}
 def get_package_wheel():
     import sys
-
     wheels = {
         10: "https://example.com/wheels/mypackage-1.0.0-cp310-cp310-linux_x86_64.whl",
         11: "https://example.com/wheels/mypackage-1.0.0-cp311-cp311-linux_x86_64.whl",
@@ -186,6 +188,6 @@ class MyApp(fal.App):
 
 ***
 
-<Card title="Importing Local Code" href="/documentation/development/import-code">
-  Learn how to bring your local Python modules and files into the fal runtime.
+<Card title="Importing Local Code" href="/docs/documentation/development/import-code">
+  Learn how to bring your local Python packages, modules, and files into the fal runtime.
 </Card>

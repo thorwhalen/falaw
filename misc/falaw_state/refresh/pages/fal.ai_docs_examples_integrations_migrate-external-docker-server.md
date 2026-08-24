@@ -6,14 +6,19 @@
 
 > Deploy an existing Docker-based server (ComfyUI, custom APIs) to fal's serverless platform.
 
-This guide shows how to migrate an existing Docker container that runs a server to fal. There are two approaches:
+If you already have a working Docker container that runs a server, you can deploy it on fal with minimal changes. This guide covers two approaches: exposing your server's port directly for zero-code migration, or wrapping it with a `fal.App` proxy for full control over the API surface. Both approaches give you autoscaling, [analytics](/docs/documentation/serverless/observability/app-analytics), and the same infrastructure that powers every model in the marketplace.
 
-* **Direct Server Mode**: Expose your server's port directly
-* **Proxy App Mode**: Wrap your server with a custom API layer
+This is the fastest path for teams migrating from self-hosted infrastructure, Kubernetes, or other serverless platforms. Your existing server code stays unchanged. You just need to define a [Dockerfile](/docs/documentation/development/use-custom-container-image) (or reference an existing image from a [private registry](/docs/documentation/development/private-registries)) and tell fal how to start your server. If you are starting from scratch rather than migrating, the [Quick Start](/docs/documentation/development/getting-started/quick-start) is a better starting point.
+
+## Dockerfile vs fal.App
+
+Most of the Serverless documentation focuses on `fal.App`, the class-based approach where you define `setup()`, endpoints, and `teardown()` as methods on a class. For server migration, this guide starts with a Dockerfile instead. Your Dockerfile starts the server process, and `pyproject.toml` provides the deployment configuration such as machine type, scaling parameters, container image, and exposed port.
+
+Direct Server Mode is the natural fit for existing servers because you typically just need to start a process and expose a port. You do not need lifecycle hooks or multiple endpoints since your server already handles those. Both Direct Server Mode and `fal.App` support the same scaling parameters (`keep_alive`, `min_concurrency`, `max_concurrency`, and more). See the [pyproject.toml reference](/docs/api-reference/python-sdk/pyproject-toml) for the full configuration schema.
 
 ## Option 1: Direct Server Mode
 
-Use `exposed_port` to route requests directly to your container's port. The port can be any valid port number — just ensure it matches the port your server listens on.
+Use `exposed_port` to route requests directly to your container's port. fal forwards all incoming traffic to that port without any intermediate processing. The port can be any valid port number, just ensure it matches the port your server listens on.
 
 ```mermaid theme={null}
 flowchart LR
@@ -22,41 +27,100 @@ flowchart LR
     Container --> Server[Server :exposed_port]
 ```
 
-```python theme={null}
-import subprocess
-import fal
-from fal.container import ContainerImage
+Create a Dockerfile that installs and starts your server. The server must bind to `0.0.0.0` on the same port you expose in `pyproject.toml`.
 
-DOCKERFILE = """
+```dockerfile theme={null}
 FROM your-base-image
 # ... your setup
-"""
 
-
-@fal.function(
-    image=ContainerImage.from_dockerfile_str(DOCKERFILE),
-    machine_type="GPU-A100",
-    exposed_port=8000,  # Must match your server's port
-    keep_alive=300,
-)
-def run_server():
-    subprocess.run(
-        ["your-server", "--host", "0.0.0.0", "--port", "8000"],
-        check=True,
-    )
+CMD ["your-server", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-Your server's API is exposed as-is. Requests go directly to `exposed_port`.
+Configure the fal app in [`pyproject.toml`](/docs/api-reference/python-sdk/pyproject-toml):
+
+```toml theme={null}
+[tool.fal.apps.my-server]
+auth = "private"
+machine_type = "GPU-A100"
+exposed_port = 8000
+keep_alive = 300
+
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
+```
+
+If your server image is already built and pushed to a registry, reference it directly instead:
+
+```toml theme={null}
+[tool.fal.apps.my-server]
+auth = "private"
+machine_type = "GPU-A100"
+exposed_port = 8000
+keep_alive = 300
+
+[tool.fal.apps.my-server.image]
+image = "my-org/my-server:latest"
+cmd = ["your-server", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+If the image itself is private, configure registry credentials under the app's `image` configuration. See [Private Docker Registries](/docs/documentation/development/private-registries) for Docker Hub, Google Artifact Registry, Amazon ECR, and Azure Container Registry examples.
+
+Run it as an ephemeral deployment to test before deploying:
+
+```bash theme={null}
+fal run my-server --auth private
+```
 
 <Warning>
-  To unlock the full fal dashboard experience—including the playground, analytics, and error tracking—your server must expose an `/openapi.json` endpoint that returns your OpenAPI specification. Without this endpoint, these features will not be available for your deployment.
+  `fal run` ignores the `auth` value in `pyproject.toml` and defaults to `public`, so pass `--auth private` explicitly unless you want the ephemeral deployment publicly reachable. `fal deploy` does respect the configured value.
 </Warning>
 
-***
+Deploy by app name:
+
+```bash theme={null}
+fal deploy my-server
+```
+
+Your server's API is exposed as-is. Requests go directly to the exposed port, and your existing routes, middleware, and response formats all work without modification. If your server serves `/generate`, call it at the same path under your endpoint ID:
+
+```bash theme={null}
+curl -X POST "https://fal.run/<your-username>/my-server/generate" \
+  -H "Authorization: Key $FAL_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a mountain at sunrise"}'
+```
+
+For queue-backed requests, submit to the same path on `queue.fal.run`, then poll the returned `status_url` and fetch the result from `response_url`:
+
+```bash theme={null}
+curl -X POST "https://queue.fal.run/<your-username>/my-server/generate" \
+  -H "Authorization: Key $FAL_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a mountain at sunrise"}'
+```
+
+See [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints) for the queue polling, streaming, and webhook flows.
+
+<Warning>
+  To unlock the full fal dashboard experience, including the [Playground](/docs/documentation/model-apis/playground), analytics, and error tracking, fal needs your OpenAPI specification. For Direct Server Mode, your server must expose an `/openapi.json` endpoint that returns the spec. For `fal.App`, the framework generates the OpenAPI spec automatically from your Pydantic models.
+
+  Without an OpenAPI spec, the Playground and endpoint listing will not be available for your deployment.
+</Warning>
+
+If the container image does not define the final command, or you want to override it for fal, set Docker command fields under `[tool.fal.apps.my-server.image]`:
+
+```toml theme={null}
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
+entrypoint = ["your-server"]
+cmd = ["--host", "0.0.0.0", "--port", "8000"]
+```
+
+For the current `pyproject.toml` schema, see the [pyproject.toml reference](/docs/api-reference/python-sdk/pyproject-toml).
 
 ## Option 2: Proxy App Mode
 
-Use `fal.App` to wrap your server with custom endpoints.
+Use `fal.App` to wrap your server with custom endpoints. This gives you control over the API surface: you can validate inputs with Pydantic, transform outputs, upload files to the [fal CDN](/docs/documentation/model-apis/fal-cdn), and define a typed schema that powers the Playground UI.
 
 ```mermaid theme={null}
 flowchart LR
@@ -79,25 +143,22 @@ from pydantic import BaseModel, Field
 DOCKERFILE = """
 FROM your-base-image
 # ... your setup
+RUN pip install --no-cache-dir fal requests
 """
 
 SERVER_PORT = 8000
 
-
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
 
-
 class GenerateResponse(BaseModel):
     image: Image
-
 
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
     image = ContainerImage.from_dockerfile_str(DOCKERFILE)
 
     def setup(self):
-        # Start server in background (non-blocking)
         self.process = subprocess.Popen(
             ["your-server", "--host", "127.0.0.1", "--port", str(SERVER_PORT)],
         )
@@ -116,7 +177,6 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
 
     @fal.endpoint("/generate")
     def generate(self, input: GenerateRequest, request: Request) -> GenerateResponse:
-        # Call internal server
         resp = requests.post(
             f"http://127.0.0.1:{SERVER_PORT}/api/generate",
             json={"prompt": input.prompt},
@@ -124,27 +184,43 @@ class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
         )
         resp.raise_for_status()
 
-        # Upload to fal CDN
         image = Image.from_path(resp.json()["path"], request=request)
         return GenerateResponse(image=image)
 ```
 
-Your `fal.App` controls the API. You can validate inputs, process outputs, and upload to CDN.
+Your `fal.App` controls the API. The internal server runs on localhost inside the same container, and your proxy endpoints handle input validation, output processing, and CDN uploads. This approach is ideal when you want a clean typed API over an existing server that has its own internal protocol.
 
-## Using an External Registry?
+## Using an External Registry
 
-If your image is already hosted on an external registry (Docker Hub, Google Artifact Registry, Amazon ECR), you can pull it directly instead of building from a Dockerfile. See [Using Private Docker Registries](/serverless/development/use-custom-container-image#using-private-docker-registries) for setup instructions.
+If your Dockerfile pulls from an external registry (Docker Hub, Google Artifact Registry, Amazon ECR, Azure Container Registry), or your app references an existing private image, provide registry credentials with your image configuration. This works for both Direct Server Mode in `pyproject.toml` and `fal.App` custom containers.
+
+Credentials map a registry host to a `username` and `password` under the app's `image.registries` table, and apply whether you build from a `dockerfile` or reference a prebuilt `image`:
+
+```toml theme={null}
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
+
+[tool.fal.apps.my-server.image.registries."registry.example.com"]
+username = "my-user"
+password = "$REGISTRY_TOKEN"
+```
+
+Never commit the password itself. Store it as a secret and reference it by name, as above:
+
+```bash theme={null}
+fal secrets set REGISTRY_TOKEN="<token>"
+```
+
+Each provider derives that username and password differently — Google Artifact Registry uses a base64-encoded service account key, Amazon ECR uses a token from `aws ecr get-login-password` that expires and must be refreshed, and Azure Container Registry uses a service principal password that is long-lived by comparison. See [Private Docker Registries](/docs/documentation/development/private-registries) for the exact setup per registry type, including the `ContainerImage(registries=...)` form for `fal.App`.
 
 ## Best Practices
 
-1. **Use `/data` for model weights**: Download to persistent storage in `setup()`, not baked into Docker.
+Download model weights to [persistent storage](/docs/documentation/development/use-persistent-storage) (`/data`) during runner startup rather than baking them into the Docker image. For `fal.App`, this usually means `setup()`. For Direct Server Mode migrations, use your server's own startup path. This keeps your image small, speeds up container pulls, and allows weights to be cached across runner restarts. The `/data` directory is shared across all runners in your account and persists between deploys.
 
-2. **Install fal packages last**: Add `boto3`, `protobuf`, `pydantic` at the end of Dockerfile to avoid conflicts.
+When your container runs `fal.App` code, install fal-specific packages (`boto3`, `protobuf`, `pydantic`) at the end to avoid version conflicts with your existing dependencies. Containers that do not import fal do not need these packages.
 
-3. **Set `keep_alive`**: Avoid cold starts between requests.
+Tune [keep\_alive](/docs/documentation/deployment/scale-your-application) based on your app's cold start time and traffic pattern. If your model takes minutes to load, a longer keep\_alive avoids paying that cost repeatedly. If your app starts quickly, a shorter value reduces idle billing. See [Optimizing Costs](/docs/documentation/serverless/optimizations/optimizing-costs) for guidance.
 
 ## Next Steps
 
-* [Deploy a ComfyUI SDXL Turbo App](/serverless/tutorials/deploy-comfyui-server) - Complete tutorial
-* [Use Custom Container Images](/serverless/development/use-custom-container-image) - Dockerfile patterns
-* [Use Persistent Storage](/serverless/development/use-persistent-storage) - The `/data` directory
+For a complete tutorial that applies this pattern to a real server, see the [ComfyUI deployment example](/docs/examples/image-generation/deploy-comfyui-server). For detailed Dockerfile configuration including build args, multi-stage builds, and private registries, see [Custom Container Images](/docs/documentation/development/use-custom-container-image). To understand how the `/data` persistent storage works and what gets cached, see [Use Persistent Storage](/docs/documentation/development/use-persistent-storage).

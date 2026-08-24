@@ -34,6 +34,24 @@ function parseEndpointId(id: string): EndpointId
 
 **Returns:** `EndpointId`
 
+### resolveEndpointPath
+
+```typescript theme={null}
+function resolveEndpointPath(app: string, path: string | undefined, defaultPath: string): string | undefined
+```
+
+Resolves the endpoint path, normalizing it and applying a default.
+If no explicit path is provided and the app already ends with the
+default path, returns undefined to avoid duplication.
+
+| Parameter     | Type                  | Description                                            |
+| :------------ | :-------------------- | :----------------------------------------------------- |
+| `app`         | `string`              | - The app/endpoint identifier                          |
+| `path`        | `string \| undefined` | - An explicitly provided path (always used if present) |
+| `defaultPath` | `string`              | - The default path to use (e.g. "/realtime")           |
+
+**Returns:** `string | undefined`
+
 ### isValidUrl
 
 ```typescript theme={null}

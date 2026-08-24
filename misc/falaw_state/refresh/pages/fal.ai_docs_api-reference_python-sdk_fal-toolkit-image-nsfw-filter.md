@@ -7,11 +7,7 @@
 > API reference for fal.toolkit.image.nsfw_filter
 
 ```python theme={null}
-from fal.toolkit.image.nsfw_filter import (
-    NSFWImageDetectionInput,
-    NSFWImageDetectionOutput,
-    run_nsfw_estimation,
-)
+from fal.toolkit.image.nsfw_filter import NSFWImageDetectionInput, NSFWImageDetectionOutput, run_nsfw_estimation
 ```
 
 ## Classes

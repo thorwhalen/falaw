@@ -6,13 +6,13 @@
 
 > Test any model with real inputs, see results, and copy working code.
 
-Every model on fal has a Playground where you can try it with real inputs, see outputs instantly, and copy working code in Python, JavaScript, or cURL. When you [deploy your own app](/documentation/serverless), it gets a Playground too, so your teammates and users can test it the same way.
+Every model on fal has a Playground where you can try it with real inputs, see outputs instantly, and copy working code in Python, JavaScript, or cURL. When you [deploy your own app](/docs/documentation/serverless), it gets a Playground too, so your teammates and users can test it the same way.
 
 <Frame>
   <img src="https://mintcdn.com/fal-d8505a2e/8WsQEbl1OYp5vQ4g/images/examples/playground-nano-banana-2.png?fit=max&auto=format&n=8WsQEbl1OYp5vQ4g&q=85&s=e230ae5495b191fca50bd9ec27194ab4" alt="Playground for Nano Banana 2 on fal.ai" width="1920" height="1088" data-path="images/examples/playground-nano-banana-2.png" />
 </Frame>
 
-The Playground is the fastest way to validate a model before writing any integration code. Once you have a result you like, copy the generated code into your project and you are ready to go. If you want to compare multiple models side by side, use the [Sandbox](/documentation/model-apis/sandbox) instead. For programmatic access, see [Client Setup](/documentation/model-apis/inference/client-setup).
+The Playground is the fastest way to validate a model before writing any integration code. Once you have a result you like, copy the generated code into your project and you are ready to go. If you want to compare multiple models side by side, use the [Sandbox](/docs/documentation/model-apis/sandbox) instead. For programmatic access, see [Client Setup](/docs/documentation/model-apis/inference/client-setup).
 
 ## Try It
 
@@ -64,10 +64,10 @@ Every Playground result includes generated code that reproduces the exact reques
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe(
-      "fal-ai/nano-banana-2",
-      arguments={"prompt": "a futuristic cityscape at sunset", "aspect_ratio": "16:9"},
-  )
+  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
+      "prompt": "a futuristic cityscape at sunset",
+      "aspect_ratio": "16:9"
+  })
   print(result["images"][0]["url"])
   ```
 
@@ -109,7 +109,7 @@ fal deploy my_app.py::MyApp
 #   Playground: https://fal.ai/models/your-username/my-app
 ```
 
-To control how your app's inputs render in the Playground (image uploaders, hidden fields, field ordering), see [Handle Inputs and Outputs](/documentation/development/handle-inputs-and-outputs). For example, naming a field with an `image_url` suffix renders it as an image upload widget, and wrapping a field in `Hidden()` keeps it accessible via API but hides it from the Playground form.
+To control how your app's inputs render in the Playground (image uploaders, hidden fields, field ordering), see [Handle Inputs and Outputs](/docs/documentation/development/handle-inputs-and-outputs). For example, naming a field with an `image_url` suffix renders it as an image upload widget, and wrapping a field in `Hidden()` keeps it accessible via API but hides it from the Playground form.
 
 ## Playground vs Sandbox
 
@@ -142,7 +142,7 @@ The Playground and the [Sandbox](https://fal.ai/sandbox) serve different purpose
     Professional design visuals
   </Card>
 
-  <Card title="Chatterbox TTS" href="https://fal.ai/models/fal-ai/chatterbox/text-to-speech" img="https://fal.media/files/rabbit/FzzCnGuQNXLOEYuQq8CE8_7afb3290e0de46d5a7e4d13495938e3f.jpg">
+  <Card title="Chatterbox TTS" href="https://fal.ai/models/fal-ai/chatterbox/text-to-speech" img="https://v3.fal.media/files/rabbit/FzzCnGuQNXLOEYuQq8CE8_7afb3290e0de46d5a7e4d13495938e3f.jpg">
     Natural text-to-speech
   </Card>
 

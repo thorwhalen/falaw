@@ -8,7 +8,7 @@
 
 If you have been running serverless GPU workloads on RunPod, this guide maps RunPod concepts to their fal equivalents and shows how to convert your code. The core ideas are similar: both platforms run your code on GPU machines that scale based on demand. The main difference is that RunPod uses a handler function pattern with explicit Docker builds, while fal uses a class-based `fal.App` with automatic container builds.
 
-For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/examples/integrations/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Replicate](/examples/integrations/migrate-from-replicate) or [Migrate from Modal](/examples/integrations/migrate-from-modal).
+For a broader overview of deploying existing Docker containers on fal (regardless of where they came from), see [Deploy an Existing Server](/docs/documentation/development/migrate-external-docker-server). If you are comparing fal to other platforms, see [Migrate from Replicate](/docs/examples/integrations/migrate-from-replicate) or [Migrate from Modal](/docs/examples/integrations/migrate-from-modal).
 
 ## Concept Mapping
 
@@ -18,10 +18,10 @@ For a broader overview of deploying existing Docker containers on fal (regardles
 | `runpod.serverless.start({"handler": handler})` | `class MyApp(fal.App)`                     | App entrypoint                                                                 |
 | `job["input"]`                                  | Pydantic `Input` model                     | fal validates and types inputs automatically                                   |
 | `return result`                                 | `return Output(...)`                       | fal validates outputs with Pydantic                                            |
-| `yield result` (streaming)                      | `StreamingResponse` or `@fal.realtime()`   | See [Streaming](/documentation/development/streaming)                          |
+| `yield result` (streaming)                      | `StreamingResponse` or `@fal.realtime()`   | See [Streaming](/docs/documentation/development/streaming)                          |
 | Model loading at module level                   | `def setup(self)`                          | Runs once per runner, not per request                                          |
 | `refresh_worker: True`                          | Return HTTP 503                            | Terminates the runner and spins up a fresh one                                 |
-| `runpod.serverless.progress_update()`           | `print()` (logs visible via SDK)           | Or use [streaming](/documentation/development/streaming) for real-time updates |
+| `runpod.serverless.progress_update()`           | `print()` (logs visible via SDK)           | Or use [streaming](/docs/documentation/development/streaming) for real-time updates |
 | Dockerfile + Docker Hub                         | `requirements = [...]` or `ContainerImage` | fal builds containers for you, or bring your own                               |
 | Docker Hub deployment                           | `fal deploy`                               | Single CLI command                                                             |
 | `/run` (async)                                  | `fal_client.submit()`                      | Queue-based async                                                              |
@@ -52,13 +52,11 @@ The most common pattern on RunPod is a handler function that loads a model at mo
         torch_dtype=torch.float16,
     ).to("cuda")
 
-
     def handler(job):
         prompt = job["input"]["prompt"]
         image = model(prompt).images[0]
         image.save("/tmp/output.png")
         return {"image_path": "/tmp/output.png"}
-
 
     runpod.serverless.start({"handler": handler})
     ```
@@ -70,14 +68,11 @@ The most common pattern on RunPod is a handler function that loads a model at mo
     from pydantic import BaseModel
     from fal.toolkit import Image
 
-
     class Input(BaseModel):
         prompt: str
 
-
     class Output(BaseModel):
         image: Image
-
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -104,7 +99,7 @@ The most common pattern on RunPod is a handler function that loads a model at mo
 
 Key differences in the fal version:
 
-The model loading moves from module-level into `setup()`, which runs once per [runner](/documentation/getting-started/runners-and-caching) rather than once per container build. Inputs are validated through a Pydantic model instead of manually extracting from `job["input"]`. Outputs are also typed, and images are automatically uploaded to the [fal CDN](/documentation/model-apis/fal-cdn) rather than saved to a local path. You do not need to write a Dockerfile or push to Docker Hub since fal builds the container from your `requirements` list.
+The model loading moves from module-level into `setup()`, which runs once per [runner](/docs/documentation/getting-started/runners-and-caching) rather than once per container build. Inputs are validated through a Pydantic model instead of manually extracting from `job["input"]`. Outputs are also typed, and images are automatically uploaded to the [fal CDN](/docs/documentation/model-apis/fal-cdn) rather than saved to a local path. You do not need to write a Dockerfile or push to Docker Hub since fal builds the container from your `requirements` list.
 
 ## Calling Your Deployed App
 
@@ -133,19 +128,21 @@ RunPod exposes `/run` (async), `/runsync` (sync), and `/stream` endpoints. fal p
     import fal_client
 
     # Sync (subscribe polls automatically)
-    result = fal_client.subscribe(
-        "your-username/your-app", arguments={"prompt": "a sunset"}
-    )
+    result = fal_client.subscribe("your-username/your-app", arguments={
+        "prompt": "a sunset"
+    })
 
     # Async
-    handler = fal_client.submit("your-username/your-app", arguments={"prompt": "a sunset"})
+    handler = fal_client.submit("your-username/your-app", arguments={
+        "prompt": "a sunset"
+    })
     status = handler.status()
     result = handler.get()
     ```
   </Tab>
 </Tabs>
 
-For the full range of calling patterns including streaming, real-time WebSockets, and webhooks, see [Calling Your Endpoints](/documentation/development/calling-your-endpoints).
+For the full range of calling patterns including streaming, real-time WebSockets, and webhooks, see [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints).
 
 ## Deployment Workflow
 
@@ -179,7 +176,8 @@ On RunPod, the deployment unit is a Docker image. Your handler code lives inside
         machine_type = "GPU-A100"
         requirements = ["torch", "diffusers", "transformers"]
 
-        def setup(self): ...
+        def setup(self):
+            ...
     ```
 
     ```bash theme={null}
@@ -202,11 +200,10 @@ class MyApp(fal.App):
     requirements = ["torch==2.1.0", "diffusers==0.30.0", "transformers"]
 ```
 
-**Option 2: Custom Docker container.** If you need system packages, a specific CUDA version, or want to reuse your existing RunPod Dockerfile with minimal changes, use [ContainerImage](/documentation/development/use-custom-container-image). You can paste your RunPod Dockerfile almost as-is, just remove the `COPY handler.py` and `CMD` lines since fal handles those.
+**Option 2: Custom Docker container.** If you need system packages, a specific CUDA version, or want to reuse your existing RunPod Dockerfile with minimal changes, use [ContainerImage](/docs/documentation/development/use-custom-container-image). You can paste your RunPod Dockerfile almost as-is, just remove the `COPY handler.py` and `CMD` lines since fal handles those.
 
 ```python theme={null}
 from fal.container import ContainerImage
-
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -218,16 +215,14 @@ class MyApp(fal.App):
 
 ## Model Storage
 
-RunPod offers three approaches for model weights: Hugging Face cache, baked into the Docker image, or network volumes. fal's equivalent is [persistent storage](/documentation/development/use-persistent-storage) at `/data`, which is mounted on every runner and shared across your account. Models downloaded to `/data` are cached automatically and survive runner restarts, similar to RunPod's network volumes but without explicit volume configuration.
+RunPod offers three approaches for model weights: Hugging Face cache, baked into the Docker image, or network volumes. fal's equivalent is [persistent storage](/docs/documentation/development/use-persistent-storage) at `/data`, which is mounted on every runner and shared across your account. Models downloaded to `/data` are cached automatically and survive runner restarts, similar to RunPod's network volumes but without explicit volume configuration.
 
 ```python theme={null}
 def setup(self):
     import os
-
     os.environ["HF_HOME"] = "/data/.cache/huggingface"
 
     from diffusers import StableDiffusionXLPipeline
-
     self.model = StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0"
     ).to("cuda")
@@ -235,4 +230,4 @@ def setup(self):
 
 ## Next Steps
 
-Once you have migrated your handler, the [App Lifecycle](/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/documentation/serverless/observability/app-analytics).
+Once you have migrated your handler, the [App Lifecycle](/docs/documentation/development/app-lifecycle) page explains how the full lifecycle works on fal, from code serialization to runner shutdown. For scaling configuration, see [Scale Your Application](/docs/documentation/deployment/scale-your-application). For monitoring your deployed app, see [App Analytics](/docs/documentation/serverless/observability/app-analytics).
