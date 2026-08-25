@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.prune &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.prune &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,7 +112,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.prune</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Capacity management for the falaw cache: see what is on disk, and reclaim it.</span>
+<span></span><span class="sd">"""Capacity management for the falaw cache: see what is on disk, and reclaim it.</span>
 
 <span class="sd">Before thorwhalen/falaw#14 the cache held kilobyte JSON manifests. It now</span>
 <span class="sd">content-addresses every media result, so it also holds the **bytes** of every</span>
@@ -155,7 +155,7 @@
 <span class="sd">    Saved Scene IR. Not media and not a cache — it is *authored input*, so</span>
 <span class="sd">    losing one is lost work rather than a re-render. Nothing here prunes it.</span>
 <span class="sd">``other``</span>
-<span class="sd">    Whatever the named areas do not claim: a crashed write&#39;s ``.part``</span>
+<span class="sd">    Whatever the named areas do not claim: a crashed write's ``.part``</span>
 <span class="sd">    leftover, or a directory a future falaw feature adds without telling this</span>
 <span class="sd">    module. Present so that the totals cannot silently under-report.</span>
 
@@ -163,12 +163,12 @@
 <span class="sd">--------</span>
 
 <span class="sd">What is actually on disk, broken down by area (``+SKIP``\\ ed because it reads</span>
-<span class="sd">the caller&#39;s real cache, which on the production box is a multi-gigabyte walk —</span>
+<span class="sd">the caller's real cache, which on the production box is a multi-gigabyte walk —</span>
 <span class="sd">:mod:`tests.test_prune` pins the same behaviour against a throwaway one):</span>
 
 <span class="sd">&gt;&gt;&gt; usage = cache_usage()                            # doctest: +SKIP</span>
 <span class="sd">&gt;&gt;&gt; sorted(a.name for a in usage.areas)              # doctest: +SKIP</span>
-<span class="sd">[&#39;assets&#39;, &#39;content&#39;, &#39;manifests&#39;, &#39;other&#39;, &#39;scenes&#39;, &#39;url_index&#39;]</span>
+<span class="sd">['assets', 'content', 'manifests', 'other', 'scenes', 'url_index']</span>
 
 <span class="sd">A prune is a dry run unless you say otherwise, and refuses to run unbounded</span>
 <span class="sd">(this one raises before touching the disk, so it is safe to execute):</span>
@@ -177,7 +177,7 @@
 <span class="sd">Traceback (most recent call last):</span>
 <span class="sd">    ...</span>
 <span class="sd">ValueError: prune_content needs a bound: pass older_than= and/or max_bytes=...</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -193,23 +193,23 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;AreaUsage&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;CacheUsage&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;PruneCandidate&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;PruneReport&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cache_usage&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;prune_assets&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;prune_content&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;prune_manifests&quot;</span><span class="p">,</span>
+    <span class="s2">"AreaUsage"</span><span class="p">,</span>
+    <span class="s2">"CacheUsage"</span><span class="p">,</span>
+    <span class="s2">"PruneCandidate"</span><span class="p">,</span>
+    <span class="s2">"PruneReport"</span><span class="p">,</span>
+    <span class="s2">"cache_usage"</span><span class="p">,</span>
+    <span class="s2">"prune_assets"</span><span class="p">,</span>
+    <span class="s2">"prune_content"</span><span class="p">,</span>
+    <span class="s2">"prune_manifests"</span><span class="p">,</span>
 <span class="p">]</span>
 
 
-<span class="n">MANIFESTS_AREA</span> <span class="o">=</span> <span class="s2">&quot;manifests&quot;</span>
-<span class="n">CONTENT_AREA</span> <span class="o">=</span> <span class="s2">&quot;content&quot;</span>
-<span class="n">ASSETS_AREA</span> <span class="o">=</span> <span class="s2">&quot;assets&quot;</span>
-<span class="n">URL_INDEX_AREA</span> <span class="o">=</span> <span class="s2">&quot;url_index&quot;</span>
-<span class="n">SCENES_AREA</span> <span class="o">=</span> <span class="s2">&quot;scenes&quot;</span>
-<span class="n">OTHER_AREA</span> <span class="o">=</span> <span class="s2">&quot;other&quot;</span>
+<span class="n">MANIFESTS_AREA</span> <span class="o">=</span> <span class="s2">"manifests"</span>
+<span class="n">CONTENT_AREA</span> <span class="o">=</span> <span class="s2">"content"</span>
+<span class="n">ASSETS_AREA</span> <span class="o">=</span> <span class="s2">"assets"</span>
+<span class="n">URL_INDEX_AREA</span> <span class="o">=</span> <span class="s2">"url_index"</span>
+<span class="n">SCENES_AREA</span> <span class="o">=</span> <span class="s2">"scenes"</span>
+<span class="n">OTHER_AREA</span> <span class="o">=</span> <span class="s2">"other"</span>
 
 <span class="n">AREA_NAMES</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">MANIFESTS_AREA</span><span class="p">,</span>
@@ -219,10 +219,10 @@
     <span class="n">SCENES_AREA</span><span class="p">,</span>
     <span class="n">OTHER_AREA</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Every area :func:`cache_usage` reports.&quot;&quot;&quot;</span>
+<span class="sd">"""Every area :func:`cache_usage` reports."""</span>
 
-<span class="n">SCENES_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;scenes&quot;</span>
-<span class="sd">&quot;&quot;&quot;Saved Scene IR, written by :func:`falaw.operations.render.save_scene`.&quot;&quot;&quot;</span>
+<span class="n">SCENES_DIRNAME</span> <span class="o">=</span> <span class="s2">"scenes"</span>
+<span class="sd">"""Saved Scene IR, written by :func:`falaw.operations.render.save_scene`."""</span>
 
 <span class="n">AREA_DIRNAMES</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">CONTENT_STORE_DIRNAME</span><span class="p">,</span>
@@ -230,28 +230,28 @@
     <span class="n">URL_INDEX_DIRNAME</span><span class="p">,</span>
     <span class="n">SCENES_DIRNAME</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Directory names at the cache root owned by a named area.</span>
+<span class="sd">"""Directory names at the cache root owned by a named area.</span>
 
 <span class="sd">The cache-entry shards are two hex characters (``_entry_dir`` shards on</span>
 <span class="sd">``key[:2]`` of a SHA-256 hexdigest), and no name here is two characters long,</span>
 <span class="sd">so the shard layout and the area layout cannot collide.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
-<span class="n">MANIFEST_FILENAME</span> <span class="o">=</span> <span class="s2">&quot;manifest.json&quot;</span>
-<span class="sd">&quot;&quot;&quot;The one filename a cache entry directory is guaranteed to contain.&quot;&quot;&quot;</span>
+<span class="n">MANIFEST_FILENAME</span> <span class="o">=</span> <span class="s2">"manifest.json"</span>
+<span class="sd">"""The one filename a cache entry directory is guaranteed to contain."""</span>
 
-<span class="n">PART_SUFFIX</span> <span class="o">=</span> <span class="s2">&quot;.part&quot;</span>
-<span class="sd">&quot;&quot;&quot;Suffix of an in-flight write (``cache_put``, ``write_blob_to_file``).</span>
+<span class="n">PART_SUFFIX</span> <span class="o">=</span> <span class="s2">".part"</span>
+<span class="sd">"""Suffix of an in-flight write (``cache_put``, ``write_blob_to_file``).</span>
 
 <span class="sd">Never a prune candidate: the file is mid-``os.replace`` and deleting it breaks</span>
 <span class="sd">the writer that owns it.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">CONTENT_HASH_LENGTH</span> <span class="o">=</span> <span class="mi">64</span>
-<span class="sd">&quot;&quot;&quot;Hex characters in a SHA-256 digest — how an asset filename&#39;s hash is found.&quot;&quot;&quot;</span>
+<span class="sd">"""Hex characters in a SHA-256 digest — how an asset filename's hash is found."""</span>
 
 <span class="n">Age</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;An age bound: seconds, or a :class:`~datetime.timedelta`.&quot;&quot;&quot;</span>
+<span class="sd">"""An age bound: seconds, or a :class:`~datetime.timedelta`."""</span>
 
 
 <span class="c1"># --- usage ------------------------------------------------------------------</span>
@@ -261,9 +261,9 @@
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.AreaUsage">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AreaUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disk usage of one cache area.</span>
+<span class="w">    </span><span class="sd">"""Disk usage of one cache area.</span>
 
-<span class="sd">    ``entries`` counts the area&#39;s own unit — cache entries for ``manifests``,</span>
+<span class="sd">    ``entries`` counts the area's own unit — cache entries for ``manifests``,</span>
 <span class="sd">    blobs for ``content``, files for ``assets`` and ``url_index`` — not files</span>
 <span class="sd">    on disk, which is why it is reported next to ``bytes`` rather than derived</span>
 <span class="sd">    from it.</span>
@@ -273,7 +273,7 @@
 <span class="sd">    the cache root) and for ``other``. It is deliberately not the cache root:</span>
 <span class="sd">    a caller reaching for ``rmtree(usage.area(...).path)`` would then destroy</span>
 <span class="sd">    the content store along with it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
@@ -290,26 +290,26 @@
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.CacheUsage">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CacheUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Where the falaw cache&#39;s disk is going, by area.</span>
+<span class="w">    </span><span class="sd">"""Where the falaw cache's disk is going, by area.</span>
 
 <span class="sd">    The whole point of the breakdown: ``size_bytes`` alone cannot tell you</span>
 <span class="sd">    whether you are looking at gigabytes of irreplaceable blobs or gigabytes of</span>
 <span class="sd">    ``assets/`` copies that cost nothing to regenerate.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">root</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">areas</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">AreaUsage</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">total_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Every byte under the cache root.</span>
+<span class="w">        </span><span class="sd">"""Every byte under the cache root.</span>
 
 <span class="sd">        Equal to a full walk of the root, because ``other`` absorbs whatever the</span>
 <span class="sd">        named areas do not claim. That identity is the point: a capacity report</span>
-<span class="sd">        whose total is &quot;the sum of the areas I thought to enumerate&quot; silently</span>
+<span class="sd">        whose total is "the sum of the areas I thought to enumerate" silently</span>
 <span class="sd">        under-reports the moment falaw grows a directory nobody added here, and</span>
 <span class="sd">        under-reporting is the one direction a capacity tool cannot afford.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">bytes</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -319,25 +319,25 @@
 <div class="viewcode-block" id="CacheUsage.area">
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.CacheUsage.area">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AreaUsage</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The :class:`AreaUsage` named ``name``.</span>
+<span class="w">        </span><span class="sd">"""The :class:`AreaUsage` named ``name``.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            KeyError: no such area. The valid names are :data:`AREA_NAMES`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">a</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;no cache area named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="n">AREA_NAMES</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no cache area named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; expected one of </span><span class="si">{</span><span class="n">AREA_NAMES</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CacheUsage.summary">
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.CacheUsage.summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;One human-readable line per area, largest first.&quot;&quot;&quot;</span>
-        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;falaw cache at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_megabytes</span><span class="si">}</span><span class="s2"> MB total&quot;</span><span class="p">]</span>
+<span class="w">        </span><span class="sd">"""One human-readable line per area, largest first."""</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">"falaw cache at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_megabytes</span><span class="si">}</span><span class="s2"> MB total"</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">areas</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">megabytes</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> MB  (</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">entries</span><span class="si">}</span><span class="s2"> entries)&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="si">:</span><span class="s2">&lt;10</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">megabytes</span><span class="si">:</span><span class="s2">&gt;10</span><span class="si">}</span><span class="s2"> MB  (</span><span class="si">{</span><span class="n">a</span><span class="o">.</span><span class="n">entries</span><span class="si">}</span><span class="s2"> entries)"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 </div>
 
 
@@ -345,11 +345,11 @@
 <div class="viewcode-block" id="cache_usage">
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.cache_usage">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cache_usage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CacheUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disk usage of the falaw cache, broken down by area.</span>
+<span class="w">    </span><span class="sd">"""Disk usage of the falaw cache, broken down by area.</span>
 
 <span class="sd">    The structured form behind :func:`falaw.cache_stats`. Read the module</span>
 <span class="sd">    docstring for what each area costs to reclaim.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">_cache_dir</span><span class="p">()</span>
     <span class="n">named</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_manifests_usage</span><span class="p">(</span><span class="n">root</span><span class="p">),</span>
@@ -363,10 +363,10 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_other_usage</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">named</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">AreaUsage</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">AreaUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Everything under the cache root the named areas did not claim.</span>
+<span class="w">    </span><span class="sd">"""Everything under the cache root the named areas did not claim.</span>
 
 <span class="sd">    Not a rounding error — it is the honesty valve. It catches a crashed</span>
-<span class="sd">    ``cache_put``&#39;s ``.part`` leftover, any file in an entry directory that is</span>
+<span class="sd">    ``cache_put``'s ``.part`` leftover, any file in an entry directory that is</span>
 <span class="sd">    not ``manifest.json``, and any directory a future falaw feature adds without</span>
 <span class="sd">    telling this module. Those bytes are real and occupy the same volume; a</span>
 <span class="sd">    breakdown that quietly omitted them would let the disk fill while the report</span>
@@ -377,7 +377,7 @@
 <span class="sd">    a plausible-looking number instead of surfacing it.</span>
 
 <span class="sd">    Nothing prunes ``other``, deliberately: falaw does not know what it is.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">owned_dirs</span> <span class="o">=</span> <span class="p">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">AREA_DIRNAMES</span><span class="p">}</span>
     <span class="n">files</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
@@ -397,7 +397,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_dir_bytes</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(file_count, total_bytes)`` under ``path``; ``(0, 0)`` when absent.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""``(file_count, total_bytes)`` under ``path``; ``(0, 0)`` when absent."""</span>
     <span class="n">files</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_dirs</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
@@ -429,20 +429,20 @@
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">CONTENT_STORE_DIRNAME</span><span class="p">)</span>
     <span class="c1"># Count *blobs*, not files: `from_directory` also lays down a `catalog/`,</span>
     <span class="c1"># which falaw never writes but which would otherwise inflate the count.</span>
-    <span class="n">blobs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;blobs&quot;</span><span class="p">)</span>
+    <span class="n">blobs_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"blobs"</span><span class="p">)</span>
     <span class="n">entries</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_dir_bytes</span><span class="p">(</span><span class="n">blobs_dir</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">_dir_bytes</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AreaUsage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">CONTENT_AREA</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_assets_usage</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AreaUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Usage of ``assets/``, counted over exactly what :func:`prune_assets` can reach.</span>
+<span class="w">    </span><span class="sd">"""Usage of ``assets/``, counted over exactly what :func:`prune_assets` can reach.</span>
 
 <span class="sd">    Both use the same flat listing and both skip ``.part`` files, so a</span>
 <span class="sd">    ``max_bytes`` budget over this area can actually converge. When they</span>
 <span class="sd">    disagreed, ``prune_assets(max_bytes=N)`` could report bytes it had no way to</span>
 <span class="sd">    delete and loop forever without reaching the budget.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">ASSETS_DIRNAME</span><span class="p">)</span>
     <span class="n">candidates</span> <span class="o">=</span> <span class="n">_asset_candidates</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AreaUsage</span><span class="p">(</span>
@@ -460,26 +460,26 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_scenes_usage</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AreaUsage</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Usage of ``scenes/`` — saved Scene IR, not media.</span>
+<span class="w">    </span><span class="sd">"""Usage of ``scenes/`` — saved Scene IR, not media.</span>
 
-<span class="sd">    Its own area because it is falaw&#39;s, is written by a different subsystem</span>
+<span class="sd">    Its own area because it is falaw's, is written by a different subsystem</span>
 <span class="sd">    (``save_scene``), and has economics unlike anything else here: a Scene is</span>
 <span class="sd">    the *authored* input, so losing one is not a re-render, it is lost work.</span>
 <span class="sd">    Nothing here prunes it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">SCENES_DIRNAME</span><span class="p">)</span>
     <span class="n">entries</span><span class="p">,</span> <span class="n">total</span> <span class="o">=</span> <span class="n">_dir_bytes</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">AreaUsage</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">SCENES_AREA</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">entries</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="n">total</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_iter_manifest_paths</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Every ``manifest.json`` in the cache, skipping the three named areas.</span>
+<span class="w">    </span><span class="sd">"""Every ``manifest.json`` in the cache, skipping the three named areas.</span>
 
 <span class="sd">    Cache entries live at ``&lt;root&gt;/&lt;2-hex&gt;/&lt;key&gt;/manifest.json``. The other</span>
 <span class="sd">    areas are named directories (``content``, ``assets``, ``url_index``), none</span>
 <span class="sd">    of which is two characters long, so the shard layout and the area layout</span>
 <span class="sd">    cannot collide.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">_cache_dir</span><span class="p">()</span> <span class="k">if</span> <span class="n">root</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">root</span>
     <span class="c1"># Every area directory, from the one constant — not a hand-listed subset.</span>
     <span class="c1"># `scenes/` was missing from an earlier hand-listed copy, which made a file</span>
@@ -506,13 +506,13 @@
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.PruneCandidate">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PruneCandidate</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One thing a prune would delete (or did).</span>
+<span class="w">    </span><span class="sd">"""One thing a prune would delete (or did).</span>
 
 <span class="sd">    ``last_modified`` is ``None`` when the age could not be determined — a</span>
 <span class="sd">    non-filesystem blob backend, or a manifest too corrupt to read. Such a</span>
 <span class="sd">    candidate is never selected by ``older_than`` (an unprovable age is not</span>
 <span class="sd">    evidence of staleness) and is evicted last under ``max_bytes``.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">key</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
@@ -525,7 +525,7 @@
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.PruneReport">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PruneReport</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;What a prune removed, or — with ``dry_run=True`` — would remove.</span>
+<span class="w">    </span><span class="sd">"""What a prune removed, or — with ``dry_run=True`` — would remove.</span>
 
 <span class="sd">    ``rebillable_entries`` is the number this exists for: cache entries that</span>
 <span class="sd">    will **cost money again** because of this prune. Its meaning is exact per</span>
@@ -554,7 +554,7 @@
 <span class="sd">    fal response behind them. Counting them as ``rebillable`` would be wrong</span>
 <span class="sd">    (no cache entry re-bills), but reporting nothing would tell an operator the</span>
 <span class="sd">    prune is free when it may be destroying the only copy of a reference image.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">area</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span>
@@ -568,13 +568,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">freed_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Bytes actually freed — or, under ``dry_run``, that would be freed.</span>
+<span class="w">        </span><span class="sd">"""Bytes actually freed — or, under ``dry_run``, that would be freed.</span>
 
 <span class="sd">        Sums ``deleted``, **not** ``candidates``. A deletion that failed (a</span>
 <span class="sd">        read-only volume, a permission error) leaves its bytes on disk, and a</span>
 <span class="sd">        capacity tool that reports them as reclaimed tells an operator staring</span>
 <span class="sd">        at a full disk that the problem is solved when it is not.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">bytes</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -584,33 +584,33 @@
 <div class="viewcode-block" id="PruneReport.summary">
 <a class="viewcode-back" href="../../module_docs/falaw/prune.html#falaw.PruneReport.summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A human-readable line, phrased in the tense the run actually was.&quot;&quot;&quot;</span>
-        <span class="n">verb</span> <span class="o">=</span> <span class="s2">&quot;would free&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="k">else</span> <span class="s2">&quot;freed&quot;</span>
+<span class="w">        </span><span class="sd">"""A human-readable line, phrased in the tense the run actually was."""</span>
+        <span class="n">verb</span> <span class="o">=</span> <span class="s2">"would free"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="k">else</span> <span class="s2">"freed"</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">verb</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">freed_megabytes</span><span class="si">}</span><span class="s2"> MB &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">)</span><span class="si">}</span><span class="s2"> entries &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kept_entries</span><span class="si">}</span><span class="s2"> kept, </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kept_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> MB)&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">verb</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">freed_megabytes</span><span class="si">}</span><span class="s2"> MB "</span>
+            <span class="sa">f</span><span class="s2">"across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">)</span><span class="si">}</span><span class="s2"> entries "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kept_entries</span><span class="si">}</span><span class="s2"> kept, </span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kept_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">1_000_000</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2"> MB)"</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rebillable_entries</span><span class="p">:</span>
-            <span class="n">tense</span> <span class="o">=</span> <span class="s2">&quot;would become&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="k">else</span> <span class="s2">&quot;became&quot;</span>
+            <span class="n">tense</span> <span class="o">=</span> <span class="s2">"would become"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span> <span class="k">else</span> <span class="s2">"became"</span>
             <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;  WARNING: up to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rebillable_entries</span><span class="si">}</span><span class="s2"> cache &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;entry&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">rebillable_entries</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;entries&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tense</span><span class="si">}</span><span class="s2"> re-billable — re-running them costs money again&quot;</span>
+                <span class="sa">f</span><span class="s2">"  WARNING: up to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rebillable_entries</span><span class="si">}</span><span class="s2"> cache "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'entry'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">rebillable_entries</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'entries'</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tense</span><span class="si">}</span><span class="s2"> re-billable — re-running them costs money again"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unreferenced_candidates</span><span class="p">:</span>
             <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;  WARNING: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unreferenced_candidates</span><span class="si">}</span><span class="s2"> blob(s) have no cache &quot;</span>
-                <span class="s2">&quot;entry behind them — falaw cannot tell garbage from the last &quot;</span>
-                <span class="s2">&quot;copy of a materialized reference asset&quot;</span>
+                <span class="sa">f</span><span class="s2">"  WARNING: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unreferenced_candidates</span><span class="si">}</span><span class="s2"> blob(s) have no cache "</span>
+                <span class="s2">"entry behind them — falaw cannot tell garbage from the last "</span>
+                <span class="s2">"copy of a materialized reference asset"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
             <span class="n">failed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deleted</span><span class="p">)</span>
             <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">failed</span><span class="si">}</span><span class="s2"> deletion(s) FAILED and their bytes remain: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">failed</span><span class="si">}</span><span class="s2"> deletion(s) FAILED and their bytes remain: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
 </div>
 
 
@@ -625,33 +625,33 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_require_a_bound</span><span class="p">(</span><span class="n">func_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refuse an unbounded prune, and refuse a bound that is a bug.</span>
+<span class="w">    </span><span class="sd">"""Refuse an unbounded prune, and refuse a bound that is a bug.</span>
 
-<span class="sd">    Neither reading of a missing bound is safe to guess: &quot;delete everything&quot;</span>
-<span class="sd">    would silently make the whole cache re-billable, and &quot;delete nothing&quot; would</span>
+<span class="sd">    Neither reading of a missing bound is safe to guess: "delete everything"</span>
+<span class="sd">    would silently make the whole cache re-billable, and "delete nothing" would</span>
 <span class="sd">    make a command the caller believes reclaimed space a no-op.</span>
 
 <span class="sd">    A **non-positive** ``older_than`` is refused for a different reason: it is</span>
 <span class="sd">    almost never typed by hand. It arrives as ``days * DAY`` with ``days`` read</span>
-<span class="sd">    from a config that defaulted to 0, and it means &quot;older than now&quot; — a total</span>
+<span class="sd">    from a config that defaulted to 0, and it means "older than now" — a total</span>
 <span class="sd">    wipe of the area, from a caller who asked for an age filter. A caller who</span>
 <span class="sd">    genuinely wants everything gone says ``max_bytes=0``, which is unambiguous.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">older_than</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_bytes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2"> needs a bound: pass older_than= and/or max_bytes=. &quot;</span>
-            <span class="s2">&quot;Refusing to guess whether an unbounded call means &#39;everything&#39; &quot;</span>
-            <span class="s2">&quot;or &#39;nothing&#39; — one of those silently re-bills your whole cache.&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2"> needs a bound: pass older_than= and/or max_bytes=. "</span>
+            <span class="s2">"Refusing to guess whether an unbounded call means 'everything' "</span>
+            <span class="s2">"or 'nothing' — one of those silently re-bills your whole cache."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">older_than</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">_as_seconds</span><span class="p">(</span><span class="n">older_than</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">: older_than must be positive, got </span><span class="si">{</span><span class="n">older_than</span><span class="si">!r}</span><span class="s2">. &quot;</span>
-            <span class="s2">&quot;&#39;Older than now&#39; selects the entire area, which is almost always &quot;</span>
-            <span class="s2">&quot;a computed-zero bug rather than an intent. Pass max_bytes=0 if you &quot;</span>
-            <span class="s2">&quot;really mean &#39;drop everything&#39;.&quot;</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">: older_than must be positive, got </span><span class="si">{</span><span class="n">older_than</span><span class="si">!r}</span><span class="s2">. "</span>
+            <span class="s2">"'Older than now' selects the entire area, which is almost always "</span>
+            <span class="s2">"a computed-zero bug rather than an intent. Pass max_bytes=0 if you "</span>
+            <span class="s2">"really mean 'drop everything'."</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">max_bytes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_bytes</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">: max_bytes must be &gt;= 0, got </span><span class="si">{</span><span class="n">max_bytes</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">func_name</span><span class="si">}</span><span class="s2">: max_bytes must be &gt;= 0, got </span><span class="si">{</span><span class="n">max_bytes</span><span class="si">!r}</span><span class="s2">."</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_select</span><span class="p">(</span>
@@ -661,16 +661,16 @@
     <span class="n">max_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">now</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Split ``candidates`` into ``(to_delete, to_keep)``.</span>
+<span class="w">    </span><span class="sd">"""Split ``candidates`` into ``(to_delete, to_keep)``.</span>
 
-<span class="sd">    Age is the file&#39;s mtime — when falaw last **wrote** those bytes, not when</span>
+<span class="sd">    Age is the file's mtime — when falaw last **wrote** those bytes, not when</span>
 <span class="sd">    it last read them. That is a deliberate limitation, not an oversight: POSIX</span>
-<span class="sd">    atime is unreliable under ``relatime``/``noatime``, and falaw&#39;s hottest read</span>
+<span class="sd">    atime is unreliable under ``relatime``/``noatime``, and falaw's hottest read</span>
 <span class="sd">    path (:func:`falaw.materialize_asset` circle 1) never opens the blob at all,</span>
 <span class="sd">    so a true LRU would need write-on-read bookkeeping on the path that exists</span>
 <span class="sd">    to avoid I/O. Age-ordered eviction is what this is; it is not LRU and the</span>
 <span class="sd">    docstrings do not claim to be.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">doomed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">survivors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
 
@@ -709,13 +709,13 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_eviction_key</span><span class="p">(</span><span class="n">candidate</span><span class="p">:</span> <span class="n">PruneCandidate</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sort key placing the first-to-evict first.</span>
+<span class="w">    </span><span class="sd">"""Sort key placing the first-to-evict first.</span>
 
 <span class="sd">    Oldest first; unknown age **last**, so an unprovable age is evicted only</span>
 <span class="sd">    when dropping everything datable was not enough. ``key`` breaks ties so two</span>
 <span class="sd">    candidates of identical age evict in the same order on every machine —</span>
 <span class="sd">    otherwise the choice falls through to filesystem listing order.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">candidate</span><span class="o">.</span><span class="n">last_modified</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">candidate</span><span class="o">.</span><span class="n">last_modified</span> <span class="k">if</span> <span class="n">candidate</span><span class="o">.</span><span class="n">last_modified</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -726,20 +726,20 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_delete</span><span class="p">(</span>
     <span class="n">remove</span><span class="p">,</span> <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run ``remove`` over each candidate; return ``(deleted, errors)``.</span>
+<span class="w">    </span><span class="sd">"""Run ``remove`` over each candidate; return ``(deleted, errors)``.</span>
 
 <span class="sd">    A prune that aborts halfway leaves the caller with neither the disk nor a</span>
 <span class="sd">    report, so a failed deletion is recorded and the sweep continues. Returning</span>
 <span class="sd">    the *deleted* set separately is what keeps ``freed_bytes`` honest — see</span>
 <span class="sd">    :attr:`PruneReport.freed_bytes`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">deleted</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">remove</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — one bad file must not abort the sweep</span>
-            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">deleted</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">deleted</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
@@ -749,7 +749,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_blob_candidates</span><span class="p">(</span><span class="n">store</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">]:</span>
-    <span class="n">blobs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s2">&quot;blobs&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">blobs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s2">"blobs"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">blobs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
@@ -777,16 +777,16 @@
                 <span class="k">continue</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">PruneCandidate</span><span class="p">(</span>
-                    <span class="n">key</span><span class="o">=</span><span class="n">content_hash</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">last_modified</span><span class="o">=</span><span class="kc">None</span>
+                    <span class="n">key</span><span class="o">=</span><span class="n">content_hash</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">last_modified</span><span class="o">=</span><span class="kc">None</span>
                 <span class="p">)</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_reference_counts</span><span class="p">(</span><span class="n">doomed_hashes</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(rebillable_entries, unreferenced_candidates)`` for a content prune.</span>
+<span class="w">    </span><span class="sd">"""``(rebillable_entries, unreferenced_candidates)`` for a content prune.</span>
 
-<span class="sd">    Walks manifests, extracts each response&#39;s asset URL exactly as</span>
+<span class="sd">    Walks manifests, extracts each response's asset URL exactly as</span>
 <span class="sd">    :func:`falaw.plan.execute` does, and maps it through the ``url -&gt; hash``</span>
 <span class="sd">    hint index. An entry that fails any step is skipped: it is already</span>
 <span class="sd">    unmaterializable, so a prune is not what breaks it.</span>
@@ -798,7 +798,7 @@
 <span class="sd">    store, and those never had a fal response behind them. Reporting only</span>
 <span class="sd">    ``rebillable`` told an operator such a prune was free while it destroyed</span>
 <span class="sd">    the last copy.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">doomed_hashes</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_first_url</span>
@@ -811,7 +811,7 @@
                 <span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — a corrupt manifest is already a miss</span>
             <span class="k">continue</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">extract_first_url</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">extract_first_url</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"raw"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">ref</span> <span class="o">=</span> <span class="n">remembered_ref</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -830,11 +830,11 @@
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PruneReport</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reclaim content-addressed blobs — the gigabytes (falaw#22).</span>
+<span class="w">    </span><span class="sd">"""Reclaim content-addressed blobs — the gigabytes (falaw#22).</span>
 
 <span class="sd">    This is the **expensive** prune. A blob is the last copy of an asset once</span>
-<span class="sd">    fal has expired its URL (&quot;expired files are permanently deleted and cannot</span>
-<span class="sd">    be recovered&quot;), so dropping one can turn a free cache hit into a re-rendered</span>
+<span class="sd">    fal has expired its URL ("expired files are permanently deleted and cannot</span>
+<span class="sd">    be recovered"), so dropping one can turn a free cache hit into a re-rendered</span>
 <span class="sd">    clip. The report says how many entries that applies to *before* you commit;</span>
 <span class="sd">    read ``rebillable_entries``.</span>
 
@@ -847,7 +847,7 @@
 <span class="sd">            :func:`falaw.content.default_content_store`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        PruneReport: with ``area=&quot;content&quot;``.</span>
+<span class="sd">        PruneReport: with ``area="content"``.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: neither bound was given — see :func:`_require_a_bound`.</span>
@@ -857,8 +857,8 @@
 <span class="sd">    &gt;&gt;&gt; report = prune_content(older_than=timedelta(days=90))  # doctest: +SKIP</span>
 <span class="sd">    &gt;&gt;&gt; report.dry_run                                         # doctest: +SKIP</span>
 <span class="sd">    True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">&quot;prune_content&quot;</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">"prune_content"</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_content_store</span>
 
     <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>
@@ -906,8 +906,8 @@
         <span class="n">stored_at</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">stored_at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stored_at&quot;</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — fall back to the filesystem&#39;s opinion</span>
+                <span class="n">stored_at</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stored_at"</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — fall back to the filesystem's opinion</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">stored_at</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
@@ -931,7 +931,7 @@
     <span class="n">max_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PruneReport</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reclaim cache entries — the fal responses themselves (falaw#22).</span>
+<span class="w">    </span><span class="sd">"""Reclaim cache entries — the fal responses themselves (falaw#22).</span>
 
 <span class="sd">    Manifests are kilobytes, so this is rarely where the disk is; it is here</span>
 <span class="sd">    because a stale *entry* is its own problem — it pins a model version and a</span>
@@ -943,13 +943,13 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        older_than: drop entries stored more than this ago — seconds, or a</span>
-<span class="sd">            :class:`~datetime.timedelta`. Read from the manifest&#39;s own</span>
+<span class="sd">            :class:`~datetime.timedelta`. Read from the manifest's own</span>
 <span class="sd">            ``stored_at``, falling back to file mtime.</span>
 <span class="sd">        max_bytes: drop oldest-first until the area fits in this budget.</span>
 <span class="sd">        dry_run: report without deleting. Default, deliberately.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        PruneReport: with ``area=&quot;manifests&quot;``.</span>
+<span class="sd">        PruneReport: with ``area="manifests"``.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: neither bound was given.</span>
@@ -957,8 +957,8 @@
 <span class="sd">    Only the manifest is removed; blobs are shared by content hash across</span>
 <span class="sd">    entries and are never dropped from here — the same rule</span>
 <span class="sd">    :func:`falaw.drop_cache_entry` follows.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">&quot;prune_manifests&quot;</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">"prune_manifests"</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">_cache_dir</span><span class="p">()</span>
     <span class="n">doomed</span><span class="p">,</span> <span class="n">survivors</span> <span class="o">=</span> <span class="n">_select</span><span class="p">(</span>
         <span class="n">_manifest_candidates</span><span class="p">(</span><span class="n">root</span><span class="p">),</span>
@@ -990,12 +990,12 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_content_hash_in_asset_name</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The content hash embedded in a :func:`falaw.materialize_asset` filename.</span>
+<span class="w">    </span><span class="sd">"""The content hash embedded in a :func:`falaw.materialize_asset` filename.</span>
 
 <span class="sd">    The layout is ``{key_hint-}{content_hash}{ext}``, so the hash is the last</span>
 <span class="sd">    64 hex characters of the stem. ``None`` when the name does not fit — a file</span>
 <span class="sd">    falaw did not write, which is reason enough not to reason about it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">stem</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stem</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">CONTENT_HASH_LENGTH</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -1008,7 +1008,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_asset_candidates</span><span class="p">(</span><span class="n">root</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">PruneCandidate</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Materialized asset copies, excluding writes still in flight.</span>
+<span class="w">    </span><span class="sd">"""Materialized asset copies, excluding writes still in flight.</span>
 
 <span class="sd">    ``.part`` files are skipped, and that is a correctness requirement rather</span>
 <span class="sd">    than tidiness: :func:`falaw.content.write_blob_to_file` writes</span>
@@ -1018,7 +1018,7 @@
 <span class="sd">    out from under it and the racing rename would raise ``FileNotFoundError``.</span>
 <span class="sd">    They would also be counted as orphaned copies, since a ``.part`` name</span>
 <span class="sd">    carries no content hash.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">ASSETS_DIRNAME</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">try</span><span class="p">:</span>
@@ -1052,7 +1052,7 @@
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PruneReport</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reclaim materialized asset copies — the cheapest disk in the cache (falaw#22).</span>
+<span class="w">    </span><span class="sd">"""Reclaim materialized asset copies — the cheapest disk in the cache (falaw#22).</span>
 
 <span class="sd">    ``assets/`` holds a **copy** of each blob rather than a hard link, which is</span>
 <span class="sd">    deliberate (:func:`falaw.content.write_blob_to_file` explains why a link</span>
@@ -1072,12 +1072,12 @@
 <span class="sd">            :func:`falaw.content.default_content_store`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        PruneReport: with ``area=&quot;assets&quot;``.</span>
+<span class="sd">        PruneReport: with ``area="assets"``.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: neither bound was given.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">&quot;prune_assets&quot;</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">_require_a_bound</span><span class="p">(</span><span class="s2">"prune_assets"</span><span class="p">,</span> <span class="n">older_than</span><span class="p">,</span> <span class="n">max_bytes</span><span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_content_store</span>
 
     <span class="n">store</span> <span class="o">=</span> <span class="n">default_content_store</span><span class="p">()</span> <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">store</span>

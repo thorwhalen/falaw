@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.pricing &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.pricing &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,12 +112,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.pricing</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Read fal&#39;s pricing API into ``models.json`` cost estimates (falaw#18).</span>
+<span></span><span class="sd">"""Read fal's pricing API into ``models.json`` cost estimates (falaw#18).</span>
 
-<span class="sd">19 of the catalogue&#39;s 40 models carry no structured ``cost_estimate``, so</span>
+<span class="sd">19 of the catalogue's 40 models carry no structured ``cost_estimate``, so</span>
 <span class="sd">``Plan.has_unknown_costs`` — correctly — forces approval on nearly every</span>
 <span class="sd">plan. fal publishes the real numbers (``GET /v1/models/pricing``), and this</span>
-<span class="sd">module turns them into catalogue entries with ``source=&quot;api&quot;``:</span>
+<span class="sd">module turns them into catalogue entries with ``source="api"``:</span>
 
 <span class="sd">&gt;&gt;&gt; from falaw import refresh_model_prices</span>
 <span class="sd">&gt;&gt;&gt; summary = refresh_model_prices()          # dry-run: reports, writes nothing</span>
@@ -127,16 +127,16 @@
 
 <span class="sd">- **This is a refresh job, not a runtime lookup.** ``plan_*`` never touches</span>
 <span class="sd">  the network; plans price themselves from the committed catalogue.</span>
-<span class="sd">- **An unmapped billing unit is recorded, never guessed.** fal&#39;s ``unit`` is</span>
-<span class="sd">  a free string (&quot;image&quot;, &quot;megapixel&quot;, GPU/compute units, …); only units with</span>
+<span class="sd">- **An unmapped billing unit is recorded, never guessed.** fal's ``unit`` is</span>
+<span class="sd">  a free string ("image", "megapixel", GPU/compute units, …); only units with</span>
 <span class="sd">  an unambiguous :data:`~falaw.base.CostKind` mapping become estimates. A</span>
 <span class="sd">  GPU-second is machine time, not output time — mapping it to ``per_second``</span>
-<span class="sd">  would misprice by the model&#39;s realtime factor, so it stays unpriced and</span>
+<span class="sd">  would misprice by the model's realtime factor, so it stays unpriced and</span>
 <span class="sd">  visible in the summary instead.</span>
 <span class="sd">- **The API wins, loudly.** A hand-written price the API disagrees with is</span>
 <span class="sd">  overwritten, and the delta is reported — stale pricing data is the normal</span>
 <span class="sd">  case, not the exception.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -150,97 +150,97 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">_load_models</span><span class="p">,</span> <span class="n">_models_path</span><span class="p">,</span> <span class="n">register_tool</span>
 
 
-<span class="n">PRICING_URL</span> <span class="o">=</span> <span class="s2">&quot;https://api.fal.ai/v1/models/pricing&quot;</span>
-<span class="sd">&quot;&quot;&quot;fal&#39;s unit-pricing endpoint. Accepts 1-50 ``endpoint_id`` values per call.&quot;&quot;&quot;</span>
+<span class="n">PRICING_URL</span> <span class="o">=</span> <span class="s2">"https://api.fal.ai/v1/models/pricing"</span>
+<span class="sd">"""fal's unit-pricing endpoint. Accepts 1-50 ``endpoint_id`` values per call."""</span>
 
 <span class="n">MAX_IDS_PER_REQUEST</span> <span class="o">=</span> <span class="mi">50</span>
-<span class="sd">&quot;&quot;&quot;The endpoint&#39;s documented per-request cap on ``endpoint_id`` values.&quot;&quot;&quot;</span>
+<span class="sd">"""The endpoint's documented per-request cap on ``endpoint_id`` values."""</span>
 
 <span class="n">_UNIT_TO_COST_KIND</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;per_image&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;megapixel&quot;</span><span class="p">:</span> <span class="s2">&quot;per_megapixel&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;second&quot;</span><span class="p">:</span> <span class="s2">&quot;per_second&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;video_second&quot;</span><span class="p">:</span> <span class="s2">&quot;per_second&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;audio_second&quot;</span><span class="p">:</span> <span class="s2">&quot;per_second&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;per_token&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;call&quot;</span><span class="p">:</span> <span class="s2">&quot;per_call&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="s2">&quot;per_call&quot;</span><span class="p">,</span>
+    <span class="s2">"image"</span><span class="p">:</span> <span class="s2">"per_image"</span><span class="p">,</span>
+    <span class="s2">"megapixel"</span><span class="p">:</span> <span class="s2">"per_megapixel"</span><span class="p">,</span>
+    <span class="s2">"second"</span><span class="p">:</span> <span class="s2">"per_second"</span><span class="p">,</span>
+    <span class="s2">"video_second"</span><span class="p">:</span> <span class="s2">"per_second"</span><span class="p">,</span>
+    <span class="s2">"audio_second"</span><span class="p">:</span> <span class="s2">"per_second"</span><span class="p">,</span>
+    <span class="s2">"token"</span><span class="p">:</span> <span class="s2">"per_token"</span><span class="p">,</span>
+    <span class="s2">"call"</span><span class="p">:</span> <span class="s2">"per_call"</span><span class="p">,</span>
+    <span class="s2">"request"</span><span class="p">:</span> <span class="s2">"per_call"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="sd">&quot;&quot;&quot;fal billing units with an unambiguous :data:`~falaw.base.CostKind`.</span>
+<span class="sd">"""fal billing units with an unambiguous :data:`~falaw.base.CostKind`.</span>
 
 <span class="sd">Keyed in the singular; :func:`_cost_rule_for_unit` also accepts the plural</span>
-<span class="sd">forms the live API actually returns (&quot;megapixels&quot;, &quot;seconds&quot;) and a few</span>
-<span class="sd">unambiguous *scaled* units (&quot;minutes&quot;, &quot;10 seconds&quot;, &quot;1m tokens&quot;). Anything</span>
-<span class="sd">else — &quot;compute seconds&quot; (GPU time, not output time), &quot;units&quot;,</span>
-<span class="sd">&quot;generations&quot;, &quot;video segments&quot;, &quot;steps&quot;, &quot;1000 characters&quot; — is</span>
+<span class="sd">forms the live API actually returns ("megapixels", "seconds") and a few</span>
+<span class="sd">unambiguous *scaled* units ("minutes", "10 seconds", "1m tokens"). Anything</span>
+<span class="sd">else — "compute seconds" (GPU time, not output time), "units",</span>
+<span class="sd">"generations", "video segments", "steps", "1000 characters" — is</span>
 <span class="sd">deliberately unmapped — see the module docstring for why guessing would be</span>
 <span class="sd">worse than staying unpriced.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="n">_SCALED_UNITS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="c1"># unit -&gt; (CostKind, multiplier turning price-per-unit into price-per-kind)</span>
-    <span class="s2">&quot;minute&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;per_second&quot;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">60</span><span class="p">),</span>
-    <span class="c1"># NOT &quot;1m tokens&quot;: video models bill by *video tokens* (a function of</span>
+    <span class="s2">"minute"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"per_second"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">60</span><span class="p">),</span>
+    <span class="c1"># NOT "1m tokens": video models bill by *video tokens* (a function of</span>
     <span class="c1"># resolution x duration falaw cannot compute), so a per_token estimate</span>
     <span class="c1"># would make exactly those calls unpriceable at plan time — worse than</span>
     <span class="c1"># keeping a hand-written per_second approximation. Recorded instead.</span>
 <span class="p">}</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_cost_rule_for_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Optional[tuple[str, float]]&quot;</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``(CostKind, price multiplier)`` for a fal billing unit, or ``None``.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cost_rule_for_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Optional[tuple[str, float]]"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``(CostKind, price multiplier)`` for a fal billing unit, or ``None``.</span>
 
-<span class="sd">    The multiplier converts the API&#39;s price-per-``unit`` into the kind&#39;s</span>
-<span class="sd">    price-per-unit: $6/minute is $0.10/second, &quot;$0.32 per 10 seconds&quot; is</span>
-<span class="sd">    $0.032/second, &quot;$2 per 1m tokens&quot; is $0.000002/token.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">singular</span> <span class="o">=</span> <span class="n">unit</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">unit</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">unit</span>
+<span class="sd">    The multiplier converts the API's price-per-``unit`` into the kind's</span>
+<span class="sd">    price-per-unit: $6/minute is $0.10/second, "$0.32 per 10 seconds" is</span>
+<span class="sd">    $0.032/second, "$2 per 1m tokens" is $0.000002/token.</span>
+<span class="sd">    """</span>
+    <span class="n">singular</span> <span class="o">=</span> <span class="n">unit</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">unit</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"s"</span><span class="p">)</span> <span class="k">else</span> <span class="n">unit</span>
     <span class="n">kind</span> <span class="o">=</span> <span class="n">_UNIT_TO_COST_KIND</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_UNIT_TO_COST_KIND</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">singular</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">kind</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">kind</span><span class="p">,</span> <span class="mf">1.0</span>
     <span class="n">scaled</span> <span class="o">=</span> <span class="n">_SCALED_UNITS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_SCALED_UNITS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">singular</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">scaled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">scaled</span>
-    <span class="n">n_seconds</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\d+) seconds?&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+    <span class="n">n_seconds</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(\d+) seconds?"</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n_seconds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;per_second&quot;</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_seconds</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">"per_second"</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_seconds</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_row_problem</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Why an API price row cannot be stamped, or ``None`` when it can.</span>
+<span class="w">    </span><span class="sd">"""Why an API price row cannot be stamped, or ``None`` when it can.</span>
 
 <span class="sd">    The catalogue is what every plan prices itself from, so a bad row is</span>
 <span class="sd">    refused here — loudly, in the summary — rather than discovered later as</span>
 <span class="sd">    a plan-time refusal (negative/NaN), an unmetered known-free call (zero),</span>
 <span class="sd">    or a mis-summed currency.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">raw</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit_price&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"unit_price"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;row has no unit_price&quot;</span>
+        <span class="k">return</span> <span class="s2">"row has no unit_price"</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;unit_price </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2"> is not a number&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"unit_price </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2"> is not a number"</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>  <span class="c1"># also catches NaN</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;unit_price </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2"> is not a positive number&quot;</span>
-    <span class="n">currency</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;USD&quot;</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">currency</span> <span class="o">!=</span> <span class="s2">&quot;USD&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;currency </span><span class="si">{</span><span class="n">currency</span><span class="si">!r}</span><span class="s2"> is not USD (estimator sums USD only)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"unit_price </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2"> is not a positive number"</span>
+    <span class="n">currency</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"currency"</span><span class="p">,</span> <span class="s2">"USD"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">currency</span> <span class="o">!=</span> <span class="s2">"USD"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"currency </span><span class="si">{</span><span class="n">currency</span><span class="si">!r}</span><span class="s2"> is not USD (estimator sums USD only)"</span>
     <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_stamp_notes</span><span class="p">(</span><span class="n">stamp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">converted</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">old</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The refreshed estimate&#39;s ``notes``, preserving a human&#39;s prior note.</span>
+<span class="w">    </span><span class="sd">"""The refreshed estimate's ``notes``, preserving a human's prior note.</span>
 
 <span class="sd">    Hand-written notes can carry operational warnings; replacing them with a</span>
 <span class="sd">    fetch stamp would erase them invisibly. A previous *API* stamp is just</span>
 <span class="sd">    an older version of this line and is not chained.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;fal pricing API, fetched </span><span class="si">{</span><span class="n">stamp</span><span class="si">}{</span><span class="n">converted</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="n">old_notes</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">old_notes</span> <span class="ow">and</span> <span class="p">(</span><span class="n">old</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;api&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">; was: </span><span class="si">{</span><span class="n">old_notes</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="sd">    """</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"fal pricing API, fetched </span><span class="si">{</span><span class="n">stamp</span><span class="si">}{</span><span class="n">converted</span><span class="si">}</span><span class="s2">"</span>
+    <span class="n">old_notes</span> <span class="o">=</span> <span class="p">(</span><span class="n">old</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"notes"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">old_notes</span> <span class="ow">and</span> <span class="p">(</span><span class="n">old</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">"api"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">base</span><span class="si">}</span><span class="s2">; was: </span><span class="si">{</span><span class="n">old_notes</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">return</span> <span class="n">base</span>
 
 
@@ -249,22 +249,22 @@
 <span class="c1"># (key, value) pairs because the live endpoint accepts the repeated-key</span>
 <span class="c1"># array syntax (?endpoint_id=a&amp;endpoint_id=b) but 404s on the comma-joined</span>
 <span class="c1"># form its docs also advertise. 404 is load-bearing: ONE unknown id fails</span>
-<span class="c1"># the WHOLE batch with {&quot;error&quot;: {&quot;type&quot;: &quot;not_found&quot;}}, so the fetcher</span>
+<span class="c1"># the WHOLE batch with {"error": {"type": "not_found"}}, so the fetcher</span>
 <span class="c1"># needs to see it (and bisect) rather than crash. Tests stub this;</span>
 <span class="c1"># production uses httpx.</span>
-<span class="n">HttpGetJson</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;list[tuple[str, str]]&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span>
+<span class="n">HttpGetJson</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">"list[tuple[str, str]]"</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span>
 
 
 <span class="n">MAX_429_RETRIES</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="sd">&quot;&quot;&quot;Attempts per request before giving up on a rate-limited endpoint.</span>
+<span class="sd">"""Attempts per request before giving up on a rate-limited endpoint.</span>
 
 <span class="sd">The bisection around unknown ids multiplies request count, and the live</span>
 <span class="sd">endpoint rate-limits aggressively — a refresh job should wait its turn,</span>
-<span class="sd">not die halfway with a partial price table.&quot;&quot;&quot;</span>
+<span class="sd">not die halfway with a partial price table."""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_http_get</span><span class="p">(</span>
-    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="s2">&quot;list[tuple[str, str]]&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="s2">"list[tuple[str, str]]"</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
@@ -276,17 +276,17 @@
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">429</span> <span class="ow">and</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">MAX_429_RETRIES</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">retry_after</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Retry-After&quot;</span><span class="p">)</span>
+                <span class="n">retry_after</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Retry-After"</span><span class="p">)</span>
                 <span class="n">delay</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="nb">float</span><span class="p">(</span><span class="n">retry_after</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">retry_after</span> <span class="ow">and</span> <span class="n">retry_after</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">retry_after</span> <span class="ow">and</span> <span class="n">retry_after</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
                     <span class="k">else</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;unreachable&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">"unreachable"</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_api_key</span><span class="p">(</span><span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -295,13 +295,13 @@
     <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">api_key</span>
         <span class="ow">or</span> <span class="n">current_fal_key</span><span class="p">()</span>
-        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAL_KEY&quot;</span><span class="p">)</span>
-        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FAL_API_KEY&quot;</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FAL_KEY"</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FAL_API_KEY"</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;No fal API key: pass api_key=, or set FAL_KEY. The pricing &quot;</span>
-            <span class="s2">&quot;endpoint is free but authenticated.&quot;</span>
+            <span class="s2">"No fal API key: pass api_key=, or set FAL_KEY. The pricing "</span>
+            <span class="s2">"endpoint is free but authenticated."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">key</span>
 
@@ -309,13 +309,13 @@
 <div class="viewcode-block" id="fetch_model_prices">
 <a class="viewcode-back" href="../../module_docs/falaw/pricing.html#falaw.fetch_model_prices">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fetch_model_prices</span><span class="p">(</span>
-    <span class="n">endpoint_ids</span><span class="p">:</span> <span class="s2">&quot;list[str]&quot;</span><span class="p">,</span>
+    <span class="n">endpoint_ids</span><span class="p">:</span> <span class="s2">"list[str]"</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">http_get</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HttpGetJson</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">MAX_IDS_PER_REQUEST</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``{endpoint_id: {&quot;unit_price&quot;, &quot;unit&quot;, &quot;currency&quot;}}`` from fal&#39;s API.</span>
+<span class="w">    </span><span class="sd">"""``{endpoint_id: {"unit_price", "unit", "currency"}}`` from fal's API.</span>
 
 <span class="sd">    Batches requests at ``batch_size`` ids (the endpoint caps at</span>
 <span class="sd">    :data:`MAX_IDS_PER_REQUEST`). Ids the API does not know are simply</span>
@@ -323,9 +323,9 @@
 <span class="sd">    takes work: the live endpoint answers a batch containing even one</span>
 <span class="sd">    unknown id with a blanket 404, so a failed batch is bisected down to</span>
 <span class="sd">    the ids that actually price (O(unknown x log batch) extra requests).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">get</span> <span class="o">=</span> <span class="n">http_get</span> <span class="ow">or</span> <span class="n">_default_http_get</span>
-    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Key </span><span class="si">{</span><span class="n">_resolve_api_key</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Authorization"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Key </span><span class="si">{</span><span class="n">_resolve_api_key</span><span class="p">(</span><span class="n">api_key</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">}</span>
     <span class="n">prices</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">endpoint_ids</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
         <span class="n">_fetch_batch</span><span class="p">(</span><span class="n">endpoint_ids</span><span class="p">[</span><span class="n">start</span> <span class="p">:</span> <span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">],</span> <span class="n">get</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">prices</span><span class="p">)</span>
@@ -334,12 +334,12 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_batch</span><span class="p">(</span>
-    <span class="n">batch</span><span class="p">:</span> <span class="s2">&quot;list[str]&quot;</span><span class="p">,</span> <span class="n">get</span><span class="p">:</span> <span class="n">HttpGetJson</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">prices</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">batch</span><span class="p">:</span> <span class="s2">"list[str]"</span><span class="p">,</span> <span class="n">get</span><span class="p">:</span> <span class="n">HttpGetJson</span><span class="p">,</span> <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">prices</span><span class="p">:</span> <span class="nb">dict</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect one batch&#39;s prices into ``prices``, bisecting around 404s.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Collect one batch's prices into ``prices``, bisecting around 404s."""</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">batch</span><span class="p">:</span>
         <span class="k">return</span>
-    <span class="n">params</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;endpoint_id&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"endpoint_id"</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">body</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">PRICING_URL</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># some id in the batch is unknown to the API</span>
@@ -349,20 +349,20 @@
             <span class="n">_fetch_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">[:</span><span class="n">middle</span><span class="p">],</span> <span class="n">get</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">prices</span><span class="p">)</span>
             <span class="n">_fetch_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">middle</span><span class="p">:],</span> <span class="n">get</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">prices</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prices&quot;</span><span class="p">,</span> <span class="p">()):</span>
-            <span class="n">endpoint</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;endpoint_id&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"prices"</span><span class="p">,</span> <span class="p">()):</span>
+            <span class="n">endpoint</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"endpoint_id"</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">endpoint</span><span class="p">:</span>
                 <span class="n">prices</span><span class="p">[</span><span class="n">endpoint</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
-        <span class="n">cursor</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_cursor&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;has_more&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cursor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"next_cursor"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"has_more"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cursor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="n">previous</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;cursor&quot;</span><span class="p">]</span>
+        <span class="n">previous</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">"cursor"</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">previous</span> <span class="ow">and</span> <span class="n">previous</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
             <span class="c1"># A server repeating the same cursor with has_more=True would</span>
             <span class="c1"># spin this loop forever; trust the data, not the vendor.</span>
             <span class="k">return</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;endpoint_id&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
-            <span class="p">(</span><span class="s2">&quot;cursor&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cursor</span><span class="p">))</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">"endpoint_id"</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span> <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">"cursor"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cursor</span><span class="p">))</span>
         <span class="p">]</span>
 
 
@@ -376,18 +376,18 @@
     <span class="n">models_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">today</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refresh ``models.json`` cost estimates from fal&#39;s pricing API.</span>
+<span class="w">    </span><span class="sd">"""Refresh ``models.json`` cost estimates from fal's pricing API.</span>
 
 <span class="sd">    Returns a summary dict; ``write=False`` (default) reports what would</span>
 <span class="sd">    change without touching the file. ``models_path`` and ``today`` exist</span>
-<span class="sd">    for tests (the fetch date lands in each estimate&#39;s ``notes``).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    for tests (the fetch date lands in each estimate's ``notes``).</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">models_path</span> <span class="ow">or</span> <span class="n">_models_path</span><span class="p">()</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">records</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
     <span class="n">prices</span> <span class="o">=</span> <span class="n">fetch_model_prices</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">],</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">http_get</span><span class="o">=</span><span class="n">http_get</span>
+        <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">],</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">,</span> <span class="n">http_get</span><span class="o">=</span><span class="n">http_get</span>
     <span class="p">)</span>
     <span class="n">stamp</span> <span class="o">=</span> <span class="n">today</span> <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 
@@ -400,15 +400,15 @@
     <span class="n">stamped_ids</span><span class="p">:</span> <span class="nb">set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">row</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">missing_from_api</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+            <span class="n">missing_from_api</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
             <span class="k">continue</span>
-        <span class="n">unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"unit"</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
         <span class="n">rule</span> <span class="o">=</span> <span class="n">_cost_rule_for_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rule</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Recorded, never guessed; any existing estimate is kept.</span>
-            <span class="n">unmapped</span><span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">unit</span>
+            <span class="n">unmapped</span><span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">unit</span>
             <span class="k">continue</span>
         <span class="n">problem</span> <span class="o">=</span> <span class="n">_row_problem</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">problem</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -416,93 +416,93 @@
             <span class="c1"># price makes every later CallPlan for the model refuse at plan</span>
             <span class="c1"># time, a zero plans as known-free and sails through spend</span>
             <span class="c1"># gates, and a non-USD amount would be summed as USD downstream.</span>
-            <span class="n">rejected_rows</span><span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">problem</span>
+            <span class="n">rejected_rows</span><span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">problem</span>
             <span class="k">continue</span>
         <span class="n">kind</span><span class="p">,</span> <span class="n">multiplier</span> <span class="o">=</span> <span class="n">rule</span>
-        <span class="n">converted</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">multiplier</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;, converted from unit </span><span class="si">{</span><span class="n">unit</span><span class="si">!r}</span><span class="s2">&quot;</span>
-        <span class="n">old</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cost_estimate&quot;</span><span class="p">)</span>
+        <span class="n">converted</span> <span class="o">=</span> <span class="s2">""</span> <span class="k">if</span> <span class="n">multiplier</span> <span class="o">==</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">", converted from unit </span><span class="si">{</span><span class="n">unit</span><span class="si">!r}</span><span class="s2">"</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cost_estimate"</span><span class="p">)</span>
         <span class="n">new_estimate</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span>
-            <span class="s2">&quot;amount&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;unit_price&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">,</span>
-            <span class="s2">&quot;currency&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;USD&quot;</span><span class="p">)),</span>
-            <span class="s2">&quot;notes&quot;</span><span class="p">:</span> <span class="n">_stamp_notes</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="n">converted</span><span class="o">=</span><span class="n">converted</span><span class="p">,</span> <span class="n">old</span><span class="o">=</span><span class="n">old</span><span class="p">),</span>
-            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;api&quot;</span><span class="p">,</span>
+            <span class="s2">"kind"</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span>
+            <span class="s2">"amount"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"unit_price"</span><span class="p">])</span> <span class="o">*</span> <span class="n">multiplier</span><span class="p">,</span>
+            <span class="s2">"currency"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"currency"</span><span class="p">,</span> <span class="s2">"USD"</span><span class="p">)),</span>
+            <span class="s2">"notes"</span><span class="p">:</span> <span class="n">_stamp_notes</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="n">converted</span><span class="o">=</span><span class="n">converted</span><span class="p">,</span> <span class="n">old</span><span class="o">=</span><span class="n">old</span><span class="p">),</span>
+            <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"api"</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="n">old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;empirical&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">old</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"empirical"</span><span class="p">:</span>
             <span class="c1"># A measured real bill outranks the rate card (which may cover</span>
-            <span class="c1"># a different resolution/config tier). The issue&#39;s rule: API</span>
+            <span class="c1"># a different resolution/config tier). The issue's rule: API</span>
             <span class="c1"># outranks *approximate*, not empirical. A disagreement is</span>
             <span class="c1"># still a signal worth surfacing; agreement changes nothing.</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">),</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">),</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]):</span>
                 <span class="n">overwritten</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="p">{</span>
-                        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-                        <span class="s2">&quot;old&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;amount&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">)},</span>
-                        <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span> <span class="s2">&quot;amount&quot;</span><span class="p">:</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]},</span>
-                        <span class="s2">&quot;kept&quot;</span><span class="p">:</span> <span class="s2">&quot;empirical&quot;</span><span class="p">,</span>
+                        <span class="s2">"id"</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+                        <span class="s2">"old"</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"kind"</span><span class="p">,</span> <span class="s2">"amount"</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">)},</span>
+                        <span class="s2">"new"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span> <span class="s2">"amount"</span><span class="p">:</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]},</span>
+                        <span class="s2">"kept"</span><span class="p">:</span> <span class="s2">"empirical"</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">old</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">newly_priced</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">),</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;amount&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]):</span>
+            <span class="n">newly_priced</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kind"</span><span class="p">),</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]):</span>
             <span class="n">overwritten</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
-                    <span class="s2">&quot;old&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;kind&quot;</span><span class="p">,</span> <span class="s2">&quot;amount&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">)},</span>
-                    <span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span> <span class="s2">&quot;amount&quot;</span><span class="p">:</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">&quot;amount&quot;</span><span class="p">]},</span>
+                    <span class="s2">"id"</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span>
+                    <span class="s2">"old"</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"kind"</span><span class="p">,</span> <span class="s2">"amount"</span><span class="p">,</span> <span class="s2">"source"</span><span class="p">)},</span>
+                    <span class="s2">"new"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"kind"</span><span class="p">:</span> <span class="n">kind</span><span class="p">,</span> <span class="s2">"amount"</span><span class="p">:</span> <span class="n">new_estimate</span><span class="p">[</span><span class="s2">"amount"</span><span class="p">]},</span>
                 <span class="p">}</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Same numbers, but source/notes/date still change on disk — a</span>
             <span class="c1"># real write that must show in the dry-run, not slip through</span>
             <span class="c1"># invisibly.</span>
-            <span class="n">restamped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
-        <span class="n">record</span><span class="p">[</span><span class="s2">&quot;cost_estimate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_estimate</span>
-        <span class="n">stamped_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+            <span class="n">restamped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
+        <span class="n">record</span><span class="p">[</span><span class="s2">"cost_estimate"</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_estimate</span>
+        <span class="n">stamped_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
 
     <span class="c1"># Every estimate this refresh stamped must load as a CostEstimate</span>
     <span class="c1"># before anything is written.</span>
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">stamped_ids</span><span class="p">:</span>
-            <span class="n">CostEstimate</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;cost_estimate&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">record</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]</span> <span class="ow">in</span> <span class="n">stamped_ids</span><span class="p">:</span>
+            <span class="n">CostEstimate</span><span class="p">(</span><span class="o">**</span><span class="n">record</span><span class="p">[</span><span class="s2">"cost_estimate"</span><span class="p">])</span>
 
     <span class="n">summary</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
-        <span class="s2">&quot;priced_by_api&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">),</span>
-        <span class="s2">&quot;newly_priced&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">),</span>
-        <span class="s2">&quot;price_deltas&quot;</span><span class="p">:</span> <span class="n">overwritten</span><span class="p">,</span>
-        <span class="s2">&quot;restamped&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">restamped</span><span class="p">),</span>
-        <span class="s2">&quot;rejected_rows&quot;</span><span class="p">:</span> <span class="n">rejected_rows</span><span class="p">,</span>
-        <span class="s2">&quot;unmapped_units&quot;</span><span class="p">:</span> <span class="n">unmapped</span><span class="p">,</span>
-        <span class="s2">&quot;missing_from_api&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">missing_from_api</span><span class="p">),</span>
-        <span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="n">write</span><span class="p">,</span>
+        <span class="s2">"total"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">records</span><span class="p">),</span>
+        <span class="s2">"priced_by_api"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">prices</span><span class="p">),</span>
+        <span class="s2">"newly_priced"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">),</span>
+        <span class="s2">"price_deltas"</span><span class="p">:</span> <span class="n">overwritten</span><span class="p">,</span>
+        <span class="s2">"restamped"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">restamped</span><span class="p">),</span>
+        <span class="s2">"rejected_rows"</span><span class="p">:</span> <span class="n">rejected_rows</span><span class="p">,</span>
+        <span class="s2">"unmapped_units"</span><span class="p">:</span> <span class="n">unmapped</span><span class="p">,</span>
+        <span class="s2">"missing_from_api"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">missing_from_api</span><span class="p">),</span>
+        <span class="s2">"write"</span><span class="p">:</span> <span class="n">write</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
         <span class="n">merged</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
             <span class="n">records</span><span class="p">,</span>
-            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;quality_tier&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"category"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"quality_tier"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="n">r</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]),</span>
         <span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">merged</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">_load_models</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.journal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_default_journal</span>
 
         <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;note&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"note"</span><span class="p">,</span>
             <span class="n">text</span><span class="o">=</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;refresh_model_prices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">)</span><span class="si">}</span><span class="s2"> newly priced, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">overwritten</span><span class="p">)</span><span class="si">}</span><span class="s2"> overwritten, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">restamped</span><span class="p">)</span><span class="si">}</span><span class="s2"> restamped, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rejected_rows</span><span class="p">)</span><span class="si">}</span><span class="s2"> rejected rows, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unmapped</span><span class="p">)</span><span class="si">}</span><span class="s2"> unmapped units&quot;</span>
+                <span class="sa">f</span><span class="s2">"refresh_model_prices: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">)</span><span class="si">}</span><span class="s2"> newly priced, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">overwritten</span><span class="p">)</span><span class="si">}</span><span class="s2"> overwritten, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">restamped</span><span class="p">)</span><span class="si">}</span><span class="s2"> restamped, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">rejected_rows</span><span class="p">)</span><span class="si">}</span><span class="s2"> rejected rows, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unmapped</span><span class="p">)</span><span class="si">}</span><span class="s2"> unmapped units"</span>
             <span class="p">),</span>
-            <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;refresh&quot;</span><span class="p">,</span> <span class="s2">&quot;cost&quot;</span><span class="p">),</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"refresh"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">),</span>
             <span class="n">context</span><span class="o">=</span><span class="p">{</span>
-                <span class="s2">&quot;newly_priced&quot;</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">)[:</span><span class="mi">10</span><span class="p">],</span>
-                <span class="s2">&quot;price_deltas&quot;</span><span class="p">:</span> <span class="n">overwritten</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
-                <span class="s2">&quot;unmapped_units&quot;</span><span class="p">:</span> <span class="n">unmapped</span><span class="p">,</span>
+                <span class="s2">"newly_priced"</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">newly_priced</span><span class="p">)[:</span><span class="mi">10</span><span class="p">],</span>
+                <span class="s2">"price_deltas"</span><span class="p">:</span> <span class="n">overwritten</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span>
+                <span class="s2">"unmapped_units"</span><span class="p">:</span> <span class="n">unmapped</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span>
 
@@ -511,32 +511,32 @@
 
 
 <span class="nd">@register_tool</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;refresh_model_prices&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"refresh_model_prices"</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Fetch fal&#39;s unit pricing for every model in `falaw/data/models.json` &quot;</span>
-        <span class="s2">&quot;and write structured cost_estimates with source=&#39;api&#39;. Hand-written &quot;</span>
-        <span class="s2">&quot;prices the API disagrees with are overwritten and the delta reported. &quot;</span>
-        <span class="s2">&quot;Units with no CostKind mapping (GPU/compute units) are recorded, not &quot;</span>
-        <span class="s2">&quot;guessed. Reads the vendor&#39;s free pricing endpoint; makes no billed &quot;</span>
-        <span class="s2">&quot;call. Pass `write=True` to persist; default is a dry-run summary.&quot;</span>
+        <span class="s2">"Fetch fal's unit pricing for every model in `falaw/data/models.json` "</span>
+        <span class="s2">"and write structured cost_estimates with source='api'. Hand-written "</span>
+        <span class="s2">"prices the API disagrees with are overwritten and the delta reported. "</span>
+        <span class="s2">"Units with no CostKind mapping (GPU/compute units) are recorded, not "</span>
+        <span class="s2">"guessed. Reads the vendor's free pricing endpoint; makes no billed "</span>
+        <span class="s2">"call. Pass `write=True` to persist; default is a dry-run summary."</span>
     <span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;refresh&quot;</span><span class="p">,</span> <span class="s2">&quot;maintenance&quot;</span><span class="p">,</span> <span class="s2">&quot;cost&quot;</span><span class="p">,</span> <span class="s2">&quot;free&quot;</span><span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"refresh"</span><span class="p">,</span> <span class="s2">"maintenance"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">,</span> <span class="s2">"free"</span><span class="p">),</span>
     <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;write&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"write"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"boolean"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">},</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_refresh_model_prices_tool</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bridge-facing wrapper for :func:`refresh_model_prices`.</span>
+<span class="w">    </span><span class="sd">"""Bridge-facing wrapper for :func:`refresh_model_prices`.</span>
 
 <span class="sd">    Separate because bridges derive a JSON schema from the function</span>
-<span class="sd">    signature, and the real function&#39;s dependency-injection seams</span>
+<span class="sd">    signature, and the real function's dependency-injection seams</span>
 <span class="sd">    (``http_get``, ``models_path``, ``today``) are not JSON-schema</span>
 <span class="sd">    representable — nor anything a tool caller should reach.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">refresh_model_prices</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="n">write</span><span class="p">)</span>
 </pre></div>
 

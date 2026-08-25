@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.errors &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.errors &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -149,13 +149,13 @@ a shot, instead of silently truncating to whatever the model produced.</p></li>
 typed subclass — <a class="reference internal" href="core.html#falaw.core.call_fal" title="falaw.core.call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.core.call_fal()</span></code></a> does this automatically.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">err</span> <span class="o">=</span> <span class="n">FalAccountLocked</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;account locked&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"account locked"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">status_code</span><span class="o">=</span><span class="mi">403</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Verify your email at fal.ai/settings&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://fal.ai/dashboard/billing&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">detail</span><span class="o">=</span><span class="s2">"Verify your email at fal.ai/settings"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">url</span><span class="o">=</span><span class="s2">"https://fal.ai/dashboard/billing"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">err</span><span class="o">.</span><span class="n">url</span>
-<span class="go">&#39;https://fal.ai/dashboard/billing&#39;</span>
+<span class="go">'https://fal.ai/dashboard/billing'</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">err</span><span class="p">,</span> <span class="n">FalError</span><span class="p">)</span>
 <span class="go">True</span>
 </pre></div>

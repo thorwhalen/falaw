@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.content &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.content &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -193,22 +193,22 @@ one.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;https://fal.media/files/one.png&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"https://fal.media/files/one.png"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;pretend-&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;png-bytes&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">"pretend-"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"png-bytes"</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span><span class="o">.</span><span class="n">bytes_size</span>
 <span class="go">17</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;hashlib&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;pretend-png-bytes&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">"hashlib"</span><span class="p">)</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="sa">b</span><span class="s2">"pretend-png-bytes"</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 <span class="go">True</span>
 </pre></div>
 </div>
 <p>The same bytes served at a <em>different</em> URL yield the same reference — which is
 the whole point:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">other</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="s2">&quot;https://fal.media/files/two.png&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">"https://fal.media/files/two.png"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;pretend-png-bytes&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">"pretend-png-bytes"</span><span class="p">],</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="n">ref</span><span class="o">.</span><span class="n">content_hash</span>
 <span class="go">True</span>
@@ -355,23 +355,23 @@ inside a netloc, while WHATWG-conformant clients — including
 is true of <code class="docutils literal notranslate"><span class="pre">evil.com\.fal.media</span></code>; <code class="docutils literal notranslate"><span class="pre">host</span> <span class="pre">==</span> <span class="pre">h</span> <span class="pre">or</span> <span class="pre">host.endswith(&quot;.&quot;</span> <span class="pre">+</span> <span class="pre">h)</span></code>
 is not.</p></li>
 </ol>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://v3b.fal.media/files/x.png&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"https://v3b.fal.media/files/x.png"</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/files/x.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"https://fal.media/files/x.png"</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://example.com/reference.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"https://example.com/reference.png"</span><span class="p">)</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;file:///tmp/render.mp4&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"file:///tmp/render.mp4"</span><span class="p">)</span>
 <span class="go">False</span>
 </pre></div>
 </div>
 <p>A host that merely <em>contains</em> a trusted name is not that host, however it
 is spelled:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media@evil.example/x.png&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"https://fal.media@evil.example/x.png"</span><span class="p">)</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;https://notfal.media/x.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"https://notfal.media/x.png"</span><span class="p">)</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">&quot;http://127.0.0.1:8000</span><span class="se">\\</span><span class="s2">@fal.media/x.png&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_immutable_url</span><span class="p">(</span><span class="s2">"http://127.0.0.1:8000</span><span class="se">\\</span><span class="s2">@fal.media/x.png"</span><span class="p">)</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -412,8 +412,8 @@ changes the <em>default</em>, never an explicit choice.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">before</span> <span class="o">=</span> <span class="n">default_url_fetcher</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">using_url_fetcher</span><span class="p">(</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">&quot;faked&quot;</span><span class="p">]):</span>
-<span class="gp">... </span>    <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span><span class="o">.</span><span class="n">bytes_size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">using_url_fetcher</span><span class="p">(</span><span class="k">lambda</span> <span class="n">url</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s2">"faked"</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">"https://fal.media/x.png"</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span><span class="o">.</span><span class="n">bytes_size</span>
 <span class="go">5</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">default_url_fetcher</span><span class="p">()</span> <span class="ow">is</span> <span class="n">before</span>
 <span class="go">True</span>

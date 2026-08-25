@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.journal &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.journal &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,7 +112,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.journal</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Agent journal: append-only log of notes, issues and improvements.</span>
+<span></span><span class="sd">"""Agent journal: append-only log of notes, issues and improvements.</span>
 
 <span class="sd">Why this exists: agents (and falaw itself) leave traces here whenever</span>
 <span class="sd">something is harder than expected, surprising, or worth remembering. The</span>
@@ -122,12 +122,12 @@
 <span class="sd">Usage:</span>
 
 <span class="sd">    &gt;&gt;&gt; from falaw import journal</span>
-<span class="sd">    &gt;&gt;&gt; journal.note(&quot;schnell tier returns 1024x1024 by default&quot;)  # doctest: +SKIP</span>
-<span class="sd">    &gt;&gt;&gt; journal.issue(&quot;FLUX dev refused a benign prompt as NSFW&quot;,</span>
-<span class="sd">    ...               suggestion=&quot;Try guidance_scale=2.0&quot;)  # doctest: +SKIP</span>
-<span class="sd">    &gt;&gt;&gt; journal.improvement(&quot;Add an `upscale_image` wrapper for clarity-upscaler&quot;,</span>
-<span class="sd">    ...                     tags=(&quot;backlog&quot;,))  # doctest: +SKIP</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; journal.note("schnell tier returns 1024x1024 by default")  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; journal.issue("FLUX dev refused a benign prompt as NSFW",</span>
+<span class="sd">    ...               suggestion="Try guidance_scale=2.0")  # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; journal.improvement("Add an `upscale_image` wrapper for clarity-upscaler",</span>
+<span class="sd">    ...                     tags=("backlog",))  # doctest: +SKIP</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -140,7 +140,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="n">EntryKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="s2">&quot;issue&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">,</span> <span class="s2">&quot;trace&quot;</span><span class="p">]</span>
+<span class="n">EntryKind</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"note"</span><span class="p">,</span> <span class="s2">"issue"</span><span class="p">,</span> <span class="s2">"improvement"</span><span class="p">,</span> <span class="s2">"trace"</span><span class="p">]</span>
 
 <span class="c1"># Tie-break for filenames minted within one clock tick (falaw#25). Process-wide</span>
 <span class="c1"># on purpose: `count().__next__` is atomic under the GIL, so concurrent threads</span>
@@ -149,8 +149,8 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_default_journal_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FALAW_DATA_DIR&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~/.config/falaw&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s2">&quot;journal&quot;</span><span class="p">)</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FALAW_DATA_DIR"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">"~/.config/falaw"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s2">"journal"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="JournalEntry">
@@ -162,7 +162,7 @@
     <span class="n">kind</span><span class="p">:</span> <span class="n">EntryKind</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">tags</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
-    <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
     <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
 
 
@@ -170,7 +170,7 @@
 <div class="viewcode-block" id="Journal">
 <a class="viewcode-back" href="../../module_docs/falaw/journal.html#falaw.journal.Journal">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Journal</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;File-backed append-only journal.</span>
+<span class="w">    </span><span class="sd">"""File-backed append-only journal.</span>
 
 <span class="sd">    Each entry becomes a single JSON file. Names are timestamp-prefixed, with</span>
 <span class="sd">    a process-wide sequence number breaking same-tick ties, so</span>
@@ -178,11 +178,11 @@
 
 <span class="sd">    &gt;&gt;&gt; import tempfile</span>
 <span class="sd">    &gt;&gt;&gt; j = Journal(tempfile.mkdtemp())</span>
-<span class="sd">    &gt;&gt;&gt; _ = j.append(kind=&quot;note&quot;, text=&quot;hello&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; _ = j.append(kind=&quot;issue&quot;, text=&quot;boom&quot;, suggestion=&quot;try X&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; _ = j.append(kind="note", text="hello")</span>
+<span class="sd">    &gt;&gt;&gt; _ = j.append(kind="issue", text="boom", suggestion="try X")</span>
 <span class="sd">    &gt;&gt;&gt; [e.kind for e in j]</span>
-<span class="sd">    [&#39;note&#39;, &#39;issue&#39;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    ['note', 'issue']</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">directory</span> <span class="ow">or</span> <span class="n">_default_journal_dir</span><span class="p">()</span>
@@ -194,7 +194,7 @@
         <span class="n">kind</span><span class="p">:</span> <span class="n">EntryKind</span><span class="p">,</span>
         <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">tags</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-        <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">suggestion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
         <span class="n">context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalEntry</span><span class="p">:</span>
         <span class="c1"># `time.time_ns()` looks tie-proof but is not: on Windows the clock</span>
@@ -213,19 +213,19 @@
             <span class="n">suggestion</span><span class="o">=</span><span class="n">suggestion</span><span class="p">,</span>
             <span class="n">context</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="p">{}),</span>
         <span class="p">)</span>
-        <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ts_ns</span><span class="si">:</span><span class="s2">020d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">seq</span><span class="si">:</span><span class="s2">010d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ts_ns</span><span class="si">:</span><span class="s2">020d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">seq</span><span class="si">:</span><span class="s2">010d</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.json"</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="n">entry</span><span class="p">),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">entry</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">JournalEntry</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".json"</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"tags"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tags"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
             <span class="k">yield</span> <span class="n">JournalEntry</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">recent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">JournalEntry</span><span class="p">]:</span>
@@ -251,15 +251,15 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">note</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalEntry</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"note"</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">issue</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalEntry</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;issue&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"issue"</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">improvement</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JournalEntry</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;improvement&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"improvement"</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">recent</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">JournalEntry</span><span class="p">]:</span>

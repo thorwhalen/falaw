@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.skill &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.bridges.skill &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,13 +112,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.bridges.skill</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Render a Claude SKILL.md (and references) from the falaw tool registry.</span>
+<span></span><span class="sd">"""Render a Claude SKILL.md (and references) from the falaw tool registry.</span>
 
 <span class="sd">The skill is the entry point that teaches Claude Code how to use falaw. It</span>
 <span class="sd">is generated --- never hand-edited at the install location --- so adding a</span>
 <span class="sd">new tool automatically updates the skill the next time we run</span>
 <span class="sd">`write_skill_files()`.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -128,7 +128,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolSpec</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_models</span><span class="p">,</span> <span class="n">list_tools</span>
 
-<span class="n">_HEADER</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;---</span>
+<span class="n">_HEADER</span> <span class="o">=</span> <span class="s2">"""---</span>
 <span class="s2">name: falaw</span>
 <span class="s2">description: &gt;-</span>
 <span class="s2">  Generate and manage AI media (images, video, audio) via fal.ai. Use this</span>
@@ -148,12 +148,12 @@
 <span class="s2">   that re-edit the Scene, re-render only the affected beats. This is the path</span>
 <span class="s2">   to *direct* a film instead of just *generate* clips.</span>
 
-<span class="s2">## Directorial workflow (when the user wants to &quot;plan, parametrize, render&quot;)</span>
+<span class="s2">## Directorial workflow (when the user wants to "plan, parametrize, render")</span>
 
 <span class="s2">The thesis: keep the film in *editable structure* all the way down to the</span>
 <span class="s2">pixels. The creator authors a Scene as data; a directorial note becomes a</span>
 <span class="s2">single IR edit; the renderer caches everything content-addressed so unchanged</span>
-<span class="s2">beats don&#39;t re-render.</span>
+<span class="s2">beats don't re-render.</span>
 
 <span class="s2">### Phase 1: Plan (LLM-assisted or hand-built)</span>
 
@@ -161,22 +161,22 @@
 <span class="s2">from falaw import parse_screenplay, Scene, Character, Environment, make_beat, make_shot</span>
 
 <span class="s2"># Option A: feed prose / treatment text and let any-llm draft the structure.</span>
-<span class="s2">scene = parse_screenplay(prose_text, title=&quot;Diner Encounter&quot;,</span>
-<span class="s2">                         style=&quot;Wes-Anderson pastel&quot;)</span>
+<span class="s2">scene = parse_screenplay(prose_text, title="Diner Encounter",</span>
+<span class="s2">                         style="Wes-Anderson pastel")</span>
 
 <span class="s2"># Option B: build the Scene directly.</span>
 <span class="s2">scene = Scene(</span>
-<span class="s2">    title=&quot;Diner Encounter&quot;,</span>
-<span class="s2">    style=&quot;Wes-Anderson symmetrical pastel&quot;,</span>
-<span class="s2">    characters=(Character(name=&quot;Sarah&quot;, description=&quot;mid-30s, dark curly hair&quot;),),</span>
-<span class="s2">    environments=(Environment(name=&quot;diner&quot;, description=&quot;1950s chrome diner&quot;,</span>
-<span class="s2">                              time_of_day=&quot;midnight&quot;),),</span>
-<span class="s2">    shots=(make_shot(&quot;two-shot at the booth&quot;, framing=&quot;medium&quot;,</span>
-<span class="s2">                     environment=&quot;diner&quot;, characters=(&quot;Sarah&quot;, &quot;Tom&quot;), index=0),),</span>
+<span class="s2">    title="Diner Encounter",</span>
+<span class="s2">    style="Wes-Anderson symmetrical pastel",</span>
+<span class="s2">    characters=(Character(name="Sarah", description="mid-30s, dark curly hair"),),</span>
+<span class="s2">    environments=(Environment(name="diner", description="1950s chrome diner",</span>
+<span class="s2">                              time_of_day="midnight"),),</span>
+<span class="s2">    shots=(make_shot("two-shot at the booth", framing="medium",</span>
+<span class="s2">                     environment="diner", characters=("Sarah", "Tom"), index=0),),</span>
 <span class="s2">    beats=(</span>
-<span class="s2">        make_beat(&quot;Sarah&quot;, &quot;Why are you here?&quot;,</span>
-<span class="s2">                  shot_id=&quot;...&quot;, emotion=&quot;wary&quot;, index=0),</span>
-<span class="s2">        make_beat(&quot;Tom&quot;, &quot;I came to apologize.&quot;, index=1),</span>
+<span class="s2">        make_beat("Sarah", "Why are you here?",</span>
+<span class="s2">                  shot_id="...", emotion="wary", index=0),</span>
+<span class="s2">        make_beat("Tom", "I came to apologize.", index=1),</span>
 <span class="s2">    ),</span>
 <span class="s2">)</span>
 <span class="s2">```</span>
@@ -190,11 +190,11 @@
 <span class="s2">```python</span>
 <span class="s2">from falaw import cast_character, establish_environment</span>
 
-<span class="s2">sarah = cast_character(&quot;Sarah&quot;, &quot;mid-30s, dark curly hair, wary eyes&quot;,</span>
-<span class="s2">                       reference_audio_url=&quot;https://.../sarah_sample.wav&quot;)</span>
-<span class="s2">diner = establish_environment(&quot;diner&quot;,</span>
-<span class="s2">                              &quot;1950s chrome diner, neon outside, half-empty booths&quot;,</span>
-<span class="s2">                              time_of_day=&quot;midnight&quot;, lighting=&quot;cool fluorescents&quot;)</span>
+<span class="s2">sarah = cast_character("Sarah", "mid-30s, dark curly hair, wary eyes",</span>
+<span class="s2">                       reference_audio_url="https://.../sarah_sample.wav")</span>
+<span class="s2">diner = establish_environment("diner",</span>
+<span class="s2">                              "1950s chrome diner, neon outside, half-empty booths",</span>
+<span class="s2">                              time_of_day="midnight", lighting="cool fluorescents")</span>
 <span class="s2">scene = scene.with_character(sarah).with_environment(diner)</span>
 <span class="s2">```</span>
 
@@ -204,7 +204,7 @@
 <span class="s2">from falaw import render_scene, save_scene</span>
 
 <span class="s2">manifest = render_scene(scene)             # all beats + shots</span>
-<span class="s2">save_scene(scene, &quot;out/diner_v1.json&quot;)     # snapshot the IR alongside</span>
+<span class="s2">save_scene(scene, "out/diner_v1.json")     # snapshot the IR alongside</span>
 <span class="s2">```</span>
 
 <span class="s2">### Phase 4: Direct (notes -&gt; IR edits -&gt; re-render)</span>
@@ -213,14 +213,14 @@
 <span class="s2">from falaw import apply_note_to_beat</span>
 
 <span class="s2"># Pick the beat to direct.</span>
-<span class="s2">beat = scene.beat(&quot;002-tom-...&quot;)</span>
-<span class="s2">edited = apply_note_to_beat(beat, &quot;He cracks on this line; tries to hide it.&quot;)</span>
+<span class="s2">beat = scene.beat("002-tom-...")</span>
+<span class="s2">edited = apply_note_to_beat(beat, "He cracks on this line; tries to hide it.")</span>
 <span class="s2">scene2 = scene.with_beat(edited)</span>
 <span class="s2">manifest2 = render_scene(scene2)   # only the edited beat re-renders;</span>
 <span class="s2">                                   # the rest are cache hits.</span>
 <span class="s2">```</span>
 
-<span class="s2">For cross-cutting notes like &quot;tighten the pacing&quot;, use</span>
+<span class="s2">For cross-cutting notes like "tighten the pacing", use</span>
 <span class="s2">`apply_note_to_scene(scene, note)`. For non-LLM edits, just construct the</span>
 <span class="s2">new dataclass yourself --- everything is frozen so `dataclasses.replace`</span>
 <span class="s2">works.</span>
@@ -232,8 +232,8 @@
 
 <span class="s2">```python</span>
 <span class="s2">from falaw.local import concatenate_clips</span>
-<span class="s2">concatenate_clips([m[&quot;url&quot;] for m in manifest[&quot;beats&quot;]],</span>
-<span class="s2">                  output_path=&quot;out/scene.mp4&quot;, transition_s=0.2)</span>
+<span class="s2">concatenate_clips([m["url"] for m in manifest["beats"]],</span>
+<span class="s2">                  output_path="out/scene.mp4", transition_s=0.2)</span>
 <span class="s2">```</span>
 
 <span class="s2">## Read the journal first</span>
@@ -244,35 +244,35 @@
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
 <span class="s2">for e in journal.recent(20):</span>
-<span class="s2">    print(e.kind, &#39;-&#39;, e.text[:120])</span>
+<span class="s2">    print(e.kind, '-', e.text[:120])</span>
 <span class="s2">```</span>
 
 <span class="s2">## Leave a journal entry when something surprises you</span>
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
-<span class="s2">journal.issue(&quot;FLUX dev returned NSFW=True for a benign prompt&quot;,</span>
-<span class="s2">              suggestion=&quot;Try guidance_scale=2.0&quot;, tags=(&quot;flux&quot;, &quot;safety&quot;))</span>
-<span class="s2">journal.improvement(&quot;Pass beat.emotion as a TTS prompt arg for emotion-aware models&quot;,</span>
-<span class="s2">                    tags=(&quot;backlog&quot;, &quot;directorial&quot;))</span>
-<span class="s2">journal.note(&quot;schnell at quality=&#39;fast&#39; returns 1024x1024 by default&quot;)</span>
+<span class="s2">journal.issue("FLUX dev returned NSFW=True for a benign prompt",</span>
+<span class="s2">              suggestion="Try guidance_scale=2.0", tags=("flux", "safety"))</span>
+<span class="s2">journal.improvement("Pass beat.emotion as a TTS prompt arg for emotion-aware models",</span>
+<span class="s2">                    tags=("backlog", "directorial"))</span>
+<span class="s2">journal.note("schnell at quality='fast' returns 1024x1024 by default")</span>
 <span class="s2">```</span>
 
 <span class="s2">## Pick a model without memorizing IDs</span>
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import list_models, pick_model</span>
-<span class="s2">[m.id for m in list_models(category=&#39;image_to_video&#39;)]</span>
-<span class="s2">pick_model(category=&#39;image_edit&#39;, quality_tier=&#39;ultra&#39;).id</span>
+<span class="s2">[m.id for m in list_models(category='image_to_video')]</span>
+<span class="s2">pick_model(category='image_edit', quality_tier='ultra').id</span>
 <span class="s2">```</span>
 
 <span class="s2">## Tools</span>
 
 <span class="s2">Every function below is a registered tool; bridges (MCP server, HTTP</span>
 <span class="s2">service, UI) derive their surfaces from the same registry.</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
-<span class="n">_FOOTER_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="n">_FOOTER_TEMPLATE</span> <span class="o">=</span> <span class="s2">"""</span>
 <span class="s2">## Models known to falaw</span>
 
 <span class="s2">The model registry lives at `falaw/data/models.json`. Refresh it from</span>
@@ -282,50 +282,50 @@
 <span class="si">{model_lines}</span>
 <span class="s2">```</span>
 
-<span class="s2">## When you can&#39;t find what you need</span>
+<span class="s2">## When you can't find what you need</span>
 
 <span class="s2">* Check `falaw/misc/docs/llms-full.txt` for a structured fal.ai overview.</span>
 <span class="s2">* Check `falaw/misc/docs/fal_ai_docs_full.md` for the full corpus (~3MB).</span>
 <span class="s2">* Drop into `falaw.call_fal(application, arguments)` for any model not</span>
 <span class="s2">  yet wrapped --- this is the escape hatch. Then leave a `journal.improvement`</span>
 <span class="s2">  asking for a proper tool wrapper.</span>
-<span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">"""</span>
 
 
 <div class="viewcode-block" id="build_skill_md">
 <a class="viewcode-back" href="../../../module_docs/falaw/bridges/skill.html#falaw.bridges.skill.build_skill_md">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_skill_md</span><span class="p">(</span><span class="n">tools</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">ToolSpec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the SKILL.md content from the tool registry.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Render the SKILL.md content from the tool registry."""</span>
     <span class="n">tools</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tools</span> <span class="k">if</span> <span class="n">tools</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">list_tools</span><span class="p">())</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">_HEADER</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
-        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">### `falaw.</span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">### `falaw.</span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">`</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">examples</span><span class="p">:</span>
-            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Examples:&quot;</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Examples:"</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">ex</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">examples</span><span class="p">:</span>
-                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  - `falaw.</span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">(**</span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)`&quot;</span><span class="p">)</span>
-            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="n">model_lines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">quality_tier</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - `falaw.</span><span class="si">{</span><span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">(**</span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span><span class="si">!r}</span><span class="s2">)`"</span><span class="p">)</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">model_lines</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">quality_tier</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">list_models</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">quality_tier</span><span class="p">))</span>
     <span class="p">)</span>
     <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_FOOTER_TEMPLATE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">model_lines</span><span class="o">=</span><span class="n">model_lines</span><span class="p">))</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="write_skill_files">
 <a class="viewcode-back" href="../../../module_docs/falaw/bridges/skill.html#falaw.bridges.skill.write_skill_files">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">write_skill_files</span><span class="p">(</span><span class="n">target_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write SKILL.md (and a small references/ folder) under `target_dir`.</span>
+<span class="w">    </span><span class="sd">"""Write SKILL.md (and a small references/ folder) under `target_dir`.</span>
 
 <span class="sd">    Returns the path written.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_dir</span><span class="p">,</span> <span class="s2">&quot;references&quot;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">skill_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_dir</span><span class="p">,</span> <span class="s2">&quot;SKILL.md&quot;</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">skill_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="sd">    """</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_dir</span><span class="p">,</span> <span class="s2">"references"</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">skill_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_dir</span><span class="p">,</span> <span class="s2">"SKILL.md"</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">skill_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">build_skill_md</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">skill_path</span></div>
 

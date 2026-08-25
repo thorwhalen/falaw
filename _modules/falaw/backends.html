@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.backends &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.backends &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,13 +112,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.backends</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Execution backend registry — where `CallPlan.backend` dispatches (falaw#15).</span>
+<span></span><span class="sd">"""Execution backend registry — where `CallPlan.backend` dispatches (falaw#15).</span>
 
-<span class="sd">Until this module existed, &quot;make the vendor call&quot; meant one hardcoded path:</span>
+<span class="sd">Until this module existed, "make the vendor call" meant one hardcoded path:</span>
 <span class="sd">`falaw.core.call_fal`. That is a budget bypass waiting to happen — the</span>
-<span class="sd">video_gen research programme&#39;s decisions of record (§3.2) put it plainly:</span>
-<span class="sd">*&quot;Do not write a ComfyUI Transform before this lands. A flavor without a</span>
-<span class="sd">priceable Plan is a budget bypass.&quot;* A backend reachable only by overriding</span>
+<span class="sd">video_gen research programme's decisions of record (§3.2) put it plainly:</span>
+<span class="sd">*"Do not write a ComfyUI Transform before this lands. A flavor without a</span>
+<span class="sd">priceable Plan is a budget bypass."* A backend reachable only by overriding</span>
 <span class="sd">`Transform.execute` wholesale returns `Plan(calls=())`, so</span>
 <span class="sd">`Plan.total_cost_usd` reads $0.00 on a real spend and every downstream</span>
 <span class="sd">consumer of `Plan` — the cache, the dry-run converter, the cost gate — never</span>
@@ -126,18 +126,18 @@
 
 <span class="sd">The fix is the smallest one that closes that gap: `CallPlan` gains a</span>
 <span class="sd">`backend: str` field (default :data:`falaw.canonical.DFLT_BACKEND`, i.e.</span>
-<span class="sd">`&quot;fal&quot;`), and `execute_isolated` resolves it through this module&#39;s `backends`</span>
+<span class="sd">`"fal"`), and `execute_isolated` resolves it through this module's `backends`</span>
 <span class="sd">registry instead of calling `call_fal` directly. Everything else about a</span>
 <span class="sd">`CallPlan` — its cost estimate, its cache key, its artifact conversion —</span>
-<span class="sd">stays exactly what it already is, because the executor&#39;s contract is</span>
-<span class="sd">narrow: turn `(application, arguments)` into the vendor&#39;s *raw* response,</span>
+<span class="sd">stays exactly what it already is, because the executor's contract is</span>
+<span class="sd">narrow: turn `(application, arguments)` into the vendor's *raw* response,</span>
 <span class="sd">in the same shape :func:`falaw.core.call_fal` already returns. Converting</span>
-<span class="sd">that raw response into a `lacing.Artifact` remains `execute`&#39;s job, uniform</span>
+<span class="sd">that raw response into a `lacing.Artifact` remains `execute`'s job, uniform</span>
 <span class="sd">across backends.</span>
 
 <span class="sd">Nothing above `falaw.Plan` may know a specific backend exists. A module that</span>
 <span class="sd">imports a backend type, references a vendor node name, or assumes a</span>
-<span class="sd">backend&#39;s execution semantics is an architecture bug regardless of whether</span>
+<span class="sd">backend's execution semantics is an architecture bug regardless of whether</span>
 <span class="sd">it works — this registry is the one seam allowed to know backends exist at</span>
 <span class="sd">all.</span>
 
@@ -147,7 +147,7 @@
 <span class="sd">two-tier ruling this registry is the executor half of: a ``nw.Transform``</span>
 <span class="sd">comfy *flavor* is the graph **template** and never opens a socket; a</span>
 <span class="sd">`GraphExecutionBackend` registered here is the **executor**.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -158,11 +158,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.canonical</span><span class="w"> </span><span class="kn">import</span> <span class="n">DFLT_BACKEND</span>
 
 <span class="n">BackendExecutor</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;``executor(application, arguments, *, on_event=None) -&gt; dict`` — the same</span>
-<span class="sd">shape :func:`falaw.core.call_fal` returns: the vendor&#39;s raw response, ready</span>
-<span class="sd">for the existing artifact converter. An executor&#39;s only job is *making the</span>
+<span class="sd">"""``executor(application, arguments, *, on_event=None) -&gt; dict`` — the same</span>
+<span class="sd">shape :func:`falaw.core.call_fal` returns: the vendor's raw response, ready</span>
+<span class="sd">for the existing artifact converter. An executor's only job is *making the</span>
 <span class="sd">call*; it must not attempt caching (the registry sits below the cache) or</span>
-<span class="sd">artifact conversion (``execute`` owns that, uniformly across backends).&quot;&quot;&quot;</span>
+<span class="sd">artifact conversion (``execute`` owns that, uniformly across backends)."""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_fal_executor</span><span class="p">(</span>
@@ -171,30 +171,30 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The only backend until a second one lands: today&#39;s ``call_fal`` path,</span>
-<span class="sd">    unchanged in behaviour — this module adds a seam, not a rewrite.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""The only backend until a second one lands: today's ``call_fal`` path,</span>
+<span class="sd">    unchanged in behaviour — this module adds a seam, not a rewrite."""</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_fal</span>
 
     <span class="k">return</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span> <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">)</span>
 
 
-<span class="n">backends</span><span class="p">:</span> <span class="n">Registry</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;falaw.backends&quot;</span><span class="p">,</span> <span class="n">on_conflict</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Public registry of execution backends, keyed by :attr:`CallPlan.backend`.</span>
-<span class="sd">``on_conflict=&quot;error&quot;`` so a misconfigured plugin fails loudly instead of</span>
-<span class="sd">silently shadowing the built-in fal executor.&quot;&quot;&quot;</span>
+<span class="n">backends</span><span class="p">:</span> <span class="n">Registry</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"falaw.backends"</span><span class="p">,</span> <span class="n">on_conflict</span><span class="o">=</span><span class="s2">"error"</span><span class="p">)</span>
+<span class="sd">"""Public registry of execution backends, keyed by :attr:`CallPlan.backend`.</span>
+<span class="sd">``on_conflict="error"`` so a misconfigured plugin fails loudly instead of</span>
+<span class="sd">silently shadowing the built-in fal executor."""</span>
 <span class="n">backends</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">DFLT_BACKEND</span><span class="p">,</span> <span class="n">_fal_executor</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_backend_executor">
 <a class="viewcode-back" href="../../module_docs/falaw/backends.html#falaw.backends.get_backend_executor">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_backend_executor</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BackendExecutor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Look up a backend executor by name; raises with the known names.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Look up a backend executor by name; raises with the known names."""</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">backends</span><span class="p">:</span>
         <span class="n">known</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;No falaw execution backend </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is registered; known: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">. Register one with &quot;</span>
-            <span class="s2">&quot;falaw.backends.backends.register(name, executor).&quot;</span>
+            <span class="sa">f</span><span class="s2">"No falaw execution backend </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is registered; known: "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">known</span><span class="si">}</span><span class="s2">. Register one with "</span>
+            <span class="s2">"falaw.backends.backends.register(name, executor)."</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">backends</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
 

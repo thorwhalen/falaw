@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.core &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.core &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,7 +112,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.core</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Wrapper over `fal_client.subscribe` with progress events and auto-journaling.</span>
+<span></span><span class="sd">"""Wrapper over `fal_client.subscribe` with progress events and auto-journaling.</span>
 
 <span class="sd">Operations should call `call_fal` rather than `fal_client.subscribe` directly,</span>
 <span class="sd">so we get one place to:</span>
@@ -124,7 +124,7 @@
 <span class="sd">See :mod:`falaw.events` for the event model. ``on_log`` (a</span>
 <span class="sd">string-only callback) still works for backward compatibility — when</span>
 <span class="sd">both ``on_log`` and ``on_event`` are given, both fire.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -145,29 +145,29 @@
 
 <span class="c1">#: The fal API key bound for the current execution context, if any. Set via</span>
 <span class="c1">#: :func:`using_fal_credentials` so a server handling a per-request</span>
-<span class="c1">#: &quot;bring-your-own-key&quot; call can route every nested :func:`call_fal` through</span>
-<span class="c1">#: the caller&#39;s key — without threading a credential argument through every</span>
+<span class="c1">#: "bring-your-own-key" call can route every nested :func:`call_fal` through</span>
+<span class="c1">#: the caller's key — without threading a credential argument through every</span>
 <span class="c1">#: intermediate signature (plan → execute → cached_call_fal → call_fal).</span>
 <span class="c1">#:</span>
 <span class="c1">#: A :class:`contextvars.ContextVar` (rather than an ``os.environ`` mutation)</span>
 <span class="c1">#: keeps the binding naturally scoped to the entering context and the threads</span>
 <span class="c1">#: it spawns: concurrent requests on other tasks/threads are unaffected, and</span>
-<span class="c1">#: no process-wide lock is needed. This is the seam reelee&#39;s HTTP server uses</span>
+<span class="c1">#: no process-wide lock is needed. This is the seam reelee's HTTP server uses</span>
 <span class="c1">#: to forward a BYO key into server-side fal calls (reelee#159).</span>
-<span class="n">_FAL_KEY_VAR</span><span class="p">:</span> <span class="s2">&quot;contextvars.ContextVar[Optional[str]]&quot;</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span>
-    <span class="s2">&quot;falaw_fal_key&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+<span class="n">_FAL_KEY_VAR</span><span class="p">:</span> <span class="s2">"contextvars.ContextVar[Optional[str]]"</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">"falaw_fal_key"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span>
 
 
 <div class="viewcode-block" id="current_fal_key">
 <a class="viewcode-back" href="../../module_docs/falaw/core.html#falaw.current_fal_key">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">current_fal_key</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The fal API key bound for the current context, or ``None``.</span>
+<span class="w">    </span><span class="sd">"""The fal API key bound for the current context, or ``None``.</span>
 
 <span class="sd">    Resolution order callers should mirror: an explicit ``api_key`` argument</span>
 <span class="sd">    to :func:`call_fal` wins over this context value, which in turn wins over</span>
-<span class="sd">    the fal SDK&#39;s own ``FAL_KEY`` env-var lookup.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    the fal SDK's own ``FAL_KEY`` env-var lookup.</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="n">_FAL_KEY_VAR</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 
 
@@ -176,21 +176,21 @@
 <a class="viewcode-back" href="../../module_docs/falaw/core.html#falaw.using_fal_credentials">[docs]</a>
 <span class="nd">@contextmanager</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">using_fal_credentials</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind ``key`` as the fal credential for every :func:`call_fal` in this context.</span>
+<span class="w">    </span><span class="sd">"""Bind ``key`` as the fal credential for every :func:`call_fal` in this context.</span>
 
 <span class="sd">    Intended for server-side bring-your-own-key flows: wrap a unit of work</span>
 <span class="sd">    that will make one or more fal calls, and they all authenticate with</span>
-<span class="sd">    ``key`` instead of the server&#39;s ``FAL_KEY`` env var — without any</span>
+<span class="sd">    ``key`` instead of the server's ``FAL_KEY`` env var — without any</span>
 <span class="sd">    intermediate function needing a credential parameter.</span>
 
 <span class="sd">    A falsy ``key`` is a deliberate no-op (the context is left untouched), so</span>
 <span class="sd">    a caller can pass an optional header value straight through without</span>
-<span class="sd">    special-casing &quot;no BYO key — fall back to the server/env key&quot;.</span>
+<span class="sd">    special-casing "no BYO key — fall back to the server/env key".</span>
 
 <span class="sd">    Thread/async safe: backed by a :class:`contextvars.ContextVar`, so the</span>
 <span class="sd">    binding is visible only within the entering context (and threads/tasks it</span>
 <span class="sd">    spawns), never to concurrent requests.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="p">:</span>
         <span class="k">yield</span>
         <span class="k">return</span>
@@ -214,10 +214,10 @@
     <span class="n">journal_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Call a fal model via fal_client.subscribe.</span>
+<span class="w">    </span><span class="sd">"""Call a fal model via fal_client.subscribe.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        application: fal model id (e.g. ``&quot;fal-ai/flux/dev&quot;``).</span>
+<span class="sd">        application: fal model id (e.g. ``"fal-ai/flux/dev"``).</span>
 <span class="sd">        arguments: Input arguments. Keys depend on the model.</span>
 <span class="sd">        on_log: Legacy log callback — receives raw log lines as strings.</span>
 <span class="sd">            Defaults to no-op (use ``on_event`` for structured access).</span>
@@ -230,31 +230,31 @@
 <span class="sd">            id and arguments so future agents can recognize the same trap.</span>
 <span class="sd">        api_key: Explicit fal key for this call. When ``None`` (default) the</span>
 <span class="sd">            key bound via :func:`using_fal_credentials` is used; when that is</span>
-<span class="sd">            also unset, the fal SDK&#39;s own ``FAL_KEY`` env-var lookup applies</span>
+<span class="sd">            also unset, the fal SDK's own ``FAL_KEY`` env-var lookup applies</span>
 <span class="sd">            (the historical behaviour). A resolved key is used per-call via a</span>
 <span class="sd">            dedicated ``fal_client.SyncClient`` — it is never written to a</span>
 <span class="sd">            global or an env var.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The raw response dict from the model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>  <span class="c1"># lazy: keep import out of `from falaw import ...`</span>
 
     <span class="c1"># Resolve the per-call credential: explicit arg &gt; context binding &gt; SDK</span>
     <span class="c1"># default. Only when a key is resolved do we route through a dedicated</span>
     <span class="c1"># ``SyncClient`` — otherwise we call the module-level ``subscribe`` so the</span>
-    <span class="c1"># SDK&#39;s own env/global resolution is preserved exactly as before.</span>
+    <span class="c1"># SDK's own env/global resolution is preserved exactly as before.</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">api_key</span> <span class="ow">or</span> <span class="n">_FAL_KEY_VAR</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="n">subscribe</span> <span class="o">=</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">subscribe</span>
     <span class="k">if</span> <span class="n">key</span><span class="p">:</span>
-        <span class="n">client_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fal_client</span><span class="p">,</span> <span class="s2">&quot;SyncClient&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">client_cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">fal_client</span><span class="p">,</span> <span class="s2">"SyncClient"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">client_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">subscribe</span> <span class="o">=</span> <span class="n">client_cls</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">subscribe</span>
 
     <span class="n">call_id</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span>
     <span class="n">started</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_ev</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">pct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_ev</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">pct</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">emit</span><span class="p">(</span>
             <span class="n">ProgressEvent</span><span class="p">(</span>
                 <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
@@ -273,15 +273,15 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="n">fal_client</span><span class="o">.</span><span class="n">InProgress</span><span class="p">):</span>
             <span class="n">entries</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">logs</span> <span class="ow">or</span> <span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;progress&quot;</span><span class="p">)</span>
+                <span class="n">_ev</span><span class="p">(</span><span class="s2">"progress"</span><span class="p">)</span>
                 <span class="k">return</span>
             <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"message"</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
                     <span class="n">log</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">_ev</span><span class="p">(</span><span class="s2">"log"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;queued&quot;</span><span class="p">)</span>
+    <span class="n">_ev</span><span class="p">(</span><span class="s2">"queued"</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">subscribe</span><span class="p">(</span>
             <span class="n">application</span><span class="p">,</span>
@@ -293,21 +293,21 @@
         <span class="c1"># Translate fal_client errors into typed falaw exceptions so callers</span>
         <span class="c1"># can catch FalAccountLocked / FalRateLimited / etc. specifically.</span>
         <span class="n">exc</span> <span class="o">=</span> <span class="n">_translate_error</span><span class="p">(</span><span class="n">raw_exc</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">)</span>
-        <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+        <span class="n">_ev</span><span class="p">(</span><span class="s2">"error"</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="nb">repr</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">journal_errors</span><span class="p">:</span>
             <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;issue&quot;</span><span class="p">,</span>
-                <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;call_fal(</span><span class="si">{</span><span class="n">application</span><span class="si">!r}</span><span class="s2">) failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span>
-                <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;call_fal&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+                <span class="n">kind</span><span class="o">=</span><span class="s2">"issue"</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="sa">f</span><span class="s2">"call_fal(</span><span class="si">{</span><span class="n">application</span><span class="si">!r}</span><span class="s2">) failed: </span><span class="si">{</span><span class="n">exc</span><span class="si">!r}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"call_fal"</span><span class="p">,</span> <span class="s2">"error"</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
                 <span class="n">context</span><span class="o">=</span><span class="p">{</span>
-                    <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span>
-                    <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span>
-                    <span class="s2">&quot;duration_s&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
-                    <span class="s2">&quot;status_code&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                    <span class="s2">"application"</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span>
+                    <span class="s2">"arguments"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span>
+                    <span class="s2">"duration_s"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
+                    <span class="s2">"status_code"</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="s2">"status_code"</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                 <span class="p">},</span>
             <span class="p">)</span>
         <span class="k">raise</span> <span class="n">exc</span> <span class="kn">from</span><span class="w"> </span><span class="nn">raw_exc</span>
-    <span class="n">_ev</span><span class="p">(</span><span class="s2">&quot;done&quot;</span><span class="p">)</span>
+    <span class="n">_ev</span><span class="p">(</span><span class="s2">"done"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span></div>
 
 </pre></div>

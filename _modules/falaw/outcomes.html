@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.outcomes &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.outcomes &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,11 +112,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.outcomes</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Per-call outcomes of running a :class:`falaw.Plan` — the partial-result type.</span>
+<span></span><span class="sd">"""Per-call outcomes of running a :class:`falaw.Plan` — the partial-result type.</span>
 
 <span class="sd">A :class:`falaw.Plan` is a fan-out: 200 panels is 200 :class:`~falaw.CallPlan`</span>
-<span class="sd">entries in one Plan. A ``list[Artifact]`` return has no room to say *&quot;call 7</span>
-<span class="sd">failed, here are the other 199&quot;*, so the only thing a bare list can do when one</span>
+<span class="sd">entries in one Plan. A ``list[Artifact]`` return has no room to say *"call 7</span>
+<span class="sd">failed, here are the other 199"*, so the only thing a bare list can do when one</span>
 <span class="sd">call raises is throw the whole run away — including artifacts that were already</span>
 <span class="sd">generated and **already billed**.</span>
 
@@ -131,22 +131,22 @@
 <span class="sd">    and retry precisely this one call.</span>
 <span class="sd">``blocked``</span>
 <span class="sd">    The call never ran, because something it depends on did not succeed — a</span>
-<span class="sd">    ``&quot;&lt;from N&gt;&quot;`` placeholder pointing at a failed upstream — or because the</span>
+<span class="sd">    ``"&lt;from N&gt;"`` placeholder pointing at a failed upstream — or because the</span>
 <span class="sd">    run was halted by an earlier failure.</span>
 
 <span class="sd">The third state is what makes a chained plan safe to resume: a blocked call</span>
-<span class="sd">must be *re-planned*, not retried, and a caller that cannot tell &quot;blocked&quot; from</span>
-<span class="sd">&quot;failed&quot; will retry a call whose input does not exist.</span>
+<span class="sd">must be *re-planned*, not retried, and a caller that cannot tell "blocked" from</span>
+<span class="sd">"failed" will retry a call whose input does not exist.</span>
 
 <span class="sd">Examples</span>
 <span class="sd">--------</span>
 
 <span class="sd">&gt;&gt;&gt; from falaw.plan import CallPlan</span>
-<span class="sd">&gt;&gt;&gt; call = CallPlan(tool=&quot;generate_image&quot;, application=&quot;fal-ai/flux/dev&quot;,</span>
-<span class="sd">...                 arguments={&quot;prompt&quot;: &quot;a tiger&quot;}, output_kind=&quot;image&quot;,</span>
+<span class="sd">&gt;&gt;&gt; call = CallPlan(tool="generate_image", application="fal-ai/flux/dev",</span>
+<span class="sd">...                 arguments={"prompt": "a tiger"}, output_kind="image",</span>
 <span class="sd">...                 estimated_cost_usd=0.025)</span>
-<span class="sd">&gt;&gt;&gt; boom = CallOutcome(index=0, call=call, status=&quot;failed&quot;,</span>
-<span class="sd">...                    error=RuntimeError(&quot;content filter&quot;))</span>
+<span class="sd">&gt;&gt;&gt; boom = CallOutcome(index=0, call=call, status="failed",</span>
+<span class="sd">...                    error=RuntimeError("content filter"))</span>
 <span class="sd">&gt;&gt;&gt; boom.ok</span>
 <span class="sd">False</span>
 <span class="sd">&gt;&gt;&gt; report = ExecutionReport(outcomes=(boom,))</span>
@@ -156,7 +156,7 @@
 <span class="sd">0.0</span>
 <span class="sd">&gt;&gt;&gt; [o.index for o in report.failed]</span>
 <span class="sd">[0]</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -169,92 +169,92 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span>
 
 
-<span class="n">CallStatus</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;succeeded&quot;</span><span class="p">,</span> <span class="s2">&quot;failed&quot;</span><span class="p">,</span> <span class="s2">&quot;blocked&quot;</span><span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;What became of one :class:`~falaw.CallPlan` in a run. See the module docstring.&quot;&quot;&quot;</span>
+<span class="n">CallStatus</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"succeeded"</span><span class="p">,</span> <span class="s2">"failed"</span><span class="p">,</span> <span class="s2">"blocked"</span><span class="p">]</span>
+<span class="sd">"""What became of one :class:`~falaw.CallPlan` in a run. See the module docstring."""</span>
 
 
 <div class="viewcode-block" id="CallOutcome">
 <a class="viewcode-back" href="../../module_docs/falaw/outcomes.html#falaw.CallOutcome">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CallOutcome</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;What happened to one :class:`~falaw.CallPlan`, at its position in the Plan.</span>
+<span class="w">    </span><span class="sd">"""What happened to one :class:`~falaw.CallPlan`, at its position in the Plan.</span>
 
-<span class="sd">    ``index`` is the call&#39;s position in ``plan.calls`` and is the identity a</span>
+<span class="sd">    ``index`` is the call's position in ``plan.calls`` and is the identity a</span>
 <span class="sd">    caller retries or re-plans by — a report always carries exactly one outcome</span>
 <span class="sd">    per call, in plan order, so ``index`` is also the safe key for zipping a</span>
 <span class="sd">    Plan against anything the caller built alongside it.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Position in ``plan.calls``. Stable, and unique within a report.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Position in ``plan.calls``. Stable, and unique within a report."""</span>
 
-    <span class="n">call</span><span class="p">:</span> <span class="s2">&quot;CallPlan&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The call this outcome is about — enough to retry it verbatim.&quot;&quot;&quot;</span>
+    <span class="n">call</span><span class="p">:</span> <span class="s2">"CallPlan"</span>
+<span class="w">    </span><span class="sd">"""The call this outcome is about — enough to retry it verbatim."""</span>
 
     <span class="n">status</span><span class="p">:</span> <span class="n">CallStatus</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``&quot;succeeded&quot;`` / ``&quot;failed&quot;`` / ``&quot;blocked&quot;``. See the module docstring.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""``"succeeded"`` / ``"failed"`` / ``"blocked"``. See the module docstring."""</span>
 
-    <span class="n">artifact</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;Artifact&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The materialized artifact. Set if and only if ``status == &quot;succeeded&quot;``.&quot;&quot;&quot;</span>
+    <span class="n">artifact</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">"Artifact"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">"""The materialized artifact. Set if and only if ``status == "succeeded"``."""</span>
 
     <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The exception the call raised. Set if and only if ``status == &quot;failed&quot;``.</span>
+<span class="w">    </span><span class="sd">"""The exception the call raised. Set if and only if ``status == "failed"``.</span>
 
 <span class="sd">    Kept as the exception object rather than a string so the caller can use</span>
-<span class="sd">    falaw&#39;s typed hierarchy (:mod:`falaw.errors`) to decide between backing off,</span>
+<span class="sd">    falaw's typed hierarchy (:mod:`falaw.errors`) to decide between backing off,</span>
 <span class="sd">    switching models, and giving up.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">cache_hit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the result came from the cache **as observed at run time**.</span>
+<span class="w">    </span><span class="sd">"""Whether the result came from the cache **as observed at run time**.</span>
 
 <span class="sd">    Not the same thing as :attr:`falaw.CallPlan.cache_status`, which is a</span>
 <span class="sd">    *prediction* made at plan time and can be wrong in both directions (a</span>
 <span class="sd">    concurrent run filled the entry; a hit turned out to be unusable and was</span>
 <span class="sd">    re-executed). Run-level cost accounting reads this one.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">blocked_by</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Indices of the calls whose non-success blocked this one. ``()`` when the</span>
-<span class="sd">    call was blocked for a run-level reason rather than a dependency.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Indices of the calls whose non-success blocked this one. ``()`` when the</span>
+<span class="sd">    call was blocked for a run-level reason rather than a dependency."""</span>
 
-    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Human-readable explanation. Required for ``blocked``; free otherwise.&quot;&quot;&quot;</span>
+    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="w">    </span><span class="sd">"""Human-readable explanation. Required for ``blocked``; free otherwise."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reject an outcome whose payload contradicts its status.</span>
+<span class="w">        </span><span class="sd">"""Reject an outcome whose payload contradicts its status.</span>
 
-<span class="sd">        A ``&quot;succeeded&quot;`` outcome with no artifact, or a ``&quot;failed&quot;`` one with no</span>
+<span class="sd">        A ``"succeeded"`` outcome with no artifact, or a ``"failed"`` one with no</span>
 <span class="sd">        exception, would be silently useless to every consumer — and the whole</span>
 <span class="sd">        point of this type is that a caller can trust ``status`` and act on it.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;an artifact&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;no error&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;an error&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;no artifact&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;blocked&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;no artifact&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;no error&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">),</span> <span class="s2">&quot;a reason&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"an artifact"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"no error"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"failed"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"an error"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"no artifact"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"blocked"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"no artifact"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"no error"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_require</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">),</span> <span class="s2">"a reason"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;CallOutcome.status must be one of &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;succeeded&#39; / &#39;failed&#39; / &#39;blocked&#39;, got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"CallOutcome.status must be one of "</span>
+                <span class="sa">f</span><span class="s2">"'succeeded' / 'failed' / 'blocked', got </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">!r}</span><span class="s2">."</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_require</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">expectation</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">condition</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;CallOutcome(index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2">, status=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">!r}</span><span class="s2">) &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;must carry </span><span class="si">{</span><span class="n">expectation</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"CallOutcome(index=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2">, status=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="si">!r}</span><span class="s2">) "</span>
+                <span class="sa">f</span><span class="s2">"must carry </span><span class="si">{</span><span class="n">expectation</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ok</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shorthand for ``status == &quot;succeeded&quot;``.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span></div>
+<span class="w">        </span><span class="sd">"""Shorthand for ``status == "succeeded"``."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span></div>
 
 
 
@@ -262,7 +262,7 @@
 <a class="viewcode-back" href="../../module_docs/falaw/outcomes.html#falaw.ExecutionReport">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExecutionReport</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The result of running a Plan: one :class:`CallOutcome` per call, in order.</span>
+<span class="w">    </span><span class="sd">"""The result of running a Plan: one :class:`CallOutcome` per call, in order.</span>
 
 <span class="sd">    ``len(report.outcomes) == len(plan.calls)`` **always**, including on a run</span>
 <span class="sd">    where most calls failed. That invariant is the whole point: a consumer that</span>
@@ -270,7 +270,7 @@
 <span class="sd">    zip against :attr:`outcomes` and stay aligned. Zipping against a</span>
 <span class="sd">    *shorter* list of successes is the silent mis-pairing this type exists to</span>
 <span class="sd">    prevent.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">outcomes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallOutcome</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
 
@@ -285,40 +285,40 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;True when every call succeeded.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""True when every call succeeded."""</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">ok</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">succeeded</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallOutcome</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Outcomes that produced an artifact, in plan order.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Outcomes that produced an artifact, in plan order."""</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallOutcome</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Outcomes whose call raised, in plan order.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;failed&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Outcomes whose call raised, in plan order."""</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"failed"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">blocked</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallOutcome</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Outcomes whose call never ran, in plan order.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;blocked&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">"""Outcomes whose call never ran, in plan order."""</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"blocked"</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">produced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">&quot;Artifact&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The artifacts that were made, in plan order.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">produced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="s2">"Artifact"</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""The artifacts that were made, in plan order.</span>
 
 <span class="sd">        **Shorter than the Plan when anything failed** — deliberately named so</span>
 <span class="sd">        it does not read like something to zip a per-call sequence against. Use</span>
 <span class="sd">        :attr:`outcomes` for anything positional.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">artifact</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span> <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">artifact</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">estimated_spend_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated USD billed by this run: succeeded calls that were **not** cache hits.</span>
+<span class="w">        </span><span class="sd">"""Estimated USD billed by this run: succeeded calls that were **not** cache hits.</span>
 
 <span class="sd">        Estimated, because it sums :attr:`falaw.CallPlan.estimated_cost_usd` —</span>
-<span class="sd">        falaw does not read fal&#39;s invoice. Two deliberate exclusions:</span>
+<span class="sd">        falaw does not read fal's invoice. Two deliberate exclusions:</span>
 
 <span class="sd">        - **Cache hits cost nothing**, and this reads the *observed*</span>
 <span class="sd">          :attr:`CallOutcome.cache_hit`, not the plan-time prediction.</span>
@@ -326,64 +326,64 @@
 <span class="sd">          billed a call that raised, and falaw cannot know which; adding an</span>
 <span class="sd">          estimate for it would be inventing a number. Read</span>
 <span class="sd">          :attr:`failed` to see how many calls are unaccounted for.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="n">o</span><span class="o">.</span><span class="n">call</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">or</span> <span class="mf">0.0</span>
                 <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span>
-                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
+                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
             <span class="p">),</span>
             <span class="mf">0.0</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_unknown_costs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;True when a call that actually billed has no price estimate.</span>
+<span class="w">        </span><span class="sd">"""True when a call that actually billed has no price estimate.</span>
 
 <span class="sd">        The run-level twin of :attr:`falaw.Plan.has_unknown_costs`, and the</span>
 <span class="sd">        reason :attr:`estimated_spend_usd` must never be read on its own: an</span>
 <span class="sd">        unpriced call contributes ``0.0`` to the sum, so a report reading</span>
-<span class="sd">        ``$0.00`` means *either* &quot;nothing was spent&quot; *or* &quot;we do not know what</span>
-<span class="sd">        was spent&quot;. Those are not the same answer, and a budget gate that</span>
+<span class="sd">        ``$0.00`` means *either* "nothing was spent" *or* "we do not know what</span>
+<span class="sd">        was spent". Those are not the same answer, and a budget gate that</span>
 <span class="sd">        cannot tell them apart approves the second one.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
             <span class="n">o</span><span class="o">.</span><span class="n">call</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">is</span> <span class="kc">None</span>
             <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span>
-            <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
+            <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cache_hit_savings_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimated USD *not* spent because a succeeded call was served from cache.</span>
+<span class="w">        </span><span class="sd">"""Estimated USD *not* spent because a succeeded call was served from cache.</span>
 
 <span class="sd">        The run-time counterpart of :attr:`falaw.Plan.cache_hit_savings_usd`</span>
 <span class="sd">        (which is a plan-time prediction).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="n">o</span><span class="o">.</span><span class="n">call</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">or</span> <span class="mf">0.0</span>
                 <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span>
-                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;succeeded&quot;</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
+                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"succeeded"</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">cache_hit</span>
             <span class="p">),</span>
             <span class="mf">0.0</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="ExecutionReport.artifacts_or_raise">
 <a class="viewcode-back" href="../../module_docs/falaw/outcomes.html#falaw.ExecutionReport.artifacts_or_raise">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">artifacts_or_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">&quot;Artifact&quot;</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Every artifact in plan order, or re-raise the first failure&#39;s exception.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">artifacts_or_raise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="s2">"Artifact"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Every artifact in plan order, or re-raise the first failure's exception.</span>
 
 <span class="sd">        The bridge back to the plain ``list[Artifact]`` contract of</span>
 <span class="sd">        :func:`falaw.execute_plan`. The exception raised is the **original** one</span>
-<span class="sd">        the call raised, unwrapped — falaw&#39;s typed error hierarchy</span>
+<span class="sd">        the call raised, unwrapped — falaw's typed error hierarchy</span>
 <span class="sd">        (:mod:`falaw.errors`) is only useful to a caller if it survives the trip</span>
 <span class="sd">        through the executor.</span>
 
 <span class="sd">        A run with no failures but some blocked calls raises too: the list would</span>
 <span class="sd">        otherwise be short, and a short list is exactly the silent mis-pairing</span>
 <span class="sd">        this type exists to prevent.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">failures</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span>
         <span class="k">if</span> <span class="n">failures</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">failures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">error</span>  <span class="c1"># type: ignore[misc]</span>
@@ -391,10 +391,10 @@
         <span class="k">if</span> <span class="n">blocked</span><span class="p">:</span>
             <span class="n">first</span> <span class="o">=</span> <span class="n">blocked</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Plan call </span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="si">}</span><span class="s2">) never ran: &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. No call failed, so there is no upstream &quot;</span>
-                <span class="s2">&quot;exception to re-raise; use falaw.execute_plan_isolated to &quot;</span>
-                <span class="s2">&quot;inspect the full report.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Plan call </span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="si">}</span><span class="s2">) never ran: "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">first</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">. No call failed, so there is no upstream "</span>
+                <span class="s2">"exception to re-raise; use falaw.execute_plan_isolated to "</span>
+                <span class="s2">"inspect the full report."</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">artifact</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">]</span>  <span class="c1"># type: ignore[misc]</span></div>
 
@@ -402,21 +402,21 @@
 <div class="viewcode-block" id="ExecutionReport.summary">
 <a class="viewcode-back" href="../../module_docs/falaw/outcomes.html#falaw.ExecutionReport.summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;A small JSON-able digest — counts, spend, and which indices failed.</span>
+<span class="w">        </span><span class="sd">"""A small JSON-able digest — counts, spend, and which indices failed.</span>
 
 <span class="sd">        For logs, telemetry and run records, where the artifacts and exception</span>
 <span class="sd">        objects themselves are not serializable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;calls&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">),</span>
-            <span class="s2">&quot;succeeded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">succeeded</span><span class="p">),</span>
-            <span class="s2">&quot;failed&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">),</span>
-            <span class="s2">&quot;blocked&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocked</span><span class="p">),</span>
-            <span class="s2">&quot;estimated_spend_usd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_spend_usd</span><span class="p">,</span>
-            <span class="s2">&quot;has_unknown_costs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_unknown_costs</span><span class="p">,</span>
-            <span class="s2">&quot;cache_hit_savings_usd&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_hit_savings_usd</span><span class="p">,</span>
-            <span class="s2">&quot;failed_indices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">],</span>
-            <span class="s2">&quot;blocked_indices&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocked</span><span class="p">],</span>
+            <span class="s2">"calls"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">),</span>
+            <span class="s2">"succeeded"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">succeeded</span><span class="p">),</span>
+            <span class="s2">"failed"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">),</span>
+            <span class="s2">"blocked"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blocked</span><span class="p">),</span>
+            <span class="s2">"estimated_spend_usd"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_spend_usd</span><span class="p">,</span>
+            <span class="s2">"has_unknown_costs"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_unknown_costs</span><span class="p">,</span>
+            <span class="s2">"cache_hit_savings_usd"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_hit_savings_usd</span><span class="p">,</span>
+            <span class="s2">"failed_indices"</span><span class="p">:</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">],</span>
+            <span class="s2">"blocked_indices"</span><span class="p">:</span> <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocked</span><span class="p">],</span>
         <span class="p">}</span></div>
 </div>
 

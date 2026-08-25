@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.degrade &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.degrade &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,7 +112,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.degrade</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Where falaw sends &quot;I carried on, but you should know&quot; — one collection point.</span>
+<span></span><span class="sd">"""Where falaw sends "I carried on, but you should know" — one collection point.</span>
 
 <span class="sd">falaw deliberately degrades rather than failing in several places: a failed</span>
 <span class="sd">asset fetch becomes a URL-only artifact instead of discarding a render fal has</span>
@@ -122,14 +122,14 @@
 
 <span class="sd">``warnings.warn`` alone is the wrong channel for two reasons, both learned:</span>
 
-<span class="sd">* **It deduplicates.** Python&#39;s default filter shows a given message once per</span>
+<span class="sd">* **It deduplicates.** Python's default filter shows a given message once per</span>
 <span class="sd">  location per process, so on a long-lived server the second and every</span>
 <span class="sd">  subsequent stale serve of the same URL is *silent*.</span>
 <span class="sd">* **It cannot be collected.** Under ``execute_plan(concurrency=N)`` a</span>
-<span class="sd">  speculative probe&#39;s complaint interleaves with real ones, and</span>
+<span class="sd">  speculative probe's complaint interleaves with real ones, and</span>
 <span class="sd">  ``warnings.catch_warnings`` is documented as not thread-safe — it mutates</span>
 <span class="sd">  process-global filter state, so one call suppressing its own noise would</span>
-<span class="sd">  suppress another call&#39;s genuine warning at random.</span>
+<span class="sd">  suppress another call's genuine warning at random.</span>
 
 <span class="sd">Hence a :class:`~contextvars.ContextVar` sink. Set inside a unit of work it is</span>
 <span class="sd">visible only to that unit (each pool task runs in its own context copy), and</span>
@@ -138,7 +138,7 @@
 <span class="sd">This lives in its own module, below both :mod:`falaw.plan` and</span>
 <span class="sd">:mod:`falaw.content`, because **both** produce degradations and neither may</span>
 <span class="sd">import the other at module scope.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -148,20 +148,20 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Optional</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;deferred_degrade_warnings&quot;</span><span class="p">,</span> <span class="s2">&quot;emit_degradation&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"deferred_degrade_warnings"</span><span class="p">,</span> <span class="s2">"emit_degradation"</span><span class="p">]</span>
 
 
-<span class="n">DEGRADE_WARNING_SINK</span><span class="p">:</span> <span class="s2">&quot;ContextVar[Optional[list]]&quot;</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
-    <span class="s2">&quot;falaw_degrade_warning_sink&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+<span class="n">DEGRADE_WARNING_SINK</span><span class="p">:</span> <span class="s2">"ContextVar[Optional[list]]"</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">"falaw_degrade_warning_sink"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;The list collecting degradation messages, or ``None`` to warn directly.&quot;&quot;&quot;</span>
+<span class="sd">"""The list collecting degradation messages, or ``None`` to warn directly."""</span>
 
 
 <div class="viewcode-block" id="deferred_degrade_warnings">
 <a class="viewcode-back" href="../../module_docs/falaw/degrade.html#falaw.degrade.deferred_degrade_warnings">[docs]</a>
 <span class="nd">@contextmanager</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">deferred_degrade_warnings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect degradation messages into a list instead of warning.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Collect degradation messages into a list instead of warning."""</span>
     <span class="n">sink</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sink</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -174,13 +174,13 @@
 <div class="viewcode-block" id="emit_degradation">
 <a class="viewcode-back" href="../../module_docs/falaw/degrade.html#falaw.degrade.emit_degradation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">emit_degradation</span><span class="p">(</span><span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">stacklevel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Report that falaw degraded rather than failed.</span>
+<span class="w">    </span><span class="sd">"""Report that falaw degraded rather than failed.</span>
 
 <span class="sd">    Into the active sink if there is one, else straight to ``warnings.warn``.</span>
 <span class="sd">    Every degradation in falaw goes through here so that none of them can be</span>
 <span class="sd">    the one that escapes collection — the more severe the degradation, the</span>
 <span class="sd">    worse it is for it to be the escapee.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sink</span> <span class="o">=</span> <span class="n">DEGRADE_WARNING_SINK</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">sink</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">stacklevel</span><span class="p">)</span>

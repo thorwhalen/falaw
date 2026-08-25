@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.registry &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.registry &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,7 +112,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.registry</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Tool and model registries.</span>
+<span></span><span class="sd">"""Tool and model registries.</span>
 
 <span class="sd">Two registries, both queryable by tags/categories:</span>
 
@@ -121,7 +121,7 @@
 
 <span class="sd">Bridges (skill / MCP / HTTP) read the tool registry. Operations call</span>
 <span class="sd">`pick_model` to map a (category, quality) pair to a concrete fal model id.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -138,13 +138,13 @@
 <div class="viewcode-block" id="register_tool">
 <a class="viewcode-back" href="../../module_docs/falaw/registry.html#falaw.register_tool">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">register_tool</span><span class="p">(</span><span class="o">**</span><span class="n">spec_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator: register the wrapped function as a falaw tool.</span>
+<span class="w">    </span><span class="sd">"""Decorator: register the wrapped function as a falaw tool.</span>
 
-<span class="sd">    &gt;&gt;&gt; @register_tool(name=&#39;echo&#39;, description=&#39;echo back&#39;, tags=(&#39;demo&#39;,))</span>
+<span class="sd">    &gt;&gt;&gt; @register_tool(name='echo', description='echo back', tags=('demo',))</span>
 <span class="sd">    ... def _echo(x): return x</span>
-<span class="sd">    &gt;&gt;&gt; get_tool(&#39;echo&#39;).name</span>
-<span class="sd">    &#39;echo&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; get_tool('echo').name</span>
+<span class="sd">    'echo'</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">decorate</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
         <span class="n">spec</span> <span class="o">=</span> <span class="n">ToolSpec</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="o">**</span><span class="n">spec_kwargs</span><span class="p">)</span>
@@ -157,7 +157,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_tool</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ToolSpec</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_TOOLS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No falaw tool registered as </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_TOOLS</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No falaw tool registered as </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">; known: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_TOOLS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_TOOLS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 
 
@@ -169,7 +169,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_models_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;models.json&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">"data"</span><span class="p">,</span> <span class="s2">"models.json"</span><span class="p">)</span>
 
 
 <span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -179,36 +179,36 @@
     <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ModelRecord</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
         <span class="n">r</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-        <span class="n">r</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aliases&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
-        <span class="k">if</span> <span class="s2">&quot;supported_resolutions&quot;</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
-            <span class="n">r</span><span class="p">[</span><span class="s2">&quot;supported_resolutions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;supported_resolutions&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
-        <span class="n">ce</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cost_estimate&quot;</span><span class="p">)</span>
+        <span class="n">r</span><span class="p">[</span><span class="s2">"aliases"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aliases"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
+        <span class="k">if</span> <span class="s2">"supported_resolutions"</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">[</span><span class="s2">"supported_resolutions"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"supported_resolutions"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">())</span>
+        <span class="n">ce</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cost_estimate"</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ce</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">r</span><span class="p">[</span><span class="s2">&quot;cost_estimate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CostEstimate</span><span class="p">(</span><span class="o">**</span><span class="n">ce</span><span class="p">)</span>
+            <span class="n">r</span><span class="p">[</span><span class="s2">"cost_estimate"</span><span class="p">]</span> <span class="o">=</span> <span class="n">CostEstimate</span><span class="p">(</span><span class="o">**</span><span class="n">ce</span><span class="p">)</span>
         <span class="c1"># else: None or already a CostEstimate — pass through unchanged.</span>
-        <span class="n">out</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ModelRecord</span><span class="p">(</span><span class="o">**</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"id"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ModelRecord</span><span class="p">(</span><span class="o">**</span><span class="n">r</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="model_constraints">
 <a class="viewcode-back" href="../../module_docs/falaw/registry.html#falaw.model_constraints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">model_constraints</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The capability/limit fields for a model — the &quot;static reminder of</span>
-<span class="sd">    limitations&quot; a shot-list builder surfaces. Resolves aliases.</span>
+<span class="w">    </span><span class="sd">"""The capability/limit fields for a model — the "static reminder of</span>
+<span class="sd">    limitations" a shot-list builder surfaces. Resolves aliases.</span>
 
 <span class="sd">    Returns a JSON-able dict; ``max_clip_seconds`` etc. are ``None`` / empty</span>
 <span class="sd">    when unknown for that model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-        <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
-        <span class="s2">&quot;quality_tier&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">quality_tier</span><span class="p">,</span>
-        <span class="s2">&quot;max_clip_seconds&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">max_clip_seconds</span><span class="p">,</span>
-        <span class="s2">&quot;single_character_recommended&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">single_character_recommended</span><span class="p">,</span>
-        <span class="s2">&quot;supported_resolutions&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">supported_resolutions</span><span class="p">),</span>
-        <span class="s2">&quot;default_negative_prompt&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">default_negative_prompt</span><span class="p">,</span>
-        <span class="s2">&quot;docs_url&quot;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">docs_url</span><span class="p">,</span>
+        <span class="s2">"id"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">"category"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+        <span class="s2">"quality_tier"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">quality_tier</span><span class="p">,</span>
+        <span class="s2">"max_clip_seconds"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">max_clip_seconds</span><span class="p">,</span>
+        <span class="s2">"single_character_recommended"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">single_character_recommended</span><span class="p">,</span>
+        <span class="s2">"supported_resolutions"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">supported_resolutions</span><span class="p">),</span>
+        <span class="s2">"default_negative_prompt"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">default_negative_prompt</span><span class="p">,</span>
+        <span class="s2">"docs_url"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">docs_url</span><span class="p">,</span>
     <span class="p">}</span></div>
 
 
@@ -216,12 +216,12 @@
 <div class="viewcode-block" id="video_model_constraints">
 <a class="viewcode-back" href="../../module_docs/falaw/registry.html#falaw.video_model_constraints">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">video_model_constraints</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``model_constraints`` for every video model in the catalog — the data a</span>
-<span class="sd">    shot-list builder shows as its model-limits reference.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""``model_constraints`` for every video model in the catalog — the data a</span>
+<span class="sd">    shot-list builder shows as its model-limits reference."""</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="n">model_constraints</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">_load_models</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-        <span class="k">if</span> <span class="s2">&quot;video&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">"video"</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="p">]</span></div>
 
 
@@ -246,11 +246,11 @@
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">models</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">aliases</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">m</span>
-    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No model </span><span class="si">{</span><span class="nb">id</span><span class="si">!r}</span><span class="s2"> known to falaw. Try list_models() to browse.&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No model </span><span class="si">{</span><span class="nb">id</span><span class="si">!r}</span><span class="s2"> known to falaw. Try list_models() to browse."</span><span class="p">)</span>
 
 
 <span class="c1"># Tier ordering used to fall back to nearby tiers when an exact match is missing.</span>
-<span class="n">_TIER_ORDER</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;ultra&quot;</span><span class="p">)</span>
+<span class="n">_TIER_ORDER</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"fast"</span><span class="p">,</span> <span class="s2">"balanced"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">,</span> <span class="s2">"ultra"</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="pick_model">
@@ -258,16 +258,16 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">pick_model</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">quality_tier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">quality_tier</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"balanced"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ModelRecord</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick a sensible fal model for a (category, quality) request.</span>
+<span class="w">    </span><span class="sd">"""Pick a sensible fal model for a (category, quality) request.</span>
 
 <span class="sd">    First-match semantics: when several models share a tier, the earlier</span>
 <span class="sd">    entry wins. Curated entries are written first in `data/models.json`,</span>
 <span class="sd">    so they take precedence over corpus-merged additions. If no model</span>
 <span class="sd">    has the exact tier, neighboring tiers are tried. KeyError only when</span>
 <span class="sd">    the category is empty.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">candidates</span> <span class="o">=</span> <span class="n">list_models</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="n">category</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_first_with_tier</span><span class="p">(</span><span class="n">tier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ModelRecord</span><span class="p">]:</span>
@@ -285,7 +285,7 @@
                     <span class="k">if</span> <span class="n">near</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">near</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No models known for category=</span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">. Try list_models().&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No models known for category=</span><span class="si">{</span><span class="n">category</span><span class="si">!r}</span><span class="s2">. Try list_models()."</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 </pre></div>

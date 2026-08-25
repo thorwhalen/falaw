@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -184,20 +184,20 @@ serialized — all without the network.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">Plan</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;a tiger&quot;</span><span class="p">,</span> <span class="s2">&quot;image_size&quot;</span><span class="p">:</span> <span class="s2">&quot;landscape_4_3&quot;</span><span class="p">},</span>
-<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/flux/dev"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="s2">"a tiger"</span><span class="p">,</span> <span class="s2">"image_size"</span><span class="p">:</span> <span class="s2">"landscape_4_3"</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">&quot;miss&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">"miss"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/minimax/hailuo-02/pro/image-to-video&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from p1&gt;&quot;</span><span class="p">},</span>
-<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">tool</span><span class="o">=</span><span class="s2">"image_to_video"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/minimax/hailuo-02/pro/image-to-video"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="s2">"&lt;from p1&gt;"</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">&quot;miss&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">cache_status</span><span class="o">=</span><span class="s2">"miss"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span><span class="o">.</span><span class="n">total_cost_usd</span>
@@ -205,7 +205,7 @@ serialized — all without the network.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span><span class="o">.</span><span class="n">cache_hit_savings_usd</span>
 <span class="go">0.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">tool</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
-<span class="go">[&#39;generate_image&#39;, &#39;image_to_video&#39;]</span>
+<span class="go">['generate_image', 'image_to_video']</span>
 </pre></div>
 </div>
 <p>Plans concatenate, so an orchestrator can build one shot’s Plan and then
@@ -632,8 +632,8 @@ holding a <code class="docutils literal notranslate"><span class="pre">&quot;&lt
 blocked, transitively.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">execute_plan_isolated</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                            <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">),))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"t"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"m"</span><span class="p">,</span>
+<span class="gp">... </span>                            <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">),))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">report</span> <span class="o">=</span> <span class="n">execute_plan_isolated</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">report</span><span class="o">.</span><span class="n">is_complete</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">outcomes</span><span class="p">)</span>
 <span class="go">(True, 1)</span>
@@ -702,15 +702,15 @@ the offending call, i.e. after every call before it had been billed.</p>
     output would not exist yet, so it can only ever be a bug.</p>
 </dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from 0&gt;&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"t"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"m"</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="p">{},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"t"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"m"</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="s2">"&lt;from 0&gt;"</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan_dependencies</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span>
 <span class="go">(frozenset(), frozenset({0}))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan_dependencies</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="p">,)))</span>
 <span class="gt">Traceback (most recent call last):</span>
 <span class="w">    </span><span class="o">...</span>
-<span class="gr">ValueError</span>: <span class="n">Placeholder &#39;&lt;from 0&gt;&#39; in call 0 references call 0, which does not run before it. ...</span>
+<span class="gr">ValueError</span>: <span class="n">Placeholder '&lt;from 0&gt;' in call 0 references call 0, which does not run before it. ...</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -748,10 +748,10 @@ cannot represent faithfully raises
 new identity-bearing field is an explicit decision about both hashes.</p>
 <p>Two structurally-identical plans hash equal; changing any call’s <code class="docutils literal notranslate"><span class="pre">app</span></code>,
 <code class="docutils literal notranslate"><span class="pre">args</span></code>, or <code class="docutils literal notranslate"><span class="pre">tool</span></code> — or the <em>order</em> of calls — changes the hash.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;a tiger&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;image_to_video&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/svd&quot;</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;from 0&gt;&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;video&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/flux/dev"</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="s2">"a tiger"</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"image_to_video"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/svd"</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="s2">"&lt;from 0&gt;"</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span> <span class="o">==</span> <span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)))</span> <span class="o">==</span> <span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)))</span>
@@ -762,9 +762,9 @@ new identity-bearing field is an explicit decision about both hashes.</p>
 one backend never dedups against the structurally-identical plan for
 another — and, since it is included only when non-default, every plan
 made of today’s (all-<code class="docutils literal notranslate"><span class="pre">&quot;fal&quot;</span></code>) calls hashes exactly as it did before:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">comfy</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">&quot;generate_image&quot;</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">&quot;fal-ai/flux/dev&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;a tiger&quot;</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                  <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;comfyui&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">comfy</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/flux/dev"</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="s2">"a tiger"</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">backend</span><span class="o">=</span><span class="s2">"comfyui"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">a</span><span class="p">,)))</span> <span class="o">==</span> <span class="n">plan_hash</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">comfy</span><span class="p">,)))</span>
 <span class="go">False</span>
 </pre></div>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.testing &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.testing &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -219,7 +219,7 @@ under test with bytes the test controls. See
 <p>A test carrying any marker in <a class="reference internal" href="#falaw.testing.DFLT_LIVE_MARKERS" title="falaw.testing.DFLT_LIVE_MARKERS"><code class="xref py py-data docutils literal notranslate"><span class="pre">DFLT_LIVE_MARKERS</span></code></a> (<code class="docutils literal notranslate"><span class="pre">live_api</span></code>) gets the
 real transport and no network guard, and keeps the cache isolation. Suites with
 another such marker build their own fixtures from the factories:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gated</span> <span class="o">=</span> <span class="n">make_fake_assets_fixture</span><span class="p">(</span><span class="n">live_markers</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;live_api&quot;</span><span class="p">,</span> <span class="s2">&quot;live_capture&quot;</span><span class="p">))</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gated</span> <span class="o">=</span> <span class="n">make_fake_assets_fixture</span><span class="p">(</span><span class="n">live_markers</span><span class="o">=</span><span class="p">(</span><span class="s2">"live_api"</span><span class="p">,</span> <span class="s2">"live_capture"</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>The classes and context managers here need no pytest; only the fixtures do.</p>
@@ -267,15 +267,15 @@ not on an exception:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">content_ref_for_url</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">using_url_fetcher</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">store</span><span class="p">,</span> <span class="n">assets</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">in_memory</span><span class="p">(),</span> <span class="n">FakeAssets</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">shared</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">&quot;https://fal.media/one.png&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;identical bytes&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">&quot;https://fal.media/two.png&quot;</span><span class="p">,</span> <span class="n">shared</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">shared</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">"https://fal.media/one.png"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"identical bytes"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">"https://fal.media/two.png"</span><span class="p">,</span> <span class="n">shared</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">using_url_fetcher</span><span class="p">(</span><span class="n">assets</span><span class="o">.</span><span class="n">chunks</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="n">one</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/one.png&quot;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="n">two</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/two.png&quot;</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">one</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">"https://fal.media/one.png"</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">two</span> <span class="o">=</span> <span class="n">content_ref_for_url</span><span class="p">(</span><span class="s2">"https://fal.media/two.png"</span><span class="p">,</span> <span class="n">store</span><span class="o">=</span><span class="n">store</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">one</span><span class="o">.</span><span class="n">content_hash</span> <span class="o">==</span> <span class="n">two</span><span class="o">.</span><span class="n">content_hash</span>  <span class="c1"># two URLs, one content address</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">assets</span><span class="o">.</span><span class="n">fetched</span>
-<span class="go">[&#39;https://fal.media/one.png&#39;, &#39;https://fal.media/two.png&#39;]</span>
+<span class="go">['https://fal.media/one.png', 'https://fal.media/two.png']</span>
 </pre></div>
 </div>
 <dl class="py method">
@@ -400,11 +400,11 @@ broken guard cannot turn this example into real traffic.)</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">blocked_outbound_network</span><span class="p">()</span> <span class="k">as</span> <span class="n">attempts</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">try</span><span class="p">:</span>
-<span class="gp">... </span>        <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span><span class="p">(</span><span class="s2">&quot;nowhere.invalid&quot;</span><span class="p">,</span> <span class="mi">443</span><span class="p">)</span>
+<span class="gp">... </span>        <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span><span class="p">(</span><span class="s2">"nowhere.invalid"</span><span class="p">,</span> <span class="mi">443</span><span class="p">)</span>
 <span class="gp">... </span>    <span class="k">except</span> <span class="n">OutboundNetworkAttempt</span><span class="p">:</span>
 <span class="gp">... </span>        <span class="k">pass</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">attempts</span>
-<span class="go">[&quot;a DNS lookup for &#39;nowhere.invalid&#39;&quot;]</span>
+<span class="go">["a DNS lookup for 'nowhere.invalid'"]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -427,9 +427,9 @@ test marked <code class="docutils literal notranslate"><span class="pre">live_ap
 <dt class="sig sig-object py" id="falaw.testing.is_network_url">
 <span class="sig-prename descclassname"><span class="pre">falaw.testing.</span></span><span class="sig-name descname"><span class="pre">is_network_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../../_modules/falaw/testing.html#is_network_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.testing.is_network_url" title="Link to this definition"></a></dt>
 <dd><p>True when resolving <code class="docutils literal notranslate"><span class="pre">url</span></code> would leave this machine.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_network_url</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_network_url</span><span class="p">(</span><span class="s2">"https://fal.media/x.png"</span><span class="p">)</span>
 <span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">is_network_url</span><span class="p">(</span><span class="s2">&quot;file:///tmp/rendered.mp4&quot;</span><span class="p">),</span> <span class="n">is_network_url</span><span class="p">(</span><span class="s2">&quot;/tmp/x.mp4&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">is_network_url</span><span class="p">(</span><span class="s2">"file:///tmp/rendered.mp4"</span><span class="p">),</span> <span class="n">is_network_url</span><span class="p">(</span><span class="s2">"/tmp/x.mp4"</span><span class="p">)</span>
 <span class="go">(False, False)</span>
 </pre></div>
 </div>
@@ -455,8 +455,8 @@ the throwaway directory.</p>
 suite’s live-marker names differ, or to label the synthetic bytes with the
 suite’s own name:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fake_assets</span> <span class="o">=</span> <span class="n">make_fake_assets_fixture</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">live_markers</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;live_api&quot;</span><span class="p">,</span> <span class="s2">&quot;live_capture&quot;</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">synthetic_prefix</span><span class="o">=</span><span class="s2">&quot;reelee-test-asset&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">live_markers</span><span class="o">=</span><span class="p">(</span><span class="s2">"live_api"</span><span class="p">,</span> <span class="s2">"live_capture"</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">synthetic_prefix</span><span class="o">=</span><span class="s2">"reelee-test-asset"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
@@ -492,11 +492,11 @@ instead of failing at teardown. Inert for a test marked <code class="docutils li
 outside a pytest session (a script, a notebook, another test runner).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">materialize_asset</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">serving_fake_assets</span><span class="p">()</span> <span class="k">as</span> <span class="n">assets</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;pinned&quot;</span><span class="p">)</span>
-<span class="gp">... </span>    <span class="n">path</span> <span class="o">=</span> <span class="n">materialize_asset</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">_</span> <span class="o">=</span> <span class="n">assets</span><span class="o">.</span><span class="n">serve</span><span class="p">(</span><span class="s2">"https://fal.media/x.png"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"pinned"</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">path</span> <span class="o">=</span> <span class="n">materialize_asset</span><span class="p">(</span><span class="s2">"https://fal.media/x.png"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="go">b&#39;pinned&#39;</span>
+<span class="go">b'pinned'</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -508,10 +508,10 @@ outside a pytest session (a script, a notebook, another test runner).</p>
 <p>Derived from the URL, so two different stub URLs behave like two genuinely
 different renders — and the same stub URL hashes the same way on every run,
 which is what lets a test assert on a content hash at all.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">&quot;https://fal.media/x.png&quot;</span><span class="p">)</span>
-<span class="go">b&#39;falaw-test-asset::https://fal.media/x.png&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">&quot;https://fal.media/one.png&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">&quot;https://fal.media/two.png&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">"https://fal.media/x.png"</span><span class="p">)</span>
+<span class="go">b'falaw-test-asset::https://fal.media/x.png'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">"https://fal.media/one.png"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">synthetic_asset_bytes</span><span class="p">(</span><span class="s2">"https://fal.media/two.png"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">==</span> <span class="n">b</span>
 <span class="go">False</span>
 </pre></div>

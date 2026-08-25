@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.journal &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.journal &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -127,11 +127,11 @@ Claude skill teaches future sessions to read recent entries before doing
 novel work, so each session starts smarter than the last.</p>
 <p>Usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">journal</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;schnell tier returns 1024x1024 by default&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">issue</span><span class="p">(</span><span class="s2">&quot;FLUX dev refused a benign prompt as NSFW&quot;</span><span class="p">,</span>
-<span class="gp">... </span>              <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;Try guidance_scale=2.0&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">improvement</span><span class="p">(</span><span class="s2">&quot;Add an `upscale_image` wrapper for clarity-upscaler&quot;</span><span class="p">,</span>
-<span class="gp">... </span>                    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;backlog&quot;</span><span class="p">,))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">"schnell tier returns 1024x1024 by default"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">issue</span><span class="p">(</span><span class="s2">"FLUX dev refused a benign prompt as NSFW"</span><span class="p">,</span>
+<span class="gp">... </span>              <span class="n">suggestion</span><span class="o">=</span><span class="s2">"Try guidance_scale=2.0"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">journal</span><span class="o">.</span><span class="n">improvement</span><span class="p">(</span><span class="s2">"Add an `upscale_image` wrapper for clarity-upscaler"</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"backlog"</span><span class="p">,))</span>
 </pre></div>
 </div>
 <dl class="py class">
@@ -143,10 +143,10 @@ a process-wide sequence number breaking same-tick ties, so
 <cite>sorted(os.listdir(…))</cite> yields insertion order without parsing.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">j</span> <span class="o">=</span> <span class="n">Journal</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">())</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;note&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;issue&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;boom&quot;</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="s2">&quot;try X&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"note"</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"hello"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"issue"</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">"boom"</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="s2">"try X"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">kind</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">j</span><span class="p">]</span>
-<span class="go">[&#39;note&#39;, &#39;issue&#39;]</span>
+<span class="go">['note', 'issue']</span>
 </pre></div>
 </div>
 </dd></dl>

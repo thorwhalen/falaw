@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.avatar &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.operations.avatar &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,22 +112,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.operations.avatar</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Avatar / lip-sync operations and composers.</span>
+<span></span><span class="sd">"""Avatar / lip-sync operations and composers.</span>
 
 <span class="sd">Two distinct primitives, often confused:</span>
 
 <span class="sd">* ``animate_face`` --- image + audio → talking video. The face is a still;</span>
 <span class="sd">  the model animates lips/expressions over the audio. Backed by ai-avatar</span>
-<span class="sd">  / omnihuman (&quot;avatar&quot; registry category).</span>
+<span class="sd">  / omnihuman ("avatar" registry category).</span>
 <span class="sd">* ``lipsync`` --- video + audio → re-synced video. The body and motion</span>
 <span class="sd">  come from an existing video; only the mouth is replaced to match new</span>
-<span class="sd">  audio. Backed by sync-lipsync / kling-lipsync (&quot;lipsync&quot; category).</span>
+<span class="sd">  audio. Backed by sync-lipsync / kling-lipsync ("lipsync" category).</span>
 
 <span class="sd">Use ``animate_face`` when you only have a portrait. Use ``lipsync`` when</span>
 <span class="sd">you already have a video clip.</span>
 
 <span class="sd">The composer ``talking_avatar_from_text`` chains TTS → ``animate_face``.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -142,40 +142,40 @@
 <div class="viewcode-block" id="animate_face">
 <a class="viewcode-back" href="../../../module_docs/falaw/operations/avatar.html#falaw.animate_face">[docs]</a>
 <span class="nd">@register_tool</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;animate_face&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"animate_face"</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Animate a still face image to speak an audio track. Returns a &quot;</span>
-        <span class="s2">&quot;falaw.Result whose .first asset is the talking-head video URL. &quot;</span>
-        <span class="s2">&quot;Use this when you have a portrait + audio but NOT an existing &quot;</span>
-        <span class="s2">&quot;video. Picks ai-avatar (balanced) or omnihuman v1.5 (high).&quot;</span>
+        <span class="s2">"Animate a still face image to speak an audio track. Returns a "</span>
+        <span class="s2">"falaw.Result whose .first asset is the talking-head video URL. "</span>
+        <span class="s2">"Use this when you have a portrait + audio but NOT an existing "</span>
+        <span class="s2">"video. Picks ai-avatar (balanced) or omnihuman v1.5 (high)."</span>
     <span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;avatar&quot;</span><span class="p">,</span> <span class="s2">&quot;generate&quot;</span><span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"video"</span><span class="p">,</span> <span class="s2">"avatar"</span><span class="p">,</span> <span class="s2">"generate"</span><span class="p">),</span>
     <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;image_url&quot;</span><span class="p">,</span> <span class="s2">&quot;audio_url&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Direction (expression / acting note); &quot;</span>
-                <span class="s2">&quot;ai-avatar requires it, omnihuman uses it as a hint.&quot;</span><span class="p">,</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"image_url"</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">],</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"image_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"audio_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"prompt"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+                <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"Direction (expression / acting note); "</span>
+                <span class="s2">"ai-avatar requires it, omnihuman uses it as a hint."</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+            <span class="s2">"quality"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+                <span class="s2">"enum"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"balanced"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">],</span>
+                <span class="s2">"default"</span><span class="p">:</span> <span class="s2">"balanced"</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s2">&quot;model_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+            <span class="s2">"model_id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"extra"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Result&quot;</span><span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"falaw.Result"</span><span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://...&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://...&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="s2">&quot;warm, attentive listener&quot;</span><span class="p">,</span>
+            <span class="s2">"image_url"</span><span class="p">:</span> <span class="s2">"https://..."</span><span class="p">,</span>
+            <span class="s2">"audio_url"</span><span class="p">:</span> <span class="s2">"https://..."</span><span class="p">,</span>
+            <span class="s2">"prompt"</span><span class="p">:</span> <span class="s2">"warm, attentive listener"</span><span class="p">,</span>
         <span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
@@ -183,17 +183,17 @@
     <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">audio_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"balanced"</span><span class="p">,</span>
     <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Animate a still face from audio. Image + audio → talking video.&quot;&quot;&quot;</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;avatar&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">}</span>
-    <span class="c1"># ai-avatar requires `prompt`; omnihuman accepts but doesn&#39;t require it.</span>
-    <span class="c1"># Pass an empty-but-present prompt so ai-avatar&#39;s schema is happy.</span>
-    <span class="n">arguments</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span> <span class="ow">or</span> <span class="s2">&quot;neutral expression, natural delivery&quot;</span>
+<span class="w">    </span><span class="sd">"""Animate a still face from audio. Image + audio → talking video."""</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">"avatar"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">}</span>
+    <span class="c1"># ai-avatar requires `prompt`; omnihuman accepts but doesn't require it.</span>
+    <span class="c1"># Pass an empty-but-present prompt so ai-avatar's schema is happy.</span>
+    <span class="n">arguments</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span> <span class="ow">or</span> <span class="s2">"neutral expression, natural delivery"</span>
     <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})</span>
     <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span></div>
@@ -203,44 +203,44 @@
 <div class="viewcode-block" id="lipsync">
 <a class="viewcode-back" href="../../../module_docs/falaw/operations/avatar.html#falaw.lipsync">[docs]</a>
 <span class="nd">@register_tool</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lipsync&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"lipsync"</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Re-sync an existing VIDEO clip to a new audio track. Pass &quot;</span>
-        <span class="s2">&quot;`video_url` (NOT a still image) and `audio_url`. The model &quot;</span>
-        <span class="s2">&quot;replaces mouth motion to match the audio while keeping body &quot;</span>
-        <span class="s2">&quot;and motion from the original video. Use `animate_face` if you &quot;</span>
-        <span class="s2">&quot;only have a still image.&quot;</span>
+        <span class="s2">"Re-sync an existing VIDEO clip to a new audio track. Pass "</span>
+        <span class="s2">"`video_url` (NOT a still image) and `audio_url`. The model "</span>
+        <span class="s2">"replaces mouth motion to match the audio while keeping body "</span>
+        <span class="s2">"and motion from the original video. Use `animate_face` if you "</span>
+        <span class="s2">"only have a still image."</span>
     <span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;lipsync&quot;</span><span class="p">,</span> <span class="s2">&quot;generate&quot;</span><span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"video"</span><span class="p">,</span> <span class="s2">"lipsync"</span><span class="p">,</span> <span class="s2">"generate"</span><span class="p">),</span>
     <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;video_url&quot;</span><span class="p">,</span> <span class="s2">&quot;audio_url&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;video_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;quality&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"video_url"</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">],</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"video_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"audio_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"quality"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span>
+                <span class="s2">"enum"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"balanced"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">],</span>
+                <span class="s2">"default"</span><span class="p">:</span> <span class="s2">"high"</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s2">&quot;model_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">},</span>
+            <span class="s2">"model_id"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"extra"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
-    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Result&quot;</span><span class="p">},</span>
-    <span class="n">examples</span><span class="o">=</span><span class="p">({</span><span class="s2">&quot;video_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://...&quot;</span><span class="p">,</span> <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://...&quot;</span><span class="p">},),</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span> <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"falaw.Result"</span><span class="p">},</span>
+    <span class="n">examples</span><span class="o">=</span><span class="p">({</span><span class="s2">"video_url"</span><span class="p">:</span> <span class="s2">"https://..."</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">:</span> <span class="s2">"https://..."</span><span class="p">},),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">lipsync</span><span class="p">(</span>
     <span class="n">video_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">audio_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"high"</span><span class="p">,</span>
     <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Re-sync mouth motion in an existing video to a new audio track.&quot;&quot;&quot;</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">&quot;lipsync&quot;</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;video_url&quot;</span><span class="p">:</span> <span class="n">video_url</span><span class="p">,</span> <span class="s2">&quot;audio_url&quot;</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
+<span class="w">    </span><span class="sd">"""Re-sync mouth motion in an existing video to a new audio track."""</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">"lipsync"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"video_url"</span><span class="p">:</span> <span class="n">video_url</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
     <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span></div>
 
@@ -249,32 +249,32 @@
 <div class="viewcode-block" id="talking_avatar_from_text">
 <a class="viewcode-back" href="../../../module_docs/falaw/operations/avatar.html#falaw.talking_avatar_from_text">[docs]</a>
 <span class="nd">@register_tool</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;talking_avatar_from_text&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"talking_avatar_from_text"</span><span class="p">,</span>
     <span class="n">description</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Composer: text + face IMAGE → talking-head video. Internally runs &quot;</span>
-        <span class="s2">&quot;`text_to_speech(text)` then `animate_face(image_url, audio_url, &quot;</span>
-        <span class="s2">&quot;prompt)`. Returns the animate_face Result. Use this when you &quot;</span>
-        <span class="s2">&quot;have text and a portrait but no audio.&quot;</span>
+        <span class="s2">"Composer: text + face IMAGE → talking-head video. Internally runs "</span>
+        <span class="s2">"`text_to_speech(text)` then `animate_face(image_url, audio_url, "</span>
+        <span class="s2">"prompt)`. Returns the animate_face Result. Use this when you "</span>
+        <span class="s2">"have text and a portrait but no audio."</span>
     <span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span> <span class="s2">&quot;avatar&quot;</span><span class="p">,</span> <span class="s2">&quot;compose&quot;</span><span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"video"</span><span class="p">,</span> <span class="s2">"avatar"</span><span class="p">,</span> <span class="s2">"compose"</span><span class="p">),</span>
     <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;image_url&quot;</span><span class="p">],</span>
-        <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;voice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;tts_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;avatar_quality&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;balanced&quot;</span><span class="p">},</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"required"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">"image_url"</span><span class="p">],</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"text"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"image_url"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"voice"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"prompt"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">},</span>
+            <span class="s2">"tts_quality"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">:</span> <span class="s2">"balanced"</span><span class="p">},</span>
+            <span class="s2">"avatar_quality"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"string"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">:</span> <span class="s2">"balanced"</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">},</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;falaw.Result (talking-head video)&quot;</span><span class="p">,</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"description"</span><span class="p">:</span> <span class="s2">"falaw.Result (talking-head video)"</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">examples</span><span class="o">=</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;Welcome to the demo.&quot;</span><span class="p">,</span> <span class="s2">&quot;image_url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://example.com/host.jpg&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">"text"</span><span class="p">:</span> <span class="s2">"Welcome to the demo."</span><span class="p">,</span> <span class="s2">"image_url"</span><span class="p">:</span> <span class="s2">"https://example.com/host.jpg"</span><span class="p">},</span>
     <span class="p">),</span>
 <span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">talking_avatar_from_text</span><span class="p">(</span>
@@ -282,16 +282,16 @@
     <span class="n">image_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">voice</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">tts_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
-    <span class="n">avatar_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">tts_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"balanced"</span><span class="p">,</span>
+    <span class="n">avatar_quality</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"balanced"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;text + face image → talking video. Two fal calls, one Result.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""text + face image → talking video. Two fal calls, one Result."""</span>
     <span class="n">tts_result</span> <span class="o">=</span> <span class="n">text_to_speech</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">voice</span><span class="o">=</span><span class="n">voice</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">tts_quality</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tts_result</span><span class="o">.</span><span class="n">first</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;talking_avatar_from_text: TTS produced no audio asset; &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;raw response: </span><span class="si">{</span><span class="n">tts_result</span><span class="o">.</span><span class="n">raw</span><span class="si">!r}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"talking_avatar_from_text: TTS produced no audio asset; "</span>
+            <span class="sa">f</span><span class="s2">"raw response: </span><span class="si">{</span><span class="n">tts_result</span><span class="o">.</span><span class="n">raw</span><span class="si">!r}</span><span class="s2">"</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">animate_face</span><span class="p">(</span>
         <span class="n">image_url</span><span class="p">,</span>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.37 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.38 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=aa2ad26f"></script>
+      <script src="../../_static/documentation_options.js?v=423071ad"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -112,10 +112,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for falaw.cache</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Content-addressed cache for fal calls.</span>
+<span></span><span class="sd">"""Content-addressed cache for fal calls.</span>
 
-<span class="sd">Why this exists: the directorial workflow (&quot;a single edit, the scene</span>
-<span class="sd">re-renders around it&quot;) only works if unchanged beats *don&#39;t* re-render.</span>
+<span class="sd">Why this exists: the directorial workflow ("a single edit, the scene</span>
+<span class="sd">re-renders around it") only works if unchanged beats *don't* re-render.</span>
 <span class="sd">A cache hit is the difference between a 30-second edit-and-preview</span>
 <span class="sd">loop and a 5-minute one.</span>
 
@@ -142,11 +142,11 @@
 <span class="sd">Usage:</span>
 
 <span class="sd">    from falaw.cache import cached_call_fal</span>
-<span class="sd">    raw = cached_call_fal(&quot;fal-ai/flux/dev&quot;, {&quot;prompt&quot;: &quot;...&quot;})</span>
+<span class="sd">    raw = cached_call_fal("fal-ai/flux/dev", {"prompt": "..."})</span>
 
 <span class="sd">The wrapped variant has the same signature as `core.call_fal` but skips</span>
 <span class="sd">the network when the (model_id, arguments) tuple was seen before.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
@@ -163,22 +163,22 @@
 
 <span class="c1"># --- cache root -----------------------------------------------------------</span>
 
-<span class="n">ASSETS_DIRNAME</span> <span class="o">=</span> <span class="s2">&quot;assets&quot;</span>
-<span class="sd">&quot;&quot;&quot;Sub-directory of the falaw cache holding :func:`materialize_asset` copies.</span>
+<span class="n">ASSETS_DIRNAME</span> <span class="o">=</span> <span class="s2">"assets"</span>
+<span class="sd">"""Sub-directory of the falaw cache holding :func:`materialize_asset` copies.</span>
 
 <span class="sd">Named here rather than in :mod:`falaw.prune` because :func:`_asset_path` is</span>
 <span class="sd">what decides the layout; the prune side reads this so the two cannot drift.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_cache_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="n">base</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FALAW_CACHE_DIR&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FALAW_CACHE_DIR"</span><span class="p">)</span>
         <span class="ow">or</span> <span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FALAW_DATA_DIR&quot;</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;FALAW_DATA_DIR&quot;</span><span class="p">],</span> <span class="s2">&quot;cache&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"FALAW_DATA_DIR"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"FALAW_DATA_DIR"</span><span class="p">],</span> <span class="s2">"cache"</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~/.config/falaw/cache&quot;</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">"~/.config/falaw/cache"</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">base</span>
@@ -195,9 +195,9 @@
     <span class="c1"># function that collides (falaw#17). Non-canonicalisable arguments raise</span>
     <span class="c1"># `FalNonCanonicalArgument` instead of silently sharing (or forever</span>
     <span class="c1"># missing) a key. The payload shape lives in `falaw.canonical`, next to</span>
-    <span class="c1"># `plan_hash`&#39;s, so a new identity-bearing field is added to both at once.</span>
+    <span class="c1"># `plan_hash`'s, so a new identity-bearing field is added to both at once.</span>
     <span class="c1"># `backend` joins the key only when non-default (falaw#15), so every</span>
-    <span class="c1"># existing &quot;fal&quot; entry keeps its exact key.</span>
+    <span class="c1"># existing "fal" entry keeps its exact key.</span>
     <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span>
         <span class="n">canonical_blob</span><span class="p">(</span>
             <span class="n">cache_key_payload</span><span class="p">(</span>
@@ -215,7 +215,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_manifest_path</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="s2">&quot;manifest.json&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="s2">"manifest.json"</span><span class="p">)</span>
 
 
 <span class="c1"># --- public API -----------------------------------------------------------</span>
@@ -230,7 +230,7 @@
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
     <span class="n">key_extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the raw fal response if cached, else None.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Return the raw fal response if cached, else None."""</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_manifest_path</span><span class="p">(</span>
         <span class="n">_key</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">key_extra</span><span class="o">=</span><span class="n">key_extra</span><span class="p">)</span>
     <span class="p">)</span>
@@ -238,7 +238,7 @@
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"raw"</span><span class="p">)</span></div>
 
 
 
@@ -249,12 +249,12 @@
     <span class="n">arguments</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
     <span class="n">raw</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">note</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">wire_arguments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
     <span class="n">key_extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Persist a fal response. Returns the entry directory path.</span>
+<span class="w">    </span><span class="sd">"""Persist a fal response. Returns the entry directory path.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        application: fal model id.</span>
@@ -276,28 +276,28 @@
 <span class="sd">    that are structurally identical land on the same key, and an interleaved</span>
 <span class="sd">    ``json.dump`` would leave a permanently unparseable entry — a cache that</span>
 <span class="sd">    poisons itself under exactly the fan-out it exists to make cheap.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">key</span> <span class="o">=</span> <span class="n">_key</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">key_extra</span><span class="o">=</span><span class="n">key_extra</span><span class="p">)</span>
     <span class="n">d</span> <span class="o">=</span> <span class="n">_entry_dir</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
-        <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span>
-        <span class="s2">&quot;arguments&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span>
-        <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
-        <span class="s2">&quot;note&quot;</span><span class="p">:</span> <span class="n">note</span><span class="p">,</span>
-        <span class="s2">&quot;stored_at&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+        <span class="s2">"key"</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+        <span class="s2">"application"</span><span class="p">:</span> <span class="n">application</span><span class="p">,</span>
+        <span class="s2">"arguments"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arguments</span><span class="p">),</span>
+        <span class="s2">"raw"</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
+        <span class="s2">"note"</span><span class="p">:</span> <span class="n">note</span><span class="p">,</span>
+        <span class="s2">"stored_at"</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">wire_arguments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;wire_arguments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">wire_arguments</span><span class="p">)</span>
+        <span class="n">manifest</span><span class="p">[</span><span class="s2">"wire_arguments"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">wire_arguments</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">backend</span> <span class="o">!=</span> <span class="n">DFLT_BACKEND</span><span class="p">:</span>
-        <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;backend&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend</span>
+        <span class="n">manifest</span><span class="p">[</span><span class="s2">"backend"</span><span class="p">]</span> <span class="o">=</span> <span class="n">backend</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_manifest_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.part&quot;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">.part"</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="c1"># `default=str` here is display-only, never keyed: `raw` and</span>
             <span class="c1"># `wire_arguments` may hold values we render for debugging. But</span>
-            <span class="c1"># `allow_nan=False` is load-bearing — Python&#39;s json would happily</span>
+            <span class="c1"># `allow_nan=False` is load-bearing — Python's json would happily</span>
             <span class="c1"># write a bare `NaN`, valid to itself and invalid JSON to every</span>
             <span class="c1"># strict parser, leaving an on-disk entry nothing else can read.</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -325,7 +325,7 @@
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
     <span class="n">key_extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete the cache entry for ``(application, arguments)``. Returns whether one existed.</span>
+<span class="w">    </span><span class="sd">"""Delete the cache entry for ``(application, arguments)``. Returns whether one existed.</span>
 
 <span class="sd">    The counterpart to :func:`cache_put`, and the mechanism that keeps a cache</span>
 <span class="sd">    from becoming a *trap*. An entry whose response can no longer be turned</span>
@@ -336,7 +336,7 @@
 
 <span class="sd">    Only the manifest is removed. Blobs in the content store are shared by</span>
 <span class="sd">    content hash across entries and are never dropped from here.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">_manifest_path</span><span class="p">(</span>
         <span class="n">_key</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">key_extra</span><span class="o">=</span><span class="n">key_extra</span><span class="p">)</span>
     <span class="p">)</span>
@@ -350,19 +350,19 @@
 <div class="viewcode-block" id="emit_cache_hit">
 <a class="viewcode-back" href="../../module_docs/falaw/cache.html#falaw.emit_cache_hit">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">emit_cache_hit</span><span class="p">(</span><span class="n">application</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Emit the synthetic ``cache_hit`` progress event for ``application``.</span>
+<span class="w">    </span><span class="sd">"""Emit the synthetic ``cache_hit`` progress event for ``application``.</span>
 
 <span class="sd">    Shared by :func:`cached_call_fal` and :func:`falaw.plan.execute` (which</span>
 <span class="sd">    drives the cache directly, because it must decide whether a hit is</span>
 <span class="sd">    *usable* before committing to it) so a UI sees one event shape either way.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_uuid</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressEvent</span><span class="p">,</span> <span class="n">emit</span>
 
     <span class="n">emit</span><span class="p">(</span>
         <span class="n">ProgressEvent</span><span class="p">(</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;cache_hit&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"cache_hit"</span><span class="p">,</span>
             <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
             <span class="n">call_id</span><span class="o">=</span><span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">],</span>
         <span class="p">),</span>
@@ -383,7 +383,7 @@
     <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DFLT_BACKEND</span><span class="p">,</span>
     <span class="n">key_extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Call a fal model, but reuse the cached response when present.</span>
+<span class="w">    </span><span class="sd">"""Call a fal model, but reuse the cached response when present.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        application: fal model id.</span>
@@ -391,29 +391,29 @@
 <span class="sd">        key_arguments: what the cache entry is **keyed** on, when that differs</span>
 <span class="sd">            from what goes on the wire. Defaults to ``arguments``. The split</span>
 <span class="sd">            exists because a chained call must send fal an expiring URL for its</span>
-<span class="sd">            upstream input while being keyed on that input&#39;s *content hash*, so</span>
+<span class="sd">            upstream input while being keyed on that input's *content hash*, so</span>
 <span class="sd">            a byte-identical upstream regeneration hits instead of re-billing.</span>
 <span class="sd">        refresh: if True, bypass the cache and overwrite it with a fresh result.</span>
 <span class="sd">        on_event: Per-call subscriber for :class:`falaw.events.ProgressEvent`.</span>
 <span class="sd">            On a cache hit, a synthetic ``cache_hit`` event is emitted so</span>
-<span class="sd">            UIs can show &quot;skipped&quot; instead of &quot;running&quot;.</span>
+<span class="sd">            UIs can show "skipped" instead of "running".</span>
 <span class="sd">        backend: which execution backend serves this call (falaw#15) —</span>
 <span class="sd">            resolved via :mod:`falaw.backends`. Also joins the cache key</span>
 <span class="sd">            (non-default only), so two backends never share an entry. Despite</span>
 <span class="sd">            the name, this function is no longer fal-specific; the name is</span>
-<span class="sd">            kept because &quot;fal&quot; is still the only backend and every existing</span>
+<span class="sd">            kept because "fal" is still the only backend and every existing</span>
 <span class="sd">            call site already spells it this way.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Raw response (whether from cache or network).</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_backend_executor</span>
 
     <span class="n">key_args</span> <span class="o">=</span> <span class="n">arguments</span> <span class="k">if</span> <span class="n">key_arguments</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">key_arguments</span>
     <span class="c1"># Refuse while it is still free: on the `refresh=True` path the first key</span>
     <span class="c1"># computation would otherwise happen in `cache_put`, *after* the paid call</span>
     <span class="c1"># — raising there loses a response fal has already billed for.</span>
-    <span class="n">ensure_canonical</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key_args</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;key_arguments&quot;</span><span class="p">)</span>
+    <span class="n">ensure_canonical</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">key_args</span><span class="p">),</span> <span class="n">context</span><span class="o">=</span><span class="s2">"key_arguments"</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
         <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">key_args</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="n">key_extra</span><span class="o">=</span><span class="n">key_extra</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -430,11 +430,11 @@
             <span class="n">key_extra</span><span class="o">=</span><span class="n">key_extra</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="c1"># A paid result is never discarded (see falaw.plan.execute&#39;s failure</span>
+        <span class="c1"># A paid result is never discarded (see falaw.plan.execute's failure</span>
         <span class="c1"># policy): fal has already run — and billed — this call, so a cache</span>
         <span class="c1"># WRITE failure (a response carrying a non-finite float that the</span>
         <span class="c1"># strict manifest refuses, a full disk, a permission error) must</span>
-        <span class="c1"># degrade to &quot;uncached&quot;, not destroy the response. On refresh=True the</span>
+        <span class="c1"># degrade to "uncached", not destroy the response. On refresh=True the</span>
         <span class="c1"># pre-refresh entry is dropped too — the caller explicitly asked for</span>
         <span class="c1"># fresh, so letting the old entry keep serving would quietly undo the</span>
         <span class="c1"># refresh on every later call.</span>
@@ -446,10 +446,10 @@
             <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;falaw could not cache the response for </span><span class="si">{</span><span class="n">application</span><span class="si">!r}</span><span class="s2"> &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); returning the billed response &quot;</span>
-            <span class="s2">&quot;uncached. Until the cause is fixed, re-running this call will &quot;</span>
-            <span class="s2">&quot;bill again.&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">"falaw could not cache the response for </span><span class="si">{</span><span class="n">application</span><span class="si">!r}</span><span class="s2"> "</span>
+            <span class="sa">f</span><span class="s2">"(</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); returning the billed response "</span>
+            <span class="s2">"uncached. Until the cause is fixed, re-running this call will "</span>
+            <span class="s2">"bill again."</span><span class="p">,</span>
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="p">)</span>
@@ -462,14 +462,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">materialize_asset</span><span class="p">(</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">key_hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">key_hint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
     <span class="n">store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fetcher</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download a remote asset to the cache and return the local path.</span>
+<span class="w">    </span><span class="sd">"""Download a remote asset to the cache and return the local path.</span>
 
-<span class="sd">    The local filename is content-addressed by the asset&#39;s **bytes**, so two</span>
+<span class="sd">    The local filename is content-addressed by the asset's **bytes**, so two</span>
 <span class="sd">    URLs serving identical bytes resolve to one file. The extension is a</span>
 <span class="sd">    presentational hint for ffmpeg/PIL; the SHA-256 is the address.</span>
 
@@ -512,7 +512,7 @@
 <span class="sd">            Unlike a generated-media artifact (which degrades to URL-only —</span>
 <span class="sd">            see :func:`falaw.plan.execute`), there is nothing to degrade to</span>
 <span class="sd">            here: the caller asked for a local file.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Local import: ``falaw.content`` imports ``_cache_dir`` from this module,</span>
     <span class="c1"># so importing it at module scope would be a cycle.</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.content</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -546,9 +546,9 @@
         <span class="c1"># routinely outlives both.</span>
         <span class="k">if</span> <span class="n">local_hint_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_hint_path</span><span class="p">):</span>
             <span class="n">emit_degradation</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2"> could not be re-read (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); returning the copy &quot;</span>
-                <span class="s2">&quot;materialized earlier. If that URL is mutable, this file may &quot;</span>
-                <span class="s2">&quot;be superseded.&quot;</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">url</span><span class="si">!r}</span><span class="s2"> could not be re-read (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">); returning the copy "</span>
+                <span class="s2">"materialized earlier. If that URL is mutable, this file may "</span>
+                <span class="s2">"be superseded."</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="n">local_hint_path</span>
         <span class="k">raise</span>
@@ -560,55 +560,55 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_asset_path</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">key_hint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_hash</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Where :func:`materialize_asset` puts the bytes for ``content_hash``.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Where :func:`materialize_asset` puts the bytes for ``content_hash``."""</span>
     <span class="n">ext</span> <span class="o">=</span> <span class="n">_infer_ext_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key_hint</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">key_hint</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}{</span><span class="n">content_hash</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">key_hint</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">'-'</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">key_hint</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">''</span><span class="si">}{</span><span class="n">content_hash</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="n">ASSETS_DIRNAME</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_infer_ext_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"?"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span>
-        <span class="s2">&quot;.mp4&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.mov&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.webm&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.mp3&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.wav&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.m4a&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.png&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;.webp&quot;</span><span class="p">,</span>
+        <span class="s2">".mp4"</span><span class="p">,</span>
+        <span class="s2">".mov"</span><span class="p">,</span>
+        <span class="s2">".webm"</span><span class="p">,</span>
+        <span class="s2">".mp3"</span><span class="p">,</span>
+        <span class="s2">".wav"</span><span class="p">,</span>
+        <span class="s2">".m4a"</span><span class="p">,</span>
+        <span class="s2">".png"</span><span class="p">,</span>
+        <span class="s2">".jpg"</span><span class="p">,</span>
+        <span class="s2">".jpeg"</span><span class="p">,</span>
+        <span class="s2">".webp"</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ext</span>
-    <span class="k">return</span> <span class="s2">&quot;.bin&quot;</span>
+    <span class="k">return</span> <span class="s2">".bin"</span>
 
 
 <div class="viewcode-block" id="cache_stats">
 <a class="viewcode-back" href="../../module_docs/falaw/cache.html#falaw.cache_stats">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cache_stats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Quick summary of the cache: entry count, disk usage, and where it went.</span>
+<span class="w">    </span><span class="sd">"""Quick summary of the cache: entry count, disk usage, and where it went.</span>
 
 <span class="sd">    ``areas`` is the part worth reading. Since falaw#14 the cache holds the</span>
 <span class="sd">    *bytes* of every generated asset, so a total on its own cannot distinguish</span>
 <span class="sd">    gigabytes of irreplaceable blobs from gigabytes of ``assets/`` copies that</span>
 <span class="sd">    cost nothing to regenerate — and only the second is safe to reclaim without</span>
-<span class="sd">    thinking. Each area&#39;s economics, and the primitives that reclaim it, are in</span>
+<span class="sd">    thinking. Each area's economics, and the primitives that reclaim it, are in</span>
 <span class="sd">    :mod:`falaw.prune`.</span>
 
 <span class="sd">    ``size_bytes`` is every byte under the cache root, unchanged in meaning from</span>
 <span class="sd">    before the breakdown existed: the ``other`` area absorbs whatever the named</span>
 <span class="sd">    areas do not claim, so the areas always sum to the whole.</span>
 
-<span class="sd">    (``+SKIP``\\ ed — it reads the caller&#39;s real cache, a multi-gigabyte walk on</span>
+<span class="sd">    (``+SKIP``\\ ed — it reads the caller's real cache, a multi-gigabyte walk on</span>
 <span class="sd">    the production box. :mod:`tests.test_prune` pins this against a throwaway</span>
 <span class="sd">    cache instead.)</span>
 
 <span class="sd">    &gt;&gt;&gt; stats = cache_stats()                        # doctest: +SKIP</span>
-<span class="sd">    &gt;&gt;&gt; sorted(stats[&quot;areas&quot;])                       # doctest: +SKIP</span>
-<span class="sd">    [&#39;assets&#39;, &#39;content&#39;, &#39;manifests&#39;, &#39;other&#39;, &#39;scenes&#39;, &#39;url_index&#39;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; sorted(stats["areas"])                       # doctest: +SKIP</span>
+<span class="sd">    ['assets', 'content', 'manifests', 'other', 'scenes', 'url_index']</span>
+<span class="sd">    """</span>
     <span class="c1"># Local import: `falaw.prune` imports `_cache_dir` from this module, so a</span>
     <span class="c1"># module-scope import would be a cycle — the same reason</span>
     <span class="c1"># `materialize_asset` imports `falaw.content` inside the function body.</span>
@@ -616,12 +616,12 @@
 
     <span class="n">usage</span> <span class="o">=</span> <span class="n">cache_usage</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
-        <span class="s2">&quot;manifest_entries&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="s2">&quot;manifests&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span>
-        <span class="s2">&quot;size_bytes&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_bytes</span><span class="p">,</span>
-        <span class="s2">&quot;size_mb&quot;</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_megabytes</span><span class="p">,</span>
-        <span class="s2">&quot;areas&quot;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="s2">&quot;bytes&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="s2">&quot;size_mb&quot;</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">megabytes</span><span class="p">}</span>
+        <span class="s2">"root"</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">root</span><span class="p">,</span>
+        <span class="s2">"manifest_entries"</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="s2">"manifests"</span><span class="p">)</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span>
+        <span class="s2">"size_bytes"</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_bytes</span><span class="p">,</span>
+        <span class="s2">"size_mb"</span><span class="p">:</span> <span class="n">usage</span><span class="o">.</span><span class="n">total_megabytes</span><span class="p">,</span>
+        <span class="s2">"areas"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="p">{</span><span class="s2">"entries"</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">entries</span><span class="p">,</span> <span class="s2">"bytes"</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">bytes</span><span class="p">,</span> <span class="s2">"size_mb"</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">megabytes</span><span class="p">}</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">usage</span><span class="o">.</span><span class="n">areas</span>
         <span class="p">},</span>
     <span class="p">}</span></div>
