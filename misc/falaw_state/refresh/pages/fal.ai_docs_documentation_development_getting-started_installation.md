@@ -6,9 +6,9 @@
 
 > Complete setup guide for the fal CLI and development environment. This guide covers all platforms and authentication methods.
 
-The fal CLI is the primary tool for developing, testing, and deploying Serverless applications. This page covers installing the CLI, authenticating with your account, and switching between team contexts. By the end, you will have a working development environment ready for the [Quick Start](/documentation/development/getting-started/quick-start).
+The fal CLI is the primary tool for developing, testing, and deploying Serverless applications. This page covers installing the CLI, authenticating with your account, and switching between team contexts. By the end, you will have a working development environment ready for the [Quick Start](/docs/documentation/development/getting-started/quick-start).
 
-If you are only using [Model APIs](/documentation/model-apis/overview) to call pre-trained models, you do not need the CLI. You only need an [API key](/documentation/model-apis/authentication/index) and the client SDK (`fal-client` for Python or `@fal-ai/client` for JavaScript). The CLI is specifically for the Serverless workflow: writing, testing, and deploying your own apps. For an overview of how accounts, keys, and profiles relate to each other, see [Accounts and Identity](/documentation/setting-up/accounts-and-identity).
+If you are only using [Model APIs](/docs/documentation/model-apis/overview) to call pre-trained models, you do not need the CLI. You only need an [API key](/docs/documentation/model-apis/authentication/index) and the client SDK (`fal-client` for Python or `@fal-ai/client` for JavaScript). The CLI is specifically for the Serverless workflow: writing, testing, and deploying your own apps. For an overview of how accounts, keys, and profiles relate to each other, see [Accounts and Identity](/docs/documentation/setting-up/accounts-and-identity).
 
 ## System Requirements
 
@@ -59,7 +59,7 @@ export FAL_KEY="your-api-key-here"
 
 Or add it to your shell profile (`~/.bashrc`, `~/.zshrc`, etc.) to persist across sessions.
 
-If you work with multiple API keys (for example, personal and team accounts), you can use `fal profile` to save keys and switch between them. See the [Accounts and Identity](/documentation/setting-up/accounts-and-identity#switching-accounts) page for details on profiles versus team switching.
+If you work with multiple API keys (for example, personal and team accounts), you can use `fal profile` to save keys and switch between them. See the [Accounts and Identity](/docs/documentation/setting-up/accounts-and-identity#switching-accounts) page for details on profiles versus team switching.
 
 ## Team Accounts
 

@@ -6,7 +6,7 @@
 
 > Configure sampling, batch export tuning, and graceful flush so your traces hold up under production load
 
-Exporting 100% of traces from a high-throughput app generates significant backend ingestion cost, and spans buffered in `BatchSpanProcessor` are silently dropped when a runner shuts down if they are not flushed before `SIGKILL` arrives. For basic tracing setup, start with [Custom Traces](/documentation/serverless/observability/opentelemetry-traces).
+Exporting 100% of traces from a high-throughput app generates significant backend ingestion cost, and spans buffered in `BatchSpanProcessor` are silently dropped when a runner shuts down if they are not flushed before `SIGKILL` arrives. For basic tracing setup, start with [Custom Traces](/docs/documentation/serverless/observability/opentelemetry-traces).
 
 ## Conditional Tracing
 
@@ -98,7 +98,7 @@ processor = BatchSpanProcessor(
 
 ## Flushing on Shutdown
 
-fal gives runners a 5-second grace period between `SIGTERM` and `SIGKILL`. `teardown()` runs during that window, after all in-flight requests finish. See [App Lifecycle](/documentation/development/app-lifecycle) for the full shutdown sequence.
+fal gives runners a 5-second grace period between `SIGTERM` and `SIGKILL`. `teardown()` runs during that window, after all in-flight requests finish. See [App Lifecycle](/docs/documentation/development/app-lifecycle) for the full shutdown sequence.
 
 Call `force_flush()` in `teardown()`, not in your endpoint handler. Per-request flushing adds latency on every call; `BatchSpanProcessor` handles periodic exports on its own schedule.
 
@@ -108,7 +108,6 @@ import os
 import fal
 from fal.toolkit import Image
 from pydantic import BaseModel, Field
-
 
 def setup_tracer(service_name: str):
     from opentelemetry import trace
@@ -184,9 +183,7 @@ class ProductionApp(fal.App):
             root.set_attribute("model.name", "stable-diffusion-xl-base-1.0")
 
             with self.tracer.start_as_current_span("inference"):
-                result = self.pipe(
-                    input.prompt, num_inference_steps=input.num_inference_steps
-                )
+                result = self.pipe(input.prompt, num_inference_steps=input.num_inference_steps)
 
             with self.tracer.start_as_current_span("upload"):
                 image = Image.from_pil(result.images[0])
@@ -203,25 +200,25 @@ class ProductionApp(fal.App):
 ```
 
 <Warning>
-  The 5-second grace period is a shared budget across `handle_exit()`, remaining in-flight requests, `teardown()`, and `force_flush()`. If your endpoint handles long-running requests, use `handle_exit()` to signal them to stop early so `teardown()` has enough time to flush. See [App Lifecycle](/documentation/development/app-lifecycle) for the full shutdown sequence.
+  The 5-second grace period is a shared budget across `handle_exit()`, remaining in-flight requests, `teardown()`, and `force_flush()`. If your endpoint handles long-running requests, use `handle_exit()` to signal them to stop early so `teardown()` has enough time to flush. See [App Lifecycle](/docs/documentation/development/app-lifecycle) for the full shutdown sequence.
 </Warning>
 
 ## What's Next
 
 <CardGroup cols={2}>
-  <Card title="Custom Traces" icon="code-branch" href="/documentation/serverless/observability/opentelemetry-traces">
+  <Card title="Custom Traces" icon="code-branch" href="/docs/documentation/serverless/observability/opentelemetry-traces">
     Add spans to trace inference stages end to end
   </Card>
 
-  <Card title="Custom Metrics" icon="chart-bar" href="/documentation/serverless/observability/custom-metrics">
-    Counters, histograms, and gauges for your inference workload
+  <Card title="Exporting Metrics" icon="chart-bar" href="/docs/documentation/serverless/observability/exporting-metrics">
+    Scrape fal's Prometheus-compatible metrics endpoint
   </Card>
 
-  <Card title="Cross-Service Tracing" icon="diagram-project" href="/documentation/serverless/observability/opentelemetry-cross-service">
+  <Card title="Cross-Service Tracing" icon="diagram-project" href="/docs/documentation/serverless/observability/opentelemetry-cross-service">
     Connect traces across multiple fal apps
   </Card>
 
-  <Card title="App Lifecycle" icon="rotate" href="/documentation/development/app-lifecycle">
+  <Card title="App Lifecycle" icon="rotate" href="/docs/documentation/development/app-lifecycle">
     Full shutdown sequence and grace period details
   </Card>
 </CardGroup>

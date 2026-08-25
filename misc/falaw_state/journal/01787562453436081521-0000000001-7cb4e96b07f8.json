@@ -1,0 +1,15 @@
+{
+  "id": "7cb4e96b07f8",
+  "timestamp": 1787562453.4360814,
+  "kind": "note",
+  "text": "refresh: llms-full changed",
+  "tags": [
+    "refresh",
+    "llms-full"
+  ],
+  "suggestion": "",
+  "context": {
+    "diff_preview": "--- llms-full.prev\n+++ llms-full\n@@ -634,7 +634,7 @@\n - Enterprise inquiries: enterprise@fal.ai\n \n **Technical Support**:\n-- Documentation: docs.fal.ai\n+- Documentation: https://fal.ai/docs/documentation\n - Community: Discord server\n - Enterprise support: support@fal.ai\n ",
+    "diff_size": 273
+  }
+}

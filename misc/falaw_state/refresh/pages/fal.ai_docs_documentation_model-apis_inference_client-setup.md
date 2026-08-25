@@ -6,9 +6,9 @@
 
 > Install and configure the fal client library
 
-The fal client is the easiest way to call models on fal. It handles [authentication](/documentation/model-apis/authentication), retries, and provides a clean API for all [inference methods](/documentation/model-apis/inference). Official clients are available for Python, JavaScript/TypeScript, Swift, Java, Kotlin, and Dart, and they all expose the same core methods (`subscribe`, `submit`, `run`, `stream`).
+The fal client is the easiest way to call models on fal. It handles [authentication](/docs/documentation/model-apis/authentication), retries, and provides a clean API for all [inference methods](/docs/documentation/model-apis/inference). Official clients are available for Python, JavaScript/TypeScript, Swift, Java, Kotlin, and Dart, and they all expose the same core methods (`subscribe`, `submit`, `run`, `stream`).
 
-How you configure the client depends on where your code runs. In a server-side environment like a Python script, a Node.js backend, or a serverless function, you set your `FAL_KEY` as an environment variable and the client picks it up automatically. In a client-side environment like a React app running in the browser, you cannot use the API key directly because browser source code is visible to anyone. Instead, the fal client routes requests through a lightweight [proxy](/documentation/model-apis/inference/proxy-setup) on your server, which attaches the key before forwarding to fal. Both approaches are covered in the [Configuration](#configuration) section below.
+How you configure the client depends on where your code runs. In a server-side environment like a Python script, a Node.js backend, or a serverless function, you set your `FAL_KEY` as an environment variable and the client picks it up automatically. In a client-side environment like a React app running in the browser, you cannot use the API key directly because browser source code is visible to anyone. Instead, the fal client routes requests through a lightweight [proxy](/docs/documentation/model-apis/inference/proxy-setup) on your server, which attaches the key before forwarding to fal. Both approaches are covered in the [Configuration](#configuration) section below.
 
 ## Installation
 
@@ -88,7 +88,9 @@ No additional configuration is needed. The client reads `FAL_KEY` from the envir
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.run("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
+  result = fal_client.run("fal-ai/flux/schnell", arguments={
+      "prompt": "a sunset"
+  })
   ```
 
   ```javascript JavaScript theme={null}
@@ -105,7 +107,6 @@ In some environments (serverless functions, containers) you may not have access 
 <CodeGroup>
   ```python Python theme={null}
   import os
-
   os.environ["FAL_KEY"] = "your-api-key-here"
 
   import fal_client
@@ -154,7 +155,7 @@ const result = await fal.subscribe("fal-ai/flux/schnell", {
 
 Make sure `FAL_KEY` is set as an environment variable on your server. The proxy reads it from the environment, just like the server-side setup above.
 
-<Card title="Proxy Setup" icon="arrow-right" href="/documentation/model-apis/inference/proxy-setup">
+<Card title="Proxy Setup" icon="arrow-right" href="/docs/documentation/model-apis/inference/proxy-setup">
   Pages Router, Vercel, Express, custom frameworks, and how the proxy works under the hood
 </Card>
 
@@ -168,13 +169,10 @@ Once configured, you can call any model:
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe(
-      "fal-ai/flux/schnell",
-      arguments={
-          "prompt": "a futuristic cityscape at sunset",
-          "image_size": "landscape_16_9",
-      },
-  )
+  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
+      "prompt": "a futuristic cityscape at sunset",
+      "image_size": "landscape_16_9"
+  })
 
   print(result["images"][0]["url"])
   ```
@@ -183,17 +181,15 @@ Once configured, you can call any model:
   import asyncio
   import fal_client
 
-
   async def main():
       result = await fal_client.subscribe_async(
           "fal-ai/flux/schnell",
           arguments={
               "prompt": "a futuristic cityscape at sunset",
-              "image_size": "landscape_16_9",
+              "image_size": "landscape_16_9"
           },
       )
       print(result["images"][0]["url"])
-
 
   asyncio.run(main())
   ```

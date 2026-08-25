@@ -6,7 +6,7 @@
 
 > Keep your API key secure in client-side applications
 
-When the fal client runs in a browser, it cannot use your API key directly because browser source code is visible to anyone. Instead, it sends requests to a proxy endpoint on your server, which attaches the key and forwards the request to fal. The [Client Setup](/documentation/model-apis/inference/client-setup#client-side-browser-react-next-js) page covers the quickest path using Next.js App Router. This page goes deeper with alternative frameworks, deployment platforms, and the underlying proxy protocol.
+When the fal client runs in a browser, it cannot use your API key directly because browser source code is visible to anyone. Instead, it sends requests to a proxy endpoint on your server, which attaches the key and forwards the request to fal. The [Client Setup](/docs/documentation/model-apis/inference/client-setup#client-side-browser-react-next-js) page covers the quickest path using Next.js App Router. This page goes deeper with alternative frameworks, deployment platforms, and the underlying proxy protocol.
 
 The proxy sits between the browser and fal's API. When the fal client makes a request, it sends it to your proxy URL (e.g., `/api/fal/proxy`) with the real fal endpoint in an `x-fal-target-url` header. Your proxy reads that header, adds your `FAL_KEY` via the `Authorization` header, forwards the request to fal, and pipes the response back to the browser. This means your key never leaves the server.
 
@@ -41,11 +41,11 @@ fal.config({
 ```
 
 <CardGroup cols={2}>
-  <Card title="Full Next.js Example" icon="arrow-right" href="/examples/integrations/nextjs">
+  <Card title="Full Next.js Example" icon="arrow-right" href="/docs/examples/integrations/nextjs">
     Complete walkthrough with working code
   </Card>
 
-  <Card title="Vercel Integration" icon="arrow-right" href="/examples/integrations/vercel">
+  <Card title="Vercel Integration" icon="arrow-right" href="/docs/examples/integrations/vercel">
     Deploy AI apps on Vercel with fal
   </Card>
 </CardGroup>
@@ -81,7 +81,7 @@ export const { GET, POST, PUT } = createRouteHandler({
 
 ## Vercel
 
-If you are deploying to Vercel, the Next.js proxy setup works out of the box. Set your `FAL_KEY` as an environment variable in your Vercel project settings (Settings > Environment Variables) and the proxy route will read it automatically. No additional configuration is needed beyond what is described in [Client Setup](/documentation/model-apis/inference/client-setup#client-side-browser-react-next-js).
+If you are deploying to Vercel, the Next.js proxy setup works out of the box. Set your `FAL_KEY` as an environment variable in your Vercel project settings (Settings > Environment Variables) and the proxy route will read it automatically. No additional configuration is needed beyond what is described in [Client Setup](/docs/documentation/model-apis/inference/client-setup#client-side-browser-react-next-js).
 
 ## Custom Proxy (Express, Flask, etc.)
 

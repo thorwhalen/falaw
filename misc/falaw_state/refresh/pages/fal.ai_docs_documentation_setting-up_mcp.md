@@ -2,13 +2,17 @@
 > Fetch the complete documentation index at: https://fal.ai/docs/llms.txt
 > Use this file to discover all available pages before exploring further.
 
-# AI Tools
+# Run MCP
 
 > Connect AI coding assistants to fal's 1,000+ models via the Model Context Protocol
 
 fal provides an [MCP](https://modelcontextprotocol.io) server that gives any compatible AI assistant direct access to the full fal platform: search models, check schemas, run inference, upload files, and browse documentation — all without leaving your editor. Your assistant becomes an expert in every fal model and can generate working code on the first try.
 
-The server is hosted at `mcp.fal.ai/mcp` and works with any client that supports the [Model Context Protocol](https://modelcontextprotocol.io), including Claude Code, Claude Desktop, Cursor, Windsurf, and more. Every request uses your own [API key](/documentation/setting-up/authentication/index) — nothing is stored on the server.
+The server is hosted at `mcp.fal.ai/mcp` and works with any client that supports the [Model Context Protocol](https://modelcontextprotocol.io) over Streamable HTTP with a bearer token — including Claude Code, Cursor, Windsurf, and more. Every request uses your own [API key](/docs/documentation/setting-up/authentication/index) — nothing is stored on the server.
+
+<Tip>
+  Looking to **debug and operate** your fal account instead of running models? That's the [Platform MCP](/docs/documentation/setting-up/platform-mcp) — connect both, they complement each other.
+</Tip>
 
 <video src="https://v3b.fal.media/files/b/0a92d4b8/L7L_neuq7UyBerLwvPJGI_videodonemcpfull.mp4" controls playsinline style={{width: '100%', borderRadius: '8px', margin: '20px 0'}} />
 
@@ -20,6 +24,10 @@ The server is hosted at `mcp.fal.ai/mcp` and works with any client that supports
 
 <Tabs>
   <Tab title="Claude Code">
+    <Note>
+      This setup is for **Claude Code**, the terminal/IDE client. Claude Desktop and Claude on the web (claude.ai Custom Connectors) require OAuth 2.0 authentication, which is not yet supported by the fal MCP server. OAuth support is coming soon.
+    </Note>
+
     Run this command in your terminal:
 
     ```bash theme={null}
@@ -33,9 +41,9 @@ The server is hosted at `mcp.fal.ai/mcp` and works with any client that supports
     ![Claude Code MCP setup](https://v3b.fal.media/files/b/0a92d4b8/BBV-rMYye2QM8VRO0AER8_gif02.gif)
   </Tab>
 
-  <Tab title="Claude Desktop">
+  <Tab title="Claude Desktop/Web">
     <Note>
-      Claude Desktop and claude.ai Custom Connectors require OAuth 2.0 authentication, which is not yet supported by the fal MCP server. OAuth support is coming soon. In the meantime, use **Claude Code**, **Cursor**, or **Windsurf** to connect.
+      Claude Desktop and Claude on the web (claude.ai Custom Connectors) require OAuth 2.0 authentication, which is not yet supported by the fal MCP server. OAuth support is coming soon. In the meantime, use **Claude Code**, **Cursor**, or **Windsurf** to connect.
     </Note>
   </Tab>
 
@@ -108,7 +116,7 @@ The server is hosted at `mcp.fal.ai/mcp` and works with any client that supports
 
 ## Available Tools
 
-The MCP server exposes 9 tools organized in three categories. Your AI assistant picks the right tool automatically based on what you ask.
+The MCP server exposes 11 tools organized in three categories. Your AI assistant picks the right tool automatically based on what you ask.
 
 ### Discovery
 
@@ -121,11 +129,13 @@ The MCP server exposes 9 tools organized in three categories. Your AI assistant 
 
 ### Execution
 
-| Tool             | What it does                                                       |
-| ---------------- | ------------------------------------------------------------------ |
-| **`run_model`**  | Run any model and wait for the result (images, video, audio, etc.) |
-| **`submit_job`** | Submit a long-running job and return immediately with a request ID |
-| **`check_job`**  | Check job status, fetch results, or cancel a running job           |
+| Tool                 | What it does                                                       |
+| -------------------- | ------------------------------------------------------------------ |
+| **`run_model`**      | Run any model and wait for the result (images, video, audio, etc.) |
+| **`submit_job`**     | Submit a long-running job and return immediately with a request ID |
+| **`check_job`**      | Check the status of a submitted job                                |
+| **`get_job_result`** | Fetch the result of a completed job                                |
+| **`cancel_job`**     | Cancel a queued or running job                                     |
 
 ### Utility
 
@@ -160,7 +170,7 @@ The assistant will:
 1. Use `upload_file` to upload your image to fal's CDN
 2. Use `recommend_model` to find the best image-to-video model
 3. Use `submit_job` (since video generation takes longer)
-4. Use `check_job` to poll for the result
+4. Use `check_job` to poll for completion, then `get_job_result` to fetch the output
 
 ### Check pricing before running
 
@@ -193,7 +203,7 @@ The MCP server is a stateless API hosted on Vercel. Each request is fully isolat
 Your API key is sent per-request in the `Authorization` header and is never stored. The server has no sessions, no state, and no access to anything beyond what the fal public API provides with your key.
 
 <Tip>
-  The MCP server uses the same [Model APIs](/documentation/model-apis/overview) you would call directly with the fal client SDK. Anything you can do with the SDK, your AI assistant can do through MCP.
+  The MCP server uses the same [Model APIs](/docs/documentation/model-apis/overview) you would call directly with the fal client SDK. Anything you can do with the SDK, your AI assistant can do through MCP.
 </Tip>
 
 ***
@@ -211,6 +221,7 @@ Search fal's model catalog by keyword, category, or both.
 | `query`    | string (optional) | Free-text search, e.g. `"flux"`, `"video generation"`, `"upscale"`                                                                        |
 | `category` | string (optional) | Filter by category: `text-to-image`, `image-to-video`, `text-to-video`, `text-to-speech`, `image-to-3d`, `image-editing`, `llm`, and more |
 | `limit`    | number (optional) | Max results to return (default 20, max 100)                                                                                               |
+| `cursor`   | string (optional) | Pagination cursor. Pass the `next_cursor` value from a previous `search_models` response to fetch the next page.                          |
 
 **Example response:**
 
@@ -225,7 +236,8 @@ Search fal's model catalog by keyword, category, or both.
     }
   ],
   "total_shown": 1,
-  "has_more": true
+  "has_more": true,
+  "next_cursor": "eyJvZmZzZXQiOjIwfQ"
 }
 ```
 
@@ -267,7 +279,7 @@ Run any fal model. Submits to the queue, polls until complete, and returns the r
 ```
 
 <Note>
-  For long-running models (video, 3D, training), use `submit_job` + `check_job` instead to avoid timeouts.
+  For long-running models (video, 3D, training), use `submit_job` + `check_job` + `get_job_result` instead to avoid timeouts.
 </Note>
 
 ***
@@ -287,15 +299,44 @@ Submit a job without waiting for the result. Returns immediately with a `request
 
 ### check\_job
 
-Check the status of a running job, fetch the result, or cancel it.
+Check the status of a running job. Fetching the result and cancelling are separate
+tools -- see `get_job_result` and `cancel_job` below.
 
 **Parameters:**
 
-| Parameter     | Type              | Description                                     |
-| ------------- | ----------------- | ----------------------------------------------- |
-| `endpoint_id` | string            | The model ID                                    |
-| `request_id`  | string            | The request ID from `run_model` or `submit_job` |
-| `action`      | string (optional) | `"status"` (default), `"result"`, or `"cancel"` |
+| Parameter     | Type              | Description                                                                                                       |
+| ------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `endpoint_id` | string            | The model ID                                                                                                      |
+| `request_id`  | string            | The request ID from `run_model` or `submit_job`                                                                   |
+| `status_url`  | string (optional) | Status URL returned by `submit_job`, or by `run_model` when it returns `processing`. Used instead of deriving it. |
+
+***
+
+### get\_job\_result
+
+Fetch the result of a completed job.
+
+**Parameters:**
+
+| Parameter      | Type              | Description                                                                                                         |
+| -------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `endpoint_id`  | string            | The model ID                                                                                                        |
+| `request_id`   | string            | The request ID from `run_model` or `submit_job`                                                                     |
+| `response_url` | string (optional) | Response URL returned by `submit_job`, or by `run_model` when it returns `processing`. Used instead of deriving it. |
+
+***
+
+### cancel\_job
+
+Cancel a queued or running job.
+
+**Parameters:**
+
+| Parameter     | Type              | Description                                                                                                       |
+| ------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `endpoint_id` | string            | The model ID                                                                                                      |
+| `request_id`  | string            | The request ID from `run_model` or `submit_job`                                                                   |
+| `cancel_url`  | string (optional) | Cancel URL returned by `submit_job`, or by `run_model` when it returns `processing`. Used instead of deriving it. |
 
 ***
 
@@ -366,6 +407,6 @@ Search the fal documentation for guides, API references, and code examples.
   </Tab>
 
   <Tab title="What about rate limits?">
-    The MCP server respects the same [concurrency limits](/documentation/model-apis/concurrency-limits) as direct API calls. There are no additional rate limits on the MCP endpoint itself.
+    The MCP server respects the same [concurrency limits](/docs/documentation/model-apis/concurrency-limits) as direct API calls. There are no additional rate limits on the MCP endpoint itself.
   </Tab>
 </Tabs>

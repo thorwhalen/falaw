@@ -4,23 +4,41 @@
 
 # Log Drains
 
-> Forward your application logs to external services like Datadog, Splunk, or Elasticsearch.
+> Forward application logs to Datadog or any HTTPS endpoint.
 
-Log Drains automatically forward your application logs to an external HTTPS endpoint in real time. Use them to send logs to Datadog, Splunk, Elasticsearch, or any service that accepts HTTPS webhooks.
+Log Drains automatically forward your application logs to an external destination in real time. Use the built-in Datadog integration or send NDJSON payloads to a custom HTTPS webhook.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=278&end=345&autoplay=1'><img src='/docs/images/video-thumbs/log-drains.jpg' alt='Log Drains - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=278&end=345&autoplay=1'><img src='/docs/docs/images/video-thumbs/log-drains.jpg' alt='Log Drains - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## Setting Up a Log Drain
 
 1. Go to [**Dashboard > Log Drains**](https://fal.ai/dashboard/drains)
 2. Click **Create Log Drain**
-3. Configure:
-   * **Name** -- A label for this drain (e.g., "Production Datadog")
-   * **Endpoint URL** -- The HTTPS URL to send logs to (must be HTTPS)
-   * **Secret Token** -- Used to sign payloads so you can verify they came from fal (minimum 64 characters)
-   * **Sampling Rate** -- Maximum logs per delivery batch (1-5000, default: 1000)
+3. Choose a destination and configure it:
+
+<Tabs>
+  <Tab title="Datadog">
+    * **Name** -- A label for this drain (for example, "Production logs")
+    * **Site** -- The Datadog site for your organization
+    * **API Key** -- A 32-character Datadog API key
+    * **Service** -- The service name attached to each log (default: `fal-log-drain`)
+    * **Source** -- The source attached to each log (default: `fal`)
+    * **Tags** -- Optional comma-separated Datadog tags (for example, `env:production,team:inference`)
+    * **Sampling Rate** -- Maximum logs per delivery batch (1-5000, default: 1000)
+
+    fal stores the API key as a credential and sends it in the `DD-API-KEY` header. Never put an API key in an endpoint URL.
+  </Tab>
+
+  <Tab title="Webhook">
+    * **Name** -- A label for this drain (for example, "Production logs")
+    * **Endpoint URL** -- The HTTPS URL that receives the logs
+    * **Secret Token** -- A secret of at least 64 characters used to sign payloads
+    * **Sampling Rate** -- Maximum logs per delivery batch (1-5000, default: 1000)
+  </Tab>
+</Tabs>
+
 4. Click **Test** to verify connectivity before saving
 
 <Note>
@@ -29,7 +47,7 @@ Log Drains automatically forward your application logs to an external HTTPS endp
 
 ## Log Format
 
-Logs are delivered as [NDJSON](http://ndjson.org/) (newline-delimited JSON) via HTTP POST. Each line is a JSON object:
+Webhook logs are delivered as [NDJSON](http://ndjson.org/) (newline-delimited JSON) via HTTP POST. Each line is a JSON object:
 
 ```json theme={null}
 {"timestamp": "2026-02-17T10:30:00.123Z", "message": "Model loaded successfully", "level": "info", "fal_app_name": "my-model", "fal_app_id": "abc123", "fal_request_id": "req-456", "fal_job_id": "job-789", "fal_endpoint": "/", "fal_node_id": "node-1", "fal_worker_id": "worker-42"}
@@ -55,21 +73,24 @@ Every log line contains the core fields plus any available context labels. Field
 | `fal_source`         | Log source (e.g., `run`, `gateway`)                       |
 | `fal_isolate_source` | Runtime-level log source                                  |
 
-## Verifying Signatures
+The Datadog integration sends the same fields through Datadog's Logs API as JSON batches. It also adds the configured `service`, `ddsource`, and `ddtags` values and maps platform log levels to Datadog's `status` field.
 
-Every delivery includes an `X-Fal-Signature` header containing an HMAC-SHA256 signature of the request body, signed with your secret token. Use this to verify that deliveries are genuinely from fal.
+## Verifying Webhook Signatures
+
+Every webhook delivery includes an `X-Fal-Signature` header containing an HMAC-SHA256 signature of the request body, signed with your secret token. Use this to verify that deliveries are genuinely from fal.
 
 ```python theme={null}
 import hmac
 import hashlib
 
-
 def verify_signature(body: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    expected = hmac.new(
+        secret.encode(), body, hashlib.sha256
+    ).hexdigest()
     return hmac.compare_digest(signature, expected)
 ```
 
-The `Content-Type` header is `application/x-ndjson`.
+Webhook deliveries use the `Content-Type: application/x-ndjson` header. Datadog deliveries use `Content-Type: application/json`.
 
 ## Delivery Behavior
 
@@ -80,7 +101,7 @@ The `Content-Type` header is `application/x-ndjson`.
 
 ### Failure Handling
 
-If your endpoint returns an error or is unreachable:
+If your destination returns an error or is unreachable:
 
 * fal tracks consecutive failures
 * After **5 consecutive failures**, the drain is automatically disabled
@@ -89,12 +110,10 @@ If your endpoint returns an error or is unreachable:
 
 ## Managing Log Drains
 
-Manage your drains from the [Dashboard](https://fal.ai/dashboard/drains). You can enable/disable, test connectivity, update the endpoint URL or sampling rate, or delete a drain entirely.
+Manage your drain from the [Dashboard](https://fal.ai/dashboard/drains). You can enable or disable it, test connectivity, update its destination settings or sampling rate, or delete it entirely.
 
-## External Services
+For a custom webhook, use an HTTPS endpoint you control that accepts NDJSON over HTTP POST. Keep credentials out of the endpoint URL; authenticate requests by verifying the `X-Fal-Signature` header instead.
 
-Log drains work with any service that accepts HTTPS webhooks with NDJSON payloads. Point the drain at your service's HTTP log intake URL and include any required API keys in the URL path or query parameters as needed by your provider.
-
-<Card title="Observability Overview" icon="arrow-right" href="/documentation/serverless/observability/monitor-performance">
+<Card title="Observability Overview" icon="arrow-right" href="/docs/documentation/serverless/observability/monitor-performance">
   See all monitoring interfaces: dashboard, CLI, and integrations
 </Card>

@@ -16,23 +16,23 @@ The **fal Platform APIs** provide programmatic access to platform management fea
 The Platform APIs provide the following endpoints for managing Compute instances:
 
 <CardGroup cols={2}>
-  <Card title="List Instances" icon="list" href="/platform-apis/v1/compute/instances/list">
+  <Card title="List Instances" icon="list" href="/docs/platform-apis/v1/compute/instances/list">
     List all compute instances with their current status and configuration
   </Card>
 
-  <Card title="Get Instance Details" icon="info-circle" href="/platform-apis/v1/compute/instances/get">
+  <Card title="Get Instance Details" icon="info-circle" href="/docs/platform-apis/v1/compute/instances/get">
     Retrieve detailed information about a specific compute instance
   </Card>
 
-  <Card title="Create Instance" icon="plus" href="/platform-apis/v1/compute/instances/create">
+  <Card title="Create Instance" icon="plus" href="/docs/platform-apis/v1/compute/instances/create">
     Create and provision a new compute instance
   </Card>
 
-  <Card title="Delete Instance" icon="trash" href="/platform-apis/v1/compute/instances/delete">
+  <Card title="Delete Instance" icon="trash" href="/docs/platform-apis/v1/compute/instances/delete">
     Terminate and remove a compute instance
   </Card>
 </CardGroup>
 
 <Note>
-  These APIs are for **platform management** of Compute instances. For getting started with Compute, see the [Compute documentation](/compute).
+  These APIs are for **platform management** of Compute instances. For getting started with Compute, see the [Compute documentation](/docs/compute).
 </Note>

@@ -28,7 +28,7 @@ fal.config({
 });
 ```
 
-Now you can call our Model API endpoint using the [fal js client](/model-apis/model-endpoints):
+Now you can call our Model API endpoint using the [fal js client](/docs/model-apis/model-endpoints):
 
 ```js theme={null}
 import { fal } from "@fal-ai/client";

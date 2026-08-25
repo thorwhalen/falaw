@@ -8,11 +8,15 @@
 
 Real-time inference uses WebSockets for persistent connections, enabling sub-100ms image generation. This is ideal for interactive applications like real-time creativity tools and camera-based inputs.
 
-Unlike [queue-based inference](/documentation/model-apis/inference), real-time connections bypass the queue entirely and route inputs directly to a runner. This eliminates queue wait time, and because the WebSocket maintains a persistent connection, the runner stays warm for all subsequent messages after the initial connection. The first connection may still incur a cold start if no runner is already available. Only models with an explicit real-time endpoint are supported.
+Unlike [queue-based inference](/docs/documentation/model-apis/inference), real-time connections bypass the queue entirely and route inputs directly to a runner. This eliminates queue wait time, and because the WebSocket maintains a persistent connection, the runner stays warm for all subsequent messages after the initial connection. The first connection may still incur a cold start if no runner is already available. Only models with an explicit real-time endpoint are supported.
 
 <Warning>
   Only models that explicitly support real-time inference can be used with the realtime client. Standard queue-based models do not have a realtime endpoint.
 </Warning>
+
+<Note>
+  If the model you want has no realtime endpoint but you still want a persistent connection, see [HTTP over WebSockets](/docs/documentation/model-apis/inference/websockets) — it carries a model's ordinary HTTP request and response format over `wss://ws.fal.run/{model_id}`, and works with any endpoint.
+</Note>
 
 ## Supported Models
 
@@ -54,13 +58,11 @@ Unlike [queue-based inference](/documentation/model-apis/inference), real-time c
   import fal_client
 
   with fal_client.realtime("fal-ai/fast-lcm-diffusion") as connection:
-      connection.send(
-          {
-              "prompt": "a sunset over mountains",
-              "sync_mode": True,
-              "image_url": "data:image/png;base64,...",
-          }
-      )
+      connection.send({
+          "prompt": "a sunset over mountains",
+          "sync_mode": True,
+          "image_url": "data:image/png;base64,..."
+      })
       result = connection.recv()
       print(result)
   ```
@@ -69,19 +71,15 @@ Unlike [queue-based inference](/documentation/model-apis/inference), real-time c
   import asyncio
   import fal_client
 
-
   async def realtime():
       async with fal_client.realtime_async("fal-ai/fast-lcm-diffusion") as connection:
-          await connection.send(
-              {
-                  "prompt": "a sunset over mountains",
-                  "sync_mode": True,
-                  "image_url": "data:image/png;base64,...",
-              }
-          )
+          await connection.send({
+              "prompt": "a sunset over mountains",
+              "sync_mode": True,
+              "image_url": "data:image/png;base64,..."
+          })
           result = await connection.recv()
           print(result)
-
 
   asyncio.run(realtime())
   ```
@@ -140,7 +138,7 @@ The simplest approach. Point the client at a server-side proxy that adds your AP
   ```
 </CodeGroup>
 
-<Card title="Proxy Setup" icon="shield" href="/documentation/model-apis/inference/proxy-setup">
+<Card title="Proxy Setup" icon="shield" href="/docs/documentation/model-apis/inference/proxy-setup">
   Learn how to set up a server-side proxy
 </Card>
 
@@ -257,16 +255,14 @@ const connection = fal.realtime.connect("fal-ai/my-app", {
 In Python, pass the `path` parameter to `realtime()`:
 
 ```python theme={null}
-connection = fal_client.realtime(
-    "fal-ai/my-app", path="/my-custom-ws", on_result=handle_result
-)
+connection = fal_client.realtime("fal-ai/my-app", path="/my-custom-ws", on_result=handle_result)
 ```
 
 ***
 
 ## Realtime vs Streaming
 
-Both realtime and [streaming](/documentation/model-apis/inference/streaming) give you faster feedback than polling, but they serve different use cases.
+Both realtime and [streaming](/docs/documentation/model-apis/inference/streaming) give you faster feedback than polling, but they serve different use cases.
 
 | Feature        | Realtime (WebSocket)                    | Streaming (SSE)                   |
 | -------------- | --------------------------------------- | --------------------------------- |
@@ -297,5 +293,5 @@ const connection = fal.realtime.connect("fal-ai/my-app", {
 Build a Real-Time AI Image App with WebSockets, Next.js, and fal.ai:
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/freyCo3pcz4?si=OFfGsi0xwJVe__Yt&autoplay=1'><img src='/docs/images/video-thumbs/realtime.jpg' alt='YouTube video player'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/freyCo3pcz4?si=OFfGsi0xwJVe__Yt&autoplay=1'><img src='/docs/docs/images/video-thumbs/realtime.jpg' alt='YouTube video player'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>

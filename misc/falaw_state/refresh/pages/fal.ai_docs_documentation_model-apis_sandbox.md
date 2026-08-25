@@ -278,7 +278,7 @@ Recipients can view the shared run without a fal account. If they want to remix 
 
 ## Using your own apps and workflows
 
-You can add your own [serverless apps](/serverless) and [workflows](/model-apis/model-endpoints/workflows) to Sandbox, allowing you to compare your custom models alongside platform models.
+You can add your own [serverless apps](/docs/serverless) and [workflows](/docs/model-apis/model-endpoints/workflows) to Sandbox, allowing you to compare your custom models alongside platform models.
 
 ### Requirements
 

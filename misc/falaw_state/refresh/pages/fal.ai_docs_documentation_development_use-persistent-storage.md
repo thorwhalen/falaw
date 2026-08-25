@@ -6,12 +6,12 @@
 
 > Store model weights, datasets, and files on the shared /data volume that persists across runners and deployments.
 
-Every fal [runner](/documentation/getting-started/runners-and-caching) has access to a persistent `/data` volume. This is a distributed filesystem that is shared across all your apps and runners, linked to your fal account. Files written to `/data` persist between requests, across runner restarts, and across deployments. Use it to store model weights, datasets, configuration files, and any other data your apps need.
+Every fal [runner](/docs/documentation/getting-started/runners-and-caching) has access to a persistent `/data` volume. This is a distributed filesystem that is shared across all your apps and runners, linked to your fal account. Files written to `/data` persist between requests, across runner restarts, and across deployments. Use it to store model weights, datasets, configuration files, and any other data your apps need.
 
-The `/data` volume is the primary mechanism for avoiding repeated downloads during [cold starts](/documentation/serverless/optimizations/optimize-cold-starts). When a new runner starts and calls [setup()](/documentation/development/app-lifecycle), it can load model weights from `/data` instead of downloading them from scratch. Because the volume is backed by a multi-layer cache (local NVME, distributed datacenter cache, and a global object store), subsequent reads are fast even on fresh nodes. For downloading files and model weights to `/data`, see [Downloading Models and Files](/documentation/development/download-model-weights-and-files).
+The `/data` volume is the primary mechanism for avoiding repeated downloads during [cold starts](/docs/documentation/serverless/optimizations/optimize-cold-starts). When a new runner starts and calls [setup()](/docs/documentation/development/app-lifecycle), it can load model weights from `/data` instead of downloading them from scratch. Because the volume is backed by a multi-layer cache (local NVME, distributed datacenter cache, and a global object store), subsequent reads are fast even on fresh nodes. For downloading files and model weights to `/data`, see [Downloading Models and Files](/docs/documentation/development/download-model-weights-and-files).
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=923&end=1000&autoplay=1'><img src='/docs/images/video-thumbs/use-persistent-storage.jpg' alt='Files UI - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=923&end=1000&autoplay=1'><img src='/docs/docs/images/video-thumbs/use-persistent-storage.jpg' alt='Files UI - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## Using `/data` in Your App
@@ -23,7 +23,6 @@ import fal
 from pathlib import Path
 
 DATA_DIR = Path("/data/mnist")
-
 
 class MyModel(fal.App):
     requirements = ["torch>=2.0.0", "torchvision"]
@@ -59,7 +58,6 @@ from pathlib import Path
 
 WEIGHTS_FILE = Path("/data/weights.safetensors")
 
-
 class MyModel(fal.App):
     def setup(self):
         if not WEIGHTS_FILE.exists():
@@ -77,11 +75,12 @@ import subprocess
 
 MODEL_DIR = "/data/models/deepseek-ai"
 subprocess.check_call(
-    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null", shell=True
+    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
+    shell=True
 )
 ```
 
-For a dedicated guide on this technique, see [Parallel File Loading](/documentation/serverless/optimizations/parallel-file-loading).
+For a dedicated guide on this technique, see [Parallel File Loading](/docs/documentation/serverless/optimizations/parallel-file-loading).
 
 ## Uploading Files to `/data`
 
@@ -97,39 +96,61 @@ fal files list models/
 fal files upload local-file.bin remote-path/file.bin
 ```
 
-For direct integration, the Platform APIs provide endpoints for uploading, listing, and downloading files. See the [Platform API Reference](/api-reference/platform-apis/for-serverless) for the full specification.
+Uploads do not overwrite. Uploading to a path that already exists returns an error. Remove the existing file first with `fal files rm`.
+
+For direct integration, the Platform APIs provide endpoints for uploading, listing, and downloading files:
+
+* `POST /serverless/files/file/local/{target_path}` -- Upload a file directly. Suitable for small files only, and `target_path` cannot contain `/`.
+* `POST /serverless/files/file/url/{file}` -- Upload from a URL. fal fetches the file server-side, so it does not pass through your connection.
+* `GET /serverless/files/list` -- List files
+* `GET /serverless/files/file/{file}` -- Download a file
+
+See the [Platform API Reference](/docs/api-reference/platform-apis/for-serverless) for the full specification.
 
 To upload files programmatically (for example, downloading weights from a URL to `/data` before deploying your app), use a `@fal.function` that writes directly to the filesystem:
 
 ```python theme={null}
 import fal
 
-
 @fal.function(machine_type="S")
 def upload_weights():
     import urllib.request
-
     urllib.request.urlretrieve(
         "https://example.com/model-weights.safetensors",
-        "/data/models/weights.safetensors",
+        "/data/models/weights.safetensors"
     )
     print("Weights uploaded to /data")
 ```
 
 This runs on a fal runner with access to `/data`, so the downloaded file is immediately available to all your apps.
 
+### Upload size limits
+
+The maximum file size depends on how you upload it.
+
+| Method                                            | Limit                                                                                  |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `fal files upload` (CLI)                          | About 100 GB. Files above 10 MB upload as 10 MB parts, with a maximum of 10,000 parts. |
+| Dashboard drag and drop                           | 1 GB per file                                                                          |
+| Upload from URL (dashboard or REST)               | 5 GB, and the download must finish within 10 minutes                                   |
+| `POST /serverless/files/file/local/{target_path}` | About 4.5 MB per request                                                               |
+| Writing from inside a running app                 | Not subject to these limits. The runner writes straight to the volume.                 |
+
+For model weights and other large files, write them from inside a running app as shown above, or use the CLI. To pull files into `/data` from inside your app, including caching, authenticated sources, and Hugging Face specifics, see [Downloading Models and Files](/docs/documentation/development/download-model-weights-and-files).
+
 ## How It Works
 
 The `/data` volume is mounted at the same path on every runner in your account. It is eventually consistent, meaning that a file written by one runner may take a moment to appear on another runner in a different datacenter, though within the same datacenter propagation is nearly instant.
 
-| Property          | Value                                       |
-| ----------------- | ------------------------------------------- |
-| **Mount path**    | `/data` on all runners                      |
-| **Shared across** | All apps and runners in your account        |
-| **Consistency**   | Eventually consistent                       |
-| **Max file size** | Up to 50 GB (resumable), \~1 TB (multipart) |
-| **Persistence**   | Files persist until you delete them         |
+| Property          | Value                                |
+| ----------------- | ------------------------------------ |
+| **Mount path**    | `/data` on all runners               |
+| **Shared across** | All apps and runners in your account |
+| **Consistency**   | Eventually consistent                |
+| **Persistence**   | Files persist until you delete them  |
+
+Maximum file size depends on how you upload. See [Upload size limits](#upload-size-limits).
 
 Under the hood, each file is split into 4MB chunks identified by their hash and saved to a global object store. A metadata layer tracks the mapping between file paths and chunks, making operations like renames atomic and fast. The volume features two caching layers: a local cache on the node using RAID 5 NVME drives (10-15 GB/s), and a distributed cache across all servers in the datacenter using a 100 Gbps network (6-8 GB/s). A cache miss at both levels falls through to the backing object store (1.5-8 GB/s). This is why parallel reads are so much faster than sequential ones: each chunk can be fetched from a different cache node simultaneously.
 
-When your app generates output files (images, videos, audio) and returns them through `fal.toolkit.Image` or `fal.toolkit.File`, those are uploaded to fal's CDN and returned as public URLs. CDN files are separate from `/data` storage. To control how long CDN files are retained, see [Media Expiration](/documentation/model-apis/media-expiration). For small key-value data (configuration, cached API responses, session state), fal also provides [KVStore](/documentation/development/use-kv-store) which offers faster access for data up to 25 MB per value.
+When your app generates output files (images, videos, audio) and returns them through `fal.toolkit.Image` or `fal.toolkit.File`, those are uploaded to fal's CDN and returned as public URLs. CDN files are separate from `/data` storage. To control how long CDN files are retained, see [Media Expiration](/docs/documentation/model-apis/media-expiration). For small key-value data (configuration, cached API responses, session state), fal also provides [KVStore](/docs/documentation/development/use-kv-store) which offers faster access for data up to 1.9MB per value.

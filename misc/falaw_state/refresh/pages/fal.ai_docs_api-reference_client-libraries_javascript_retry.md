@@ -28,14 +28,31 @@ Retry metrics for tracking retry attempts
 
 ## Functions
 
+### isRetryableNetworkError
+
+```typescript theme={null}
+function isRetryableNetworkError(error: unknown): boolean
+```
+
+Returns true for transient transport-level failures (connection resets,
+DNS hiccups, socket timeouts, etc.). Mirrors the Python client's behavior
+of retrying `httpx.TransportError` and `httpx.TimeoutException`.
+
+| Parameter | Type      | Description |
+| :-------- | :-------- | :---------- |
+| `error`   | `unknown` | -           |
+
+**Returns:** `boolean`
+
 ### isRetryableError
 
 ```typescript theme={null}
 function isRetryableError(error: any, retryableStatusCodes: number[]): boolean
 ```
 
-Determines if an error is retryable based on the status code.
-User-specified timeouts (504 with X-Fal-Request-Timeout-Type: user) are NOT retryable.
+Determines if an error is retryable based on the status code or, for
+non-HTTP failures, on the underlying transport error. User-specified
+timeouts (504 with X-Fal-Request-Timeout-Type: user) are NOT retryable.
 
 | Parameter              | Type       | Description |
 | :--------------------- | :--------- | :---------- |

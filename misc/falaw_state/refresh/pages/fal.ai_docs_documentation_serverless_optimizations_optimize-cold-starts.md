@@ -8,7 +8,7 @@
 
 ## Cold Starts vs Warm Starts
 
-A **cold start** occurs when a new runner needs to be created from scratch. The runner goes through `PENDING` → `SETUP` → `IDLE` (or `PENDING` → `DOCKER_PULL` → `SETUP` → `IDLE` if the Docker image isn't [cached](/documentation/deployment/caching)) before it can serve requests.
+A **cold start** occurs when a new runner needs to be created from scratch. The runner goes through `PENDING` → `SETUP` → `IDLE` (or `PENDING` → `DOCKER_PULL` → `SETUP` → `IDLE` if the Docker image isn't [cached](/docs/documentation/deployment/caching)) before it can serve requests.
 
 A **warm start** occurs when an existing IDLE runner is reused to handle a new request: `IDLE` → `RUNNING`.
 
@@ -32,19 +32,19 @@ A **warm start** occurs when an existing IDLE runner is reused to handle a new r
 Each of these strategies targets a different phase of the cold start:
 
 <CardGroup cols={2}>
-  <Card title="Scaling Parameters" icon="sliders" href="/documentation/serverless/optimizations/cold-start-scaling">
+  <Card title="Scaling Parameters" icon="sliders" href="/docs/documentation/serverless/optimizations/cold-start-scaling">
     Keep warm runners available with keep\_alive, min\_concurrency, and buffers
   </Card>
 
-  <Card title="Container Images" icon="docker" href="/documentation/serverless/optimizations/optimize-container-images">
+  <Card title="Container Images" icon="docker" href="/docs/documentation/serverless/optimizations/optimize-container-images">
     Reduce image size for faster pulls with multi-stage builds and smaller base images
   </Card>
 
-  <Card title="Compiled Caches" icon="bolt" href="/documentation/serverless/optimizations/optimize-startup-with-compiled-caches">
+  <Card title="Compiled Caches" icon="bolt" href="/docs/documentation/serverless/optimizations/optimize-startup-with-compiled-caches">
     Cache compiled kernels to speed up setup() across runners
   </Card>
 
-  <Card title="Persistent Storage" icon="hard-drive" href="/documentation/development/use-persistent-storage">
+  <Card title="Persistent Storage" icon="hard-drive" href="/docs/documentation/development/use-persistent-storage">
     Download models to /data for automatic caching between runners
   </Card>
 </CardGroup>

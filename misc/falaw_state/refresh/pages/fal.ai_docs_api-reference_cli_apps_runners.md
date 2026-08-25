@@ -7,7 +7,7 @@
 ```bash theme={null}
 Usage: fal apps runners [-h] [--team TEAM] [--env ENV]
                         [--since SINCE]
-                        [--state {all,idle,running,pending,setup,failure_delay,terminated} [...]]
+                        [--state {all,idle,running,pending,setup,crash_backoff,terminated} [...]]
                         [--output {pretty,json}] [--json]
                         app_name
 
@@ -21,7 +21,7 @@ Options:
   --team TEAM           The team to use.
   --env ENV             Target environment (defaults to main).
   --since SINCE         Show terminated runners since the given time. Accepts 'now', relative like '30m', '1h', '1d', or an ISO timestamp. Max 24 hours.
-  --state {all,idle,running,pending,setup,failure_delay,terminated} [{all,idle,running,pending,setup,failure_delay,terminated} ...]
+  --state {all,idle,running,pending,setup,crash_backoff,terminated} [{all,idle,running,pending,setup,crash_backoff,terminated} ...]
                         Filter by runner state(s). Choose one or more, or 'all' (default).
 
 Output:

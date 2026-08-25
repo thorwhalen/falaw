@@ -39,14 +39,11 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     app = modal.App()
     image = modal.Image.debian_slim().pip_install("torch", "transformers")
 
-
     @app.function(image=image, gpu="A100")
     def generate(prompt: str):
         from transformers import pipeline
-
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
-
 
     @app.local_entrypoint()
     def main():
@@ -59,14 +56,12 @@ If you use `@app.function()` in Modal, the closest fal equivalent is `@fal.funct
     ```python theme={null}
     import fal
 
-
     @fal.function(
         requirements=["torch", "transformers"],
         machine_type="GPU-A100",
     )
     def generate(prompt: str):
         from transformers import pipeline
-
         pipe = pipeline("text-generation", model="gpt2", device="cuda")
         return pipe(prompt)[0]["generated_text"]
     ```
@@ -85,10 +80,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     import modal
 
     app = modal.App()
-    image = modal.Image.debian_slim().pip_install(
-        "torch", "diffusers", "transformers", "accelerate"
+    image = (
+        modal.Image.debian_slim()
+        .pip_install("torch", "diffusers", "transformers", "accelerate")
     )
-
 
     @app.cls(image=image, gpu="A100")
     class TextToImage:
@@ -111,7 +106,6 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
         def cleanup(self):
             del self.pipe
 
-
     @app.local_entrypoint()
     def main():
         result = TextToImage().generate.remote(prompt="a sunset")
@@ -122,7 +116,10 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
     ```python theme={null}
     import fal
     from fal.toolkit import Image
+    from pydantic import BaseModel
 
+    class Input(BaseModel):
+        prompt: str
 
     class TextToImage(fal.App):
         machine_type = "GPU-A100"
@@ -138,8 +135,8 @@ If you use `@app.cls()` with `@modal.enter()` and `@modal.method()`, convert to 
             ).to("cuda")
 
         @fal.endpoint("/")
-        def generate(self, prompt: str) -> dict:
-            image = self.pipe(prompt).images[0]
+        def generate(self, input: Input) -> dict:
+            image = self.pipe(input.prompt).images[0]
             return {"image": Image.from_pil(image)}
 
         def teardown(self):
@@ -166,10 +163,9 @@ TextToImage().generate.remote(prompt="a sunset")
 
 # fal
 import fal_client
-
-result = fal_client.subscribe(
-    "your-username/text-to-image", arguments={"prompt": "a sunset"}
-)
+result = fal_client.subscribe("your-username/text-to-image", arguments={
+    "prompt": "a sunset"
+})
 ```
 
 ***
@@ -200,18 +196,18 @@ Modal chains image methods (`Image.debian_slim().pip_install(...).apt_install(..
 ```python theme={null}
 # Modal
 image = (
-    modal.Image.debian_slim().apt_install("ffmpeg").pip_install("torch", "diffusers")
+    modal.Image.debian_slim()
+    .apt_install("ffmpeg")
+    .pip_install("torch", "diffusers")
 )
-
 
 # fal (simple)
 class MyApp(fal.App):
     requirements = ["torch", "diffusers"]
 
-
 # fal (Dockerfile)
+import fal
 from fal.container import ContainerImage
-
 
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
@@ -229,10 +225,9 @@ Modal uses named `Volume` objects mounted at specific paths. fal provides `/data
 # Modal
 volume = modal.Volume.from_name("model-cache")
 
-
 @app.cls(volumes={"/cache": volume})
-class MyModel: ...
-
+class MyModel:
+    ...
 
 # fal -- /data is always available, no configuration needed
 class MyModel(fal.App):
@@ -257,11 +252,11 @@ fal secrets set HF_TOKEN=hf_xxx
 Both make secrets available via `os.environ["HF_TOKEN"]` in your code.
 
 <CardGroup cols={2}>
-  <Card title="Getting Started" icon="arrow-right" href="/documentation/development/getting-started/quick-start">
+  <Card title="Getting Started" icon="arrow-right" href="/docs/documentation/development/getting-started/quick-start">
     Deploy your first fal app
   </Card>
 
-  <Card title="App Lifecycle" icon="arrow-right" href="/documentation/development/app-lifecycle">
+  <Card title="App Lifecycle" icon="arrow-right" href="/docs/documentation/development/app-lifecycle">
     Learn about runners, scaling, and the fal architecture
   </Card>
 </CardGroup>

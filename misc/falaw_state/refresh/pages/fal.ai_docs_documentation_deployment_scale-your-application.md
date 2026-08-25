@@ -7,7 +7,7 @@
 > All scaling parameters for controlling runners, cold starts, and costs.
 
 <Note>
-  **WebSocket apps:** All runner scaling parameters below (`keep_alive`, `min_concurrency`, `max_concurrency`, `concurrency_buffer`, `scaling_delay`, `max_multiplexing`, `request_timeout`) apply to WebSocket-based apps the same as queue-based apps. See [Real-Time Inference](/documentation/model-apis/inference/real-time#differences-from-queue-based-inference) for differences in queue-level parameters like retries and priority.
+  **WebSocket apps:** All runner scaling parameters below (`keep_alive`, `min_concurrency`, `max_concurrency`, `concurrency_buffer`, `scaling_delay`, `max_multiplexing`, `request_timeout`) apply to WebSocket-based apps the same as queue-based apps. See [Real-Time Inference](/docs/documentation/model-apis/inference/real-time#differences-from-queue-based-inference) for differences in queue-level parameters like retries and priority.
 </Note>
 
 ### min\_concurrency
@@ -86,7 +86,7 @@ fal apps scale myapp --max-concurrency 10
 
 **Default:** 60 seconds
 
-Seconds to keep a runner alive after its last request. Longer values reduce cold starts for sporadic traffic but increase cost.
+Seconds to keep an idle runner alive before shutdown. This applies after a runner finishes a request and when a newly started runner gets no request. Longer values reduce cold starts for sporadic traffic but increase cost.
 
 ```python theme={null}
 class MyApp(fal.App):
@@ -96,10 +96,6 @@ class MyApp(fal.App):
 ```bash theme={null}
 fal apps scale myapp --keep-alive 300
 ```
-
-<Note>
-  If your app does not set `min_concurrency` or `concurrency_buffer`, a newly started runner that has not picked up any request yet is shut down after 10 seconds instead of waiting for the full `keep_alive` period.
-</Note>
 
 ### scaling\_delay
 
@@ -140,9 +136,9 @@ class MyApp(fal.App):
 
 ### termination\_grace\_period\_seconds
 
-**Default:** 5 seconds | **Maximum:** 30 seconds
+**Default:** 5 seconds | **Maximum:** 1 hour
 
-The termination grace period sets the total time window between the runner receiving a shutdown signal (`SIGTERM`) and being forcefully killed (`SIGKILL`). By default, this window is **5 seconds** and can be set to a maximum of **30 seconds**. This time is shared between finishing in-flight requests and running your `teardown()` method.
+The termination grace period sets the total time window between the runner receiving a shutdown signal (`SIGTERM`) and being forcefully killed (`SIGKILL`). By default, this window is **5 seconds** and can be set to a maximum of **1 hour** (3600 seconds). This time is shared between finishing in-flight requests and running your `teardown()` method.
 
 A runner can be shut down for several reasons:
 
@@ -158,7 +154,7 @@ In all cases, the same shutdown sequence occurs:
 3. **`teardown()` runs** -- called after all in-flight requests complete, to clean up resources.
 4. **`SIGKILL` sent** -- when the grace period expires, the process is forcefully killed regardless of whether `teardown()` has finished.
 
-Without a sufficient grace period, long-running requests may consume the entire window, causing `teardown()` to be skipped when `SIGKILL` arrives. See [App Lifecycle](/documentation/development/app-lifecycle) for more details on the shutdown lifecycle.
+Without a sufficient grace period, long-running requests may consume the entire window, causing `teardown()` to be skipped when `SIGKILL` arrives. See [App Lifecycle](/docs/documentation/development/app-lifecycle) for more details on the shutdown lifecycle.
 
 ```python theme={null}
 class MyApp(fal.App):
@@ -191,7 +187,6 @@ GPU/CPU instance type for your runners.
 ```python theme={null}
 class MyApp(fal.App):
     machine_type = "GPU-A100"
-
 
 # With fallback options (tried in order)
 class MyApp(fal.App):
@@ -238,7 +233,7 @@ With multiplexing of 4, a single runner handles up to 4 requests simultaneously.
 * **Monitor with analytics** and tune parameters based on real usage patterns
 * **Set `max_concurrency`** to prevent runaway costs during unexpected traffic spikes
 
-<Card title="Updating Your Configuration" icon="arrow-right" href="/documentation/deployment/scaling-configuration">
+<Card title="Updating Your Configuration" icon="arrow-right" href="/docs/documentation/deployment/scaling-configuration">
   Learn how to set parameters via code, CLI, or dashboard -- and how they behave across deploys
 </Card>
 
@@ -247,5 +242,5 @@ With multiplexing of 4, a single runner handles up to 4 requests simultaneously.
 See concurrency buffer and scaling delay in action:
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=75&end=222&autoplay=1'><img src='/docs/images/video-thumbs/scale-your-application.jpg' alt='Scaling Parameters - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=75&end=222&autoplay=1'><img src='/docs/docs/images/video-thumbs/scale-your-application.jpg' alt='Scaling Parameters - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>

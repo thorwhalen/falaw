@@ -6,9 +6,9 @@
 
 > Stream progressive results to clients using Server-Sent Events (SSE) for real-time feedback during long-running operations.
 
-Streaming endpoints let you send progressive results to clients as your model processes a request, rather than waiting for the full result. This is essential for long-running operations where users benefit from seeing incremental progress: image generation previews at each diffusion step, intermediate 3D geometry, or token-by-token LLM output. Callers consume the stream using the [`stream()` method](/documentation/model-apis/inference/streaming) in the fal client SDKs.
+Streaming endpoints let you send progressive results to clients as your model processes a request, rather than waiting for the full result. This is essential for long-running operations where users benefit from seeing incremental progress: image generation previews at each diffusion step, intermediate 3D geometry, or token-by-token LLM output. Callers consume the stream using the [`stream()` method](/docs/documentation/model-apis/inference/streaming) in the fal client SDKs.
 
-Under the hood, streaming uses [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE), a one-way protocol where the server pushes events to the client over a single HTTP connection. You define a streaming endpoint by returning a FastAPI `StreamingResponse` with SSE-formatted events from an `@fal.endpoint("/stream")` method. For bidirectional communication where clients send multiple inputs over a persistent connection, see [Realtime Endpoints](/documentation/development/realtime) instead.
+Under the hood, streaming uses [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE), a one-way protocol where the server pushes events to the client over a single HTTP connection. You define a streaming endpoint by returning a FastAPI `StreamingResponse` with SSE-formatted events from an `@fal.endpoint("/stream")` method. For bidirectional communication where clients send multiple inputs over a persistent connection, see [Realtime Endpoints](/docs/documentation/development/realtime) instead.
 
 ## Streaming vs Realtime
 
@@ -21,7 +21,7 @@ Streaming and realtime endpoints serve different interaction patterns. Streaming
 | **Best for**   | Progressive output, previews | Interactive apps, back-to-back requests |
 | **Protocol**   | JSON over SSE                | Binary msgpack                          |
 
-Choose streaming when you want to show generation progress (diffusion steps, [progressive 3D rendering](/examples/video-generation/deploy-3d-progressive-rendering)) or stream LLM tokens, and the client sends a single request per generation. Choose [realtime](/documentation/development/realtime) when users interact continuously, like drawing on a canvas that triggers re-generation on every stroke.
+Choose streaming when you want to show generation progress (diffusion steps, [progressive 3D rendering](/docs/examples/video-generation/deploy-3d-progressive-rendering)) or stream LLM tokens, and the client sends a single request per generation. Choose [realtime](/docs/documentation/development/realtime) when users interact continuously, like drawing on a canvas that triggers re-generation on every stroke.
 
 ## Example: Streaming Intermediate Steps with SDXL
 
@@ -112,19 +112,15 @@ class StreamingSDXLApp(fal.App):
             # Convert to base64 data URI
             buffer = BytesIO()
             image.save(buffer, format="JPEG", quality=70)
-            data_uri = (
-                f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
-            )
+            data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
 
             # Stream the image in the format the playground expects
-            event_queue.put(
-                {
-                    "image": {
-                        "url": data_uri,
-                        "content_type": "image/jpeg",
-                    }
+            event_queue.put({
+                "image": {
+                    "url": data_uri,
+                    "content_type": "image/jpeg",
                 }
-            )
+            })
 
             return callback_kwargs
 
@@ -150,14 +146,12 @@ class StreamingSDXLApp(fal.App):
                 data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
 
                 # Send final result in the same format
-                event_queue.put(
-                    {
-                        "image": {
-                            "url": data_uri,
-                            "content_type": "image/jpeg",
-                        }
+                event_queue.put({
+                    "image": {
+                        "url": data_uri,
+                        "content_type": "image/jpeg",
                     }
-                )
+                })
                 event_queue.put(None)  # Signal completion
 
             # Run pipeline in background thread
@@ -268,15 +262,15 @@ Your streaming endpoint must return a FastAPI `StreamingResponse` with `media_ty
 ## Next Steps
 
 <CardGroup cols={3}>
-  <Card title="Realtime Endpoints" href="/documentation/development/realtime">
+  <Card title="Realtime Endpoints" href="/docs/documentation/development/realtime">
     Bidirectional WebSocket communication for interactive apps
   </Card>
 
-  <Card title="3D Progressive Rendering" href="/examples/video-generation/deploy-3d-progressive-rendering">
+  <Card title="3D Progressive Rendering" href="/docs/examples/video-generation/deploy-3d-progressive-rendering">
     Stream voxel data in real-time during 3D diffusion
   </Card>
 
-  <Card title="Distributed Streaming" href="/documentation/serverless/distributed/streaming">
+  <Card title="Distributed Streaming" href="/docs/documentation/serverless/distributed/streaming">
     Stream results from multi-GPU workers
   </Card>
 </CardGroup>

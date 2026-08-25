@@ -14,7 +14,7 @@ Navigate to the dashboard keys page and generate a key from the UI: [fal.ai/dash
 
 Platform APIs may require different API key scopes.
 
-[Learn more about key-based authentication and scopes](/documentation/model-apis/authentication/key-based).
+[Learn more about key-based authentication and scopes](/docs/documentation/model-apis/authentication/key-based).
 
 <CardGroup cols={2}>
   <Card title="API Scope">
@@ -73,10 +73,14 @@ Using an API scope key:
 ```python theme={null}
 import requests
 
-headers = {"Authorization": "Key YOUR_API_KEY"}
+headers = {
+    "Authorization": "Key YOUR_API_KEY"
+}
 
 response = requests.get(
-    "https://api.fal.ai/v1/models", headers=headers, params={"limit": 10}
+    "https://api.fal.ai/v1/models",
+    headers=headers,
+    params={"limit": 10}
 )
 
 print(response.json())

@@ -7,6 +7,7 @@
 ```bash theme={null}
 Usage: fal run [-h] [--team TEAM] [--no-cache] [--app-name APP_NAME]
                [--auth AUTH] [--env ENV] [--local]
+               [--exposed-port PORT] [--exposed-metrics-port PORT]
                [--machine-type MACHINE_TYPE]
                [--limit-max-requests LIMIT_MAX_REQUESTS]
                func_ref
@@ -24,6 +25,9 @@ Options:
   --auth AUTH           Application authentication mode (private, public, shared), defaults to public.
   --env ENV             Target environment (defaults to main).
   --local               Run locally without serverless.
+  --exposed-port PORT   Port for the --local app server (default: 8080).
+  --exposed-metrics-port PORT
+                        Port for the --local metrics server (default: 9090).
   --machine-type MACHINE_TYPE
                         Machine type to use for this run.
   --limit-max-requests LIMIT_MAX_REQUESTS

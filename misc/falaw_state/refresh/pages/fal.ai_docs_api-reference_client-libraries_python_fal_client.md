@@ -16,6 +16,12 @@ from fal_client import (
     Queued,
     InProgress,
     Completed,
+    FalClientError,
+    FalClientHTTPError,
+    FalClientTimeoutError,
+    StorageACL,
+    StorageACLRule,
+    StorageSettings,
     SyncRequestHandle,
     AsyncRequestHandle,
     run,
@@ -37,6 +43,7 @@ from fal_client import (
     encode,
     encode_file,
     encode_image,
+    set_get_current_app,
 )
 ```
 
@@ -49,10 +56,10 @@ class fal_client.SyncClient
 ```
 
 <Accordion title="Constructor Parameters" defaultOpen>
-  | Name              | Type          | Default | Description |
-  | :---------------- | :------------ | :------ | :---------- |
-  | `key`             | `str \| None` | `None`  | -           |
-  | `default_timeout` | `float`       | `120.0` | -           |
+  | Name              | Type            | Default | Description |
+  | :---------------- | :-------------- | :------ | :---------- |
+  | `key`             | `Optional[str]` | `None`  | -           |
+  | `default_timeout` | `float`         | `120.0` | -           |
 </Accordion>
 
 <Accordion title="Class Variables" defaultOpen>
@@ -106,7 +113,7 @@ class fal_client.SyncClient
   | `application`      | `str`                            | -             | -           |
   | `use_jwt`          | `bool`                           | `True`        | -           |
   | `path`             | `str`                            | `'/realtime'` | -           |
-  | `max_buffering`    | `int \| None`                    | `None`        | -           |
+  | `max_buffering`    | `Optional[int]`                  | `None`        | -           |
   | `token_expiration` | `int`                            | `120`         | -           |
   | `encode_message`   | `Optional[Callable[Any, bytes]]` | `None`        | -           |
   | `decode_message`   | `Optional[Callable[bytes, Any]]` | `None`        | -           |
@@ -141,7 +148,7 @@ class fal_client.SyncClient
   | `path`          | `str`                      | `''`    | -                                                                                                                                                        |
   | `timeout`       | `int \| float \| NoneType` | `None`  | Client-side HTTP timeout in seconds. Controls how long the HTTP client waits for a response. Defaults to the client's default\_timeout.                  |
   | `start_timeout` | `int \| float \| NoneType` | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts. Does not apply once the application begins processing. |
-  | `hint`          | `str \| None`              | `None`  | -                                                                                                                                                        |
+  | `hint`          | `Optional[str]`            | `None`  | -                                                                                                                                                        |
   | `headers`       | `dict[str, str]`           | `\{\}`  | -                                                                                                                                                        |
 
   **Returns:** `dict[str, Any]`
@@ -163,7 +170,7 @@ class fal_client.SyncClient
   #### stream
 
   ```python theme={null}
-  def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None) -> 'Iterator[dict[str, Any]]'
+  def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None, headers: 'dict[str, str]' = {}) -> 'Iterator[dict[str, Any]]'
   ```
 
   Stream the output of an application with the given arguments (which will be JSON serialized). This is only supported at a few select applications at the moment, so be sure to first consult with the documentation of individual applications
@@ -171,12 +178,13 @@ class fal_client.SyncClient
 
   The function will iterate over each event that is streamed from the server.
 
-  | Parameter     | Type             | Default     | Description |
-  | :------------ | :--------------- | :---------- | :---------- |
-  | `application` | `str`            | -           | -           |
-  | `arguments`   | `dict[str, Any]` | -           | -           |
-  | `path`        | `str`            | `'/stream'` | -           |
-  | `timeout`     | `float \| None`  | `None`      | -           |
+  | Parameter     | Type              | Default     | Description |
+  | :------------ | :---------------- | :---------- | :---------- |
+  | `application` | `str`             | -           | -           |
+  | `arguments`   | `dict[str, Any]`  | -           | -           |
+  | `path`        | `str`             | `'/stream'` | -           |
+  | `timeout`     | `Optional[float]` | `None`      | -           |
+  | `headers`     | `dict[str, str]`  | `\{\}`      | -           |
 
   **Returns:** `Iterator[dict[str, Any]]`
 
@@ -193,8 +201,8 @@ class fal_client.SyncClient
   | `application`   | `str`                            | -       | -                                                                                                                                                                                                    |
   | `arguments`     | `dict[str, Any]`                 | -       | -                                                                                                                                                                                                    |
   | `path`          | `str`                            | `''`    | -                                                                                                                                                                                                    |
-  | `hint`          | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
-  | `webhook_url`   | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
+  | `hint`          | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
+  | `webhook_url`   | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
   | `priority`      | `Optional[Literal[normal, low]]` | `None`  | -                                                                                                                                                                                                    |
   | `headers`       | `dict[str, str]`                 | `\{\}`  | -                                                                                                                                                                                                    |
   | `start_timeout` | `int \| float \| NoneType`       | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
@@ -204,7 +212,7 @@ class fal_client.SyncClient
   #### subscribe
 
   ```python theme={null}
-  def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
+  def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, interval: 'float' = 0.1, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
   ```
 
   Subscribe to an application and wait for the result.
@@ -214,8 +222,9 @@ class fal_client.SyncClient
   | `application`     | `str`                                  | -       | -                                                                                                                                                                                                    |
   | `arguments`       | `dict[str, Any]`                       | -       | -                                                                                                                                                                                                    |
   | `path`            | `str`                                  | `''`    | -                                                                                                                                                                                                    |
-  | `hint`            | `str \| None`                          | `None`  | -                                                                                                                                                                                                    |
+  | `hint`            | `Optional[str]`                        | `None`  | -                                                                                                                                                                                                    |
   | `with_logs`       | `bool`                                 | `False` | -                                                                                                                                                                                                    |
+  | `interval`        | `float`                                | `0.1`   | Polling interval in seconds while waiting for request updates.                                                                                                                                       |
   | `on_enqueue`      | `Optional[Callable[str, NoneType]]`    | `None`  | -                                                                                                                                                                                                    |
   | `on_queue_update` | `Optional[Callable[Status, NoneType]]` | `None`  | -                                                                                                                                                                                                    |
   | `priority`        | `Optional[Literal[normal, low]]`       | `None`  | -                                                                                                                                                                                                    |
@@ -228,44 +237,50 @@ class fal_client.SyncClient
   #### upload
 
   ```python theme={null}
-  def upload(self, data: 'str | bytes', content_type: 'str', file_name: 'str | None' = None, *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  def upload(self, data: 'str | bytes', content_type: 'str', file_name: 'str | None' = None, *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload the given data blob to the CDN and return the access URL. The content type should be specified as the second argument. Use upload\_file or upload\_image for convenience.
+  Upload the given data blob and return the access URL. The content type should be specified as the second argument. Use
+  `upload_file()` or `upload_image()` for convenience. Pass `lifecycle` to
+  control uploaded object expiration and initial ACL settings.
 
   | Parameter             | Type                                                                       | Default | Description |
   | :-------------------- | :------------------------------------------------------------------------- | :------ | :---------- |
   | `data`                | `str \| bytes`                                                             | -       | -           |
   | `content_type`        | `str`                                                                      | -       | -           |
-  | `file_name`           | `str \| None`                                                              | `None`  | -           |
+  | `file_name`           | `Optional[str]`                                                            | `None`  | -           |
   | `repository`          | `Optional[Literal[fal_v3, cdn, fal]]`                                      | `None`  | -           |
   | `fallback_repository` | `Literal[fal_v3, cdn, fal] \| list[Literal[fal_v3, cdn, fal]] \| NoneType` | `None`  | -           |
+  | `lifecycle`           | `Optional[StorageSettings]`                                                | `None`  | -           |
 
   **Returns:** `str`
 
   #### upload\_file
 
   ```python theme={null}
-  def upload_file(self, path: 'os.PathLike', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  def upload_file(self, path: 'os.PathLike', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload a file from the local filesystem to the CDN and return the access URL.
+  Upload a local file and return the access URL. Pass `lifecycle` to control uploaded object expiration and initial ACL
+  settings.
 
   | Parameter             | Type                                                                       | Default | Description |
   | :-------------------- | :------------------------------------------------------------------------- | :------ | :---------- |
   | `path`                | `PathLike`                                                                 | -       | -           |
   | `repository`          | `Optional[Literal[fal_v3, cdn, fal]]`                                      | `None`  | -           |
   | `fallback_repository` | `Literal[fal_v3, cdn, fal] \| list[Literal[fal_v3, cdn, fal]] \| NoneType` | `None`  | -           |
+  | `lifecycle`           | `Optional[StorageSettings]`                                                | `None`  | -           |
 
   **Returns:** `str`
 
   #### upload\_image
 
   ```python theme={null}
-  def upload_image(self, image: 'Image.Image', format: 'str' = 'jpeg', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  def upload_image(self, image: 'Image.Image', format: 'str' = 'jpeg', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload a pillow image object to the CDN and return the access URL.
+  Upload a Pillow image object and return the access URL. Pass `lifecycle` to control uploaded object expiration and initial ACL
+  settings.
 
   | Parameter             | Type                                                     | Default  | Description |
   | :-------------------- | :------------------------------------------------------- | :------- | :---------- |
@@ -273,6 +288,7 @@ class fal_client.SyncClient
   | `format`              | `str`                                                    | `'jpeg'` | -           |
   | `repository`          | `UploadRepositoryId \| None`                             | `None`   | -           |
   | `fallback_repository` | `UploadRepositoryId \| list[UploadRepositoryId] \| None` | `None`   | -           |
+  | `lifecycle`           | `StorageSettings \| None`                                | `None`   | -           |
 
   #### ws\_connect
 
@@ -296,10 +312,10 @@ class fal_client.AsyncClient
 ```
 
 <Accordion title="Constructor Parameters" defaultOpen>
-  | Name              | Type          | Default | Description |
-  | :---------------- | :------------ | :------ | :---------- |
-  | `key`             | `str \| None` | `None`  | -           |
-  | `default_timeout` | `float`       | `120.0` | -           |
+  | Name              | Type            | Default | Description |
+  | :---------------- | :-------------- | :------ | :---------- |
+  | `key`             | `Optional[str]` | `None`  | -           |
+  | `default_timeout` | `float`         | `120.0` | -           |
 </Accordion>
 
 <Accordion title="Class Variables" defaultOpen>
@@ -326,7 +342,7 @@ class fal_client.AsyncClient
   #### get\_handle
 
   ```python theme={null}
-  def get_handle(self, application: 'str', request_id: 'str') -> 'AsyncRequestHandle'
+  async def get_handle(self, application: 'str', request_id: 'str') -> 'AsyncRequestHandle'
   ```
 
   | Parameter     | Type  | Default | Description |
@@ -347,7 +363,7 @@ class fal_client.AsyncClient
   | `application`      | `str`                            | -             | -           |
   | `use_jwt`          | `bool`                           | `True`        | -           |
   | `path`             | `str`                            | `'/realtime'` | -           |
-  | `max_buffering`    | `int \| None`                    | `None`        | -           |
+  | `max_buffering`    | `Optional[int]`                  | `None`        | -           |
   | `token_expiration` | `int`                            | `120`         | -           |
   | `encode_message`   | `Optional[Callable[Any, bytes]]` | `None`        | -           |
   | `decode_message`   | `Optional[Callable[bytes, Any]]` | `None`        | -           |
@@ -382,7 +398,7 @@ class fal_client.AsyncClient
   | `path`          | `str`                      | `''`    | -                                                                                                                                                        |
   | `timeout`       | `int \| float \| NoneType` | `None`  | Client-side HTTP timeout in seconds. Controls how long the HTTP client waits for a response. Defaults to the client's default\_timeout.                  |
   | `start_timeout` | `int \| float \| NoneType` | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts. Does not apply once the application begins processing. |
-  | `hint`          | `str \| None`              | `None`  | -                                                                                                                                                        |
+  | `hint`          | `Optional[str]`            | `None`  | -                                                                                                                                                        |
   | `headers`       | `dict[str, str]`           | `\{\}`  | -                                                                                                                                                        |
 
   **Returns:** `dict[str, Any]`
@@ -404,7 +420,7 @@ class fal_client.AsyncClient
   #### stream
 
   ```python theme={null}
-  def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None) -> 'AsyncIterator[dict[str, Any]]'
+  def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None, headers: 'dict[str, str]' = {}) -> 'AsyncIterator[dict[str, Any]]'
   ```
 
   Stream the output of an application with the given arguments (which will be JSON serialized). This is only supported at a few select applications at the moment, so be sure to first consult with the documentation of individual applications
@@ -412,12 +428,13 @@ class fal_client.AsyncClient
 
   The function will iterate over each event that is streamed from the server.
 
-  | Parameter     | Type             | Default     | Description |
-  | :------------ | :--------------- | :---------- | :---------- |
-  | `application` | `str`            | -           | -           |
-  | `arguments`   | `dict[str, Any]` | -           | -           |
-  | `path`        | `str`            | `'/stream'` | -           |
-  | `timeout`     | `float \| None`  | `None`      | -           |
+  | Parameter     | Type              | Default     | Description |
+  | :------------ | :---------------- | :---------- | :---------- |
+  | `application` | `str`             | -           | -           |
+  | `arguments`   | `dict[str, Any]`  | -           | -           |
+  | `path`        | `str`             | `'/stream'` | -           |
+  | `timeout`     | `Optional[float]` | `None`      | -           |
+  | `headers`     | `dict[str, str]`  | `\{\}`      | -           |
 
   **Returns:** `AsyncIterator[dict[str, Any]]`
 
@@ -435,8 +452,8 @@ class fal_client.AsyncClient
   | `application`   | `str`                            | -       | -                                                                                                                                                                                                    |
   | `arguments`     | `dict[str, Any]`                 | -       | -                                                                                                                                                                                                    |
   | `path`          | `str`                            | `''`    | -                                                                                                                                                                                                    |
-  | `hint`          | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
-  | `webhook_url`   | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
+  | `hint`          | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
+  | `webhook_url`   | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
   | `priority`      | `Optional[Literal[normal, low]]` | `None`  | -                                                                                                                                                                                                    |
   | `headers`       | `dict[str, str]`                 | `\{\}`  | -                                                                                                                                                                                                    |
   | `start_timeout` | `int \| float \| NoneType`       | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
@@ -446,68 +463,75 @@ class fal_client.AsyncClient
   #### subscribe
 
   ```python theme={null}
-  async def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
+  async def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, interval: 'float' = 0.1, on_enqueue: 'Optional[Callable[[str], None | Awaitable[None]]]' = None, on_queue_update: 'Optional[Callable[[Status], None | Awaitable[None]]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
   ```
 
   Subscribe to an application and wait for the result.
 
-  | Parameter         | Type                                   | Default | Description                                                                                                                                                                                          |
-  | :---------------- | :------------------------------------- | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | `application`     | `str`                                  | -       | -                                                                                                                                                                                                    |
-  | `arguments`       | `dict[str, Any]`                       | -       | -                                                                                                                                                                                                    |
-  | `path`            | `str`                                  | `''`    | -                                                                                                                                                                                                    |
-  | `hint`            | `str \| None`                          | `None`  | -                                                                                                                                                                                                    |
-  | `with_logs`       | `bool`                                 | `False` | -                                                                                                                                                                                                    |
-  | `on_enqueue`      | `Optional[Callable[str, NoneType]]`    | `None`  | -                                                                                                                                                                                                    |
-  | `on_queue_update` | `Optional[Callable[Status, NoneType]]` | `None`  | -                                                                                                                                                                                                    |
-  | `priority`        | `Optional[Literal[normal, low]]`       | `None`  | -                                                                                                                                                                                                    |
-  | `headers`         | `dict[str, str]`                       | `\{\}`  | -                                                                                                                                                                                                    |
-  | `start_timeout`   | `int \| float \| NoneType`             | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
-  | `client_timeout`  | `int \| float \| NoneType`             | `None`  | Client-side total timeout in seconds. Limits the total time spent waiting for the entire request to complete (including queue wait and processing). If not set, waits indefinitely.                  |
+  | Parameter         | Type                                                        | Default | Description                                                                                                                                                                                          |
+  | :---------------- | :---------------------------------------------------------- | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `application`     | `str`                                                       | -       | -                                                                                                                                                                                                    |
+  | `arguments`       | `dict[str, Any]`                                            | -       | -                                                                                                                                                                                                    |
+  | `path`            | `str`                                                       | `''`    | -                                                                                                                                                                                                    |
+  | `hint`            | `Optional[str]`                                             | `None`  | -                                                                                                                                                                                                    |
+  | `with_logs`       | `bool`                                                      | `False` | -                                                                                                                                                                                                    |
+  | `interval`        | `float`                                                     | `0.1`   | Polling interval in seconds while waiting for request updates.                                                                                                                                       |
+  | `on_enqueue`      | `Optional[Callable[str, Optional[Awaitable[NoneType]]]]`    | `None`  | -                                                                                                                                                                                                    |
+  | `on_queue_update` | `Optional[Callable[Status, Optional[Awaitable[NoneType]]]]` | `None`  | -                                                                                                                                                                                                    |
+  | `priority`        | `Optional[Literal[normal, low]]`                            | `None`  | -                                                                                                                                                                                                    |
+  | `headers`         | `dict[str, str]`                                            | `\{\}`  | -                                                                                                                                                                                                    |
+  | `start_timeout`   | `int \| float \| NoneType`                                  | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
+  | `client_timeout`  | `int \| float \| NoneType`                                  | `None`  | Client-side total timeout in seconds. Limits the total time spent waiting for the entire request to complete (including queue wait and processing). If not set, waits indefinitely.                  |
 
   **Returns:** `dict[str, Any]`
 
   #### upload
 
   ```python theme={null}
-  async def upload(self, data: 'str | bytes', content_type: 'str', file_name: 'str | None' = None, *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  async def upload(self, data: 'str | bytes', content_type: 'str', file_name: 'str | None' = None, *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload the given data blob to the CDN and return the access URL. The content type should be specified as the second argument. Use upload\_file or upload\_image for convenience.
+  Upload the given data blob and return the access URL. The content type should be specified as the second argument. Use
+  `upload_file()` or `upload_image()` for convenience. Pass `lifecycle` to
+  control uploaded object expiration and initial ACL settings.
 
   | Parameter             | Type                                                                       | Default | Description |
   | :-------------------- | :------------------------------------------------------------------------- | :------ | :---------- |
   | `data`                | `str \| bytes`                                                             | -       | -           |
   | `content_type`        | `str`                                                                      | -       | -           |
-  | `file_name`           | `str \| None`                                                              | `None`  | -           |
+  | `file_name`           | `Optional[str]`                                                            | `None`  | -           |
   | `repository`          | `Optional[Literal[fal_v3, cdn, fal]]`                                      | `None`  | -           |
   | `fallback_repository` | `Literal[fal_v3, cdn, fal] \| list[Literal[fal_v3, cdn, fal]] \| NoneType` | `None`  | -           |
+  | `lifecycle`           | `Optional[StorageSettings]`                                                | `None`  | -           |
 
   **Returns:** `str`
 
   #### upload\_file
 
   ```python theme={null}
-  async def upload_file(self, path: 'os.PathLike', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  async def upload_file(self, path: 'os.PathLike', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload a file from the local filesystem to the CDN and return the access URL.
+  Upload a local file and return the access URL. Pass `lifecycle` to control uploaded object expiration and initial ACL
+  settings.
 
   | Parameter             | Type                                                                       | Default | Description |
   | :-------------------- | :------------------------------------------------------------------------- | :------ | :---------- |
   | `path`                | `PathLike`                                                                 | -       | -           |
   | `repository`          | `Optional[Literal[fal_v3, cdn, fal]]`                                      | `None`  | -           |
   | `fallback_repository` | `Literal[fal_v3, cdn, fal] \| list[Literal[fal_v3, cdn, fal]] \| NoneType` | `None`  | -           |
+  | `lifecycle`           | `Optional[StorageSettings]`                                                | `None`  | -           |
 
   **Returns:** `str`
 
   #### upload\_image
 
   ```python theme={null}
-  async def upload_image(self, image: 'Image.Image', format: 'str' = 'jpeg', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None) -> 'str'
+  async def upload_image(self, image: 'Image.Image', format: 'str' = 'jpeg', *, repository: 'UploadRepositoryId | None' = None, fallback_repository: 'UploadRepositoryId | list[UploadRepositoryId] | None' = None, lifecycle: 'StorageSettings | None' = None) -> 'str'
   ```
 
-  Upload a pillow image object to the CDN and return the access URL.
+  Upload a Pillow image object and return the access URL. Pass `lifecycle` to control uploaded object expiration and initial ACL
+  settings.
 
   | Parameter             | Type                                                     | Default  | Description |
   | :-------------------- | :------------------------------------------------------- | :------- | :---------- |
@@ -515,6 +539,7 @@ class fal_client.AsyncClient
   | `format`              | `str`                                                    | `'jpeg'` | -           |
   | `repository`          | `UploadRepositoryId \| None`                             | `None`   | -           |
   | `fallback_repository` | `UploadRepositoryId \| list[UploadRepositoryId] \| None` | `None`   | -           |
+  | `lifecycle`           | `StorageSettings \| None`                                | `None`   | -           |
 
   #### ws\_connect
 
@@ -562,7 +587,7 @@ Synchronous realtime connection wrapper.
   def recv(self) -> 'dict[str, Any] | None'
   ```
 
-  **Returns:** `dict[str, Any] | None`
+  **Returns:** `Optional[dict[str, Any]]`
 
   #### send
 
@@ -608,7 +633,7 @@ Asynchronous realtime connection wrapper.
   async def recv(self) -> 'dict[str, Any] | None'
   ```
 
-  **Returns:** `dict[str, Any] | None`
+  **Returns:** `Optional[dict[str, Any]]`
 
   #### send
 
@@ -663,9 +688,9 @@ log objects.
 > **Inherits from:** `Status`
 
 <Accordion title="Constructor Parameters" defaultOpen>
-  | Name   | Type                           | Default | Description |
-  | :----- | :----------------------------- | :------ | :---------- |
-  | `logs` | `list[dict[str, Any]] \| None` | -       | -           |
+  | Name   | Type                             | Default | Description |
+  | :----- | :------------------------------- | :------ | :---------- |
+  | `logs` | `Optional[list[dict[str, Any]]]` | -       | -           |
 </Accordion>
 
 <Accordion title="Class Variables" defaultOpen>
@@ -687,17 +712,152 @@ processed, etc.).
 > **Inherits from:** `Status`
 
 <Accordion title="Constructor Parameters" defaultOpen>
-  | Name      | Type                           | Default | Description |
-  | :-------- | :----------------------------- | :------ | :---------- |
-  | `logs`    | `list[dict[str, Any]] \| None` | -       | -           |
-  | `metrics` | `dict[str, Any]`               | -       | -           |
+  | Name         | Type                             | Default | Description |
+  | :----------- | :------------------------------- | :------ | :---------- |
+  | `logs`       | `Optional[list[dict[str, Any]]]` | -       | -           |
+  | `metrics`    | `dict[str, Any]`                 | -       | -           |
+  | `error`      | `Optional[str]`                  | `None`  | -           |
+  | `error_type` | `Optional[str]`                  | `None`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name         | Type                           | Default | Description |
+  | :----------- | :----------------------------- | :------ | :---------- |
+  | `logs`       | `list[dict[str, Any]] \| None` | -       | -           |
+  | `metrics`    | `dict[str, Any]`               | -       | -           |
+  | `error`      | `str \| None`                  | `None`  | -           |
+  | `error_type` | `str \| None`                  | `None`  | -           |
+</Accordion>
+
+### FalClientError
+
+```python theme={null}
+class fal_client.FalClientError
+```
+
+Common base class for all non-exit exceptions.
+
+> **Inherits from:** `Exception`
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name     | Type | Default | Description |
+  | :------- | :--- | :------ | :---------- |
+  | `args`   | -    | -       | -           |
+  | `kwargs` | -    | -       | -           |
+</Accordion>
+
+### FalClientHTTPError
+
+```python theme={null}
+class fal_client.FalClientHTTPError
+```
+
+> **Inherits from:** `FalClientError`
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name               | Type             | Default | Description |
+  | :----------------- | :--------------- | :------ | :---------- |
+  | `message`          | `str`            | -       | -           |
+  | `status_code`      | `int`            | -       | -           |
+  | `response_headers` | `dict[str, str]` | -       | -           |
+  | `response`         | `Response`       | -       | -           |
+  | `error_type`       | `Optional[str]`  | `None`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name               | Type             | Default | Description |
+  | :----------------- | :--------------- | :------ | :---------- |
+  | `message`          | `str`            | -       | -           |
+  | `status_code`      | `int`            | -       | -           |
+  | `response_headers` | `dict[str, str]` | -       | -           |
+  | `response`         | `httpx.Response` | -       | -           |
+  | `error_type`       | `str \| None`    | `None`  | -           |
+</Accordion>
+
+### FalClientTimeoutError
+
+```python theme={null}
+class fal_client.FalClientTimeoutError
+```
+
+> **Inherits from:** `FalClientError`, `TimeoutError`
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name         | Type            | Default | Description |
+  | :----------- | :-------------- | :------ | :---------- |
+  | `timeout`    | `float`         | -       | -           |
+  | `request_id` | `Optional[str]` | `None`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name         | Type            | Default | Description |
+  | :----------- | :-------------- | :------ | :---------- |
+  | `timeout`    | `float`         | -       | -           |
+  | `request_id` | `Optional[str]` | `None`  | -           |
+</Accordion>
+
+### StorageACL
+
+```python theme={null}
+class fal_client.StorageACL
+```
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name      | Type                                     | Default | Description |
+  | :-------- | :--------------------------------------- | :------ | :---------- |
+  | `default` | `Optional[Literal[hide, forbid, allow]]` | `None`  | -           |
+  | `rules`   | `Optional[list[StorageACLRule]]`         | `None`  | -           |
 </Accordion>
 
 <Accordion title="Class Variables" defaultOpen>
   | Name      | Type                           | Default | Description |
   | :-------- | :----------------------------- | :------ | :---------- |
-  | `logs`    | `list[dict[str, Any]] \| None` | -       | -           |
-  | `metrics` | `dict[str, Any]`               | -       | -           |
+  | `default` | `StorageACLDecision \| None`   | `None`  | -           |
+  | `rules`   | `list[StorageACLRule] \| None` | `None`  | -           |
+</Accordion>
+
+### StorageACLRule
+
+```python theme={null}
+class fal_client.StorageACLRule
+```
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name       | Type                           | Default | Description |
+  | :--------- | :----------------------------- | :------ | :---------- |
+  | `user`     | `str`                          | -       | -           |
+  | `decision` | `Literal[hide, forbid, allow]` | -       | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name       | Type                 | Default | Description |
+  | :--------- | :------------------- | :------ | :---------- |
+  | `user`     | `str`                | -       | -           |
+  | `decision` | `StorageACLDecision` | -       | -           |
+</Accordion>
+
+### StorageSettings
+
+```python theme={null}
+class fal_client.StorageSettings
+```
+
+Lifecycle configuration for uploaded files. Use `expires_in="never"` (or omit `expires_in`) to keep the backend's
+default retention policy. `expires_in="immediate"` maps to approximately
+60 seconds because the backend treats `0` as no expiration.
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name          | Type                                                                | Default | Description |
+  | :------------ | :------------------------------------------------------------------ | :------ | :---------- |
+  | `expires_in`  | `Literal[never, immediate, 1h, 1d, 7d, 30d, 1y] \| int \| NoneType` | `None`  | -           |
+  | `initial_acl` | `Optional[StorageACL]`                                              | `None`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name          | Type                       | Default | Description |
+  | :------------ | :------------------------- | :------ | :---------- |
+  | `expires_in`  | `ObjectExpiration \| None` | `None`  | -           |
+  | `initial_acl` | `StorageACL \| None`       | `None`  | -           |
 </Accordion>
 
 ### SyncRequestHandle
@@ -752,10 +912,14 @@ class fal_client.SyncRequestHandle
   #### get
 
   ```python theme={null}
-  def get(self) -> 'AnyJSON'
+  def get(self, *, interval: 'float' = 0.1) -> 'AnyJSON'
   ```
 
   Wait till the request is completed and return the result of the inference call.
+
+  | Parameter  | Type    | Default | Description |
+  | :--------- | :------ | :------ | :---------- |
+  | `interval` | `float` | `0.1`   | -           |
 
   **Returns:** `dict[str, Any]`
 
@@ -842,10 +1006,14 @@ class fal_client.AsyncRequestHandle
   #### get
 
   ```python theme={null}
-  async def get(self) -> 'AnyJSON'
+  async def get(self, *, interval: 'float' = 0.1) -> 'AnyJSON'
   ```
 
   Wait till the request is completed and return the result.
+
+  | Parameter  | Type    | Default | Description |
+  | :--------- | :------ | :------ | :---------- |
+  | `interval` | `float` | `0.1`   | -           |
 
   **Returns:** `dict[str, Any]`
 
@@ -899,7 +1067,7 @@ Run an application with the given arguments (which will be JSON serialized).
 | `path`          | `str`                      | `''`    | -                                                                                                                                                        |
 | `timeout`       | `int \| float \| NoneType` | `None`  | Client-side HTTP timeout in seconds. Controls how long the HTTP client waits for a response. Defaults to the client's default\_timeout.                  |
 | `start_timeout` | `int \| float \| NoneType` | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts. Does not apply once the application begins processing. |
-| `hint`          | `str \| None`              | `None`  | -                                                                                                                                                        |
+| `hint`          | `Optional[str]`            | `None`  | -                                                                                                                                                        |
 | `headers`       | `dict[str, str]`           | `\{\}`  | -                                                                                                                                                        |
 
 **Returns:** `dict[str, Any]`
@@ -907,31 +1075,32 @@ Run an application with the given arguments (which will be JSON serialized).
 ### subscribe\_async
 
 ```python theme={null}
-async def subscribe_async(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
+async def subscribe_async(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, interval: 'float' = 0.1, on_enqueue: 'Optional[Callable[[str], None | Awaitable[None]]]' = None, on_queue_update: 'Optional[Callable[[Status], None | Awaitable[None]]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
 ```
 
 Subscribe to an application and wait for the result.
 
-| Parameter         | Type                                   | Default | Description                                                                                                                                                                                          |
-| :---------------- | :------------------------------------- | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `application`     | `str`                                  | -       | -                                                                                                                                                                                                    |
-| `arguments`       | `dict[str, Any]`                       | -       | -                                                                                                                                                                                                    |
-| `path`            | `str`                                  | `''`    | -                                                                                                                                                                                                    |
-| `hint`            | `str \| None`                          | `None`  | -                                                                                                                                                                                                    |
-| `with_logs`       | `bool`                                 | `False` | -                                                                                                                                                                                                    |
-| `on_enqueue`      | `Optional[Callable[str, NoneType]]`    | `None`  | -                                                                                                                                                                                                    |
-| `on_queue_update` | `Optional[Callable[Status, NoneType]]` | `None`  | -                                                                                                                                                                                                    |
-| `priority`        | `Optional[Literal[normal, low]]`       | `None`  | -                                                                                                                                                                                                    |
-| `headers`         | `dict[str, str]`                       | `\{\}`  | -                                                                                                                                                                                                    |
-| `start_timeout`   | `int \| float \| NoneType`             | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
-| `client_timeout`  | `int \| float \| NoneType`             | `None`  | Client-side total timeout in seconds. Limits the total time spent waiting for the entire request to complete (including queue wait and processing). If not set, waits indefinitely.                  |
+| Parameter         | Type                                                        | Default | Description                                                                                                                                                                                          |
+| :---------------- | :---------------------------------------------------------- | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `application`     | `str`                                                       | -       | -                                                                                                                                                                                                    |
+| `arguments`       | `dict[str, Any]`                                            | -       | -                                                                                                                                                                                                    |
+| `path`            | `str`                                                       | `''`    | -                                                                                                                                                                                                    |
+| `hint`            | `Optional[str]`                                             | `None`  | -                                                                                                                                                                                                    |
+| `with_logs`       | `bool`                                                      | `False` | -                                                                                                                                                                                                    |
+| `interval`        | `float`                                                     | `0.1`   | Polling interval in seconds while waiting for request updates.                                                                                                                                       |
+| `on_enqueue`      | `Optional[Callable[str, Optional[Awaitable[NoneType]]]]`    | `None`  | -                                                                                                                                                                                                    |
+| `on_queue_update` | `Optional[Callable[Status, Optional[Awaitable[NoneType]]]]` | `None`  | -                                                                                                                                                                                                    |
+| `priority`        | `Optional[Literal[normal, low]]`                            | `None`  | -                                                                                                                                                                                                    |
+| `headers`         | `dict[str, str]`                                            | `\{\}`  | -                                                                                                                                                                                                    |
+| `start_timeout`   | `int \| float \| NoneType`                                  | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
+| `client_timeout`  | `int \| float \| NoneType`                                  | `None`  | Client-side total timeout in seconds. Limits the total time spent waiting for the entire request to complete (including queue wait and processing). If not set, waits indefinitely.                  |
 
 **Returns:** `dict[str, Any]`
 
 ### subscribe
 
 ```python theme={null}
-def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
+def subscribe(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '', hint: 'str | None' = None, with_logs: 'bool' = False, interval: 'float' = 0.1, on_enqueue: 'Optional[Callable[[str], None]]' = None, on_queue_update: 'Optional[Callable[[Status], None]]' = None, priority: 'Optional[Priority]' = None, headers: 'dict[str, str]' = {}, start_timeout: 'Optional[Union[int, float]]' = None, client_timeout: 'Optional[Union[int, float]]' = None) -> 'AnyJSON'
 ```
 
 Subscribe to an application and wait for the result.
@@ -941,8 +1110,9 @@ Subscribe to an application and wait for the result.
 | `application`     | `str`                                  | -       | -                                                                                                                                                                                                    |
 | `arguments`       | `dict[str, Any]`                       | -       | -                                                                                                                                                                                                    |
 | `path`            | `str`                                  | `''`    | -                                                                                                                                                                                                    |
-| `hint`            | `str \| None`                          | `None`  | -                                                                                                                                                                                                    |
+| `hint`            | `Optional[str]`                        | `None`  | -                                                                                                                                                                                                    |
 | `with_logs`       | `bool`                                 | `False` | -                                                                                                                                                                                                    |
+| `interval`        | `float`                                | `0.1`   | Polling interval in seconds while waiting for request updates.                                                                                                                                       |
 | `on_enqueue`      | `Optional[Callable[str, NoneType]]`    | `None`  | -                                                                                                                                                                                                    |
 | `on_queue_update` | `Optional[Callable[Status, NoneType]]` | `None`  | -                                                                                                                                                                                                    |
 | `priority`        | `Optional[Literal[normal, low]]`       | `None`  | -                                                                                                                                                                                                    |
@@ -965,8 +1135,8 @@ Submit an application with the given arguments (which will be JSON serialized).
 | `application`   | `str`                            | -       | -                                                                                                                                                                                                    |
 | `arguments`     | `dict[str, Any]`                 | -       | -                                                                                                                                                                                                    |
 | `path`          | `str`                            | `''`    | -                                                                                                                                                                                                    |
-| `hint`          | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
-| `webhook_url`   | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
+| `hint`          | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
+| `webhook_url`   | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
 | `priority`      | `Optional[Literal[normal, low]]` | `None`  | -                                                                                                                                                                                                    |
 | `headers`       | `dict[str, str]`                 | `\{\}`  | -                                                                                                                                                                                                    |
 | `start_timeout` | `int \| float \| NoneType`       | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
@@ -976,7 +1146,7 @@ Submit an application with the given arguments (which will be JSON serialized).
 ### stream
 
 ```python theme={null}
-def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None) -> 'Iterator[dict[str, Any]]'
+def stream(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None, headers: 'dict[str, str]' = {}) -> 'Iterator[dict[str, Any]]'
 ```
 
 Stream the output of an application with the given arguments (which will be JSON serialized). This is only supported at a few select applications at the moment, so be sure to first consult with the documentation of individual applications
@@ -984,12 +1154,13 @@ to see if this is supported.
 
 The function will iterate over each event that is streamed from the server.
 
-| Parameter     | Type             | Default     | Description |
-| :------------ | :--------------- | :---------- | :---------- |
-| `application` | `str`            | -           | -           |
-| `arguments`   | `dict[str, Any]` | -           | -           |
-| `path`        | `str`            | `'/stream'` | -           |
-| `timeout`     | `float \| None`  | `None`      | -           |
+| Parameter     | Type              | Default     | Description |
+| :------------ | :---------------- | :---------- | :---------- |
+| `application` | `str`             | -           | -           |
+| `arguments`   | `dict[str, Any]`  | -           | -           |
+| `path`        | `str`             | `'/stream'` | -           |
+| `timeout`     | `Optional[float]` | `None`      | -           |
+| `headers`     | `dict[str, str]`  | `\{\}`      | -           |
 
 **Returns:** `Iterator[dict[str, Any]]`
 
@@ -1008,7 +1179,7 @@ Run an application with the given arguments (which will be JSON serialized). The
 | `path`          | `str`                      | `''`    | -                                                                                                                                                        |
 | `timeout`       | `int \| float \| NoneType` | `None`  | Client-side HTTP timeout in seconds. Controls how long the HTTP client waits for a response. Defaults to the client's default\_timeout.                  |
 | `start_timeout` | `int \| float \| NoneType` | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts. Does not apply once the application begins processing. |
-| `hint`          | `str \| None`              | `None`  | -                                                                                                                                                        |
+| `hint`          | `Optional[str]`            | `None`  | -                                                                                                                                                        |
 | `headers`       | `dict[str, str]`           | `\{\}`  | -                                                                                                                                                        |
 
 **Returns:** `dict[str, Any]`
@@ -1027,8 +1198,8 @@ and retrieve the result of the inference call when it is done.
 | `application`   | `str`                            | -       | -                                                                                                                                                                                                    |
 | `arguments`     | `dict[str, Any]`                 | -       | -                                                                                                                                                                                                    |
 | `path`          | `str`                            | `''`    | -                                                                                                                                                                                                    |
-| `hint`          | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
-| `webhook_url`   | `str \| None`                    | `None`  | -                                                                                                                                                                                                    |
+| `hint`          | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
+| `webhook_url`   | `Optional[str]`                  | `None`  | -                                                                                                                                                                                                    |
 | `priority`      | `Optional[Literal[normal, low]]` | `None`  | -                                                                                                                                                                                                    |
 | `headers`       | `dict[str, str]`                 | `\{\}`  | -                                                                                                                                                                                                    |
 | `start_timeout` | `int \| float \| NoneType`       | `None`  | Server-side request timeout in seconds. Limits total time spent waiting before processing starts (includes queue wait, retries, and routing). Does not apply once the application begins processing. |
@@ -1038,7 +1209,7 @@ and retrieve the result of the inference call when it is done.
 ### stream\_async
 
 ```python theme={null}
-def stream_async(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None) -> 'AsyncIterator[dict[str, Any]]'
+def stream_async(self, application: 'str', arguments: 'AnyJSON', *, path: 'str' = '/stream', timeout: 'float | None' = None, headers: 'dict[str, str]' = {}) -> 'AsyncIterator[dict[str, Any]]'
 ```
 
 Stream the output of an application with the given arguments (which will be JSON serialized). This is only supported at a few select applications at the moment, so be sure to first consult with the documentation of individual applications
@@ -1046,12 +1217,13 @@ to see if this is supported.
 
 The function will iterate over each event that is streamed from the server.
 
-| Parameter     | Type             | Default     | Description |
-| :------------ | :--------------- | :---------- | :---------- |
-| `application` | `str`            | -           | -           |
-| `arguments`   | `dict[str, Any]` | -           | -           |
-| `path`        | `str`            | `'/stream'` | -           |
-| `timeout`     | `float \| None`  | `None`      | -           |
+| Parameter     | Type              | Default     | Description |
+| :------------ | :---------------- | :---------- | :---------- |
+| `application` | `str`             | -           | -           |
+| `arguments`   | `dict[str, Any]`  | -           | -           |
+| `path`        | `str`             | `'/stream'` | -           |
+| `timeout`     | `Optional[float]` | `None`      | -           |
+| `headers`     | `dict[str, str]`  | `\{\}`      | -           |
 
 **Returns:** `AsyncIterator[dict[str, Any]]`
 
@@ -1066,7 +1238,7 @@ def realtime(self, application: 'str', *, use_jwt: 'bool' = True, path: 'str' = 
 | `application`      | `str`                            | -             | -           |
 | `use_jwt`          | `bool`                           | `True`        | -           |
 | `path`             | `str`                            | `'/realtime'` | -           |
-| `max_buffering`    | `int \| None`                    | `None`        | -           |
+| `max_buffering`    | `Optional[int]`                  | `None`        | -           |
 | `token_expiration` | `int`                            | `120`         | -           |
 | `encode_message`   | `Optional[Callable[Any, bytes]]` | `None`        | -           |
 | `decode_message`   | `Optional[Callable[bytes, Any]]` | `None`        | -           |
@@ -1084,7 +1256,7 @@ def realtime_async(self, application: 'str', *, use_jwt: 'bool' = True, path: 's
 | `application`      | `str`                            | -             | -           |
 | `use_jwt`          | `bool`                           | `True`        | -           |
 | `path`             | `str`                            | `'/realtime'` | -           |
-| `max_buffering`    | `int \| None`                    | `None`        | -           |
+| `max_buffering`    | `Optional[int]`                  | `None`        | -           |
 | `token_expiration` | `int`                            | `120`         | -           |
 | `encode_message`   | `Optional[Callable[Any, bytes]]` | `None`        | -           |
 | `decode_message`   | `Optional[Callable[bytes, Any]]` | `None`        | -           |
@@ -1212,3 +1384,13 @@ Encode a pillow image object to a data URL with the specified format.
 | :-------- | :------------ | :------- | :---------- |
 | `image`   | `Image.Image` | -        | -           |
 | `format`  | `str`         | `'jpeg'` | -           |
+
+### set\_get\_current\_app
+
+```python theme={null}
+def set_get_current_app(func: 'Callable[[], Any]')
+```
+
+| Parameter | Type            | Default | Description |
+| :-------- | :-------------- | :------ | :---------- |
+| `func`    | `Callable[Any]` | -       | -           |

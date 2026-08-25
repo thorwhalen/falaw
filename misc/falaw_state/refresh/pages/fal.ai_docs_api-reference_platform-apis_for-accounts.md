@@ -17,15 +17,15 @@ The **fal Platform APIs** provide programmatic access to account-level billing, 
 The Platform APIs provide the following endpoints for account billing, reporting, and governance:
 
 <CardGroup cols={2}>
-  <Card title="Account Billing" icon="dollar-sign" href="/platform-apis/v1/account/billing">
+  <Card title="Account Billing" icon="dollar-sign" href="/docs/platform-apis/v1/account/billing">
     Retrieve billing information and credit balances for your account
   </Card>
 
-  <Card title="FOCUS Report" icon="file-csv" href="/platform-apis/v1/account/focus">
+  <Card title="FOCUS Report" icon="file-csv" href="/docs/platform-apis/v1/account/focus">
     Download FOCUS-compliant billing reports from invoice or usage estimate data
   </Card>
 
-  <Card title="Model Access Controls" icon="lock" href="/platform-apis/v1/account/model-access-controls">
+  <Card title="Model Access Controls" icon="lock" href="/docs/platform-apis/v1/account/model-access-controls">
     Export the resolved UI and API access state for each model in your organization
   </Card>
 </CardGroup>

@@ -9,7 +9,7 @@
 Streaming allows you to send intermediate results from your distributed workers back to the client in real-time. This is particularly useful for long-running operations like image generation, video creation, or model training where users benefit from seeing progress updates.
 
 <Note>
-  For a complete working example of streaming with multi-GPU inference, see the [Parallel SDXL Tutorial](/serverless/tutorials/deploy-multi-gpu-inference).
+  For a complete working example of streaming with multi-GPU inference, see the [Parallel SDXL Tutorial](/docs/serverless/tutorials/deploy-multi-gpu-inference).
 </Note>
 
 ## How Streaming Works
@@ -53,24 +53,20 @@ In your `DistributedWorker`, use `add_streaming_result()` to send intermediate r
 from fal.distributed import DistributedWorker
 import torch.distributed as dist
 
-
 class StreamingWorker(DistributedWorker):
     def __call__(self, prompt: str, steps: int = 20):
         for step in range(steps):
             # Do some processing
             result = self.model.step(prompt)
-
+            
             # Only rank 0 streams to avoid duplicates
             if self.rank == 0:
-                self.add_streaming_result(
-                    {
-                        "step": step,
-                        "progress": (step + 1) / steps,
-                        "message": f"Processing step {step + 1}/{steps}",
-                    },
-                    as_text_event=True,
-                )
-
+                self.add_streaming_result({
+                    "step": step,
+                    "progress": (step + 1) / steps,
+                    "message": f"Processing step {step + 1}/{steps}"
+                }, as_text_event=True)
+        
         # Return final result
         return {"output": final_result}
 ```
@@ -90,16 +86,15 @@ import fal
 from fal.distributed import DistributedRunner
 from fastapi.responses import StreamingResponse
 
-
 class MyApp(fal.App):
     num_gpus = 2
-
+    
     def setup(self):
         self.runner = DistributedRunner(
             worker_cls=StreamingWorker,
             world_size=self.num_gpus,
         )
-
+    
     @fal.endpoint("/stream")
     async def stream(self, request: MyRequest) -> StreamingResponse:
         """Endpoint that streams results"""
@@ -149,7 +144,7 @@ import fal_client
 
 for event in fal_client.stream(
     "username/app-name",
-    arguments={"prompt": "A sunset", "steps": 20},
+    arguments={"prompt": "A sunset", "steps": 20}
     # path="/stream"  # Optional: defaults to "/stream", change if your endpoint uses a different path
 ):
     print(f"Step {event['step']}: {event['progress'] * 100}%")
@@ -169,7 +164,7 @@ class MultiGPUStreamingWorker(DistributedWorker):
         for step in range(0, num_steps, 5):  # Stream every 5 steps
             # Generate intermediate result on this GPU
             intermediate = self.model.step(prompt)
-
+            
             # Gather from all workers
             if self.rank == 0:
                 gather_list = [
@@ -178,24 +173,21 @@ class MultiGPUStreamingWorker(DistributedWorker):
                 ]
             else:
                 gather_list = None
-
+            
             dist.gather(intermediate, gather_list, dst=0)
-
+            
             # Only rank 0 streams the combined result
             if self.rank == 0:
                 combined = self.combine_results(gather_list)
-                self.add_streaming_result(
-                    {
-                        "step": step,
-                        "preview": combined,
-                        "num_gpus": self.world_size,
-                    },
-                    as_text_event=True,
-                )
-
+                self.add_streaming_result({
+                    "step": step,
+                    "preview": combined,
+                    "num_gpus": self.world_size,
+                }, as_text_event=True)
+            
             # Synchronize before next step
             dist.barrier()
-
+        
         return {"final": final_result}
 ```
 
@@ -236,12 +228,10 @@ Stream minimal data for responsiveness:
 
 ```python theme={null}
 # Good: Small progress updates
-self.add_streaming_result(
-    {
-        "step": step,
-        "progress": 0.5,
-    }
-)
+self.add_streaming_result({
+    "step": step,
+    "progress": 0.5,
+})
 
 # Avoid: Large data in every update
 # self.add_streaming_result({"large_array": [...]})
@@ -260,14 +250,14 @@ buffer = io.BytesIO()
 image.save(buffer, format="JPEG")
 image_b64 = base64.b64encode(buffer.getvalue()).decode()
 
-self.add_streaming_result(
-    {"preview": f"data:image/jpeg;base64,{image_b64}"}, as_text_event=True
-)
+self.add_streaming_result({
+    "preview": f"data:image/jpeg;base64,{image_b64}"
+}, as_text_event=True)
 ```
 
 ## Complete Example
 
-See the [Multi-GPU Inference Tutorial](/serverless/tutorials/deploy-multi-gpu-inference) for a complete working example with streaming, including:
+See the [Multi-GPU Inference Tutorial](/docs/serverless/tutorials/deploy-multi-gpu-inference) for a complete working example with streaming, including:
 
 * Real-time preview generation
 * Progress updates every 5 steps
@@ -277,11 +267,11 @@ See the [Multi-GPU Inference Tutorial](/serverless/tutorials/deploy-multi-gpu-in
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Multi-GPU Inference Tutorial" icon="bolt" href="/serverless/tutorials/deploy-multi-gpu-inference">
+  <Card title="Multi-GPU Inference Tutorial" icon="bolt" href="/docs/serverless/tutorials/deploy-multi-gpu-inference">
     Complete streaming example with SDXL
   </Card>
 
-  <Card title="Real-time Endpoints" icon="signal-stream" href="/serverless/development/realtime">
+  <Card title="Real-time Endpoints" icon="signal-stream" href="/docs/serverless/development/realtime">
     Learn about fal's real-time framework
   </Card>
 </CardGroup>

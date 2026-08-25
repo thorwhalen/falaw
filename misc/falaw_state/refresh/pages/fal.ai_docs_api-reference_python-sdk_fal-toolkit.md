@@ -13,15 +13,18 @@ from fal.toolkit import (
     FalBaseModel,
     File,
     Image,
+    ImageSizeConstraints,
+    ImageValidationConfig,
+    ImageValidationOptions,
     KVStore,
     Video,
     FalTookitException,
     FileUploadException,
     KVStoreException,
     DownloadError,
+    to_xfal,
     Hidden,
     get_image_size,
-    optimize,
     clone_repository,
     download_file,
     download_model_weights,
@@ -108,7 +111,6 @@ Features:
 ```python theme={null}
 from fal.toolkit.pydantic import FalBaseModel, Field, Hidden
 
-
 class Input(FalBaseModel):
     FIELD_ORDERS = ["prompt", "image_url"]
 
@@ -172,38 +174,76 @@ A base class for creating Pydantic models.
   #### from\_bytes
 
   ```python theme={null}
-  def from_bytes(cls, data: 'bytes', content_type: 'Optional[str]' = None, file_name: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['cdn', 'fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
+  def from_bytes(cls, data: 'bytes', content_type: 'Optional[str]' = None, file_name: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
   ```
 
-  | Parameter              | Type                                                                                                                                                                                   | Default          | Description |
-  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- | :---------- |
-  | `data`                 | `bytes`                                                                                                                                                                                | -                | -           |
-  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`           | -           |
-  | `file_name`            | `Optional[str]`                                                                                                                                                                        | `None`           | -           |
-  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'`       | -           |
-  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['cdn', 'fal']` | -           |
-  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`           | -           |
-  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`           | -           |
-  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`           | -           |
+  | Parameter              | Type                                                                                                                                                                                   | Default    | Description |
+  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `data`                 | `bytes`                                                                                                                                                                                | -          | -           |
+  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `file_name`            | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'` | -           |
+  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+
+  **Returns:** `File`
+
+  #### from\_bytes\_async
+
+  ```python theme={null}
+  async def from_bytes_async(cls, data: 'bytes', content_type: 'Optional[str]' = None, file_name: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
+  ```
+
+  | Parameter              | Type                                                                                                                                                                                   | Default    | Description |
+  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `data`                 | `bytes`                                                                                                                                                                                | -          | -           |
+  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `file_name`            | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'` | -           |
+  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
 
   **Returns:** `File`
 
   #### from\_path
 
   ```python theme={null}
-  def from_path(cls, path: 'str | Path', content_type: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', multipart: 'bool | None' = None, fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['cdn', 'fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
+  def from_path(cls, path: 'str | Path', content_type: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', multipart: 'bool | None' = None, fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
   ```
 
-  | Parameter              | Type                                                                                                                                                                                   | Default          | Description |
-  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- | :---------- |
-  | `path`                 | `str \| pathlib.Path`                                                                                                                                                                  | -                | -           |
-  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`           | -           |
-  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'`       | -           |
-  | `multipart`            | `bool \| None`                                                                                                                                                                         | `None`           | -           |
-  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['cdn', 'fal']` | -           |
-  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`           | -           |
-  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`           | -           |
-  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`           | -           |
+  | Parameter              | Type                                                                                                                                                                                   | Default    | Description |
+  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `path`                 | `str \| Path`                                                                                                                                                                          | -          | -           |
+  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'` | -           |
+  | `multipart`            | `Optional[bool]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+
+  **Returns:** `File`
+
+  #### from\_path\_async
+
+  ```python theme={null}
+  async def from_path_async(cls, path: 'str | Path', content_type: 'Optional[str]' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', multipart: 'bool | None' = None, fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'File'
+  ```
+
+  | Parameter              | Type                                                                                                                                                                                   | Default    | Description |
+  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `path`                 | `str \| Path`                                                                                                                                                                          | -          | -           |
+  | `content_type`         | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'` | -           |
+  | `multipart`            | `Optional[bool]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
 
   **Returns:** `File`
 
@@ -213,10 +253,23 @@ A base class for creating Pydantic models.
   def save(self, path: 'str | Path', overwrite: 'bool' = False) -> 'Path'
   ```
 
-  | Parameter   | Type                  | Default | Description |
-  | :---------- | :-------------------- | :------ | :---------- |
-  | `path`      | `str \| pathlib.Path` | -       | -           |
-  | `overwrite` | `bool`                | `False` | -           |
+  | Parameter   | Type          | Default | Description |
+  | :---------- | :------------ | :------ | :---------- |
+  | `path`      | `str \| Path` | -       | -           |
+  | `overwrite` | `bool`        | `False` | -           |
+
+  **Returns:** `Path`
+
+  #### save\_async
+
+  ```python theme={null}
+  async def save_async(self, path: 'str | Path', overwrite: 'bool' = False) -> 'Path'
+  ```
+
+  | Parameter   | Type          | Default | Description |
+  | :---------- | :------------ | :------ | :---------- |
+  | `path`      | `str \| Path` | -       | -           |
+  | `overwrite` | `bool`        | `False` | -           |
 
   **Returns:** `Path`
 </Accordion>
@@ -248,35 +301,39 @@ Represents an image file.
   #### from\_bytes
 
   ```python theme={null}
-  def from_bytes(cls, data: 'bytes', format: 'ImageFormat', size: 'ImageSize | None' = None, file_name: 'str | None' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['cdn', 'fal'], request: 'Optional[Request]' = None) -> 'Image'
+  def from_bytes(cls, data: 'bytes', format: 'ImageFormat', size: 'ImageSize | None' = None, file_name: 'str | None' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'Image'
   ```
 
-  | Parameter             | Type                                                                                                                                                                                   | Default          | Description |
-  | :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------- | :---------- |
-  | `data`                | `bytes`                                                                                                                                                                                | -                | -           |
-  | `format`              | `Literal[png, jpeg, jpg, webp, gif]`                                                                                                                                                   | -                | -           |
-  | `size`                | `fal.toolkit.image.image.ImageSize \| None`                                                                                                                                            | `None`           | -           |
-  | `file_name`           | `str \| None`                                                                                                                                                                          | `None`           | -           |
-  | `repository`          | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'`       | -           |
-  | `fallback_repository` | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['cdn', 'fal']` | -           |
-  | `request`             | `Optional[Request]`                                                                                                                                                                    | `None`           | -           |
+  | Parameter              | Type                                                                                                                                                                                   | Default    | Description |
+  | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `data`                 | `bytes`                                                                                                                                                                                | -          | -           |
+  | `format`               | `Literal[png, jpeg, jpg, webp, gif]`                                                                                                                                                   | -          | -           |
+  | `size`                 | `Optional[ImageSize]`                                                                                                                                                                  | `None`     | -           |
+  | `file_name`            | `Optional[str]`                                                                                                                                                                        | `None`     | -           |
+  | `repository`           | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]`                                                                                                      | `'fal_v3'` | -           |
+  | `fallback_repository`  | `FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn] \| list[FileRepository \| Literal[fal, fal_v2, fal_v3, in_memory, gcp_storage, r2, cdn]] \| NoneType` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                                                                                                                    | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                                                                                                                       | `None`     | -           |
 
   **Returns:** `Image`
 
   #### from\_pil
 
   ```python theme={null}
-  def from_pil(cls, pil_image: 'PILImage.Image', format: 'ImageFormat | None' = None, file_name: 'str | None' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['cdn', 'fal'], request: 'Optional[Request]' = None) -> 'Image'
+  def from_pil(cls, pil_image: 'PILImage.Image', format: 'ImageFormat | None' = None, file_name: 'str | None' = None, repository: 'FileRepository | RepositoryId' = 'fal_v3', fallback_repository: 'Optional[FileRepository | RepositoryId | list[FileRepository | RepositoryId]]' = ['fal'], request: 'Optional[Request]' = None, save_kwargs: 'Optional[dict]' = None, fallback_save_kwargs: 'Optional[dict]' = None) -> 'Image'
   ```
 
-  | Parameter             | Type                                                                               | Default          | Description |
-  | :-------------------- | :--------------------------------------------------------------------------------- | :--------------- | :---------- |
-  | `pil_image`           | `PILImage.Image`                                                                   | -                | -           |
-  | `format`              | `ImageFormat \| None`                                                              | `None`           | -           |
-  | `file_name`           | `str \| None`                                                                      | `None`           | -           |
-  | `repository`          | `FileRepository \| RepositoryId`                                                   | `'fal_v3'`       | -           |
-  | `fallback_repository` | `Optional[FileRepository \| RepositoryId \| list[FileRepository \| RepositoryId]]` | `['cdn', 'fal']` | -           |
-  | `request`             | `Optional[Request]`                                                                | `None`           | -           |
+  | Parameter              | Type                                                                               | Default    | Description |
+  | :--------------------- | :--------------------------------------------------------------------------------- | :--------- | :---------- |
+  | `pil_image`            | `PILImage.Image`                                                                   | -          | -           |
+  | `format`               | `ImageFormat \| None`                                                              | `None`     | -           |
+  | `file_name`            | `str \| None`                                                                      | `None`     | -           |
+  | `repository`           | `FileRepository \| RepositoryId`                                                   | `'fal_v3'` | -           |
+  | `fallback_repository`  | `Optional[FileRepository \| RepositoryId \| list[FileRepository \| RepositoryId]]` | `['fal']`  | -           |
+  | `request`              | `Optional[Request]`                                                                | `None`     | -           |
+  | `save_kwargs`          | `Optional[dict]`                                                                   | `None`     | -           |
+  | `fallback_save_kwargs` | `Optional[dict]`                                                                   | `None`     | -           |
 
   #### to\_pil
 
@@ -287,6 +344,109 @@ Represents an image file.
   | Parameter | Type  | Default | Description |
   | :-------- | :---- | :------ | :---------- |
   | `mode`    | `str` | `'RGB'` | -           |
+</Accordion>
+
+### ImageSizeConstraints
+
+```python theme={null}
+class fal.toolkit.ImageSizeConstraints
+```
+
+Advisory limits on the image size a model can generate. Attach to an `image_size` field via :func:`fal.toolkit.ImageSizeField` to
+surface the model's size envelope in the OpenAPI schema (under the `x-fal`
+extension), so clients and UIs can validate sizes before a request. These are
+documentation hints and are not enforced by the SDK.
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name               | Type              | Default | Description |
+  | :----------------- | :---------------- | :------ | :---------- |
+  | `min_width`        | `Optional[int]`   | `None`  | -           |
+  | `min_height`       | `Optional[int]`   | `None`  | -           |
+  | `max_width`        | `Optional[int]`   | `None`  | -           |
+  | `max_height`       | `Optional[int]`   | `None`  | -           |
+  | `min_area`         | `Optional[int]`   | `None`  | -           |
+  | `max_area`         | `Optional[int]`   | `None`  | -           |
+  | `multiple_of`      | `Optional[int]`   | `None`  | -           |
+  | `min_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `max_aspect_ratio` | `Optional[float]` | `None`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name               | Type              | Default | Description |
+  | :----------------- | :---------------- | :------ | :---------- |
+  | `min_width`        | `Optional[int]`   | `None`  | -           |
+  | `min_height`       | `Optional[int]`   | `None`  | -           |
+  | `max_width`        | `Optional[int]`   | `None`  | -           |
+  | `max_height`       | `Optional[int]`   | `None`  | -           |
+  | `min_area`         | `Optional[int]`   | `None`  | -           |
+  | `max_area`         | `Optional[int]`   | `None`  | -           |
+  | `multiple_of`      | `Optional[int]`   | `None`  | -           |
+  | `min_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `max_aspect_ratio` | `Optional[float]` | `None`  | -           |
+</Accordion>
+
+### ImageValidationConfig
+
+```python theme={null}
+class fal.toolkit.ImageValidationConfig
+```
+
+Limits applied to an input image. Surfaced in the schema (`x-fal`); the SDK does not enforce them.
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name               | Type              | Default | Description |
+  | :----------------- | :---------------- | :------ | :---------- |
+  | `max_file_size`    | `Optional[int]`   | `None`  | -           |
+  | `min_width`        | `Optional[int]`   | `None`  | -           |
+  | `min_height`       | `Optional[int]`   | `None`  | -           |
+  | `max_width`        | `Optional[int]`   | `None`  | -           |
+  | `max_height`       | `Optional[int]`   | `None`  | -           |
+  | `min_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `max_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `timeout`          | `float`           | `20.0`  | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name               | Type              | Default | Description |
+  | :----------------- | :---------------- | :------ | :---------- |
+  | `max_file_size`    | `Optional[int]`   | `None`  | -           |
+  | `min_width`        | `Optional[int]`   | `None`  | -           |
+  | `min_height`       | `Optional[int]`   | `None`  | -           |
+  | `max_width`        | `Optional[int]`   | `None`  | -           |
+  | `max_height`       | `Optional[int]`   | `None`  | -           |
+  | `min_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `max_aspect_ratio` | `Optional[float]` | `None`  | -           |
+  | `timeout`          | `float`           | `20.0`  | -           |
+</Accordion>
+
+### ImageValidationOptions
+
+```python theme={null}
+class fal.toolkit.ImageValidationOptions
+```
+
+Validation options accepted by input-image helpers.
+
+> **Inherits from:** `dict`
+
+<Accordion title="Constructor Parameters" defaultOpen>
+  | Name     | Type | Default | Description |
+  | :------- | :--- | :------ | :---------- |
+  | `args`   | -    | -       | -           |
+  | `kwargs` | -    | -       | -           |
+</Accordion>
+
+<Accordion title="Class Variables" defaultOpen>
+  | Name               | Type                                                                                                                    | Default | Description |
+  | :----------------- | :---------------------------------------------------------------------------------------------------------------------- | :------ | :---------- |
+  | `max_file_size`    | `ForwardRef('Optional[int]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)`   | -       | -           |
+  | `min_width`        | `ForwardRef('Optional[int]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)`   | -       | -           |
+  | `min_height`       | `ForwardRef('Optional[int]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)`   | -       | -           |
+  | `max_width`        | `ForwardRef('Optional[int]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)`   | -       | -           |
+  | `max_height`       | `ForwardRef('Optional[int]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)`   | -       | -           |
+  | `min_aspect_ratio` | `ForwardRef('Optional[float]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)` | -       | -           |
+  | `max_aspect_ratio` | `ForwardRef('Optional[float]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)` | -       | -           |
+  | `timeout`          | `ForwardRef('Optional[float]', module='fal.toolkit.constraints', owner=fal.toolkit.constraints.ImageValidationOptions)` | -       | -           |
 </Accordion>
 
 ### KVStore
@@ -310,10 +470,25 @@ A key-value store client for interacting with the FAL KV service.
 </Accordion>
 
 <Accordion title="Methods" defaultOpen>
+  #### delete
+
+  ```python theme={null}
+  def delete(self, key: str) -> None
+  ```
+
+  Delete a value from the key-value store. The operation is idempotent and succeeds whether or not the key
+  existed.
+
+  | Parameter | Type  | Default | Description        |
+  | :-------- | :---- | :------ | :----------------- |
+  | `key`     | `str` | -       | The key to delete. |
+
+  **Returns:** `NoneType`
+
   #### get
 
   ```python theme={null}
-  def get(self, key: str) -> Optional[str]
+  def get(self, key: str) -> str | None
   ```
 
   Retrieve a value from the key-value store.
@@ -327,15 +502,16 @@ A key-value store client for interacting with the FAL KV service.
   #### set
 
   ```python theme={null}
-  def set(self, key: str, value: str) -> None
+  def set(self, key: str, value: str, ttl: int | None = None) -> None
   ```
 
   Store a value in the key-value store.
 
-  | Parameter | Type  | Default | Description                       |
-  | :-------- | :---- | :------ | :-------------------------------- |
-  | `key`     | `str` | -       | The key to store the value under. |
-  | `value`   | `str` | -       | The value to store.               |
+  | Parameter | Type            | Default | Description                                                                                                   |
+  | :-------- | :-------------- | :------ | :------------------------------------------------------------------------------------------------------------ |
+  | `key`     | `str`           | -       | The key to store the value under.                                                                             |
+  | `value`   | `str`           | -       | The value to store.                                                                                           |
+  | `ttl`     | `Optional[int]` | `None`  | Optional time-to-live in seconds. Must be between 60 and 2592000 (30 days). Defaults to 30 days when omitted. |
 
   **Returns:** `NoneType`
 </Accordion>
@@ -430,6 +606,20 @@ Common base class for all non-exit exceptions.
 
 ## Functions
 
+### to\_xfal
+
+```python theme={null}
+def to_xfal(config: 'ImageSizeConstraints | ImageValidationConfig') -> 'dict[str, Any]'
+```
+
+Return a config's set (non-None) limits as the `x-fal` schema payload.
+
+| Parameter | Type                                            | Default | Description |
+| :-------- | :---------------------------------------------- | :------ | :---------- |
+| `config`  | `ImageSizeConstraints \| ImageValidationConfig` | -       | -           |
+
+**Returns:** `dict[str, Any]`
+
 ### Hidden
 
 ```python theme={null}
@@ -466,21 +656,6 @@ def get_image_size(source: 'ImageSizeInput') -> 'ImageSize'
 
 **Returns:** `ImageSize`
 
-### optimize
-
-```python theme={null}
-def optimize(module: 'torch.nn.Module', *, optimization_config: 'dict[str, Any] | None' = None) -> 'torch.nn.Module'
-```
-
-Optimize the given torch module with dynamic compilation and quantization techniques. Only applicable under fal's cloud environment.
-
-Warning: This function is experimental and may not work as expected.
-
-| Parameter             | Type                     | Default | Description |
-| :-------------------- | :----------------------- | :------ | :---------- |
-| `module`              | `torch.nn.Module`        | -       | -           |
-| `optimization_config` | `dict[str, Any] \| None` | `None`  | -           |
-
 ### clone\_repository
 
 ```python theme={null}
@@ -495,14 +670,14 @@ directory. It can also checkout a specific commit if the `commit_hash` is provid
 If a custom `target_dir` or `repo_name` is not specified, a predefined directory is
 used for the target directory, and the repository name is determined from the URL.
 
-| Parameter         | Type                          | Default | Description                                                                                                                                      |
-| :---------------- | :---------------------------- | :------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `https_url`       | `str`                         | -       | The HTTPS URL of the Git repository to be cloned.                                                                                                |
-| `commit_hash`     | `str \| None`                 | `None`  | The commit hash to checkout after cloning.                                                                                                       |
-| `target_dir`      | `str \| pathlib.Path \| None` | `None`  | The directory where the repository will be saved. If not provided, a predefined directory is used.                                               |
-| `repo_name`       | `str \| None`                 | `None`  | The name to be used for the cloned repository directory. If not provided, the repository's name from the URL is used.                            |
-| `force`           | `bool`                        | `False` | If `True`, the repository is cloned even if it already exists locally and its commit hash matches the provided commit hash. Defaults to `False`. |
-| `include_to_path` | `bool`                        | `False` | If `True`, the cloned repository is added to the `sys.path`. Defaults to `False`.                                                                |
+| Parameter         | Type                      | Default | Description                                                                                                                                      |
+| :---------------- | :------------------------ | :------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `https_url`       | `str`                     | -       | The HTTPS URL of the Git repository to be cloned.                                                                                                |
+| `commit_hash`     | `Optional[str]`           | `None`  | The commit hash to checkout after cloning.                                                                                                       |
+| `target_dir`      | `str \| Path \| NoneType` | `None`  | The directory where the repository will be saved. If not provided, a predefined directory is used.                                               |
+| `repo_name`       | `Optional[str]`           | `None`  | The name to be used for the cloned repository directory. If not provided, the repository's name from the URL is used.                            |
+| `force`           | `bool`                    | `False` | If `True`, the repository is cloned even if it already exists locally and its commit hash matches the provided commit hash. Defaults to `False`. |
+| `include_to_path` | `bool`                    | `False` | If `True`, the cloned repository is added to the `sys.path`. Defaults to `False`.                                                                |
 
 **Returns:** `Path`
 
@@ -515,29 +690,26 @@ def download_file(url: 'str', target_dir: 'str | Path', *, force: 'bool' = False
 Downloads a file from the specified URL to the target directory. The function downloads the file from the given URL and saves it in the specified
 target directory, provided it is below the given filesize limit.
 
-It also checks whether the local file already exists and whether its content length
-matches the expected content length from the remote file. If the local file already
-exists and its content length matches the expected content length from the remote
-file, the existing file is returned without re-downloading it.
+If the downloaded response resolves to an existing local file whose content length
+matches the downloaded file, the existing file is kept.
 
 If the file needs to be downloaded or if an existing file's content length does not
 match the expected length, the function proceeds to download and save the file. It
 ensures that the target directory exists and handles any errors that may occur
 during the download process, raising a `DownloadError` if necessary.
 
-| Parameter         | Type                     | Default | Description                                                                                                                                                               |
-| :---------------- | :----------------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `url`             | `str`                    | -       | The URL of the file to be downloaded.                                                                                                                                     |
-| `target_dir`      | `str \| pathlib.Path`    | -       | The directory where the downloaded file will be saved. If it's not an absolute path, it's treated as a relative directory to "/data".                                     |
-| `force`           | `bool`                   | `False` | If `True`, the file is downloaded even if it already exists locally and its content length matches the expected content length from the remote file. Defaults to `False`. |
-| `request_headers` | `dict[str, str] \| None` | `None`  | A dictionary containing additional headers to be included in the HTTP request. Defaults to `None`.                                                                        |
-| `filesize_limit`  | `int \| None`            | `None`  | An integer specifying the maximum downloadable size, in megabytes. Defaults to `None`.                                                                                    |
+| Parameter         | Type                       | Default | Description                                                                                                                                      |
+| :---------------- | :------------------------- | :------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `url`             | `str`                      | -       | The URL of the file to be downloaded.                                                                                                            |
+| `target_dir`      | `str \| Path`              | -       | The directory where the downloaded file will be saved. If it's not an absolute path, it's treated as a relative directory to "/data".            |
+| `force`           | `bool`                     | `False` | If `True`, the file is downloaded even if it already exists locally and its content length matches the downloaded response. Defaults to `False`. |
+| `request_headers` | `Optional[dict[str, str]]` | `None`  | A dictionary containing additional headers to be included in the HTTP request. Defaults to `None`.                                               |
+| `filesize_limit`  | `Optional[int]`            | `None`  | An integer specifying the maximum downloadable size, in megabytes. Defaults to `None`.                                                           |
 
 **Returns:** `Path`
 
 **Raises:**
 
-* `ValueError`: If the provided `file_name` contains a forward slash ('/').
 * `DownloadError`: If an error occurs during the download process.
 
 ### download\_model\_weights
@@ -556,11 +728,11 @@ URL and the target directory set to a pre-defined location for model weights.
 The downloaded model weights are saved in this directory, and the function returns
 the full path to the downloaded weights file.
 
-| Parameter         | Type                     | Default | Description                                                                                                                                                                            |
-| :---------------- | :----------------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `url`             | `str`                    | -       | The URL from which the model weights will be downloaded.                                                                                                                               |
-| `force`           | `bool`                   | `False` | If `True`, the model weights are downloaded even if they already exist locally and their content length matches the expected content length from the remote file. Defaults to `False`. |
-| `request_headers` | `dict[str, str] \| None` | `None`  | A dictionary containing additional headers to be included in the HTTP request. Defaults to `None`.                                                                                     |
+| Parameter         | Type                       | Default | Description                                                                                                                                                                            |
+| :---------------- | :------------------------- | :------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `url`             | `str`                      | -       | The URL from which the model weights will be downloaded.                                                                                                                               |
+| `force`           | `bool`                     | `False` | If `True`, the model weights are downloaded even if they already exist locally and their content length matches the expected content length from the remote file. Defaults to `False`. |
+| `request_headers` | `Optional[dict[str, str]]` | `None`  | A dictionary containing additional headers to be included in the HTTP request. Defaults to `None`.                                                                                     |
 
 **Returns:** `Path`
 

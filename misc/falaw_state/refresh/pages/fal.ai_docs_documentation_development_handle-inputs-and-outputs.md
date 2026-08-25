@@ -6,9 +6,9 @@
 
 > Define input and output schemas for your fal App endpoints that render correctly in the Playground.
 
-Every [fal App](/documentation/getting-started/apps-and-execution) endpoint defines its interface through Python type annotations. The types you choose for your function parameters and return values determine what the [Playground](/documentation/model-apis/playground) renders: text inputs, sliders, file uploaders, image galleries, video players, and more. Getting these right means your model is immediately testable from the browser without building a custom UI.
+Every [fal App](/docs/documentation/getting-started/apps-and-execution) endpoint defines its interface through Python type annotations. The types you choose for your function parameters and return values determine what the [Playground](/docs/documentation/model-apis/playground) renders: text inputs, sliders, file uploaders, image galleries, video players, and more. Getting these right means your model is immediately testable from the browser without building a custom UI.
 
-fal endpoints are fully compatible with [Pydantic](https://docs.pydantic.dev/) models. You can use standard Pydantic features like field validation, default values, and nested models. On top of that, fal provides `FalBaseModel` for field ordering and hidden fields, specialized field helpers (`ImageField`, `VideoField`, `AudioField`) for Playground rendering, and toolkit types (`Image`, `Video`, `Audio`, `File`) for returning media with metadata. For the runtime side of file handling (downloading user inputs and uploading generated outputs to CDN), see [Working with Files](/documentation/development/working-with-files).
+fal endpoints are fully compatible with [Pydantic](https://docs.pydantic.dev/) models. You can use standard Pydantic features like field validation, default values, and nested models. On top of that, fal provides `FalBaseModel` for field ordering and hidden fields, specialized field helpers (`ImageField`, `VideoField`, `AudioField`) for Playground rendering, and toolkit types (`Image`, `Video`, `Audio`, `File`) for returning media with metadata. For the runtime side of file handling (downloading user inputs and uploading generated outputs to CDN), see [Working with Files](/docs/documentation/development/working-with-files).
 
 ## FalBaseModel
 
@@ -19,7 +19,6 @@ For the best experience defining inputs and outputs, use `FalBaseModel` from the
 
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, Hidden
-
 
 class TextToImageInput(FalBaseModel):
     FIELD_ORDERS = ["prompt", "negative_prompt", "image_size"]
@@ -42,14 +41,12 @@ This is particularly useful when you have a base model with common fields that m
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, ImageField
 
-
 # Base model with common fields
 class BaseTextInput(FalBaseModel):
     FIELD_ORDERS = ["prompt", "negative_prompt"]
 
     prompt: str = Field(description="Text prompt")
     negative_prompt: str = Field(default="", description="What to avoid")
-
 
 # Extended model for image-to-image
 class ImageToImageInput(BaseTextInput):
@@ -58,7 +55,6 @@ class ImageToImageInput(BaseTextInput):
 
     image_url: str = ImageField(description="Input image")
     strength: float = Field(default=0.8, description="How much to transform")
-
 
 # Without FIELD_ORDERS, schema would show: image_url, strength, prompt, negative_prompt
 # With FIELD_ORDERS, schema shows: prompt, negative_prompt, image_url, strength
@@ -78,7 +74,6 @@ Use `Hidden()` to wrap any field that should be available via API but hidden fro
 
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field, Hidden
-
 
 class MyInput(FalBaseModel):
     prompt: str = Field(description="User prompt")
@@ -102,7 +97,6 @@ For better playground rendering, use the specialized field helpers instead of pl
 ```python theme={null}
 from fal.toolkit import FalBaseModel, ImageField, AudioField
 
-
 class MyInput(FalBaseModel):
     # Renders as image upload in playground
     input_image: str = ImageField(description="Source image")
@@ -115,7 +109,7 @@ These helpers work with both Pydantic v1 and v2. See the [Standard Inputs and Ou
 
 ## Output Format for Playground Rendering
 
-The Playground detects media outputs by checking for objects that have both a `url` and `content_type` field. If you use the toolkit types (`Image`, `Video`, `Audio`, `File`), these fields are set automatically. But if you are returning raw dicts from a [custom Docker container](/documentation/development/use-custom-container-image) or a [`fal.function`](/documentation/development/migrate-external-docker-server#fal-function-reference) endpoint, you must include both fields for the Playground to render the output as media instead of raw JSON.
+The Playground detects media outputs by checking for objects that have both a `url` and `content_type` field. If you use the toolkit types (`Image`, `Video`, `Audio`, `File`), these fields are set automatically. But if you are returning raw dicts from a [custom Docker container](/docs/documentation/development/use-custom-container-image) or a [Direct Server Mode](/docs/documentation/development/migrate-external-docker-server#option-1-direct-server-mode) endpoint, you must include both fields for the Playground to render the output as media instead of raw JSON.
 
 ```json theme={null}
 {
@@ -137,7 +131,7 @@ The Playground recognizes these field names for automatic rendering:
 
 Each object in the response must have at minimum `url` and `content_type`. Without `content_type`, the Playground falls back to displaying the result as raw JSON. Additional fields like `file_name`, `file_size`, `width`, and `height` are optional but improve the display.
 
-For [streaming endpoints](/documentation/development/streaming) that send results via SSE, the same format applies to each event. Streaming endpoints typically use `data:` URIs (base64-encoded inline content) instead of CDN URLs, since uploading each intermediate frame to CDN would add latency. The Playground renders data URIs the same way as CDN URLs.
+For [streaming endpoints](/docs/documentation/development/streaming) that send results via SSE, the same format applies to each event. Streaming endpoints typically use `data:` URIs (base64-encoded inline content) instead of CDN URLs, since uploading each intermediate frame to CDN would add latency. The Playground renders data URIs the same way as CDN URLs.
 
 ```json theme={null}
 {"image": {"url": "data:image/jpeg;base64,...", "content_type": "image/jpeg"}}
@@ -150,15 +144,14 @@ For [streaming endpoints](/documentation/development/streaming) that send result
 Name your field with a `file_url` suffix and it will be rendered as a file in the playground, allowing users to upload or download the file.
 
 ```python theme={null}
+import fal
 from pydantic import BaseModel
-
 
 class MyInput(BaseModel):
     file_url: str
 
-
-class MyOutput(BaseModel): ...
-
+class MyOutput(BaseModel):
+    ...
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -173,7 +166,6 @@ Alternatively if that naming convention is not suitable, you can use the `FileFi
 ```python theme={null}
 from fal.toolkit import FalBaseModel, FileField
 
-
 class MyInput(FalBaseModel):
     document: str = FileField(description="Upload a document")
 ```
@@ -185,14 +177,12 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
-
     class MyInput(BaseModel):
         document: str = Field(..., json_schema_extra={"ui": {"field": "file"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
-
 
     class MyInput(BaseModel):
         document: str = Field(..., ui={"field": "file"})
@@ -207,7 +197,6 @@ Use the `File` type from `fal.toolkit` in your output schema. The Playground ren
 ```python theme={null}
 from fal.toolkit import File
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     file: File
@@ -226,23 +215,22 @@ The response includes file metadata:
 }
 ```
 
-See [Working with Files](/documentation/development/working-with-files#creating-files) for how to create `File` objects from local paths or bytes.
+See [Working with Files](/docs/documentation/development/working-with-files#creating-files) for how to create `File` objects from local paths or bytes.
 
 ### Image Input
 
 Name your field with a `image_url` suffix and it will be rendered as an image in the playground, allowing users to upload or download the image.
 
 ```python theme={null}
+import fal
 from pydantic import BaseModel
 from fal.toolkit import download_file
-
 
 class MyInput(BaseModel):
     image_url: str
 
-
-class MyOutput(BaseModel): ...
-
+class MyOutput(BaseModel):
+    ...
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -257,7 +245,6 @@ Alternatively if that naming convention is not suitable, you can use the `ImageF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, ImageField
 
-
 class MyInput(FalBaseModel):
     photo: str = ImageField(description="Upload a photo")
 ```
@@ -269,14 +256,12 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
-
     class MyInput(BaseModel):
         photo: str = Field(..., json_schema_extra={"ui": {"field": "image"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
-
 
     class MyInput(BaseModel):
         photo: str = Field(..., ui={"field": "image"})
@@ -291,7 +276,6 @@ Use the `Image` type in your output schema. The Playground renders it as an imag
 ```python theme={null}
 from fal.toolkit import Image
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     image: Image
@@ -312,27 +296,30 @@ The response includes image metadata with dimensions:
 }
 ```
 
-See [Working with Files](/documentation/development/working-with-files#creating-files) for how to create `Image` objects from PIL images, bytes, or local files.
+See [Working with Files](/docs/documentation/development/working-with-files#creating-files) for how to create `Image` objects from PIL images, bytes, or local files.
 
 ### Multiple Image Output
 
 Return a list of `Image` objects to output multiple images. The Playground renders them in a gallery grid.
 
 ```python theme={null}
+import fal
 from typing import List
 from fal.toolkit import Image
 from pydantic import BaseModel
 
+class MyInput(BaseModel):
+    prompt: str
+    num_images: int = 1
 
 class MyOutput(BaseModel):
     images: List[Image]
     has_nsfw_concepts: List[bool]
 
-
 class MyApp(fal.App):
     @fal.endpoint("/")
-    def predict(self, prompt: str, num_images: int = 1) -> MyOutput:
-        results = self.pipe(prompt, num_images=num_images).images
+    def predict(self, input: MyInput) -> MyOutput:
+        results = self.pipe(input.prompt, num_images=input.num_images).images
         return MyOutput(
             images=[Image.from_pil(img) for img in results],
             has_nsfw_concepts=[False] * len(results),
@@ -371,7 +358,6 @@ Use `image_urls` suffix to render a dataset of images in the playground.
 from typing import List
 from pydantic import BaseModel
 
-
 class MyInput(BaseModel):
     image_urls: List[str]
 ```
@@ -381,16 +367,15 @@ class MyInput(BaseModel):
 Name your field with a `audio_url` suffix and it will be rendered as an audio in the playground, allowing users to upload or download the audio.
 
 ```python theme={null}
+import fal
 from typing import List
 from pydantic import BaseModel
-
 
 class MyInput(BaseModel):
     audio_url: str
 
-
-class MyOutput(BaseModel): ...
-
+class MyOutput(BaseModel):
+    ...
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -405,7 +390,6 @@ Alternatively if that naming convention is not suitable, you can use the `AudioF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, AudioField
 
-
 class MyInput(FalBaseModel):
     voice_sample: str = AudioField(description="Upload a voice sample")
 ```
@@ -417,14 +401,12 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
-
     class MyInput(BaseModel):
         voice_sample: str = Field(..., json_schema_extra={"ui": {"field": "audio"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
-
 
     class MyInput(BaseModel):
         voice_sample: str = Field(..., ui={"field": "audio"})
@@ -439,7 +421,6 @@ Use the `Audio` type in your output schema. The Playground renders it as an audi
 ```python theme={null}
 from fal.toolkit import Audio
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     audio: Audio
@@ -458,7 +439,7 @@ The response includes audio metadata:
 }
 ```
 
-See [Working with Files](/documentation/development/working-with-files#creating-files) for how to create `Audio` objects from local files or bytes.
+See [Working with Files](/docs/documentation/development/working-with-files#creating-files) for how to create `Audio` objects from local files or bytes.
 
 ### Multiple Audio Output
 
@@ -468,7 +449,6 @@ Return a list of `Audio` objects. The Playground renders each as a stacked wavef
 from typing import List
 from fal.toolkit import Audio
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     audios: List[Audio]
@@ -484,7 +464,6 @@ Use `audio_urls` suffix to render a dataset of audios in the playground.
 from typing import List
 from pydantic import BaseModel
 
-
 class MyInput(BaseModel):
     audio_urls: List[str]
 ```
@@ -494,16 +473,15 @@ class MyInput(BaseModel):
 Name your field with a `video_url` suffix and it will be rendered as a video in the playground, allowing users to upload or download the video.
 
 ```python theme={null}
+import fal
 from typing import List
 from pydantic import BaseModel
-
 
 class MyInput(BaseModel):
     video_url: str
 
-
-class MyOutput(BaseModel): ...
-
+class MyOutput(BaseModel):
+    ...
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -518,7 +496,6 @@ Alternatively if that naming convention is not suitable, you can use the `VideoF
 ```python theme={null}
 from fal.toolkit import FalBaseModel, VideoField
 
-
 class MyInput(FalBaseModel):
     clip: str = VideoField(description="Upload a video clip")
 ```
@@ -530,14 +507,12 @@ class MyInput(FalBaseModel):
     ```python Pydantic v2 theme={null}
     from pydantic import BaseModel, Field
 
-
     class MyInput(BaseModel):
         clip: str = Field(..., json_schema_extra={"ui": {"field": "video"}})
     ```
 
     ```python Pydantic v1 theme={null}
     from pydantic import BaseModel, Field
-
 
     class MyInput(BaseModel):
         clip: str = Field(..., ui={"field": "video"})
@@ -552,7 +527,6 @@ Use the `Video` type in your output schema. The Playground renders it as a video
 ```python theme={null}
 from fal.toolkit import Video
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     video: Video
@@ -571,7 +545,7 @@ The response includes video metadata:
 }
 ```
 
-See [Working with Files](/documentation/development/working-with-files#creating-files) for how to create `Video` objects from local files or bytes.
+See [Working with Files](/docs/documentation/development/working-with-files#creating-files) for how to create `Video` objects from local files or bytes.
 
 ### Multiple Video Output
 
@@ -581,7 +555,6 @@ Return a list of `Video` objects. The Playground renders each video as a stacked
 from typing import List
 from fal.toolkit import Video
 from pydantic import BaseModel
-
 
 class MyOutput(BaseModel):
     videos: List[Video]
@@ -597,7 +570,6 @@ Use `video_urls` suffix to render a dataset of videos in the playground.
 from typing import List
 from pydantic import BaseModel
 
-
 class MyInput(BaseModel):
     video_urls: List[str]
 ```
@@ -608,7 +580,6 @@ Name your field with a `mask_image_url` or `mask_url` suffix (or prefix) and the
 
 ```python theme={null}
 from pydantic import BaseModel
-
 
 class InpaintInput(BaseModel):
     image_url: str
@@ -626,12 +597,10 @@ If your input uses a Pydantic model named `RGBColor` with `r`, `g`, `b` integer 
 from pydantic import BaseModel, Field
 from typing import List
 
-
 class RGBColor(BaseModel):
     r: int = Field(ge=0, le=255)
     g: int = Field(ge=0, le=255)
     b: int = Field(ge=0, le=255)
-
 
 class MyInput(BaseModel):
     background_color: RGBColor = RGBColor(r=255, g=255, b=255)
@@ -647,12 +616,11 @@ class MyInput(BaseModel):
 Use `ImageSizeInput` from `fal.toolkit` to render an image size selector with preset buttons (square, landscape, portrait) and custom width/height inputs. This is the same type used by most image generation models on fal.
 
 ```python theme={null}
+import fal
 from fal.toolkit import ImageSizeInput, get_image_size
-
 
 class MyInput(BaseModel):
     image_size: ImageSizeInput = "square_hd"
-
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -671,7 +639,6 @@ Name your field with a `face_image_url` suffix and the Playground renders a came
 ```python theme={null}
 from pydantic import BaseModel
 
-
 class FaceSwapInput(BaseModel):
     face_image_url: str
     target_image_url: str
@@ -684,12 +651,11 @@ Use `ui.field = "camera_control"` or name your field ending with `advanced_camer
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
-
 class VideoInput(FalBaseModel):
     prompt: str
     camera_control: dict = Field(
         default={"movement_type": "default", "movement_value": 0},
-        json_schema_extra={"ui": {"field": "camera_control"}},
+        json_schema_extra={"ui": {"field": "camera_control"}}
     )
 ```
 
@@ -699,7 +665,6 @@ Name your field with a `model_url` suffix and the Playground renders a 3D model 
 
 ```python theme={null}
 from pydantic import BaseModel
-
 
 class TextureInput(BaseModel):
     model_url: str
@@ -713,7 +678,6 @@ Name your field with a `data_url` or `archive_url` suffix to render a dataset up
 ```python theme={null}
 from pydantic import BaseModel
 
-
 class TrainingInput(BaseModel):
     training_data_url: str
     trigger_word: str
@@ -726,7 +690,6 @@ Fields ending in `model_name` automatically render as a preset selector. The Pla
 ```python theme={null}
 from pydantic import BaseModel, Field
 
-
 class MyInput(BaseModel):
     model_name: str = Field(
         default="stabilityai/stable-diffusion-xl-base-1.0",
@@ -734,7 +697,7 @@ class MyInput(BaseModel):
             "stabilityai/stable-diffusion-xl-base-1.0",
             "runwayml/stable-diffusion-v1-5",
             "black-forest-labs/FLUX.1-dev",
-        ],
+        ]
     )
 ```
 
@@ -752,21 +715,17 @@ import numpy as np
 from pydantic import BaseModel
 from fal.toolkit import File
 
-
 class DepthInput(BaseModel):
     image_url: str
 
-
 class DepthOutput(BaseModel):
     depth_map: File
-
 
 class DepthApp(fal.App):
     machine_type = "GPU-A100"
 
     def setup(self):
         import cv2
-
         self.cv2 = cv2
 
     @fal.endpoint("/")
@@ -808,14 +767,11 @@ import fal
 from pydantic import BaseModel
 from fal.toolkit import File
 
-
 class MeshInput(BaseModel):
     image_url: str
 
-
 class MeshOutput(BaseModel):
     mesh: File
-
 
 class MeshApp(fal.App):
     machine_type = "GPU-A100"
@@ -838,7 +794,7 @@ class MeshApp(fal.App):
 The Playground detects 3D output by checking the URL file extension. GLB is the recommended format for best Playground compatibility, as it supports textures, materials, and AR preview.
 
 <Tip>
-  For examples of deploying 3D models on fal, see [Deploy 3D Progressive Rendering](/examples/video-generation/deploy-3d-progressive-rendering).
+  For examples of deploying 3D models on fal, see [Deploy 3D Progressive Rendering](/docs/examples/video-generation/deploy-3d-progressive-rendering).
 </Tip>
 
 ***
@@ -891,11 +847,29 @@ class MyInput(BaseModel):
 ```python theme={null}
 from typing import Literal
 
-
 class MyInput(BaseModel):
     scheduler: Literal["euler", "ddim", "dpm++"] = "euler"
     image_size: Literal["square_hd", "landscape_16_9", "portrait_4_3"] = "square_hd"
 ```
+
+**Single-option dropdown (Pydantic v2)** - under Pydantic v2, a single-value `Literal` is emitted as a JSON Schema constant, so the Playground renders it as a text input instead.
+
+If a field currently has one allowed value but will gain more options later, add an `enum` to its JSON Schema metadata. This preserves the single-value API contract while rendering a dropdown from the start:
+
+```python theme={null}
+from typing import Literal
+
+from fal.toolkit import FalBaseModel, Field
+
+class MyInput(FalBaseModel):
+    example_field: Literal["value1"] = Field(
+        default="value1",
+        description="Example description",
+        json_schema_extra={"enum": ["value1"]},
+    )
+```
+
+Do not add a duplicate or placeholder value to the `Literal` just to trigger a dropdown; that value becomes part of the API schema. Once the field has multiple real choices, list them in the `Literal` and remove `json_schema_extra`.
 
 **Seed** - any `int` field with a name ending in `seed` gets a randomize button:
 
@@ -909,11 +883,11 @@ class MyInput(BaseModel):
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
-
 class MyInput(FalBaseModel):
     prompt: str = Field(description="This automatically renders as textarea")
     system_message: str = Field(
-        default="", json_schema_extra={"ui": {"field": "textarea"}}
+        default="",
+        json_schema_extra={"ui": {"field": "textarea"}}
     )
 ```
 
@@ -921,7 +895,6 @@ class MyInput(FalBaseModel):
 
 ```python theme={null}
 from typing import List, Literal
-
 
 class MyInput(BaseModel):
     styles: List[Literal["photorealistic", "anime", "oil-painting", "watercolor"]] = []
@@ -934,25 +907,31 @@ You can control Playground behavior with `json_schema_extra` metadata on any fie
 ```python theme={null}
 from fal.toolkit import FalBaseModel, Field
 
-
 class MyInput(FalBaseModel):
     prompt: str = Field(description="Main prompt")
 
     # Override the widget type
-    notes: str = Field(default="", json_schema_extra={"ui": {"field": "textarea"}})
+    notes: str = Field(
+        default="",
+        json_schema_extra={"ui": {"field": "textarea"}}
+    )
 
     # Show helper text below the field
     lora_url: str = Field(
         default="",
-        json_schema_extra={"ui": {"hint": "Paste a HuggingFace or Civitai URL"}},
+        json_schema_extra={"ui": {"hint": "Paste a HuggingFace or Civitai URL"}}
     )
 
     # Mark as read-only in Playground (API-only parameter)
-    internal_config: str = Field(default="", json_schema_extra={"ui": {"frozen": True}})
+    internal_config: str = Field(
+        default="",
+        json_schema_extra={"ui": {"frozen": True}}
+    )
 
     # Force field into the main form (not "Additional Settings")
     negative_prompt: str = Field(
-        default="", json_schema_extra={"ui": {"important": True}}
+        default="",
+        json_schema_extra={"ui": {"important": True}}
     )
 ```
 

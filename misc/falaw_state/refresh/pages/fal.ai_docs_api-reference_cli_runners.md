@@ -17,6 +17,7 @@ Commands:
     stop        Stop a runner gracefully.
     kill        Kill a runner.
     list        List runners.
+    gpus        Show GPU usage summary across runners.
     logs (log)  Show logs for a runner.
     shell       Open a shell on a runner.
     exec        Execute a command on a runner.
@@ -26,7 +27,7 @@ Commands:
 
 ```bash theme={null}
 Usage: fal runners list [-h] [--team TEAM] [--since SINCE]
-                        [--state {all,idle,running,pending,setup,failure_delay,terminated} [...]]
+                        [--state {all,idle,running,pending,setup,crash_backoff,terminated} [...]]
                         [--output {pretty,json}] [--json]
 
 List runners.
@@ -35,7 +36,7 @@ Options:
   -h, --help            show this help message and exit
   --team TEAM           The team to use.
   --since SINCE         Show terminated runners since the given time. Accepts 'now', relative like '30m', '1h', '1d', or an ISO timestamp. Max 24 hours.
-  --state {all,idle,running,pending,setup,failure_delay,terminated} [{all,idle,running,pending,setup,failure_delay,terminated} ...]
+  --state {all,idle,running,pending,setup,crash_backoff,terminated} [{all,idle,running,pending,setup,crash_backoff,terminated} ...]
                         Filter by runner state(s). Choose one or more, or 'all' (default).
 
 Output:
@@ -182,3 +183,27 @@ fal runners exec runner_abc123xyz -- tail -f /var/log/my-app.log
 # Run an interactive Python REPL
 fal runners exec runner_abc123xyz -it -- python
 ```
+
+***
+
+## GPUs
+
+Show a GPU usage summary across all runners in the account.
+
+```bash theme={null}
+Usage: fal runners gpus [-h] [--output {pretty,json}] [--json] [--team TEAM]
+
+Show GPU usage summary across runners.
+
+Options:
+  -h, --help            show this help message and exit
+  --team TEAM           The team to use.
+
+Output:
+  --output {pretty,json}
+                        Modify the command output
+  --json                Output in JSON format (same as --output json)
+```
+
+For the GPUs behind a single application rather than the whole account, see
+[`fal apps gpus`](/docs/api-reference/cli/apps/gpus).

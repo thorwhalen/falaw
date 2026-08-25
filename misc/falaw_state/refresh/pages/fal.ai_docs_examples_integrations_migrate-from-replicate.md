@@ -45,7 +45,7 @@ This will give you a list of Python packages that you can install in your Docker
   'torch' 'torchvision' 'torchaudio' 'torchsde' 'einops' 'transformers>=4.25.1' ...
 </Info>
 
-Alternatively, you can write the contents of the `python_packages` to a `requirements.txt` file and install them in the Dockerfile. See the example in [the containerized application page](/serverless/development/use-custom-container-image).
+Alternatively, you can write the contents of the `python_packages` to a `requirements.txt` file and install them in the Dockerfile. See the example in [the containerized application page](/docs/serverless/development/use-custom-container-image).
 
 Here's a basic example of what your `Dockerfile` might look like:
 
@@ -155,9 +155,9 @@ class MyApp(fal.App):
   your application to run on fal.
 </Note>
 
-You can see details documentation on how to use fal SDK [here](/serverless).
+You can see details documentation on how to use fal SDK [here](/docs/serverless).
 
-More information on how to deploy a containerized application can be found [here](/serverless/development/use-custom-container-image).
+More information on how to deploy a containerized application can be found [here](/docs/serverless/development/use-custom-container-image).
 
 ## Step 4: Test Your Deployment
 

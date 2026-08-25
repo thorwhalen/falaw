@@ -12,6 +12,12 @@ Environments let you isolate applications, secrets, and configurations for diffe
   **Each app is attached to a single environment.** To deploy the same application code to multiple environments (e.g., dev, staging, and main), you must create a separate app deployment for each environment. Apps cannot be promoted or moved between environments—instead, deploy your code to each target environment independently.
 </Note>
 
+See how environments isolate secrets and keep development separate from production, with analytics and requests scoped per environment:
+
+<Frame>
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/Fw1DkM7eNPI?start=1775&end=2105&autoplay=1'><img src='/docs/docs/images/video-thumbs/environments.jpg' alt='Environments - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+</Frame>
+
 ## Why Use Environments?
 
 * **Isolation**: Keep development, staging, and production completely separate
@@ -166,11 +172,11 @@ fal apps delete my-app --env staging
 ## Reference
 
 <CardGroup cols={2}>
-  <Card title="CLI Reference" icon="terminal" href="/reference/cli/environments">
+  <Card title="CLI Reference" icon="terminal" href="/docs/reference/cli/environments">
     Complete CLI documentation for `fal environments`
   </Card>
 
-  <Card title="Secrets Guide" icon="key" href="/documentation/development/manage-secrets-securely">
+  <Card title="Secrets Guide" icon="key" href="/docs/documentation/development/manage-secrets-securely">
     Managing secrets across environments
   </Card>
 </CardGroup>

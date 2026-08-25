@@ -122,7 +122,7 @@ fal.config({
 <Note>
   **Protect your API Key**
 
-  Although the client can be configured with credentials, use that only for rapid prototyping. We recommend you always use the proxy to avoid exposing your API Key in the client before you deploy your web application. See the [server-side guide](/model-apis/model-endpoints/server-side) for more details.
+  Although the client can be configured with credentials, use that only for rapid prototyping. We recommend you always use the proxy to avoid exposing your API Key in the client before you deploy your web application. See the [server-side guide](/docs/model-apis/model-endpoints/server-side) for more details.
 </Note>
 
 ## 4. Generate an image
@@ -153,6 +153,6 @@ Image generation is just one of the many cool things you can do with fal. Make s
 
 * Check our demo application at [github.com/fal-ai/serverless-js/apps/demo-nextjs-app-router](https://github.com/fal-ai/fal-js/tree/main/apps/demo-nextjs-app-router)
 * Check all the available [Model APIs](https://fal.ai/models)
-* Learn how to write your own model APIs on [Introduction to serverless functions](/serverless)
-* Read more about function endpoints on [private serverless models](/serverless)
-* Check the next page to learn how to [deploy your app to Vercel](/model-apis/integrations/vercel)
+* Learn how to write your own model APIs on [Introduction to serverless functions](/docs/serverless)
+* Read more about function endpoints on [private serverless models](/docs/serverless)
+* Check the next page to learn how to [deploy your app to Vercel](/docs/model-apis/integrations/vercel)

@@ -61,6 +61,6 @@ You can opt in to receive email notifications when new models are designated as 
   Model Access Controls are available on enterprise plans. Contact [sales](https://fal.ai/enterprise#contact-sales) to enable this feature for your organization.
 </Note>
 
-<Card title="Managing Teams" icon="arrow-right" href="/documentation/organizations/managing-teams">
+<Card title="Managing Teams" icon="arrow-right" href="/docs/documentation/organizations/managing-teams">
   Configure org-wide policies and member management
 </Card>

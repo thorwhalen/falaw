@@ -6,15 +6,15 @@
 
 > Deploy an existing Docker-based server (ComfyUI, custom APIs) to fal's serverless platform.
 
-If you already have a working Docker container that runs a server, you can deploy it on fal with minimal changes. This guide covers two approaches: exposing your server's port directly for zero-code migration, or wrapping it with a `fal.App` proxy for full control over the API surface. Both approaches give you autoscaling, [analytics](/documentation/serverless/observability/app-analytics), and the same infrastructure that powers every model in the marketplace.
+If you already have a working Docker container that runs a server, you can deploy it on fal with minimal changes. This guide covers two approaches: exposing your server's port directly for zero-code migration, or wrapping it with a `fal.App` proxy for full control over the API surface. Both approaches give you autoscaling, [analytics](/docs/documentation/serverless/observability/app-analytics), and the same infrastructure that powers every model in the marketplace.
 
-This is the fastest path for teams migrating from self-hosted infrastructure, Kubernetes, or other serverless platforms. Your existing server code stays unchanged. You just need to define a [Dockerfile](/documentation/development/use-custom-container-image) (or reference an existing image from a [private registry](/documentation/development/private-registries)) and tell fal how to start your server. If you are starting from scratch rather than migrating, the [Quick Start](/documentation/development/getting-started/quick-start) is a better starting point.
+This is the fastest path for teams migrating from self-hosted infrastructure, Kubernetes, or other serverless platforms. Your existing server code stays unchanged. You just need to define a [Dockerfile](/docs/documentation/development/use-custom-container-image) (or reference an existing image from a [private registry](/docs/documentation/development/private-registries)) and tell fal how to start your server. If you are starting from scratch rather than migrating, the [Quick Start](/docs/documentation/development/getting-started/quick-start) is a better starting point.
 
-## fal.function vs fal.App
+## Dockerfile vs fal.App
 
-Most of the Serverless documentation focuses on `fal.App`, the class-based approach where you define `setup()`, endpoints, and `teardown()` as methods on a class. For server migration, this guide uses `@fal.function` instead. It is a decorator-based alternative that wraps a single function rather than a class. You pass all configuration (machine type, scaling parameters, container image) as decorator arguments, and the function body runs on the remote machine.
+Most of the Serverless documentation focuses on `fal.App`, the class-based approach where you define `setup()`, endpoints, and `teardown()` as methods on a class. For server migration, this guide starts with a Dockerfile instead. Your Dockerfile starts the server process, and `pyproject.toml` provides the deployment configuration such as machine type, scaling parameters, container image, and exposed port.
 
-`fal.function` is the natural fit for existing servers because you typically just need to start a process and expose a port. You do not need lifecycle hooks or multiple endpoints since your server already handles those. Both `fal.function` and `fal.App` support the same scaling parameters (`keep_alive`, `min_concurrency`, `max_concurrency`, and more). See the [full parameter reference](#fal-function-reference) below for the complete list.
+Direct Server Mode is the natural fit for existing servers because you typically just need to start a process and expose a port. You do not need lifecycle hooks or multiple endpoints since your server already handles those. Both Direct Server Mode and `fal.App` support the same scaling parameters (`keep_alive`, `min_concurrency`, `max_concurrency`, and more). See the [pyproject.toml reference](/docs/api-reference/python-sdk/pyproject-toml) for the full configuration schema.
 
 ## Option 1: Direct Server Mode
 
@@ -27,43 +27,100 @@ flowchart LR
     Container --> Server[Server :exposed_port]
 ```
 
-```python theme={null}
-import subprocess
-import fal
-from fal.container import ContainerImage
+Create a Dockerfile that installs and starts your server. The server must bind to `0.0.0.0` on the same port you expose in `pyproject.toml`.
 
-DOCKERFILE = """
+```dockerfile theme={null}
 FROM your-base-image
 # ... your setup
-"""
 
-
-@fal.function(
-    image=ContainerImage.from_dockerfile_str(DOCKERFILE),
-    machine_type="GPU-A100",
-    exposed_port=8000,
-    keep_alive=300,
-)
-def run_server():
-    subprocess.run(
-        ["your-server", "--host", "0.0.0.0", "--port", "8000"],
-        check=True,
-    )
+CMD ["your-server", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-Your server's API is exposed as-is. Requests go directly to the exposed port, and your existing routes, middleware, and response formats all work without modification.
+Configure the fal app in [`pyproject.toml`](/docs/api-reference/python-sdk/pyproject-toml):
+
+```toml theme={null}
+[tool.fal.apps.my-server]
+auth = "private"
+machine_type = "GPU-A100"
+exposed_port = 8000
+keep_alive = 300
+
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
+```
+
+If your server image is already built and pushed to a registry, reference it directly instead:
+
+```toml theme={null}
+[tool.fal.apps.my-server]
+auth = "private"
+machine_type = "GPU-A100"
+exposed_port = 8000
+keep_alive = 300
+
+[tool.fal.apps.my-server.image]
+image = "my-org/my-server:latest"
+cmd = ["your-server", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+If the image itself is private, configure registry credentials under the app's `image` configuration. See [Private Docker Registries](/docs/documentation/development/private-registries) for Docker Hub, Google Artifact Registry, Amazon ECR, and Azure Container Registry examples.
+
+Run it as an ephemeral deployment to test before deploying:
+
+```bash theme={null}
+fal run my-server --auth private
+```
 
 <Warning>
-  To unlock the full fal dashboard experience, including the [Playground](/documentation/model-apis/playground), analytics, and error tracking, fal needs your OpenAPI specification. For `fal.function` with `exposed_port`, pass the spec via the `metadata` parameter. For `fal.App`, the framework generates the OpenAPI spec automatically from your Pydantic models.
-
-  Without an OpenAPI spec, the Playground and endpoint listing will not be available for your deployment. See [Providing an OpenAPI Spec via Metadata](#providing-an-openapi-spec-via-metadata) for a working example.
+  `fal run` ignores the `auth` value in `pyproject.toml` and defaults to `public`, so pass `--auth private` explicitly unless you want the ephemeral deployment publicly reachable. `fal deploy` does respect the configured value.
 </Warning>
 
-***
+Deploy by app name:
+
+```bash theme={null}
+fal deploy my-server
+```
+
+Your server's API is exposed as-is. Requests go directly to the exposed port, and your existing routes, middleware, and response formats all work without modification. If your server serves `/generate`, call it at the same path under your endpoint ID:
+
+```bash theme={null}
+curl -X POST "https://fal.run/<your-username>/my-server/generate" \
+  -H "Authorization: Key $FAL_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a mountain at sunrise"}'
+```
+
+For queue-backed requests, submit to the same path on `queue.fal.run`, then poll the returned `status_url` and fetch the result from `response_url`:
+
+```bash theme={null}
+curl -X POST "https://queue.fal.run/<your-username>/my-server/generate" \
+  -H "Authorization: Key $FAL_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a mountain at sunrise"}'
+```
+
+See [Calling Your Endpoints](/docs/documentation/development/calling-your-endpoints) for the queue polling, streaming, and webhook flows.
+
+<Warning>
+  To unlock the full fal dashboard experience, including the [Playground](/docs/documentation/model-apis/playground), analytics, and error tracking, fal needs your OpenAPI specification. For Direct Server Mode, your server must expose an `/openapi.json` endpoint that returns the spec. For `fal.App`, the framework generates the OpenAPI spec automatically from your Pydantic models.
+
+  Without an OpenAPI spec, the Playground and endpoint listing will not be available for your deployment.
+</Warning>
+
+If the container image does not define the final command, or you want to override it for fal, set Docker command fields under `[tool.fal.apps.my-server.image]`:
+
+```toml theme={null}
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
+entrypoint = ["your-server"]
+cmd = ["--host", "0.0.0.0", "--port", "8000"]
+```
+
+For the current `pyproject.toml` schema, see the [pyproject.toml reference](/docs/api-reference/python-sdk/pyproject-toml).
 
 ## Option 2: Proxy App Mode
 
-Use `fal.App` to wrap your server with custom endpoints. This gives you control over the API surface: you can validate inputs with Pydantic, transform outputs, upload files to the [fal CDN](/documentation/model-apis/fal-cdn), and define a typed schema that powers the Playground UI.
+Use `fal.App` to wrap your server with custom endpoints. This gives you control over the API surface: you can validate inputs with Pydantic, transform outputs, upload files to the [fal CDN](/docs/documentation/model-apis/fal-cdn), and define a typed schema that powers the Playground UI.
 
 ```mermaid theme={null}
 flowchart LR
@@ -86,18 +143,16 @@ from pydantic import BaseModel, Field
 DOCKERFILE = """
 FROM your-base-image
 # ... your setup
+RUN pip install --no-cache-dir fal requests
 """
 
 SERVER_PORT = 8000
 
-
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
 
-
 class GenerateResponse(BaseModel):
     image: Image
-
 
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"
@@ -137,153 +192,35 @@ Your `fal.App` controls the API. The internal server runs on localhost inside th
 
 ## Using an External Registry
 
-If your image is already hosted on an external registry (Docker Hub, Google Artifact Registry, Amazon ECR), you can pull it directly instead of building from a Dockerfile string. This avoids rebuilding the image on every deploy and is the recommended approach for production containers that are already built in CI. See [Using Private Docker Registries](/documentation/development/use-custom-container-image#using-private-docker-registries) for setup instructions including authentication for each registry type.
+If your Dockerfile pulls from an external registry (Docker Hub, Google Artifact Registry, Amazon ECR, Azure Container Registry), or your app references an existing private image, provide registry credentials with your image configuration. This works for both Direct Server Mode in `pyproject.toml` and `fal.App` custom containers.
 
-## fal.function Reference
+Credentials map a registry host to a `username` and `password` under the app's `image.registries` table, and apply whether you build from a `dockerfile` or reference a prebuilt `image`:
 
-The `@fal.function` decorator used in Option 1 accepts all the same infrastructure and scaling parameters that `fal.App` supports as class attributes. If you have been using `fal.function` and did not realize you could configure scaling, this table covers every available parameter.
+```toml theme={null}
+[tool.fal.apps.my-server.image]
+dockerfile = "Dockerfile"
 
-| Parameter                 | Type                 | Default      | Description                                                                                                                                                |
-| ------------------------- | -------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `image`                   | `ContainerImage`     | None         | Custom Docker container for the function                                                                                                                   |
-| `machine_type`            | `str` or `list[str]` | `"XS"` (CPU) | Hardware to run on. Use a list for fallback types.                                                                                                         |
-| `num_gpus`                | `int`                | None         | Number of GPUs to allocate                                                                                                                                 |
-| `exposed_port`            | `int`                | None         | Route traffic directly to this port (for existing servers)                                                                                                 |
-| `requirements`            | `list[str]`          | None         | Pip packages to install (when not using `image`)                                                                                                           |
-| `keep_alive`              | `int`                | 10           | Seconds an idle runner stays alive before shutting down                                                                                                    |
-| `min_concurrency`         | `int`                | 0            | Minimum runners kept warm at all times                                                                                                                     |
-| `max_concurrency`         | `int`                | None         | Maximum runners to scale up to                                                                                                                             |
-| `max_multiplexing`        | `int`                | 1            | Maximum concurrent requests per runner                                                                                                                     |
-| `concurrency_buffer`      | `int`                | 0            | Extra runners to keep warm above current load                                                                                                              |
-| `concurrency_buffer_perc` | `int`                | 0            | Percentage buffer of runners above current load                                                                                                            |
-| `scaling_delay`           | `int`                | None         | Seconds to wait before scaling up for a new request                                                                                                        |
-| `request_timeout`         | `int`                | None         | Maximum seconds for a single request                                                                                                                       |
-| `startup_timeout`         | `int`                | None         | Maximum seconds for the function to start                                                                                                                  |
-| `setup_function`          | `Callable`           | None         | One-time initialization function (runs before first request)                                                                                               |
-| `regions`                 | `list[str]`          | None         | Restrict to specific regions                                                                                                                               |
-| `serve`                   | `bool`               | False        | Run as an HTTP server on port 8080                                                                                                                         |
-| `metadata`                | `dict`               | None         | App metadata. Pass `{"openapi": {...}}` to provide your OpenAPI spec for Playground and endpoint listing. Required for `fal.function` with `exposed_port`. |
-| `local_python_modules`    | `list[str]`          | None         | Local Python modules to ship to the remote environment. See [Import Code](/documentation/development/import-code).                                         |
-| `python_version`          | `str`                | None         | Python version to use (for virtualenv kind).                                                                                                               |
-
-A realistic example using scaling parameters:
-
-```python theme={null}
-@fal.function(
-    image=ContainerImage.from_dockerfile_str(DOCKERFILE),
-    machine_type="GPU-A100",
-    exposed_port=8000,
-    keep_alive=300,
-    min_concurrency=1,
-    max_concurrency=5,
-    max_multiplexing=1,
-    request_timeout=600,
-    startup_timeout=300,
-)
-def run_server():
-    subprocess.run(
-        ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"],
-        check=True,
-    )
+[tool.fal.apps.my-server.image.registries."registry.example.com"]
+username = "my-user"
+password = "$REGISTRY_TOKEN"
 ```
 
-For full documentation on `fal.App` configuration, see [App Lifecycle](/documentation/development/app-lifecycle). For scaling parameter details, see [Scale Your Application](/documentation/deployment/scale-your-application).
+Never commit the password itself. Store it as a secret and reference it by name, as above:
 
-## Providing an OpenAPI Spec via Metadata
-
-When using `fal.function` with `exposed_port`, fal does not automatically generate an OpenAPI spec from your code (unlike `fal.App` which derives it from your Pydantic models). To enable the Playground, endpoint listing, and schema validation in the dashboard, pass your OpenAPI spec through the `metadata` parameter.
-
-```python theme={null}
-@fal.function(
-    image=ContainerImage.from_dockerfile_str(DOCKERFILE),
-    machine_type="S",
-    exposed_port=8080,
-    metadata={
-        "openapi": {
-            "openapi": "3.0.3",
-            "info": {"title": "My Server", "version": "1.0.0"},
-            "paths": {
-                "/generate": {
-                    "post": {
-                        "summary": "Generate",
-                        "operationId": "generate",
-                        "requestBody": {
-                            "required": True,
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "$ref": "#/components/schemas/GenerateRequest"
-                                    }
-                                }
-                            },
-                        },
-                        "responses": {
-                            "200": {
-                                "description": "Success",
-                                "content": {
-                                    "application/json": {
-                                        "schema": {
-                                            "$ref": "#/components/schemas/GenerateResponse"
-                                        }
-                                    }
-                                },
-                            }
-                        },
-                    }
-                }
-            },
-            "components": {
-                "schemas": {
-                    "GenerateRequest": {
-                        "type": "object",
-                        "required": ["prompt"],
-                        "properties": {
-                            "prompt": {"type": "string"},
-                        },
-                    },
-                    "GenerateResponse": {
-                        "type": "object",
-                        "properties": {
-                            "result": {"type": "string"},
-                        },
-                    },
-                }
-            },
-        }
-    },
-)
-def run_server():
-    import uvicorn
-    from fastapi import FastAPI
-    from pydantic import BaseModel
-
-    app = FastAPI()
-
-    class GenerateRequest(BaseModel):
-        prompt: str
-
-    class GenerateResponse(BaseModel):
-        result: str
-
-    @app.post("/generate")
-    async def generate(req: GenerateRequest) -> GenerateResponse:
-        return GenerateResponse(result=f"Output for: {req.prompt}")
-
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+```bash theme={null}
+fal secrets set REGISTRY_TOKEN="<token>"
 ```
 
-<Note>
-  Even if your server is built with FastAPI (which exposes `/openapi.json` automatically), the `metadata` approach is still required for `fal.function` deployments. The platform reads the spec from `metadata` at registration time, not from the running server.
-</Note>
+Each provider derives that username and password differently — Google Artifact Registry uses a base64-encoded service account key, Amazon ECR uses a token from `aws ecr get-login-password` that expires and must be refreshed, and Azure Container Registry uses a service principal password that is long-lived by comparison. See [Private Docker Registries](/docs/documentation/development/private-registries) for the exact setup per registry type, including the `ContainerImage(registries=...)` form for `fal.App`.
 
 ## Best Practices
 
-Download model weights to [persistent storage](/documentation/development/use-persistent-storage) (`/data`) in your `setup()` method rather than baking them into the Docker image. This keeps your image small, speeds up container pulls, and allows weights to be cached across runner restarts. The `/data` directory is shared across all runners in your account and persists between deploys.
+Download model weights to [persistent storage](/docs/documentation/development/use-persistent-storage) (`/data`) during runner startup rather than baking them into the Docker image. For `fal.App`, this usually means `setup()`. For Direct Server Mode migrations, use your server's own startup path. This keeps your image small, speeds up container pulls, and allows weights to be cached across runner restarts. The `/data` directory is shared across all runners in your account and persists between deploys.
 
-When building your Dockerfile, install fal-specific packages (`boto3`, `protobuf`, `pydantic`) at the end to avoid version conflicts with your existing dependencies. If your base image already includes these packages, the fal runtime will use the versions in your image.
+When your container runs `fal.App` code, install fal-specific packages (`boto3`, `protobuf`, `pydantic`) at the end to avoid version conflicts with your existing dependencies. Containers that do not import fal do not need these packages.
 
-Tune [keep\_alive](/documentation/deployment/scale-your-application) based on your app's cold start time and traffic pattern. If your model takes minutes to load, a longer keep\_alive avoids paying that cost repeatedly. If your app starts quickly, a shorter value reduces idle billing. See [Optimizing Costs](/documentation/serverless/optimizations/optimizing-costs) for guidance.
+Tune [keep\_alive](/docs/documentation/deployment/scale-your-application) based on your app's cold start time and traffic pattern. If your model takes minutes to load, a longer keep\_alive avoids paying that cost repeatedly. If your app starts quickly, a shorter value reduces idle billing. See [Optimizing Costs](/docs/documentation/serverless/optimizations/optimizing-costs) for guidance.
 
 ## Next Steps
 
-For a complete tutorial that applies this pattern to a real server, see the [ComfyUI deployment example](/examples/image-generation/deploy-comfyui-server). For detailed Dockerfile configuration including build args, multi-stage builds, and private registries, see [Custom Container Images](/documentation/development/use-custom-container-image). To understand how the `/data` persistent storage works and what gets cached, see [Use Persistent Storage](/documentation/development/use-persistent-storage).
+For a complete tutorial that applies this pattern to a real server, see the [ComfyUI deployment example](/docs/examples/image-generation/deploy-comfyui-server). For detailed Dockerfile configuration including build args, multi-stage builds, and private registries, see [Custom Container Images](/docs/documentation/development/use-custom-container-image). To understand how the `/data` persistent storage works and what gets cached, see [Use Persistent Storage](/docs/documentation/development/use-persistent-storage).

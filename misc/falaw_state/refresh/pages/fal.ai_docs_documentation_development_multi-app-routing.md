@@ -8,7 +8,7 @@
 
 As your workloads grow more complex, you may need different GPU types for different inputs, want to A/B test model versions, or orchestrate multi-step pipelines across specialized apps. Multi-app routing lets you deploy a lightweight CPU app as a router that inspects incoming requests and forwards them to the right backend. Each backend runs independently on its own machine type, scaling configuration, and model version.
 
-The pattern is simple: deploy your backend apps normally, then deploy a CPU-only router app that uses [`FAL_KEY`](/documentation/development/environment-variables#authentication) (auto-injected into every runner) to call the backends via the fal client SDK. The router runs on cheap CPU instances and adds minimal latency, while each backend scales independently based on its own traffic. For simpler cases where you just want requests routed to runners that already have the right model loaded, see [Optimize Routing Behavior](/documentation/serverless/optimizations/optimize-routing-behavior) instead.
+The pattern is simple: deploy your backend apps normally, then deploy a CPU-only router app that uses [`FAL_KEY`](/docs/documentation/development/environment-variables#authentication) (auto-injected into every runner) to call the backends via the fal client SDK. The router runs on cheap CPU instances and adds minimal latency, while each backend scales independently based on its own traffic. For simpler cases where you just want requests routed to runners that already have the right model loaded, see [Optimize Routing Behavior](/docs/documentation/serverless/optimizations/optimize-routing-behavior) instead.
 
 ## When to Use
 
@@ -46,7 +46,12 @@ Three apps: a CPU router and two GPU backends for different resolutions.
 # backend_standard.py
 import fal
 from fal.toolkit import Image
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
+    width: int = 1024
+    height: int = 1024
 
 class ImageGenStandard(fal.App):
     machine_type = "GPU-A100"
@@ -54,15 +59,16 @@ class ImageGenStandard(fal.App):
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
-
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
         ).to("cuda")
 
     @fal.endpoint("/")
-    def generate(self, prompt: str, width: int = 1024, height: int = 1024) -> dict:
-        image = self.pipe(prompt, width=width, height=height).images[0]
+    def generate(self, input: Input) -> dict:
+        image = self.pipe(
+            input.prompt, width=input.width, height=input.height
+        ).images[0]
         return {"image": Image.from_pil(image)}
 ```
 
@@ -70,7 +76,12 @@ class ImageGenStandard(fal.App):
 # backend_highres.py
 import fal
 from fal.toolkit import Image
+from pydantic import BaseModel
 
+class HighResInput(BaseModel):
+    prompt: str
+    width: int = 2048
+    height: int = 2048
 
 class ImageGenHighRes(fal.App):
     machine_type = "GPU-H100"
@@ -78,15 +89,16 @@ class ImageGenHighRes(fal.App):
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
-
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
         ).to("cuda")
 
     @fal.endpoint("/")
-    def generate(self, prompt: str, width: int = 2048, height: int = 2048) -> dict:
-        image = self.pipe(prompt, width=width, height=height).images[0]
+    def generate(self, input: HighResInput) -> dict:
+        image = self.pipe(
+            input.prompt, width=input.width, height=input.height
+        ).images[0]
         return {"image": Image.from_pil(image)}
 ```
 
@@ -103,31 +115,33 @@ fal deploy backend_highres.py::ImageGenHighRes --app-name image-gen-highres
 # router.py
 import fal
 import fal_client
+from pydantic import BaseModel
 
 STANDARD_THRESHOLD = 1024 * 1024  # 1 megapixel
 
+class Input(BaseModel):
+    prompt: str
+    width: int = 1024
+    height: int = 1024
 
 class ImageRouter(fal.App):
     machine_type = "S"  # Lightweight CPU -- just routing, no GPU needed
     requirements = ["fal-client"]
 
     @fal.endpoint("/")
-    def route(self, prompt: str, width: int = 1024, height: int = 1024) -> dict:
-        total_pixels = width * height
+    def route(self, input: Input) -> dict:
+        total_pixels = input.width * input.height
 
         if total_pixels <= STANDARD_THRESHOLD:
             app_id = "your-username/image-gen-standard"
         else:
             app_id = "your-username/image-gen-highres"
 
-        result = fal_client.subscribe(
-            app_id,
-            arguments={
-                "prompt": prompt,
-                "width": width,
-                "height": height,
-            },
-        )
+        result = fal_client.subscribe(app_id, arguments={
+            "prompt": input.prompt,
+            "width": input.width,
+            "height": input.height,
+        })
 
         return result
 ```
@@ -148,26 +162,26 @@ Split traffic between two model versions:
 import fal
 import fal_client
 import random
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
 
 class ABTestRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
 
     @fal.endpoint("/")
-    def route(self, prompt: str) -> dict:
+    def route(self, input: Input) -> dict:
         # 80% to stable version, 20% to experimental
         if random.random() < 0.8:
             app_id = "your-username/model-v1"
         else:
             app_id = "your-username/model-v2"
 
-        result = fal_client.subscribe(
-            app_id,
-            arguments={
-                "prompt": prompt,
-            },
-        )
+        result = fal_client.subscribe(app_id, arguments={
+            "prompt": input.prompt,
+        })
 
         # Include which version was used in the response
         result["model_version"] = app_id
@@ -183,22 +197,27 @@ Chain multiple apps together:
 ```python theme={null}
 import fal
 import fal_client
+from pydantic import BaseModel
 
+class PipelineInput(BaseModel):
+    image_url: str
 
 class PipelineRouter(fal.App):
     machine_type = "S"
     requirements = ["fal-client"]
 
     @fal.endpoint("/")
-    def run_pipeline(self, image_url: str) -> dict:
+    def run_pipeline(self, input: PipelineInput) -> dict:
         # Step 1: Upscale
         upscaled = fal_client.subscribe(
-            "fal-ai/real-esrgan", arguments={"image_url": image_url, "scale": 4}
+            "fal-ai/real-esrgan",
+            arguments={"image_url": input.image_url, "scale": 4}
         )
 
         # Step 2: Remove background
         result = fal_client.subscribe(
-            "fal-ai/birefnet", arguments={"image_url": upscaled["image"]["url"]}
+            "fal-ai/birefnet",
+            arguments={"image_url": upscaled["image"]["url"]}
         )
 
         return result
@@ -222,11 +241,11 @@ class PipelineRouter(fal.App):
 ## Related
 
 <CardGroup cols={2}>
-  <Card title="Optimize Routing Behavior" icon="arrow-right" href="/documentation/serverless/optimizations/optimize-routing-behavior">
+  <Card title="Optimize Routing Behavior" icon="arrow-right" href="/docs/documentation/serverless/optimizations/optimize-routing-behavior">
     Route requests within a single app using runner hints
   </Card>
 
-  <Card title="Environment Variables" icon="arrow-right" href="/documentation/development/environment-variables">
+  <Card title="Environment Variables" icon="arrow-right" href="/docs/documentation/development/environment-variables">
     FAL\_KEY is auto-injected for calling other fal apps
   </Card>
 </CardGroup>

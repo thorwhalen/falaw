@@ -9,7 +9,7 @@
 Connect Slack to your fal account to receive notifications when your applications encounter startup issues. Get alerted immediately when a runner fails, so you can investigate before users are affected.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=570&end=633&autoplay=1'><img src='/docs/images/video-thumbs/slack-notifications.jpg' alt='Slack Notifications - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/Fw1DkM7eNPI?start=1638&end=1775&autoplay=1'><img src='/docs/docs/images/video-thumbs/notifications.jpg' alt='Notifications - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## Setting Up Slack
@@ -95,6 +95,6 @@ From the [Notification Settings](https://fal.ai/dashboard/notifications/settings
 
 * Go to notification settings and click **Reconnect** to re-authorize the fal bot
 
-<Card title="Monitor Performance" icon="arrow-right" href="/documentation/serverless/observability/monitor-performance">
+<Card title="Monitor Performance" icon="arrow-right" href="/docs/documentation/serverless/observability/monitor-performance">
   View real-time metrics and logs in the fal dashboard
 </Card>

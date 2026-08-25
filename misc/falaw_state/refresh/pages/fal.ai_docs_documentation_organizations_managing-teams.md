@@ -8,7 +8,7 @@
 
 Organization administrators manage teams and members from the [Organization dashboard](https://fal.ai/dashboard/organization). This page covers the day-to-day operations of running an organization: creating and archiving teams, managing members across teams, and configuring the policies that govern how teams operate.
 
-For an overview of what organizations are and when you need one, see [Organizations](/documentation/organizations/index). For controlling which models teams can access, see [Model Access Controls](/documentation/organizations/access-controls).
+For an overview of what organizations are and when you need one, see [Organizations](/docs/documentation/organizations/index). For controlling which models teams can access, see [Model Access Controls](/docs/documentation/organizations/access-controls).
 
 ## Team Lifecycle
 
@@ -26,7 +26,7 @@ Every team member has one of three roles. The role determines what they can acce
 
 | Role          | What they can do                                                                                                                                                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Admin**     | Full team management: invite and remove members, manage API keys, configure scaling, set up [log drains](/documentation/serverless/observability/log-drains), and access all team settings. |
+| **Admin**     | Full team management: invite and remove members, manage API keys, configure scaling, set up [log drains](/docs/documentation/serverless/observability/log-drains), and access all team settings. |
 | **Developer** | Deploy and manage apps, view analytics, access logs, and use the API. This is the default role for new members.                                                                             |
 | **Billing**   | View and manage billing: invoices, payment methods, spending alerts, and usage analytics. Cannot deploy apps or manage members.                                                             |
 
@@ -58,6 +58,6 @@ These policies are configured from the Organization dashboard and apply across a
 
 Each team in an organization maintains its own billing and subscription. Org admins with billing access can view invoices across all teams from the Organization dashboard, set spending alerts for any team, and monitor usage analytics across the organization (when cross-team visibility is enabled).
 
-<Card title="Model Access Controls" icon="arrow-right" href="/documentation/organizations/access-controls">
+<Card title="Model Access Controls" icon="arrow-right" href="/docs/documentation/organizations/access-controls">
   Control which models your teams can access
 </Card>

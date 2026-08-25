@@ -17,19 +17,19 @@ The **fal Platform APIs** provide programmatic access to API key management, inc
 The Platform APIs provide the following endpoints for managing API keys:
 
 <CardGroup cols={3}>
-  <Card title="List API Keys" icon="list" href="/platform-apis/v1/keys/list">
+  <Card title="List API Keys" icon="list" href="/docs/platform-apis/v1/keys/list">
     Retrieve all API keys with pagination support
   </Card>
 
-  <Card title="Create API Key" icon="plus" href="/platform-apis/v1/keys/create">
+  <Card title="Create API Key" icon="plus" href="/docs/platform-apis/v1/keys/create">
     Generate a new API key with a friendly alias
   </Card>
 
-  <Card title="Delete API Key" icon="trash" href="/platform-apis/v1/keys/delete">
+  <Card title="Delete API Key" icon="trash" href="/docs/platform-apis/v1/keys/delete">
     Permanently revoke and delete an API key
   </Card>
 </CardGroup>
 
 <Note>
-  These APIs require **admin API key** authentication. For more information on authentication, see the [Authentication](/reference/platform-apis/authentication) documentation.
+  These APIs require **admin API key** authentication. For more information on authentication, see the [Authentication](/docs/reference/platform-apis/authentication) documentation.
 </Note>

@@ -142,6 +142,29 @@ client.apps.scale("my-app", max_concurrency=10)
 </Accordion>
 
 <Accordion title="Methods" defaultOpen>
+  #### gpus
+
+  ```python theme={null}
+  def gpus(self, app_name: 'str') -> 'dict'
+  ```
+
+  Get GPU usage for a single application. Corresponds to `fal apps gpus \<app\>`. Returns
+  `\{"gpus": \{\<type\>: \<count\>, ...\}, "total": \<int\>\}`.
+
+  **Example:**
+
+  ```python theme={null}
+  usage = client.apps.gpus("fal-ai/flux")
+  print(usage["total"])  # e.g. 21
+  print(usage["gpus"])   # e.g. {"B200": 21}
+  ```
+
+  | Parameter  | Type  | Default | Description |
+  | :--------- | :---- | :------ | :---------- |
+  | `app_name` | `str` | -       | -           |
+
+  **Returns:** `dict`
+
   #### list
 
   ```python theme={null}
@@ -157,10 +180,10 @@ client.apps.scale("my-app", max_concurrency=10)
   filtered = client.apps.list(filter="stable")
   ```
 
-  | Parameter          | Type          | Default | Description                      |
-  | :----------------- | :------------ | :------ | :------------------------------- |
-  | `filter`           | `str \| None` | `None`  | Optional app name filter string. |
-  | `environment_name` | `str \| None` | `None`  | Optional environment name.       |
+  | Parameter          | Type            | Default | Description                      |
+  | :----------------- | :-------------- | :------ | :------------------------------- |
+  | `filter`           | `Optional[str]` | `None`  | Optional app name filter string. |
+  | `environment_name` | `Optional[str]` | `None`  | Optional environment name.       |
 
   **Returns:** `list[AliasInfo]`
 
@@ -170,11 +193,11 @@ client.apps.scale("my-app", max_concurrency=10)
   def rollout(self, app_name: 'str', *, force: 'bool' = False, environment_name: 'str | None' = None) -> 'None'
   ```
 
-  | Parameter          | Type          | Default | Description |
-  | :----------------- | :------------ | :------ | :---------- |
-  | `app_name`         | `str`         | -       | -           |
-  | `force`            | `bool`        | `False` | -           |
-  | `environment_name` | `str \| None` | `None`  | -           |
+  | Parameter          | Type            | Default | Description |
+  | :----------------- | :-------------- | :------ | :---------- |
+  | `app_name`         | `str`           | -       | -           |
+  | `force`            | `bool`          | `False` | -           |
+  | `environment_name` | `Optional[str]` | `None`  | -           |
 
   **Returns:** `NoneType`
 
@@ -192,7 +215,9 @@ client.apps.scale("my-app", max_concurrency=10)
   from datetime import datetime, timedelta
 
   runners = client.apps.runners("my-app")
-  recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1))
+  recent = client.apps.runners(
+      "my-app", since=datetime.now() - timedelta(hours=1)
+  )
   running = client.apps.runners("my-app", state=["running"])
   ```
 
@@ -201,7 +226,7 @@ client.apps.scale("my-app", max_concurrency=10)
   | `app_name`         | `str`                 | -       | Name of the application.                         |
   | `since`            | -                     | `None`  | Only return runners started after this datetime. |
   | `state`            | `Optional[list[str]]` | `None`  | Filter by runner state (e.g., \["running"]).     |
-  | `environment_name` | `str \| None`         | `None`  | Optional environment name.                       |
+  | `environment_name` | `Optional[str]`       | `None`  | Optional environment name.                       |
 
   **Returns:** `list[RunnerInfo]`
 
@@ -228,18 +253,18 @@ client.apps.scale("my-app", max_concurrency=10)
   | Parameter                 | Type                  | Default | Description                                          |
   | :------------------------ | :-------------------- | :------ | :--------------------------------------------------- |
   | `app_name`                | `str`                 | -       | Name of the application.                             |
-  | `keep_alive`              | `int \| None`         | `None`  | Keep-alive time in seconds.                          |
-  | `max_multiplexing`        | `int \| None`         | `None`  | Maximum request multiplexing.                        |
-  | `max_concurrency`         | `int \| None`         | `None`  | Maximum concurrent runners.                          |
-  | `min_concurrency`         | `int \| None`         | `None`  | Minimum concurrent runners.                          |
-  | `concurrency_buffer`      | `int \| None`         | `None`  | -                                                    |
-  | `concurrency_buffer_perc` | `int \| None`         | `None`  | -                                                    |
-  | `scaling_delay`           | `int \| None`         | `None`  | -                                                    |
-  | `request_timeout`         | `int \| None`         | `None`  | Request timeout in seconds.                          |
-  | `startup_timeout`         | `int \| None`         | `None`  | Startup timeout in seconds.                          |
+  | `keep_alive`              | `Optional[int]`       | `None`  | Keep-alive time in seconds.                          |
+  | `max_multiplexing`        | `Optional[int]`       | `None`  | Maximum request multiplexing.                        |
+  | `max_concurrency`         | `Optional[int]`       | `None`  | Maximum concurrent runners.                          |
+  | `min_concurrency`         | `Optional[int]`       | `None`  | Minimum concurrent runners.                          |
+  | `concurrency_buffer`      | `Optional[int]`       | `None`  | -                                                    |
+  | `concurrency_buffer_perc` | `Optional[int]`       | `None`  | -                                                    |
+  | `scaling_delay`           | `Optional[int]`       | `None`  | -                                                    |
+  | `request_timeout`         | `Optional[int]`       | `None`  | Request timeout in seconds.                          |
+  | `startup_timeout`         | `Optional[int]`       | `None`  | Startup timeout in seconds.                          |
   | `machine_types`           | `Optional[list[str]]` | `None`  | List of allowed machine types (e.g., \["GPU-H100"]). |
-  | `regions`                 | `Optional[list[str]]` | `None`  | List of allowed regions (e.g., \["us-east-1"]).      |
-  | `environment_name`        | `str \| None`         | `None`  | -                                                    |
+  | `regions`                 | `Optional[list[str]]` | `None`  | List of allowed regions (e.g., \["us-east"]).        |
+  | `environment_name`        | `Optional[str]`       | `None`  | -                                                    |
 
   **Returns:** `AliasInfo`
 </Accordion>
@@ -271,6 +296,25 @@ client.runners.stop("runner-id")
 </Accordion>
 
 <Accordion title="Methods" defaultOpen>
+  #### gpus
+
+  ```python theme={null}
+  def gpus(self) -> 'dict'
+  ```
+
+  Get team-wide GPU usage summary. Corresponds to `fal runners gpus`. Returns
+  `\{"gpus": \{\<type\>: \<count\>, ...\}, "total": \<int\>\}`.
+
+  **Example:**
+
+  ```python theme={null}
+  usage = client.runners.gpus()
+  print(usage["total"])  # e.g. 1120
+  print(usage["gpus"])   # e.g. {"H100": 394, "B200": 353, ...}
+  ```
+
+  **Returns:** `dict`
+
   #### kill
 
   ```python theme={null}
@@ -311,14 +355,15 @@ client.runners.stop("runner-id")
   #### stop
 
   ```python theme={null}
-  def stop(self, runner_id: 'str') -> 'None'
+  def stop(self, runner_id: 'str', replace_first: 'bool' = False) -> 'None'
   ```
 
   Gracefully stop a runner.
 
-  | Parameter   | Type  | Default | Description                   |
-  | :---------- | :---- | :------ | :---------------------------- |
-  | `runner_id` | `str` | -       | The ID of the runner to stop. |
+  | Parameter       | Type   | Default | Description                                       |
+  | :-------------- | :----- | :------ | :------------------------------------------------ |
+  | `runner_id`     | `str`  | -       | The ID of the runner to stop.                     |
+  | `replace_first` | `bool` | `False` | Whether to replace the runner before stopping it. |
 
   **Returns:** `NoneType`
 </Accordion>
@@ -356,10 +401,10 @@ key_id, key_secret = client.keys.create(scope="admin")
 
   Create a new API key.
 
-  | Parameter     | Type          | Default | Description                       |
-  | :------------ | :------------ | :------ | :-------------------------------- |
-  | `scope`       | `KeyScope`    | -       | Key scope (e.g., "admin").        |
-  | `description` | `str \| None` | `None`  | Optional description for the key. |
+  | Parameter     | Type            | Default | Description                       |
+  | :------------ | :-------------- | :------ | :-------------------------------- |
+  | `scope`       | `KeyScope`      | -       | Key scope (e.g., "admin").        |
+  | `description` | `Optional[str]` | `None`  | Optional description for the key. |
 
   **Returns:** `tuple[str, str]`
 
@@ -421,25 +466,26 @@ secrets = client.secrets.list()
 
   List all secrets (names only, not values).
 
-  | Parameter          | Type          | Default | Description |
-  | :----------------- | :------------ | :------ | :---------- |
-  | `environment_name` | `str \| None` | `None`  | -           |
+  | Parameter          | Type            | Default | Description |
+  | :----------------- | :-------------- | :------ | :---------- |
+  | `environment_name` | `Optional[str]` | `None`  | -           |
 
   **Returns:** `list[ServerlessSecret]`
 
   #### set
 
   ```python theme={null}
-  def set(self, name: 'str', value: 'str', environment_name: 'str | None' = None) -> 'None'
+  def set(self, name: 'str', value: 'str', environment_name: 'str | None' = None, default_exposed: 'bool | None' = None) -> 'None'
   ```
 
   Set a secret value.
 
-  | Parameter          | Type          | Default | Description         |
-  | :----------------- | :------------ | :------ | :------------------ |
-  | `name`             | `str`         | -       | Name of the secret. |
-  | `value`            | `str`         | -       | Value to store.     |
-  | `environment_name` | `str \| None` | `None`  | -                   |
+  | Parameter          | Type             | Default | Description                                                                                                                                                           |
+  | :----------------- | :--------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `name`             | `str`            | -       | Name of the secret.                                                                                                                                                   |
+  | `value`            | `str`            | -       | Value to store.                                                                                                                                                       |
+  | `environment_name` | `Optional[str]`  | `None`  | Optional environment name.                                                                                                                                            |
+  | `default_exposed`  | `Optional[bool]` | `None`  | Whether the secret is exposed to apps that do not explicitly list their secrets. None keeps the account-level default (and preserves the current setting on updates). |
 
   **Returns:** `NoneType`
 
@@ -451,10 +497,10 @@ secrets = client.secrets.list()
 
   Delete a secret.
 
-  | Parameter          | Type          | Default | Description                   |
-  | :----------------- | :------------ | :------ | :---------------------------- |
-  | `name`             | `str`         | -       | Name of the secret to delete. |
-  | `environment_name` | `str \| None` | `None`  | Optional environment name.    |
+  | Parameter          | Type            | Default | Description                   |
+  | :----------------- | :-------------- | :------ | :---------------------------- |
+  | `name`             | `str`           | -       | Name of the secret to delete. |
+  | `environment_name` | `Optional[str]` | `None`  | Optional environment name.    |
 
   **Returns:** `NoneType`
 </Accordion>

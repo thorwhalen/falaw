@@ -9,7 +9,7 @@
 [FlashPack](https://github.com/fal-ai/flashpack) is an open-source library by fal that dramatically speeds up model loading by streaming weights directly from disk to GPU with zero-copy reconstruction. Use it in your `setup()` method to reduce cold start times.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=633&end=732&autoplay=1'><img src='/docs/images/video-thumbs/flashpack.jpg' alt='FlashPack - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=633&end=732&autoplay=1'><img src='/docs/docs/images/video-thumbs/flashpack.jpg' alt='FlashPack - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## How It Works
@@ -51,10 +51,9 @@ Add `FlashPackMixin` to your module for `save_flashpack` and `from_flashpack` me
 ```python theme={null}
 from flashpack import FlashPackMixin
 
-
 class MyModule(nn.Module, FlashPackMixin):
-    def __init__(self, some_arg: int = 4) -> None: ...
-
+    def __init__(self, some_arg: int = 4) -> None:
+        ...
 
 module = MyModule(some_arg=4)
 module.save_flashpack("model.flashpack")
@@ -70,10 +69,8 @@ Use `FlashPackDiffusersModelMixin` for diffusers models with `from_pretrained_fl
 from flashpack.integrations.diffusers import FlashPackDiffusersModelMixin
 from diffusers.models import AutoencoderKL
 
-
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
-
 
 # Load from original weights
 sdxl_vae = FlashPackAutoencoderKL.from_pretrained(
@@ -104,10 +101,8 @@ Works the same way with `FlashPackTransformersModelMixin`:
 from flashpack.integrations.transformers import FlashPackTransformersModelMixin
 from transformers import CLIPTextModel
 
-
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
-
 
 # Load, convert, and save
 clip = FlashPackCLIPTextModel.from_pretrained(
@@ -149,25 +144,20 @@ from transformers import (
     CLIPVisionModelWithProjection,
 )
 
-
 # Define FlashPack-enabled classes
 class FlashPackCLIPTextModel(FlashPackTransformersModelMixin, CLIPTextModel):
     pass
-
 
 class FlashPackCLIPTextModelWithProjection(
     FlashPackTransformersModelMixin, CLIPTextModelWithProjection
 ):
     pass
 
-
 class FlashPackAutoencoderKL(FlashPackDiffusersModelMixin, AutoencoderKL):
     pass
 
-
 class FlashPackUNet2DConditionModel(FlashPackDiffusersModelMixin, UNet2DConditionModel):
     pass
-
 
 class FlashPackStableDiffusionXLPipeline(
     FlashPackDiffusionPipeline, StableDiffusionXLPipeline
@@ -199,7 +189,6 @@ class FlashPackStableDiffusionXLPipeline(
             add_watermarker=add_watermarker,
             force_zeros_for_empty_prompt=force_zeros_for_empty_prompt,
         )
-
 
 # Save entire pipeline as FlashPack
 pipeline = FlashPackStableDiffusionXLPipeline.from_pretrained(
@@ -266,7 +255,10 @@ Convert your model to FlashPack format, store it on `/data` or HuggingFace, and 
 ```python theme={null}
 import fal
 from flashpack import assign_from_file
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -280,15 +272,18 @@ class MyModel(fal.App):
         assign_from_file(self.model, "/data/models/my-model.flashpack")
 
     @fal.endpoint("/")
-    def generate(self, prompt: str) -> dict:
-        return self.model(prompt)
+    def generate(self, input: Input) -> dict:
+        return self.model(input.prompt)
 ```
 
 Or with the Diffusers integration:
 
 ```python theme={null}
 import fal
+from pydantic import BaseModel
 
+class Input(BaseModel):
+    prompt: str
 
 class SDXLApp(fal.App):
     machine_type = "GPU-A100"
@@ -303,8 +298,8 @@ class SDXLApp(fal.App):
         )
 
     @fal.endpoint("/")
-    def generate(self, prompt: str) -> dict:
-        image = self.pipe(prompt, num_inference_steps=30).images[0]
+    def generate(self, input: Input) -> dict:
+        image = self.pipe(input.prompt, num_inference_steps=30).images[0]
         return {"image": fal.toolkit.Image.from_pil(image)}
 ```
 

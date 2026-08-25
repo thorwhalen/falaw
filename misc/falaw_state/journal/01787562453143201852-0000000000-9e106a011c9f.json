@@ -1,0 +1,15 @@
+{
+  "id": "9e106a011c9f",
+  "timestamp": 1787562453.1432018,
+  "kind": "note",
+  "text": "refresh: llms changed",
+  "tags": [
+    "refresh",
+    "llms"
+  ],
+  "suggestion": "",
+  "context": {
+    "diff_preview": "--- llms.prev\n+++ llms\n@@ -51,11 +51,9 @@\n \n ## Video generation\n \n-- [Sora 2](https://fal.ai/models/fal-ai/sora-2/text-to-video): `fal-ai/sora-2/text-to-video`, generates synchronized audio with the video\n-- [Sora 2 image-to-video](https://fal.ai/models/fal-ai/sora-2/image-to-video): `fal-ai/sora-2/image-to-video`\n-- [Veo 3.1](https://fal.ai/models/fal-ai/veo3.1): `fal-ai/veo3.1`, Google's video model, generates sound\n-- [Kling 3 pro](https://fal.ai/models/fal-ai/kling-video/v3/pro/text-to-video): `fal-ai/kling-video/v3/pro/text-to-video`, pro tier of the Kling family\n-- [Kling 3 pro image-to-video](https://fal.ai/models/fal-ai/kling-video/v3/pro/image-to-video): `fal-ai/kling-video/v3/pro/image-to-video`\n+- [Veo 3.1](https://fal.ai/models/fal-ai/veo3.1): `fal-ai/veo3.1`, Google's video model, generates synchronised audio with the video\n+- [Kling 3 pro](https://fal.ai/models/fal-ai/kling-video/v3/pro/text-to-video): `fal-ai/kling-video/v3/pro/text-to-video`, cinematic quality, also generates synchronised audio and costs less per second than Veo\n+- [Kling 3 pro image-to-video](https://fal.ai/models/fal-ai/kling-video/v3/pro/image-to-video): `fal-ai/kling-video/v3/pro/image-to-video`, animates a supplied image, audio optional\n - [Seedance 1 pro](https://fal.ai/models/fal-ai/bytedance/seedance/v1/pro/text-to-video): `fal-ai/bytedance/seedance/v1/pro/text-to-video`, ByteDance video model, also has lite and fast tiers\n \n ## Audio and speech",
+    "diff_size": 1461
+  }
+}

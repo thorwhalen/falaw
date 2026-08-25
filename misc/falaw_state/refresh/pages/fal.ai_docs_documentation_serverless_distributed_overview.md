@@ -9,7 +9,7 @@
 The `fal.distributed` module enables you to scale your AI workloads across multiple GPUs, dramatically improving performance for both inference and training tasks. Whether you need to generate multiple images simultaneously or train large models faster, distributed computing on fal makes it straightforward.
 
 <Frame>
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=1111&end=1195&autoplay=1'><img src='/docs/images/video-thumbs/distributed-overview.jpg' alt='Multi-GPU Support - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?start=1111&end=1195&autoplay=1'><img src='/docs/docs/images/video-thumbs/distributed-overview.jpg' alt='Multi-GPU Support - fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
 </Frame>
 
 ## Why Use Multiple GPUs?
@@ -84,38 +84,37 @@ Returns an async iterator that streams intermediate results from workers. Use th
 ```python theme={null}
 from fal.distributed import DistributedRunner, DistributedWorker
 
-
 class MyWorker(DistributedWorker):
     def setup(self, model_path):
         # Load model on this GPU (called once per worker)
         self.model = load_model(model_path).to(self.device)
-
+    
     def __call__(self, prompt, **kwargs):
         # Process request (called for each request)
         return self.model.generate(prompt)
 
-
 class MyApp(fal.App):
     num_gpus = 4  # Use 4 GPUs
-
+    
     async def setup(self):
         # Create and start the runner
-        self.runner = DistributedRunner(worker_cls=MyWorker, world_size=self.num_gpus)
+        self.runner = DistributedRunner(
+            worker_cls=MyWorker,
+            world_size=self.num_gpus
+        )
         await self.runner.start(model_path="/data/model")
-
+    
     @fal.endpoint("/")
     async def run(self, request: MyRequest):
         # Invoke workers for each request
-        result = await self.runner.invoke(
-            {
-                "prompt": request.prompt,
-            }
-        )
+        result = await self.runner.invoke({
+            "prompt": request.prompt,
+        })
         return result
 ```
 
 <Info>
-  For complete API documentation with all parameters and examples, see the [DistributedRunner API Reference](/serverless/distributed/api-reference#distributedrunner).
+  For complete API documentation with all parameters and examples, see the [DistributedRunner API Reference](/docs/serverless/distributed/api-reference#distributedrunner).
 </Info>
 
 ### DistributedWorker
@@ -147,7 +146,7 @@ Sends intermediate results to the client during streaming. Only call from rank 0
 Prints a message with the worker's rank prefix for easier debugging.
 
 <Info>
-  For complete API documentation with detailed examples, see the [DistributedWorker API Reference](/serverless/distributed/api-reference#distributedworker).
+  For complete API documentation with detailed examples, see the [DistributedWorker API Reference](/docs/serverless/distributed/api-reference#distributedworker).
 </Info>
 
 ### PyTorch Distributed Primitives
@@ -285,19 +284,19 @@ All examples are available in the [fal-demos repository](https://github.com/fal-
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="API Reference" icon="book" href="/serverless/distributed/api-reference">
+  <Card title="API Reference" icon="book" href="/docs/serverless/distributed/api-reference">
     Complete API documentation for DistributedRunner and DistributedWorker
   </Card>
 
-  <Card title="Multi-GPU Inference Tutorial" icon="bolt" href="/serverless/tutorials/deploy-multi-gpu-inference">
+  <Card title="Multi-GPU Inference Tutorial" icon="bolt" href="/docs/serverless/tutorials/deploy-multi-gpu-inference">
     Step-by-step guide with parallel SDXL
   </Card>
 
-  <Card title="Multi-GPU Training Tutorial" icon="graduation-cap" href="/serverless/tutorials/deploy-multi-gpu-training">
+  <Card title="Multi-GPU Training Example" icon="graduation-cap" href="https://github.com/fal-ai-community/fal-demos/tree/main/fal_demos/distributed/training/flux_lora">
     Build a distributed Flux LoRA training service
   </Card>
 
-  <Card title="Event Streaming" icon="signal-stream" href="/serverless/distributed/streaming">
+  <Card title="Event Streaming" icon="signal-stream" href="/docs/serverless/distributed/streaming">
     Stream intermediate results from workers
   </Card>
 </CardGroup>
@@ -305,5 +304,5 @@ All examples are available in the [fal-demos repository](https://github.com/fal-
 ## Additional Resources
 
 * [fal-demos distributed examples](https://github.com/fal-ai-community/fal-demos/tree/main/fal_demos/distributed) - Complete working code
-* [Python SDK Reference](/serverless/python/api-reference) - Full Python API
-* [App Lifecycle](/documentation/development/app-lifecycle) - How apps are structured and how runners start up and shut down
+* [Python SDK Reference](/docs/serverless/python/api-reference) - Full Python API
+* [App Lifecycle](/docs/documentation/development/app-lifecycle) - How apps are structured and how runners start up and shut down

@@ -5,7 +5,7 @@
 # fal apps scale
 
 ```bash theme={null}
-Usage: fal apps scale [-h] [--debug] [--pdb] [--cprofile]
+Usage: fal apps scale [-h] [--debug] [--pdb] [--cprofile] [--team TEAM]
                       [--keep-alive KEEP_ALIVE]
                       [--max-multiplexing MAX_MULTIPLEXING]
                       [--max-concurrency MAX_CONCURRENCY]
@@ -27,6 +27,7 @@ Positional Arguments:
 
 Options:
   -h, --help            show this help message and exit
+  --team TEAM           The team to use.
   --keep-alive KEEP_ALIVE
                         Keep alive (seconds).
   --max-multiplexing MAX_MULTIPLEXING
@@ -55,5 +56,5 @@ Options:
 <Note>
   **Note:**
 
-  Redeploying the application, by default, will not reset these settings, except for the code-specific settings. See [Code-Specific Settings (Reset on Deploy)](/serverless/deployment-operations/scale-your-application#code-specific-settings-reset-on-deploy) for details.
+  Redeploying the application, by default, will not reset these settings, except for the code-specific settings. See [Code-Specific Settings (Reset on Deploy)](/docs/serverless/deployment-operations/scale-your-application#code-specific-settings-reset-on-deploy) for details.
 </Note>

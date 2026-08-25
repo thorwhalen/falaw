@@ -6,7 +6,7 @@
 
 > Add OpenTelemetry spans to your fal app to trace inference stages like warmup, diffusion, and image upload
 
-fal apps run on standard Python, so you can instrument them with the OpenTelemetry SDK the same way you would any other service. Add the SDK to `requirements`, initialize a tracer in `setup()`, and wrap your inference stages with spans. For custom metrics instrumentation, see [Custom Metrics](/documentation/serverless/observability/custom-metrics). For tracing across multiple fal apps, see [Cross-Service Tracing](/documentation/serverless/observability/opentelemetry-cross-service).
+fal apps run on standard Python, so you can instrument them with the OpenTelemetry SDK the same way you would any other service. Add the SDK to `requirements`, initialize a tracer in `setup()`, and wrap your inference stages with spans. For exporting metrics to your monitoring stack, see [Exporting Metrics](/docs/documentation/serverless/observability/exporting-metrics). For tracing across multiple fal apps, see [Cross-Service Tracing](/docs/documentation/serverless/observability/opentelemetry-cross-service).
 
 ## Prerequisites
 
@@ -67,7 +67,7 @@ Store your credentials as fal secrets so they are available as environment varia
   </Tab>
 </Tabs>
 
-See [Managing Secrets](/documentation/development/manage-secrets-securely) for details on how fal secrets work.
+See [Managing Secrets](/docs/documentation/development/manage-secrets-securely) for details on how fal secrets work.
 
 ## Adding Traces to Your App
 
@@ -75,7 +75,7 @@ Add `opentelemetry-sdk` and `opentelemetry-exporter-otlp-proto-http` to your app
 
 Initialize the tracer in `setup()`. The provider and export connection are created once per runner, not once per request.
 
-The example below builds on the [Stable Diffusion XL quickstart](/documentation/development/getting-started/deploy-your-first-image-generator) and adds spans around each stage of a text-to-image request.
+The example below builds on the [Stable Diffusion XL quickstart](/docs/documentation/development/getting-started/deploy-your-first-image-generator) and adds spans around each stage of a text-to-image request.
 
 ```python Python theme={null}
 import os
@@ -220,25 +220,25 @@ with self.tracer.start_as_current_span("inference") as span:
 ```
 
 <Note>
-  `BatchSpanProcessor` exports spans asynchronously in the background. On a long-running runner, spans are batched and exported on a schedule. On shutdown, spans still in the buffer are flushed in `teardown()`. See [Production Configuration](/documentation/serverless/observability/opentelemetry-production) for how to configure this flush.
+  `BatchSpanProcessor` exports spans asynchronously in the background. On a long-running runner, spans are batched and exported on a schedule. On shutdown, spans still in the buffer are flushed in `teardown()`. See [Production Configuration](/docs/documentation/serverless/observability/opentelemetry-production) for how to configure this flush.
 </Note>
 
 ## What's Next
 
 <CardGroup cols={2}>
-  <Card title="Custom Metrics" icon="chart-bar" href="/documentation/serverless/observability/custom-metrics">
-    Add counters, histograms, and gauges to your app
+  <Card title="Exporting Metrics" icon="chart-bar" href="/docs/documentation/serverless/observability/exporting-metrics">
+    Scrape fal's Prometheus-compatible metrics endpoint
   </Card>
 
-  <Card title="Cross-Service Tracing" icon="diagram-project" href="/documentation/serverless/observability/opentelemetry-cross-service">
+  <Card title="Cross-Service Tracing" icon="diagram-project" href="/docs/documentation/serverless/observability/opentelemetry-cross-service">
     Connect traces across two fal apps into a single parent trace
   </Card>
 
-  <Card title="Production Configuration" icon="sliders" href="/documentation/serverless/observability/opentelemetry-production">
+  <Card title="Production Configuration" icon="sliders" href="/docs/documentation/serverless/observability/opentelemetry-production">
     Sampling, batch export tuning, and graceful flush on shutdown
   </Card>
 
-  <Card title="App Lifecycle" icon="rotate" href="/documentation/development/app-lifecycle">
+  <Card title="App Lifecycle" icon="rotate" href="/docs/documentation/development/app-lifecycle">
     How setup() and teardown() fit into the runner lifecycle
   </Card>
 </CardGroup>

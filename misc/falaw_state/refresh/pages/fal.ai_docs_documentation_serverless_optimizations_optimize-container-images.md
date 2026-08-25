@@ -149,7 +149,7 @@ image = ContainerImage.from_dockerfile_str(dockerfile_str)
 image.add_dockerignore(patterns=[".git", "*.pyc", ".env"])
 ```
 
-If no `.dockerignore` exists, fal uses sensible defaults that exclude common development artifacts. See the [custom container image guide](/serverless/development/use-custom-container-image#dockerignore-support) for more details.
+If no `.dockerignore` exists, fal uses sensible defaults that exclude common development artifacts. See the [custom container image guide](/docs/serverless/development/use-custom-container-image#dockerignore-support) for more details.
 
 ## Complete Example
 

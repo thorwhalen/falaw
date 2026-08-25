@@ -6,7 +6,7 @@
 
 > Latest features and updates to the fal platform
 
-<div className="max-w-2xl mx-auto bg-gradient-to-br from-blue-600/10 to-blue-500/5 border border-blue-500/20 rounded-xl p-5 mb-8 shadow-sm">
+<div className="max-w-4xl mx-auto bg-gradient-to-br from-blue-600/10 to-blue-500/5 border border-blue-500/20 rounded-xl p-5 mb-8 shadow-sm">
   <div className="flex items-center gap-2.5 mb-4">
     <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="#3386FE" xmlns="http://www.w3.org/2000/svg">
@@ -20,26 +20,231 @@
       </span>
 
       <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-        Scaling, observability, cold starts, multi-GPU & more
+        Analytics, requests, runners, logs, notifications & environments
       </span>
     </div>
   </div>
 
-  <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?autoplay=1'><img src='https://img.youtube.com/vi/gDJJ9bppyV8/maxresdefault.jpg' alt='What's New in fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          From Alert to Root Cause
+        </span>
+
+        <span className="text-xs text-gray-500 dark:text-gray-400">June 2026</span>
+      </div>
+
+      <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/Fw1DkM7eNPI?autoplay=1'><img src='https://img.youtube.com/vi/Fw1DkM7eNPI/maxresdefault.jpg' alt='What's New in fal Serverless — From Alert to Root Cause'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+    </div>
+
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Scaling, observability, cold starts & multi-GPU
+        </span>
+
+        <span className="text-xs text-gray-500 dark:text-gray-400">January 2026</span>
+      </div>
+
+      <iframe className="w-full aspect-video rounded-lg" srcdoc="<style>*{padding:0;margin:0;overflow:hidden}html,body{height:100%}img,span{position:absolute;width:100%;top:0;bottom:0;margin:auto}span{height:1.5em;text-align:center;font:48px/1.5 sans-serif;color:white;text-shadow:0 0 0.5em black}</style><a href='https://www.youtube.com/embed/gDJJ9bppyV8?autoplay=1'><img src='https://img.youtube.com/vi/gDJJ9bppyV8/maxresdefault.jpg' alt='What's New in fal Serverless'><span>▶</span></a>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen />
+    </div>
+  </div>
 </div>
+
+<Update label="August 17, 2026" tags={["Platform API", "MCP", "Serverless"]}>
+  ## Platform MCP Server
+
+  fal's second MCP server — the **Platform API MCP** — is now available at `https://api.fal.ai/v1/mcp/platform`. Where the [Run MCP](/docs/documentation/setting-up/mcp) lets your AI assistant *build with models*, this one lets it *operate your fal account*: connect Claude Code, Cursor, or any MCP-compatible client with your API key and ask *"why did my last request to my-app fail?"* — your assistant walks the same debugging steps you would.
+
+  **15 tools**: eleven first-class serverless debugging tools covering requests, logs, error analytics, deploy and revision history, runner and queue state, spend, and persistent storage — plus a four-tool discovery gateway that opens up the rest of the Platform API (compute, workflows, keys, account, organization, storage) without bloating your assistant's context.
+
+  ```bash theme={null}
+  claude mcp add --transport http fal-platform \
+    https://api.fal.ai/v1/mcp/platform \
+    --header "Authorization: Key YOUR_FAL_KEY"
+  ```
+
+  * **Read-only** — it can observe your account but never change it; write operations are listed in the catalog but refuse to execute
+  * **Stateless** — your key is sent per-request and never stored, and normal permission and ownership scoping applies
+  * **Free** — tool calls are the same Platform API calls you could make directly with your key
+
+  [Setup guide →](/docs/documentation/setting-up/platform-mcp)
+</Update>
+
+<Update label="August 17, 2026" tags={["Platform API", "Serverless"]}>
+  ## New Serverless Observability APIs
+
+  A batch of endpoints rounds out programmatic access to what the dashboard shows about your serverless apps:
+
+  * **[`GET /v1/serverless/apps`](/docs/platform-apis/v1/serverless/apps/list)** — list your deployed apps with live state: active runners, queue size, machine types, and environment. Add `expand=endpoints` to include each app's route-level endpoint ids, in the exact form the requests and analytics APIs accept.
+  * **[`GET /v1/serverless/apps/{owner}/{name}/events`](/docs/platform-apis/v1/serverless/apps/events)** — operational event history: deployments, configuration changes, and runner lifecycle transitions — the "what changed around this time?" API. Also surfaced in the dashboard's [events timeline](/docs/documentation/serverless/observability/app-events).
+  * **[`GET /v1/serverless/apps/{owner}/{name}/revisions`](/docs/platform-apis/v1/serverless/apps/revisions)** — revision history with deployment status, who deployed, and [deploy messages and annotations](/docs/documentation/deployment/deploy-to-production#annotating-deployments) (the API behind the August 3 entry above) — line revision boundaries up against your error timeline to spot a bad deploy.
+  * **[`GET /v1/serverless/apps/{owner}/{name}/runners/history`](/docs/platform-apis/v1/serverless/apps/runner-history)** — historical runner counts by state (running, idle, pending, draining) for capacity analysis and incident forensics.
+
+  Together with the existing requests, logs, analytics, metrics, and usage APIs, these power the new [Platform MCP server](/docs/documentation/setting-up/platform-mcp) — and they're plain REST endpoints you can call directly with your API key.
+</Update>
+
+<Update label="August 4, 2026" tags={["Dashboard", "Serverless"]}>
+  ## GPU Utilization in Runner Telemetry
+
+  Runner telemetry now includes a dedicated **GPU Utilization** chart alongside the existing CPU, memory, and VRAM charts, so you can see how much compute your GPUs are actually doing -- not just how much memory they hold.
+
+  * **GPU Utilization** reports the average compute utilization across a runner's GPUs over time, surfaced both as a current stat and a time-series chart in the runner side sheet.
+  * Pair it with **VRAM Usage** to tell a memory-bound runner apart from a compute-bound one, making it easier to right-size machine types and spot under-utilized GPUs.
+
+  Open any runner from the Runners page (**Dashboard → Apps → \[your-app] → Runners**) to view its telemetry. See [Runner Analytics](/docs/documentation/serverless/observability/runner-analytics) for details.
+</Update>
+
+<Update label="August 3, 2026" tags={["Serverless", "CLI", "Dashboard", "Python SDK", "Platform API"]}>
+  ## Deploy Messages and Annotations
+
+  You can now attach a freeform message and custom annotations to each revision when deploying:
+
+  ```bash theme={null}
+  fal deploy my_app.py::MyApp --message "Deploying new version" --annotation GIT_SHA=a1b2c3d4
+  ```
+
+  * Messages and annotations are set at deploy time and stay with the revision.
+  * View and search them on the app's **Versions** page in the dashboard, or fetch them via the [revisions API](/docs/platform-apis/v1/serverless/apps/revisions).
+  * Also available in the Python SDK: `client.deploy(..., message=..., annotations={...})`.
+
+  See [Annotating Deployments](/docs/documentation/deployment/deploy-to-production#annotating-deployments) for details.
+</Update>
+
+<Update label="July 8, 2026" tags={["Serverless"]}>
+  ## App-Level Retry Configuration
+
+  Apps can now register a default per-condition retry budget at deploy time with the new **`retry_config`** deployment option, using the same format as the `X-Fal-Retry-Config` request header.
+
+  * Set it as a class attribute on `fal.App` or under the app's table in `pyproject.toml`.
+  * Applies to all queue-based requests to the app; the app owner can still override it per-request with the `X-Fal-Retry-Config` header.
+  * Each condition (`server_error`, `timeout`, `connection_error`) keeps an independent budget, bounded by the platform ceiling of 10 total attempts.
+
+  See [Retries and Error Handling](/docs/documentation/serverless/reliability/retries#app-level-retry_config) for details.
+</Update>
+
+<Update label="June 17, 2026" tags={["Dashboard", "Serverless", "Billing"]}>
+  ## New Serverless Usage Page
+
+  The new **[Serverless Usage page](https://fal.ai/dashboard/serverless-usage)** (Serverless → Usage) provides attributable, dimensioned reporting of serverless compute spend in the dashboard.
+
+  * **Compute reported in machine-seconds**, broken down per app, environment, and machine type.
+  * **Spend is split by price category: Reserve, Burst, On-Demand, and List.** This distinguishes consumption covered by committed reserved capacity from burst overage and undiscounted list-rate usage, supporting reservation sizing and workload placement decisions.
+  * **Group by app or by machine type**, including a dedicated **Usage by machine type** view, to identify the deployments and hardware classes driving cost.
+  * Billing-cycle and custom time-range presets are supported. On-demand quotes are reported as a distinct price category, and organization-level reporting now spans both serverless and compute.
+
+  This is the same dataset returned by the [`GET /v1/serverless/usage`](/docs/platform-apis/v1/serverless/usage) API, surfaced in the dashboard.
+</Update>
+
+<Update label="June 16, 2026" tags={["Dashboard", "Billing"]}>
+  ## Redesigned Usage & Billing Page
+
+  The **[Usage & Billing page](https://fal.ai/dashboard/usage-billing)** has been rebuilt to support usage attribution (the Settings "Overview" tab is now "Usage").
+
+  * **Filter by auth method, API key, and login username** to attribute consumption to a specific credential or user.
+  * Normalized app names and revised charts improve readability and export.
+</Update>
+
+<Update label="June 16, 2026" tags={["Serverless", "Python SDK"]}>
+  ## Deploy Existing Docker Servers Without Code Changes
+
+  Existing Docker-based servers (ComfyUI, custom APIs) can now be deployed without rewriting them as a `fal.App`, reducing migration effort from self-hosted infrastructure, Kubernetes, or RunPod.
+
+  * **Direct Server Mode:** set `exposed_port` in `pyproject.toml` and fal routes traffic directly to the container port. Existing routes, middleware, and response formats are preserved.
+  * **Prebuilt image references (no Dockerfile required):** reference an image already pushed to a registry (`image = "my-org/my-server:latest"`) and override `entrypoint`/`cmd` under `[tool.fal.apps.<name>.image]`.
+  * **Private registry support:** pull from Docker Hub, Google Artifact Registry, or Amazon ECR by supplying registry credentials in the image configuration.
+  * Migration guides are available for [external Docker servers](/docs/documentation/development/migrate-external-docker-server) and [RunPod](/docs/documentation/development/migrate-from-runpod), along with the [`pyproject.toml` reference](/docs/api-reference/python-sdk/pyproject-toml) and [Private Docker Registries](/docs/documentation/development/private-registries).
+</Update>
+
+<Update label="June 15, 2026" tags={["Platform API", "Serverless"]}>
+  ## Serverless Usage API
+
+  * New **[`GET /v1/serverless/usage`](/docs/platform-apis/v1/serverless/usage)** endpoint reports your own serverless compute usage — the machine-seconds each of your deployed apps consumed, priced with your machine rates and net of discounts
+  * Break usage down per app, environment, and machine type, with `time_series` and `summary` views over any date range and timeframe
+  * Filter by app name with `app` (exact, one or more) or `search` (case-insensitive substring) — match a deployed app by name without needing its exact version suffix
+  * Ideal for per-app cost reporting and exporting to your own billing/observability tools
+  * Complements the per-request `billable_units` on [`GET /v1/serverless/requests/by-endpoint`](/docs/platform-apis/v1/serverless/requests/by-endpoint) with an aggregated, time-bucketed view
+</Update>
+
+<Update label="June 7, 2026" tags={["Serverless", "Dashboard"]}>
+  ## New Capacity Page
+
+  The new **[Capacity page](https://fal.ai/dashboard/capacity)** (Serverless → Capacity) reports GPU consumption against your account limit, providing visibility into available headroom before requests begin queuing.
+
+  * **Account-wide GPU usage over time, plotted against your limit**, with baseline and burst reference lines indicating utilization relative to reserved capacity.
+  * **Per-GPU-type breakdown** of capacity consumption by hardware class.
+  * **Approaching-limit and at-limit indicators** on runner and app views, with GPU counts shown on runners.
+  * **Request more capacity** action for requesting a higher limit.
+</Update>
+
+<Update label="June 5, 2026" tags={["Serverless", "API"]}>
+  ## Per-Condition Retry Configuration
+
+  The new **`X-Fal-Retry-Config`** request header replaces all-or-nothing retry behavior with a separate retry budget per failure condition, allowing retry policy to be tuned independently for each failure mode.
+
+  * Map each retry condition (`server_error`, `timeout`, `connection_error`) to its own `retries` count (for example, retry transient server errors while disabling retries on timeouts).
+  * Each condition maintains an independent budget, bounded by the platform ceiling of 10 total attempts.
+  * Applies to apps you own and takes precedence over status-code defaults. `x-fal-no-retry` takes precedence when both are set.
+  * Complements app-level `skip_retry_conditions` and the per-response `X-Fal-Needs-Retry` and `x-fal-stop-runner` controls.
+
+  See [Retries and Error Handling](/docs/documentation/serverless/reliability/retries) for the full reference.
+</Update>
+
+<Update label="June 2, 2026" tags={["Dashboard", "Serverless"]}>
+  ## Filter and Sort Apps
+
+  Managing a large number of serverless apps is now easier with new filtering and sorting controls directly on the [apps page](https://fal.ai/dashboard/apps).
+
+  * **Filter by machine type** to instantly isolate apps running on specific hardware (e.g., H100, A100, L40) and monitor targeted resource allocation.
+  * **Sort by active runners, GPUs, or queue size** to instantly surface the apps consuming the most capacity or backing up with queued requests.
+
+  <Frame>
+    <img src="https://mintcdn.com/fal-d8505a2e/ND7LYAPTZuIL9ZIB/images/changelog/apps-filters.png?fit=max&auto=format&n=ND7LYAPTZuIL9ZIB&q=85&s=d5db77ed01bd9fc1d93279d0bb95752d" alt="New filter by machine type and sorting options for runners, GPUs, and queue size" className="w-full rounded-lg" width="2852" height="460" data-path="images/changelog/apps-filters.png" />
+  </Frame>
+
+  Works in both card view and list view, and stacks with environment and tag filtering so you can find what needs your attention faster.
+</Update>
+
+<Update label="June 1, 2026" tags={["Platform API", "Analytics", "Serverless"]}>
+  ## Expanded Analytics Metrics
+
+  The [`GET /v1/models/analytics`](/docs/platform-apis/v1/models/analytics) and [`GET /v1/serverless/analytics`](/docs/platform-apis/v1/serverless/analytics) endpoints now support fourteen additional metrics via the `expand` parameter, matching the metric families the dashboard surfaces:
+
+  * **Error type breakdown** — `startup_error_count`, `connection_error_count`, `timeout_error_count`, `runtime_error_count` for finer-grained failure attribution beyond the existing 4xx/5xx counts
+  * **Cold boot metrics** — `cold_boot_count`, `p50_cold_boot_duration`, `p75_cold_boot_duration`, `p90_cold_boot_duration` for tracking startup latency
+  * **Extended latency percentiles** — `p25_duration`, `p95_duration`, `p99_duration`, `p95_prepare_duration`, `p99_prepare_duration` for tail-latency analysis
+  * **Total billable duration** — `total_billable_duration` for aggregate billable execution time (the sum of request execution durations)
+
+  Existing metrics and response shape are unchanged; only new optional fields are added.
+</Update>
+
+<Update label="May 29, 2026" tags={["Serverless"]}>
+  ## Configurable Termination Grace Period
+
+  The runner termination grace period is now configurable, allowing long-running requests to drain and `teardown()` to complete before `SIGKILL`, which reduces the risk of dropped work or inconsistent state during scale-down.
+
+  * **`termination_grace_period_seconds` is configurable up to 1 hour** (previously capped at 30 seconds, default 5 seconds).
+  * The grace period is a shared budget for completing in-flight requests and running `teardown()`. Use `handle_exit()` to signal long requests to stop early so cleanup is not skipped.
+  * `keep_alive` now applies to both idle-after-request and never-served runners.
+
+  See [Scale Your Application](/docs/documentation/deployment/scale-your-application#termination_grace_period_seconds) for details.
+</Update>
 
 <Update label="April 29, 2026" tags={["Dashboard", "Analytics", "Serverless"]}>
   ## Aggregate Analytics Components
 
   <Frame>
-    <img src="https://mintcdn.com/fal-d8505a2e/NH1xMgqfuYMzBqdq/images/changelog/apps.png?fit=max&auto=format&n=NH1xMgqfuYMzBqdq&q=85&s=39b65eb1b8d4b4f4d0376c0a11b57a05" alt="Serverless apps page showing shared health metrics components for runners, requests, latency, errors, and queue" className="w-full rounded-lg" width="5504" height="3128" data-path="images/changelog/apps.png" />
+    <img src="https://mintcdn.com/fal-d8505a2e/NH1xMgqfuYMzBqdq/images/changelog/apps.png?fit=max&auto=format&n=NH1xMgqfuYMzBqdq&q=85&s=39b65eb1b8d4b4f4d0376c0a11b57a05" alt="Serverless apps page aggregate analytics dashboard with GPU and CPU distribution, live capacity tiles, traffic and concurrency charts, top apps, and a per-app stacked requests breakdown" className="w-full rounded-lg" width="5504" height="3128" data-path="images/changelog/apps.png" />
   </Frame>
 
-  We introduced new aggregate analytics components on serverless app surfaces to keep health signals consistent between the app listing and each app header.
+  The Serverless apps page now opens with an aggregate analytics dashboard that summarizes capacity, traffic, and per-app activity across every app you own in one place.
 
-  * Shared metrics components now power **Runners, Reqs/min, Latency, and Errors** in both app cards and app detail headers
-  * Reqs/min, latency, and error trends are shown with directional indicators using recent activity windows, so regressions stand out at a glance
-  * App headers now pair those analytics signals with a queue metric, giving a compact operational snapshot before drilling into detailed analytics tabs
+  * **GPU and CPU distribution** charts visualize how your active runners are split across machine types (H100, A100, L40, B200, CPU types, etc.)
+  * **Live capacity tiles** show total **Active Runners, Queued Requests, GPUs, and CPUs**, each annotated with how many apps contribute to the number
+  * **Status code, request traffic, and concurrent request** charts plot aggregate request health over your selected window
+  * **Top Apps** lists your highest-volume apps over the window for quick drill-in
+  * **Requests by app** is a new stacked chart that breaks aggregate traffic down per app, with a searchable legend you can click to isolate a single app or flip to an **Errors** view
 </Update>
 
 <Update label="April 28, 2026" tags={["CDN", "Storage"]}>
@@ -73,7 +278,7 @@
 
   The launcher auto-installs `uv` and Python 3.11 on first run — no Python knowledge required from end users. Works on macOS and Windows.
 
-  [Read the guide →](/examples/image-generation/run-comfyui-visual)
+  [Read the guide →](/docs/examples/image-generation/run-comfyui-visual)
 </Update>
 
 <Update label="April 23, 2026" tags={["Dashboard", "Serverless"]}>
@@ -117,7 +322,7 @@
 <Update label="April 14, 2026" tags={["Documentation", "API Reference"]}>
   ## Model API Reference
 
-  We've launched a comprehensive **[Model API Reference](/model-api-reference)** — auto-generated documentation for every top model on fal.ai, covering video generation, image generation, audio, vision, and 3D.
+  We've launched a comprehensive **[Model API Reference](/docs/model-api-reference)** — auto-generated documentation for every top model on fal.ai, covering video generation, image generation, audio, vision, and 3D.
 
   Each model page includes:
 
@@ -129,17 +334,17 @@
 
   The reference is organized by model family (FLUX, Kling Video, Seedance, Nano Banana, Veo, and more) with a navigation structure that mirrors the endpoint hierarchy. Browse by category or jump straight to any endpoint.
 
-  [Explore the Model API Reference →](/model-api-reference)
+  [Explore the Model API Reference →](/docs/model-api-reference)
 </Update>
 
 <Update label="April 10, 2026" tags={["Platform API", "Analytics", "Serverless"]}>
   ## Serverless Analytics API
 
-  * New **[`GET /v1/serverless/analytics`](/platform-apis/v1/serverless/analytics)** endpoint lets serverless app owners query time-bucketed analytics across all inbound traffic to their endpoints
+  * New **[`GET /v1/serverless/analytics`](/docs/platform-apis/v1/serverless/analytics)** endpoint lets serverless app owners query time-bucketed analytics across all inbound traffic to their endpoints
   * Retrieve request counts, success/error rates, and latency percentiles (p50/p75/p90) for any date range and timeframe
   * Ideal for exporting analytics to your own tools like BigQuery, Grafana, or Datadog
   * Requires endpoint ownership — only the app owner can access these metrics
-  * The existing [`GET /v1/models/analytics`](/platform-apis/v1/models/analytics) continues to show your own request activity as a caller
+  * The existing [`GET /v1/models/analytics`](/docs/platform-apis/v1/models/analytics) continues to show your own request activity as a caller
 </Update>
 
 <Update label="April 1, 2026" tags={["Dashboard", "Analytics", "Serverless"]}>
@@ -149,7 +354,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/latency-percentile-chart.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=b652d30a1d10d515e5c2adada4b7c364" alt="Latency percentile chart showing p50, p90, p95, and p99 over time" className="w-full rounded-lg" width="2908" height="660" data-path="images/changelog/latency-percentile-chart.png" />
   </Frame>
 
-  * The [analytics page](/documentation/serverless/observability/app-analytics) now includes a **latency percentile chart** showing p50, p90, p95, and p99 request latency over time
+  * The [analytics page](/docs/documentation/serverless/observability/app-analytics) now includes a **latency percentile chart** showing p50, p90, p95, and p99 request latency over time
   * Quickly spot latency regressions or tail-latency spikes at a glance
 </Update>
 
@@ -160,7 +365,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/multi-endpoint-aggregation.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=612727e3c34f436fb147b05517d4bdd4" alt="Analytics endpoint selector with All option for aggregated metrics" className="w-full rounded-lg" width="2908" height="1916" data-path="images/changelog/multi-endpoint-aggregation.png" />
   </Frame>
 
-  * Select **"All" endpoints** in [App Analytics](/documentation/serverless/observability/app-analytics) to see metrics aggregated across every endpoint at once
+  * Select **"All" endpoints** in [App Analytics](/docs/documentation/serverless/observability/app-analytics) to see metrics aggregated across every endpoint at once
   * Aggregation works across request counts, error rates, percentile charts, and gateway stats, so you can get a full picture of your app's performance without switching between endpoints
 </Update>
 
@@ -171,7 +376,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/gpu-runner-metrics-apps.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=4d30827b73e8c4dab8707307896f688d" alt="Apps page with aggregate metrics bar showing runners, queue depth, and GPU distribution" className="w-full rounded-lg" width="2908" height="572" data-path="images/changelog/gpu-runner-metrics-apps.png" />
   </Frame>
 
-  * The [apps page](/documentation/deployment/manage-deployments) now shows an **aggregate metrics bar** with total runners, queue depth, and GPU distribution, giving you a quick overview of your resource usage without clicking into each app
+  * The [apps page](/docs/documentation/deployment/manage-deployments) now shows an **aggregate metrics bar** with total runners, queue depth, and GPU distribution, giving you a quick overview of your resource usage without clicking into each app
   * **Per-app GPU and queue columns** in both card view and list view make it easy to compare usage across apps at a glance
 </Update>
 
@@ -182,7 +387,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/logs-endpoint-source.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=0637fb4efb04c9488924b69b2a91cff1" alt="Logs view with endpoint filter and source column" className="w-full rounded-lg" width="4530" height="572" data-path="images/changelog/logs-endpoint-source.png" />
   </Frame>
 
-  * **Filter [logs](/serverless/development/logging) by endpoint** to focus on a specific route
+  * **Filter [logs](/docs/serverless/development/logging) by endpoint** to focus on a specific route
   * A new **Source column** shows which endpoint or system action produced each log line
 </Update>
 
@@ -200,7 +405,7 @@
   * **OOM alerts** notify you when a runner runs out of memory, so you can resize before it impacts users
   * **Notification badge on app tabs** shows unread counts per app so you know exactly which apps need attention
 
-  See [notification settings](/documentation/serverless/observability/slack-notifications) to configure alerts.
+  See [notification settings](/docs/documentation/serverless/observability/slack-notifications) to configure alerts.
 </Update>
 
 <Update label="March 28, 2026" tags={["Dashboard", "Analytics", "Serverless"]}>
@@ -214,7 +419,7 @@
   * **Cold start duration percentiles** (p50, p75, p90, p95) help you understand whether cold starts are a minor delay or a real bottleneck for your users
   * **Queue wait percentiles** (p50, p75, p90, p95) reveal how long requests wait before a runner picks them up, helping you decide if you need more concurrency
   * A new **startup breakdown card** shows exactly where startup time goes (image pull, setup, etc.) so you know what to optimize
-  * The [analytics](/documentation/serverless/observability/app-analytics) layout has been redesigned with expandable sections so you can focus on the metrics that matter most
+  * The [analytics](/docs/documentation/serverless/observability/app-analytics) layout has been redesigned with expandable sections so you can focus on the metrics that matter most
 </Update>
 
 <Update label="March 28, 2026" tags={["Dashboard", "Analytics", "Serverless"]}>
@@ -224,7 +429,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/request-throughput-charts.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=63a293ed8a4ebec930f7f3a42eff8be3" alt="Charts showing processed requests per second, received requests per second, and concurrent requests" className="w-full rounded-lg" width="3316" height="544" data-path="images/changelog/request-throughput-charts.png" />
   </Frame>
 
-  New charts are available on the [App Analytics](/documentation/serverless/observability/app-analytics) Requests tab:
+  New charts are available on the [App Analytics](/docs/documentation/serverless/observability/app-analytics) Requests tab:
 
   * **Processed requests per second** chart shows your inference throughput over time
   * **Received requests per second** chart shows the inbound request rate
@@ -238,7 +443,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/api-key-tags-editing.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=433861fbc2313a08b37a7b53c64a55d7" alt="Keys page with tags column and editable key descriptions" className="w-full rounded-lg" width="3540" height="1202" data-path="images/changelog/api-key-tags-editing.png" />
   </Frame>
 
-  * **Tags on [API keys](/documentation/setting-up/authentication/index)** let you organize keys with the same tagging system used for apps
+  * **Tags on [API keys](/docs/documentation/setting-up/authentication/index)** let you organize keys with the same tagging system used for apps
   * **Editable key descriptions** can now be updated directly from the dashboard without recreating the key
 </Update>
 
@@ -249,7 +454,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/request-timing-breakdown.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=905043093a77cbf45aa840451a649378" alt="Request list showing duration broken into startup time and execution time" className="w-full rounded-lg" width="4838" height="1368" data-path="images/changelog/request-timing-breakdown.png" />
   </Frame>
 
-  * Request duration in the [requests list](/serverless/deployment-operations/monitor-performance) now shows a **breakdown into startup time and execution time**
+  * Request duration in the [requests list](/docs/serverless/deployment-operations/monitor-performance) now shows a **breakdown into startup time and execution time**
   * Hover over the duration to see the full timing detail
 </Update>
 
@@ -260,7 +465,7 @@
     <img src="https://mintcdn.com/fal-d8505a2e/_K0ozUKUZUyNXY0L/images/changelog/environment-manager.png?fit=max&auto=format&n=_K0ozUKUZUyNXY0L&q=85&s=f2ddcafc9f772e06c0aff90ec68643aa" alt="Environment manager dialog for creating and deleting environments" className="w-full rounded-lg" width="2950" height="946" data-path="images/changelog/environment-manager.png" />
   </Frame>
 
-  * A new **[environment manager](/serverless/deployment-operations/manage-environments) dialog** lets you create and delete environments in one place
+  * A new **[environment manager](/docs/serverless/deployment-operations/manage-environments) dialog** lets you create and delete environments in one place
   * The environment selector is now **searchable**, replacing the old dropdown
 </Update>
 
@@ -308,7 +513,7 @@
 
   * Failed requests in the dashboard now show the **specific reason** for the failure — not just a status code, but whether it was a `request_timeout`, `runner_disconnected`, `startup_timeout`, `runner_scheduling_failure`, and more
   * Instantly understand if a 500 was caused by your code crashing, the runner running out of memory, or a scheduling issue — without digging through logs
-  * Error types are shown as badges on request rows and in the request detail view, matching the `error_type` field in [API responses](/model-apis/errors#request-error-types)
+  * Error types are shown as badges on request rows and in the request detail view, matching the `error_type` field in [API responses](/docs/model-apis/errors#request-error-types)
 </Update>
 
 <Update label="March 20, 2026" tags={["Dashboard", "Serverless"]}>
@@ -354,7 +559,7 @@
 
   The server is fully stateless and free to use. You only pay for the model runs you trigger.
 
-  * [Setup guide](/documentation/setting-up/mcp)
+  * [Setup guide](/docs/documentation/setting-up/mcp)
 </Update>
 
 <Update label="March 17, 2026" tags={["Serverless"]}>
@@ -367,7 +572,7 @@
   * The header is stripped from the response before it reaches the caller
   * Combine with `X-Fal-Needs-Retry` to fully decouple retry behavior from runner lifecycle — for example, retry on a fresh runner (`X-Fal-Needs-Retry: 1` + `x-fal-stop-runner: true`) or retry while keeping the current runner alive (`X-Fal-Needs-Retry: 1` + `x-fal-stop-runner: false`)
 
-  See [Retries and Error Handling](/documentation/serverless/reliability/retries#per-response-x-fal-stop-runner) for full details.
+  See [Retries and Error Handling](/docs/documentation/serverless/reliability/retries#per-response-x-fal-stop-runner) for full details.
 </Update>
 
 <Update label="March 12, 2026" tags={["Dashboard", "Serverless"]}>
@@ -397,8 +602,8 @@
 
   * The analytics pages now include an **Interval** picker that lets you control how metrics are bucketed — choose from **30 seconds**, **1 minute**, **5 minutes**, **10 minutes**, **1 hour**, **1 day**, **1 week**, or **1 month** depending on your selected date range
   * Use finer intervals (30 sec, 1 min) to pinpoint exact moments when latency spiked or error rates changed, and wider intervals (1 day, 1 week) for high-level trends over longer periods
-  * **Click and drag on any chart** in [App Analytics](/documentation/serverless/observability/app-analytics) to select a time range and instantly zoom into that window — the date range updates automatically so you can isolate an incident, compare before-and-after a deployment, or drill into a traffic spike without manually adjusting date pickers
-  * The Interval picker is available on both the **Requests** and **Runners** tabs in App Analytics, as well as in [Error Analytics](/serverless/observability/error-analytics)
+  * **Click and drag on any chart** in [App Analytics](/docs/documentation/serverless/observability/app-analytics) to select a time range and instantly zoom into that window — the date range updates automatically so you can isolate an incident, compare before-and-after a deployment, or drill into a traffic spike without manually adjusting date pickers
+  * The Interval picker is available on both the **Requests** and **Runners** tabs in App Analytics, as well as in [Error Analytics](/docs/documentation/serverless/observability/error-analytics)
 </Update>
 
 <Update label="March 11, 2026" tags={["Dashboard", "Serverless"]}>
@@ -417,7 +622,7 @@
   * Use `error_type` to build smarter retry logic: runner and timeout errors (e.g. `runner_connection_timeout`, `startup_timeout`) are typically transient and worth retrying, while client errors like `bad_request` should not be
   * Track `error_type` values in your monitoring to spot trends — for example, frequent `runner_scheduling_failure` errors may indicate you need to increase `max_concurrency`
 
-  See [Error Reference — Request Error Types](/model-apis/errors#request-error-types) for the full list of error types, status codes, and handling guidance.
+  See [Error Reference — Request Error Types](/docs/model-apis/errors#request-error-types) for the full list of error types, status codes, and handling guidance.
 </Update>
 
 <Update label="March 11, 2026" tags={["Serverless", "Runners"]}>
@@ -431,7 +636,7 @@
       termination_grace_period_seconds = 20
   ```
 
-  See [Scale Your Application — Termination Grace Period](/serverless/deployment-operations/scale-your-application#termination-grace-period) for the full shutdown lifecycle and best practices.
+  See [Scale Your Application — Termination Grace Period](/docs/serverless/deployment-operations/scale-your-application#termination-grace-period) for the full shutdown lifecycle and best practices.
 </Update>
 
 <Update label="February 25, 2026" tags={["Dashboard", "Serverless"]}>
@@ -442,7 +647,7 @@
   * **Filter by tag** in the app list to quickly find the apps you need
   * Create, assign, and remove tags right from the app listing page — no CLI or API needed
 
-  Tags are visual labels for organizing your dashboard — they don't affect app behavior, routing, or secrets. For isolated deployment stages (dev, staging, production), use [Environments](/serverless/deployment-operations/manage-environments) instead.
+  Tags are visual labels for organizing your dashboard — they don't affect app behavior, routing, or secrets. For isolated deployment stages (dev, staging, production), use [Environments](/docs/serverless/deployment-operations/manage-environments) instead.
 </Update>
 
 <Update label="February 23, 2026" tags={["CLI", "Serverless"]}>
@@ -453,11 +658,11 @@
 </Update>
 
 <Update label="February 17, 2026" tags={["Serverless"]}>
-  ## Runner `FAILURE_DELAY` Status
+  ## Runner `CRASH_BACKOFF` Status
 
-  * Runners that fail during `setup()` now show a `FAILURE_DELAY` status, making it easier to identify runners that are in a cooldown period before retrying initialization
-  * You can filter runners by this state using `fal runners list --state failure_delay`
-  * See [Understanding Runners](/serverless/deployment-operations/understand-runners#runner-states) for details
+  * Runners that fail during `setup()` now show a `CRASH_BACKOFF` status, making it easier to identify runners that are in a cooldown period before retrying initialization
+  * You can filter runners by this state using `fal runners list --state crash_backoff`
+  * See [Understanding Runners](/docs/serverless/deployment-operations/understand-runners#runner-states) for details
 </Update>
 
 <Update label="February 16, 2026" tags={["Dashboard", "Logs", "Serverless"]}>
@@ -535,7 +740,6 @@
   ```python theme={null}
   from fal.toolkit import FalBaseModel, Field, Hidden, ImageField
 
-
   class TextToImageInput(FalBaseModel):
       FIELD_ORDERS = ["prompt", "negative_prompt", "image_size"]
 
@@ -547,13 +751,12 @@
       debug_mode: bool = Hidden(Field(default=False))
       internal_seed: int = Hidden(Field(default=-1))
 
-
   class ImageToImageInput(FalBaseModel):
       image_url: str = ImageField(description="Input image")
       strength: float = Field(default=0.8)
   ```
 
-  See [Handle Inputs and Outputs](/serverless/development/handle-inputs-and-outputs#falbasemodel) for details.
+  See [Handle Inputs and Outputs](/docs/serverless/development/handle-inputs-and-outputs#falbasemodel) for details.
 </Update>
 
 <Update label="February 2, 2026" tags={["Dashboard", "Serverless"]}>
@@ -581,7 +784,7 @@
   * **Better resource monitoring** - distinguish between actively processing requests and waiting states
   * **Improved observability** - track idle time to optimize scaling and resource allocation
 
-  See the new [Understanding Runners](/serverless/deployment-operations/understand-runners) guide and [Optimizing Cold Starts](/serverless/deployment-operations/optimize-cold-starts) guide for complete details on runner lifecycle, states, and performance optimization.
+  See the new [Understanding Runners](/docs/serverless/deployment-operations/understand-runners) guide and [Optimizing Cold Starts](/docs/serverless/deployment-operations/optimize-cold-starts) guide for complete details on runner lifecycle, states, and performance optimization.
 </Update>
 
 <Update label="January 25, 2026" tags={["Model APIs"]}>
@@ -589,7 +792,7 @@
 
   You can now set a `start_timeout` on requests which ensures that when queue time is too long, the request is aborted without starting.
 
-  See [Client Libraries → Start Timeout](/model-apis/client#2-queue-management) for details.
+  See [Client Libraries → Start Timeout](/docs/model-apis/client#2-queue-management) for details.
 </Update>
 
 <Update label="January 21, 2026" tags={["Serverless"]}>
@@ -612,7 +815,7 @@
   fal secrets set API_KEY=staging-key --env staging
   ```
 
-  See [environments documentation](/serverless/deployment-operations/manage-environments) for details.
+  See [environments documentation](/docs/serverless/deployment-operations/manage-environments) for details.
 </Update>
 
 <Update label="January 19, 2026" tags={["Serverless"]}>
@@ -652,7 +855,6 @@
   COPY src/ ./src/
   """
 
-
   class MyApp(fal.App):
       image = ContainerImage.from_dockerfile_str(dockerfile_str)
   ```
@@ -667,7 +869,7 @@
 
   ```python theme={null}
   class MyApp(fal.App):
-      skip_retry_conditions = ["timeout"]  # This app won't retry on timeout
+      skip_retry_conditions=["timeout"]  # This app won't retry on timeout
       ...
   ```
 

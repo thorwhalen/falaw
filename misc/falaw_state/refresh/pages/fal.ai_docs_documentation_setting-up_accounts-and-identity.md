@@ -6,7 +6,7 @@
 
 > Set up your fal account, choose between personal and team workspaces, and understand how identity works on the platform.
 
-The first step to using fal is setting up your account. When you sign up, you get a personal account that comes with its own [API keys](/documentation/model-apis/authentication), deployed apps, and billing. If you're working with others, you can create a [team](/documentation/setting-up/teams) so everyone shares a single set of API keys, deployments, and billing instead of managing their own. This is useful whether you are consuming [Model APIs](/documentation/model-apis/overview) together or deploying your own models with [Serverless](/documentation/serverless).
+The first step to using fal is setting up your account. When you sign up, you get a personal account that comes with its own [API keys](/docs/documentation/model-apis/authentication), deployed apps, and billing. If you're working with others, you can create a [team](/docs/documentation/setting-up/teams) so everyone shares a single set of API keys, deployments, and billing instead of managing their own. This is useful whether you are consuming [Model APIs](/docs/documentation/model-apis/overview) together or deploying your own models with [Serverless](/docs/documentation/serverless).
 
 Your identity on fal is separate from the accounts you operate under. You log in as yourself, then choose which account context to work in, whether that's your personal account or a team you belong to. This means one person can switch between multiple accounts without logging out.
 
@@ -18,7 +18,7 @@ Your identity on fal is separate from the accounts you operate under. You log in
 | **Team**         | A shared workspace with its own API keys, apps, and billing. Members are invited and assigned roles. |
 | **Organization** | An enterprise parent that manages multiple teams with centralized policies and SSO.                  |
 
-Teams can exist on their own (standalone) or as children of an [organization](/documentation/organizations/index). Standalone teams work well for small groups. Organizations add centralized policies, SSO, and cross-team visibility. Each team maintains its own API keys, secrets, deployed apps, and billing, completely separate from your personal account.
+Teams can exist on their own (standalone) or as children of an [organization](/docs/documentation/organizations/index). Standalone teams work well for small groups. Organizations add centralized policies, SSO, and cross-team visibility. Each team maintains its own API keys, secrets, deployed apps, and billing, completely separate from your personal account.
 
 ## Sign In
 
@@ -40,8 +40,8 @@ When creating a key, you'll choose a scope:
 
 | Scope     | Use case                                                                                                                                                                                                                           |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **API**   | Calling any model on fal, including [Model APIs](/documentation/model-apis/overview) and your own deployed endpoints.                                                                                                              |
-| **ADMIN** | Everything in API, plus CLI operations (`fal deploy`, `fal run`), managing apps, and accessing admin-scoped [Platform APIs](/api-reference/platform-apis/index). Use this for [Serverless](/documentation/serverless) deployments. |
+| **API**   | Calling any model on fal, including [Model APIs](/docs/documentation/model-apis/overview) and your own deployed endpoints.                                                                                                              |
+| **ADMIN** | Everything in API, plus CLI operations (`fal deploy`, `fal run`), managing apps, and accessing admin-scoped [Platform APIs](/docs/api-reference/platform-apis/index). Use this for [Serverless](/docs/documentation/serverless) deployments. |
 
 <Warning>
   API keys belong to **accounts**, not people. A team's API key is shared by all team members and accesses that team's resources. When creating a key, make sure the correct account is selected in the top-left corner of the dashboard.
@@ -53,7 +53,7 @@ All operations, including API calls, deployments, and billing, happen under whic
 
 In the [dashboard](https://fal.ai/dashboard), select the account in the top-left corner. This controls which account's resources you see and which account new API keys are scoped to.
 
-If you're using the fal CLI, you have two options. The recommended approach is [`fal auth login`](/api-reference/cli/auth), which opens a browser-based login flow and lets you select your team account interactively. Alternatively, use [`fal teams set`](/api-reference/cli/teams) to switch the active account for all subsequent commands, or pass `--team` on any command.
+If you're using the fal CLI, you have two options. The recommended approach is [`fal auth login`](/docs/api-reference/cli/auth), which opens a browser-based login flow and lets you select your team account interactively. Alternatively, use [`fal teams set`](/docs/api-reference/cli/teams) to switch the active account for all subsequent commands, or pass `--team` on any command.
 
 ```bash theme={null}
 # Browser-based login (recommended for SSO users)
@@ -66,7 +66,7 @@ fal teams set my-company
 fal deploy my_app.py::MyApp --team my-company
 ```
 
-You can also use [`fal profile`](/api-reference/cli/profile) to manage multiple named profiles, each with its own API key and host. This is useful if you work across multiple accounts or environments and want to switch between them without re-authenticating.
+You can also use [`fal profile`](/docs/api-reference/cli/profile) to manage multiple named profiles, each with its own API key and host. This is useful if you work across multiple accounts or environments and want to switch between them without re-authenticating.
 
 ```bash theme={null}
 fal profile create staging
@@ -78,19 +78,19 @@ fal profile unset  # go back to default
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Teams" icon="users" href="/documentation/setting-up/teams">
+  <Card title="Teams" icon="users" href="/docs/documentation/setting-up/teams">
     Create shared workspaces with roles, API keys, and request attribution
   </Card>
 
-  <Card title="Organizations" icon="building" href="/documentation/organizations/index">
+  <Card title="Organizations" icon="building" href="/docs/documentation/organizations/index">
     Enterprise policies, SSO, and multi-team management
   </Card>
 
-  <Card title="Data Retention & Storage" icon="clock" href="/documentation/model-apis/media-expiration">
+  <Card title="Data Retention & Storage" icon="clock" href="/docs/documentation/model-apis/media-expiration">
     How generated media is stored and how to control file expiration
   </Card>
 
-  <Card title="Resources" icon="book" href="/documentation/setting-up/resources">
+  <Card title="Resources" icon="book" href="/docs/documentation/setting-up/resources">
     Client libraries, API references, and community links
   </Card>
 </CardGroup>

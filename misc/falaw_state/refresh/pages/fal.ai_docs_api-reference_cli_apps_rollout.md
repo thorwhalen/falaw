@@ -28,12 +28,13 @@ Debug:
 
 ## When to Use
 
-Use `fal apps rollout` when you need to restart all runners for an application without redeploying:
+Use `fal apps rollout` when you need to replace all runners for an application without redeploying:
 
 * **Environment variable changes**: Force runners to pick up updated secrets or environment variables
-* **Bad state recovery**: Restart runners that may be in an unhealthy state
+* **Bad state recovery**: Replace runners that may be in an unhealthy state
 * **Memory cleanup**: Force garbage collection and memory cleanup across all runners
-* **Configuration updates**: Apply changes that require a runner restart
+* **Configuration updates**: Apply changes that require a fresh runner
+* **Machine type changes**: Move existing runners onto a machine type you changed with `fal apps scale` -- see [Changing Machine Types](/docs/documentation/deployment/machine-types#rolling-out-existing-runners)
 
 ## Graceful vs Force Rollout
 
@@ -43,14 +44,16 @@ Use `fal apps rollout` when you need to restart all runners for an application w
 fal apps rollout myapp
 ```
 
-Gracefully stops all active runners, allowing them to finish processing current requests before shutting down. This is the recommended approach for most situations.
+Brings up replacement runners before draining the existing ones, so requests are not interrupted. This is the recommended approach for most situations.
 
 **How it works:**
 
 1. Identifies all active runners for the application
-2. Sends a graceful stop signal to each runner
-3. Runners finish their current requests
-4. New runners are automatically started by the auto-scaling system as needed
+2. Marks each one for replacement -- they keep serving requests in the meantime
+3. Starts replacement runners on the application's current configuration
+4. As each new runner finishes starting up and joins the application, one marked runner stops accepting new requests and drains the ones it is still processing
+
+Replacements are started in parallel rather than one at a time, so while the rollout is in progress the application can run close to double its usual runner count -- and is billed for both sets. If your account's GPU limits are already fully consumed, replacements wait until capacity frees up and the marked runners keep serving in the meantime.
 
 ### Force Rollout
 
@@ -106,11 +109,11 @@ fal apps rollout myapp --force
 
 `fal apps rollout` is different from `fal deploy`:
 
-* **`fal apps rollout`**: Restarts existing runners without changing the application code or configuration. Useful for applying environment changes or recovering from bad states.
+* **`fal apps rollout`**: Replaces existing runners without creating a new revision, so they come up on the app's current configuration. Useful for applying environment or machine-type changes and recovering from bad states.
 * **`fal deploy`**: Creates a new revision of your application with updated code and configuration. Use this when you've made code changes.
 
 ## See Also
 
-* [fal deploy](/serverless/cli/deploy) - Deploy a new revision of your application
-* [fal apps scale](/serverless/cli/apps/scale) - Adjust scaling parameters
-* [fal apps runners](/serverless/cli/apps/runners) - View active runners for an application
+* [fal deploy](/docs/serverless/cli/deploy) - Deploy a new revision of your application
+* [fal apps scale](/docs/serverless/cli/apps/scale) - Adjust scaling parameters
+* [fal apps runners](/docs/serverless/cli/apps/runners) - View active runners for an application

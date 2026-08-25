@@ -6,9 +6,9 @@
 
 > The recommended way to call models on fal
 
-Asynchronous inference is the recommended way to call models on fal. You submit a request to a persistent [queue](/documentation/model-apis/inference/reliability), then retrieve results later by polling for status or receiving them via [webhook](/documentation/model-apis/inference/webhooks). If you prefer a simpler blocking call that handles polling for you automatically, use [subscribe](/documentation/model-apis/inference/synchronous) instead.
+Asynchronous inference is the recommended way to call models on fal. You submit a request to a persistent [queue](/docs/documentation/model-apis/inference/reliability), then retrieve results later by polling for status or receiving them via [webhook](/docs/documentation/model-apis/inference/webhooks). If you prefer a simpler blocking call that handles polling for you automatically, use [subscribe](/docs/documentation/model-apis/inference/synchronous) instead.
 
-The async approach gives you full control over the request lifecycle. You can submit many requests in parallel and process them as they complete, get real-time visibility into queue position and [runner](/documentation/deployment/runners) logs, and rely on [automatic retries](/documentation/serverless/reliability/retries) when failures occur. All of this works identically whether you are calling a pre-trained model from the gallery or your own app deployed on [Serverless](/documentation/serverless). This page covers the full queue API: submitting requests, checking status, streaming updates, retrieving results, cancelling, and configuring webhooks.
+The async approach gives you full control over the request lifecycle. You can submit many requests in parallel and process them as they complete, get real-time visibility into queue position and [runner](/docs/documentation/deployment/runners) logs, and rely on [automatic retries](/docs/documentation/serverless/reliability/retries) when failures occur. All of this works identically whether you are calling a pre-trained model from the gallery or your own app deployed on [Serverless](/docs/documentation/serverless). This page covers the full queue API: submitting requests, checking status, streaming updates, retrieving results, cancelling, and configuring webhooks.
 
 ***
 
@@ -24,11 +24,11 @@ When you submit a request to `queue.fal.run`, it enters a persistent, durable qu
 | `IN_PROGRESS` | `InProgress(logs)` / `"IN_PROGRESS"`       | fal's dispatcher has routed the request to a runner.                   |
 | `COMPLETED`   | `Completed(logs, metrics)` / `"COMPLETED"` | Result is stored and available for retrieval, or sent to your webhook. |
 
-See the [Python SDK reference](/api-reference/client-libraries/python/fal_client#status) or [JavaScript SDK reference](/api-reference/client-libraries/javascript/types.common) for the full type definitions.
+See the [Python SDK reference](/docs/api-reference/client-libraries/python/fal_client#status) or [JavaScript SDK reference](/docs/api-reference/client-libraries/javascript/types.common) for the full type definitions.
 
 ### Key Guarantees
 
-Requests in the queue are never dropped. If no runners are available, your request waits while fal [scales up new runners](/documentation/deployment/scale-your-application) automatically. There is no queue size limit. If a runner fails during processing (503, 504, or a connection error), the request is automatically re-queued and [retried](/documentation/model-apis/inference/reliability) up to 10 times. As demand grows, runners scale up to match. When demand drops, they scale back down, so you only pay for compute you use.
+Requests in the queue are never dropped. If no runners are available, your request waits while fal [scales up new runners](/docs/documentation/deployment/scale-your-application) automatically. There is no queue size limit. If a runner fails during processing (503, 504, or a connection error), the request is automatically re-queued and [retried](/docs/documentation/model-apis/inference/reliability) up to 10 times. As demand grows, runners scale up to match. When demand drops, they scale back down, so you only pay for compute you use.
 
 ***
 
@@ -40,9 +40,9 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit(
-      "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
-  )
+  handler = fal_client.submit("fal-ai/flux/schnell", arguments={
+      "prompt": "a sunset over mountains"
+  })
 
   print(handler.request_id)
   ```
@@ -51,13 +51,11 @@ Use `submit` to send a request to the queue and return immediately. In Python, `
   import asyncio
   import fal_client
 
-
   async def main():
-      handler = await fal_client.submit_async(
-          "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
-      )
+      handler = await fal_client.submit_async("fal-ai/flux/schnell", arguments={
+          "prompt": "a sunset over mountains"
+      })
       print(handler.request_id)
-
 
   asyncio.run(main())
   ```
@@ -184,7 +182,7 @@ The response shape depends on the current status:
 | `logs`                   | Array of log messages from the runner (when logs are enabled)                                                                                                              |
 | `metrics.inference_time` | Seconds the runner spent processing (only when `COMPLETED`)                                                                                                                |
 | `error`                  | A human-readable error message, present only if the request failed (only when `COMPLETED`)                                                                                 |
-| `error_type`             | A machine-readable error type string, present only if the request failed. See [Request Error Types](/documentation/model-apis/request-errors) for the full list of values. |
+| `error_type`             | A machine-readable error type string, present only if the request failed. See [Request Error Types](/docs/documentation/model-apis/request-errors) for the full list of values. |
 
 ***
 
@@ -285,7 +283,7 @@ The result structure is **model-specific**. For example, an image model returns:
 Video generation models return a `video` object, and audio/speech models return an `audio_url` or `audio` object. Check the model's API page (e.g., [FLUX.1 schnell API](https://fal.ai/models/fal-ai/flux/schnell/api)) for the exact output schema.
 
 <Note>
-  All media URLs in responses (`https://v3.fal.media/...`) are publicly accessible and subject to your [media expiration settings](/documentation/model-apis/media-expiration). Download files you need to keep before they expire.
+  All media URLs in responses (`https://v3.fal.media/...`) are publicly accessible and subject to your [media expiration settings](/docs/documentation/model-apis/media-expiration). Download files you need to keep before they expire.
 </Note>
 
 ***
@@ -297,7 +295,7 @@ Cancel a request. What happens depends on the request's state:
 * **Still in the queue (IN\_QUEUE):** The request is removed immediately and is never processed.
 * **Already being processed (IN\_PROGRESS):** fal sends a cancellation signal to the runner. The request may still complete if the app does not handle cancellation. Whether the running code actually stops depends on whether the app has implemented a cancel endpoint.
 
-If you are deploying your own serverless app and want in-progress requests to stop cleanly when cancelled, see [Handle Cancellations](/documentation/development/handle-cancellations) for how to implement a cancel endpoint.
+If you are deploying your own serverless app and want in-progress requests to stop cleanly when cancelled, see [Handle Cancellations](/docs/documentation/development/handle-cancellations) for how to implement a cancel endpoint.
 
 <CodeGroup>
   ```python Python theme={null}
@@ -340,8 +338,7 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python theme={null}
   import fal_client
 
-  handler = fal_client.submit(
-      "fal-ai/flux/schnell",
+  handler = fal_client.submit("fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -352,8 +349,7 @@ Instead of polling, configure fal to POST results directly to your server when a
   ```python Python (async) theme={null}
   import fal_client
 
-  handler = await fal_client.submit_async(
-      "fal-ai/flux/schnell",
+  handler = await fal_client.submit_async("fal-ai/flux/schnell",
       arguments={"prompt": "a sunset over mountains"},
       webhook_url="https://your-server.com/webhook",
   )
@@ -391,7 +387,7 @@ When complete, fal sends a POST to your webhook URL:
 }
 ```
 
-The webhook `status` is `"OK"` for successful responses (HTTP 200) or `"ERROR"` for failures -- this is different from the queue status values (`IN_QUEUE`, `IN_PROGRESS`, `COMPLETED`). Return 200 quickly to acknowledge the webhook. fal may retry failed deliveries, so use `request_id` for idempotency. See [Webhooks](/documentation/model-apis/inference/webhooks) for full details on payload format, retries, and signature verification.
+The webhook `status` is `"OK"` for successful responses (HTTP 200) or `"ERROR"` for failures -- this is different from the queue status values (`IN_QUEUE`, `IN_PROGRESS`, `COMPLETED`). Return 200 quickly to acknowledge the webhook. fal may retry failed deliveries, so use `request_id` for idempotency. See [Webhooks](/docs/documentation/model-apis/inference/webhooks) for full details on payload format, retries, and signature verification.
 
 ***
 
@@ -403,9 +399,7 @@ Endpoint path appended to the model ID. Most models expose a single root endpoin
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit(
-      "fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint"
-  )
+  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, path="/custom-endpoint")
   ```
 
   ```javascript JavaScript theme={null}
@@ -427,7 +421,7 @@ If a runner picks up the request but **fails** (e.g., returns 503 or crashes), t
   This timeout does not limit how long inference takes. Once a runner starts processing, the deadline is not enforced and the request runs to completion. This is different from `request_timeout`, which limits each individual processing attempt and actively kills the runner if exceeded. The maximum inference time is controlled by the app's `request_timeout` setting (default 3600s), which is configured by the app developer, not the caller. If you need a total client-side deadline that includes processing time, use [`client_timeout`](#client_timeout-subscribe-only) on `subscribe()`.
 </Note>
 
-For a full comparison of timeout mechanisms, see [Timeouts and Retries](/documentation/serverless/reliability/retries#timeouts-and-retries).
+For a full comparison of timeout mechanisms, see [Timeouts and Retries](/docs/documentation/serverless/reliability/retries#timeouts-and-retries).
 
 <CodeGroup>
   ```python Python theme={null}
@@ -444,13 +438,11 @@ For a full comparison of timeout mechanisms, see [Timeouts and Retries](/documen
 
 ### `hint`
 
-Routing hint sent as the `X-Fal-Runner-Hint` header. When you pass a hint string, fal tries to route the request to the same runner that handled a previous request with the same hint. This is useful for session affinity -- for example, keeping requests pinned to a runner that already has a specific model or adapter loaded in memory. For serverless apps that serve multiple models, your app can implement `provide_hints()` on the server side to tell fal what each runner is specialized for. See [Optimize Routing Behavior](/documentation/serverless/optimizations/optimize-routing-behavior) for the full pattern.
+Routing hint sent as the `X-Fal-Runner-Hint` header. When you pass a hint string, fal tries to route the request to the same runner that handled a previous request with the same hint. This is useful for session affinity -- for example, keeping requests pinned to a runner that already has a specific model or adapter loaded in memory. For serverless apps that serve multiple models, your app can implement `provide_hints()` on the server side to tell fal what each runner is specialized for. See [Optimize Routing Behavior](/docs/documentation/serverless/optimizations/optimize-routing-behavior) for the full pattern.
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit(
-      "fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc"
-  )
+  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, hint="user-session-abc")
   ```
 
   ```javascript JavaScript theme={null}
@@ -484,7 +476,7 @@ Low priority is most useful for your own deployed serverless apps where you cont
 
 ### `webhook_url`
 
-URL where fal sends a POST request with the result when processing completes. When set, you don't need to poll for status -- the result arrives at your server automatically. The webhook payload includes the `request_id`, `status`, and the full model output. See [Webhooks](/documentation/model-apis/inference/webhooks) for payload format, retries, and signature verification.
+URL where fal sends a POST request with the result when processing completes. When set, you don't need to poll for status -- the result arrives at your server automatically. The webhook payload includes the `request_id`, `status`, and the full model output. See [Webhooks](/docs/documentation/model-apis/inference/webhooks) for payload format, retries, and signature verification.
 
 <CodeGroup>
   ```python Python theme={null}
@@ -505,13 +497,11 @@ URL where fal sends a POST request with the result when processing completes. Wh
 
 ### `headers`
 
-Additional HTTP headers passed with the request. Use this to set [platform-level headers](/documentation/model-apis/common-parameters) like `X-Fal-Store-IO` (disable payload storage), `X-Fal-No-Retry` (disable retries), or `X-Fal-Object-Lifecycle-Preference` (control media expiration).
+Additional HTTP headers passed with the request. Use this to set [platform-level headers](/docs/documentation/model-apis/common-parameters) like `X-Fal-Store-IO` (disable payload storage), `X-Fal-No-Retry` (disable retries), or `X-Fal-Object-Lifecycle-Preference` (control media expiration).
 
 <CodeGroup>
   ```python Python theme={null}
-  handler = fal_client.submit(
-      "fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"}
-  )
+  handler = fal_client.submit("fal-ai/nano-banana-2", arguments={...}, headers={"X-Fal-No-Retry": "1"})
   ```
 
   ```javascript JavaScript theme={null}
@@ -561,7 +551,7 @@ Client-side deadline that limits the total time the client waits for the result,
 
 ## Disabling Retries
 
-By default, fal [automatically retries](/documentation/serverless/reliability/retries) queue requests that fail due to server errors, timeouts, or rate limits. If you need to disable retries for a specific request, pass the `X-Fal-No-Retry` header when submitting:
+By default, fal [automatically retries](/docs/documentation/serverless/reliability/retries) queue requests that fail due to server errors, timeouts, or rate limits. If you need to disable retries for a specific request, pass the `X-Fal-No-Retry` header when submitting:
 
 ```bash theme={null}
 curl -X POST "https://queue.fal.run/fal-ai/flux/dev" \

@@ -8,7 +8,7 @@
 
 Workflows let you chain multiple models together into a single endpoint, creating complex pipelines that run as one API call. Instead of orchestrating individual model requests yourself, you define the steps and fal handles the execution, passing outputs from one model as inputs to the next.
 
-Unlike standard model calls that return a single result, workflows emit streaming events as each step progresses, giving you access to intermediate results along the way. This makes them ideal for multi-step generation tasks where you want real-time feedback. For more on consuming streaming responses, see [streaming inference](/documentation/model-apis/inference/streaming).
+Unlike standard model calls that return a single result, workflows emit streaming events as each step progresses, giving you access to intermediate results along the way. This makes them ideal for multi-step generation tasks where you want real-time feedback. For more on consuming streaming responses, see [streaming inference](/docs/documentation/model-apis/inference/streaming).
 
 ## Workflow as an API
 
@@ -128,9 +128,9 @@ What could be a tedious process of running and coordinating three different mode
     ```js theme={null}
     import { fal } from "@fal-ai/client";
 
-    const stream = await fal.stream("workflows/fal-ai/sdxl-sticker", {
+    const stream = await fal.stream("workflows/fal-ai/4x4-grid-images", {
     input: {
-      prompt: "a face of a cute puppy, in the style of pixar animation",
+      prompt: "a cute puppy, in the style of pixar animation",
     },
     });
 
@@ -149,9 +149,9 @@ What could be a tedious process of running and coordinating three different mode
     import fal_client
 
     stream = fal_client.stream(
-        "workflows/fal-ai/sdxl-sticker",
+        "workflows/fal-ai/4x4-grid-images",
         arguments={
-            "prompt": "a face of a cute puppy, in the style of pixar animation",
+            "prompt": "a cute puppy, in the style of pixar animation",
         },
     )
     for event in stream:
@@ -164,12 +164,11 @@ What could be a tedious process of running and coordinating three different mode
     import asyncio
     import fal_client
 
-
     async def main():
         stream = await fal_client.stream_async(
-            "workflows/fal-ai/sdxl-sticker",
+            "workflows/fal-ai/4x4-grid-images",
             arguments={
-                "prompt": "a face of a cute puppy, in the style of pixar animation",
+                "prompt": "a cute puppy, in the style of pixar animation",
             },
         )
 

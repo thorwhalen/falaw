@@ -38,7 +38,6 @@ fal auth login
   from fastapi import Response
   from pydantic import Field, BaseModel
 
-
   # Base Output Model, it can be reused for image endpoints
   class Output(BaseModel):
       images: list[Image] = Field(description="The generated image files info.")
@@ -122,11 +121,9 @@ fal auth login
           description="The format of the generated image.",
       )
 
-
   # For the base endpoint
   class TextToImageInput(BaseInput):
       pass
-
 
   # For the sprint endpoint, we can reuse the base input model and override the fields that we want to change
   class SprintInput(BaseInput):
@@ -154,7 +151,6 @@ fal auth login
           ],
       )
 
-
   class SanaSprintOutput(Output):
       images: list[Image] = Field(
           description="The generated image files info.",
@@ -176,10 +172,7 @@ fal auth login
       """
       Specify requirements as follows and make sure to pin the versions of packages and commit hashes to ensure reliability.
       """
-
-      keep_alive = (
-          60  # The worker will be kept alive for 10 minutes after the last request
-      )
+      keep_alive = 60  # The worker will be kept alive for 10 minutes after the last request
       min_concurrency = 0  # The minimum number of concurrent workers to keep alive, if set to 0, the app will startup when the first request is received
       max_concurrency = 2  # The maximum number of concurrent workers to acquire, it helps limit the number of concurrent requests to the app
       app_name = "sana"  # set the app name, the endpoint will be served at username/sana
@@ -194,7 +187,7 @@ fal auth login
           "--extra-index-url",
           "https://download.pytorch.org/whl/cu124",
       ]
-      machine_type = "GPU-H100"  # Choose machine type from https://docs.fal.ai/private-serverless-models/resources/
+      machine_type = "GPU-H100" # Choose machine type from https://docs.fal.ai/private-serverless-models/resources/
 
       def setup(self):
           """
@@ -213,9 +206,7 @@ fal auth login
 
           self.pipes["sprint"] = SanaSprintPipeline.from_pretrained(
               "Efficient-Large-Model/Sana_Sprint_1.6B_1024px_diffusers",
-              text_encoder=self.pipes[
-                  "base"
-              ].text_encoder,  # Reuse the text encoder from the base pipeline
+              text_encoder=self.pipes["base"].text_encoder, # Reuse the text encoder from the base pipeline
               torch_dtype=torch.bfloat16,
           ).to("cuda")
 
@@ -251,17 +242,19 @@ fal auth login
           if model_id == "sprint":
               # Negative prompt is not supported in the sprint pipeline
               model_input.pop("negative_prompt")
+          
 
           # Generate the images
           images = self.pipes[model_id](**model_input).images
 
+
           # Perform the safety check
           postprocessed_images = postprocess_images(
-              images,
-              input.enable_safety_checker,
-          )
+                  images,
+                  input.enable_safety_checker,
+              )
 
-          # Pricing
+          # Pricing 
           resolution_factor = math.ceil(
               (image_size.width * image_size.height) / (1024 * 1024)
           )
@@ -284,28 +277,25 @@ fal auth login
       @fal.endpoint("/")
       async def generate(
           self,
-          input: TextToImageInput,  # This will be used to autgenerate the OpenAPI spec and the playground form
-          response: Response,  # This is the response object that will be used to set the headers for setting the billing units
-      ) -> (
-          SanaOutput
-      ):  # This is the output object that will be used to autgenerate the OpenAPI spec
+          input: TextToImageInput, # This will be used to autgenerate the OpenAPI spec and the playground form
+          response: Response, # This is the response object that will be used to set the headers for setting the billing units
+      ) -> SanaOutput: # This is the output object that will be used to autgenerate the OpenAPI spec
           return await self._generate(input, response, "base")
 
       @fal.endpoint("/sprint")
       async def generate_sprint(
           self,
-          input: SprintInput,  # Use a different input class for the sprint endpoint to change example values and remove the negative prompt
+          input: SprintInput, # Use a different input class for the sprint endpoint to change example values and remove the negative prompt
           response: Response,
       ) -> SanaSprintOutput:
           return await self._generate(input, response, "sprint")
-
 
   # Run the app with:
   #   cd fal_demos/image
   #   fal run sana
   #
   # Or directly with:
-  #   fal run fal_demos/image/sana.py::Sana
+  #   fal run fal_demos/image/sana.py::Sana 
   #
   # The app will be served on an ephemeral URL, example: https://fal.ai/dashboard/sdk/fal-ai/9fe9b6fc-534d-4926-95b1-87b7f15a67de
   # Visit https://fal.ai/dashboard/sdk/fal-ai/9fe9b6fc-534d-4926-95b1-87b7f15a67de to test the root endpoint
@@ -441,11 +431,9 @@ class BaseInput(BaseModel):
         description="The format of the generated image.",
     )
 
-
 # Endpoint-specific input models
 class TextToImageInput(BaseInput):
     pass
-
 
 class SprintInput(BaseInput):
     # Override settings for the faster endpoint
@@ -476,7 +464,6 @@ class SanaOutput(Output):
             ],
         ],
     )
-
 
 class SanaSprintOutput(Output):
     images: list[Image] = Field(
@@ -545,59 +532,61 @@ class Sana(fal.App):
 Create a reusable generation method for both endpoints:
 
 ```python theme={null}
-async def _generate(
-    self,
-    input: TextToImageInput,
-    response: Response,
-    model_id: str,
-) -> Output:
-    import torch
+    async def _generate(
+        self,
+        input: TextToImageInput,
+        response: Response,
+        model_id: str,
+    ) -> Output:
+        import torch
 
-    # Preprocess input
-    image_size = get_image_size(input.image_size)
-    seed = input.seed or torch.seed()
-    generator = torch.Generator("cuda").manual_seed(seed)
+        # Preprocess input
+        image_size = get_image_size(input.image_size)
+        seed = input.seed or torch.seed()
+        generator = torch.Generator("cuda").manual_seed(seed)
 
-    # Prepare model input
-    model_input = {
-        "prompt": input.prompt,
-        "negative_prompt": input.negative_prompt,
-        "num_inference_steps": input.num_inference_steps,
-        "guidance_scale": input.guidance_scale,
-        "height": image_size.height,
-        "width": image_size.width,
-        "num_images_per_prompt": input.num_images,
-        "generator": generator,
-    }
+        # Prepare model input
+        model_input = {
+            "prompt": input.prompt,
+            "negative_prompt": input.negative_prompt,
+            "num_inference_steps": input.num_inference_steps,
+            "guidance_scale": input.guidance_scale,
+            "height": image_size.height,
+            "width": image_size.width,
+            "num_images_per_prompt": input.num_images,
+            "generator": generator,
+        }
 
-    # Handle model-specific differences
-    if model_id == "sprint":
-        model_input.pop("negative_prompt")  # Not supported in sprint
+        # Handle model-specific differences
+        if model_id == "sprint":
+            model_input.pop("negative_prompt")  # Not supported in sprint
 
-    # Generate images
-    images = self.pipes[model_id](**model_input).images
+        # Generate images
+        images = self.pipes[model_id](**model_input).images
 
-    # Apply safety checking
-    postprocessed_images = postprocess_images(
-        images,
-        input.enable_safety_checker,
-    )
+        # Apply safety checking
+        postprocessed_images = postprocess_images(
+            images,
+            input.enable_safety_checker,
+        )
 
-    # Calculate billing
-    resolution_factor = math.ceil(
-        (image_size.width * image_size.height) / (1024 * 1024)
-    )
-    response.headers["x-fal-billable-units"] = str(resolution_factor * input.num_images)
+        # Calculate billing
+        resolution_factor = math.ceil(
+            (image_size.width * image_size.height) / (1024 * 1024)
+        )
+        response.headers["x-fal-billable-units"] = str(
+            resolution_factor * input.num_images
+        )
 
-    return Output(
-        images=[
-            Image.from_pil(image, input.output_format)
-            for image in postprocessed_images["images"]
-        ],
-        seed=seed,
-        has_nsfw_concepts=postprocessed_images["has_nsfw_concepts"],
-        prompt=input.prompt,
-    )
+        return Output(
+            images=[
+                Image.from_pil(image, input.output_format)
+                for image in postprocessed_images["images"]
+            ],
+            seed=seed,
+            has_nsfw_concepts=postprocessed_images["has_nsfw_concepts"],
+            prompt=input.prompt,
+        )
 ```
 
 ## Endpoint Definitions
@@ -605,22 +594,21 @@ async def _generate(
 Define multiple endpoints using the shared generation logic:
 
 ```python theme={null}
-@fal.endpoint("/")
-async def generate(
-    self,
-    input: TextToImageInput,
-    response: Response,
-) -> SanaOutput:
-    return await self._generate(input, response, "base")
+    @fal.endpoint("/")
+    async def generate(
+        self,
+        input: TextToImageInput,
+        response: Response,
+    ) -> SanaOutput:
+        return await self._generate(input, response, "base")
 
-
-@fal.endpoint("/sprint")
-async def generate_sprint(
-    self,
-    input: SprintInput,
-    response: Response,
-) -> SanaSprintOutput:
-    return await self._generate(input, response, "sprint")
+    @fal.endpoint("/sprint")
+    async def generate_sprint(
+        self,
+        input: SprintInput,
+        response: Response,
+    ) -> SanaSprintOutput:
+        return await self._generate(input, response, "sprint")
 ```
 
 ## Running the Application

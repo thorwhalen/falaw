@@ -1477,14 +1477,14 @@
   },
   "llms": {
     "etag": "\"04899724a98c8700a9b36e6fa891b4d6\"",
-    "fetched_at": 1786958090.4139285,
-    "last_modified": "Mon, 17 Aug 2026 09:14:50 GMT",
+    "fetched_at": 1787562453.1396677,
+    "last_modified": "Mon, 24 Aug 2026 06:32:04 GMT",
     "size": 7890
   },
   "llms-full": {
-    "etag": "\"5347f78017f06b39f2eefcf66bf1bb92\"",
-    "fetched_at": 1778490540.3046288,
-    "last_modified": "Mon, 11 May 2026 09:09:00 GMT",
-    "size": 21432
+    "etag": "\"385a1f5c21faf648b47fe5edc6676fca\"",
+    "fetched_at": 1787562453.432919,
+    "last_modified": "Mon, 24 Aug 2026 06:29:31 GMT",
+    "size": 21454
   }
 }

@@ -43,7 +43,8 @@ Runners that process one request at a time have idle gaps between sequential req
 `max_multiplexing` allows a single runner to process multiple requests concurrently, filling idle time while one request waits on I/O.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4): ...
+class MyApp(fal.App, max_multiplexing=4):
+    ...
 ```
 
 This is especially effective for workloads with I/O waits (network calls, file downloads) where the GPU would otherwise sit idle between operations.
@@ -53,7 +54,8 @@ This is especially effective for workloads with I/O waits (network calls, file d
 `concurrency_buffer` pre-warms runners before existing ones reach capacity. This reduces latency spikes but keeps more runners alive.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2): ...
+class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2):
+    ...
 ```
 
 Use conservatively — each buffered runner is billed while alive.
@@ -63,19 +65,19 @@ Use conservatively — each buffered runner is billed while alive.
 Since `setup()` time is billed, faster initialization directly reduces cost per cold start. This matters most for applications with frequent cold starts (low `keep_alive`, bursty traffic).
 
 <CardGroup cols={2}>
-  <Card title="FlashPack" icon="bolt" href="/documentation/serverless/optimizations/flashpack">
+  <Card title="FlashPack" icon="bolt" href="/docs/documentation/serverless/optimizations/flashpack">
     High-throughput tensor loading for faster model initialization.
   </Card>
 
-  <Card title="Optimizing Cold Starts" icon="gauge-high" href="/documentation/serverless/optimizations/optimize-cold-starts">
+  <Card title="Optimizing Cold Starts" icon="gauge-high" href="/docs/documentation/serverless/optimizations/optimize-cold-starts">
     Strategies for reducing container startup and setup time.
   </Card>
 
-  <Card title="Compiled Caches" icon="database" href="/documentation/serverless/optimizations/optimize-startup-with-compiled-caches">
+  <Card title="Compiled Caches" icon="database" href="/docs/documentation/serverless/optimizations/optimize-startup-with-compiled-caches">
     Cache compiled kernels to skip recompilation on startup.
   </Card>
 
-  <Card title="Persistent Storage" icon="hard-drive" href="/documentation/development/file-storage">
+  <Card title="Persistent Storage" icon="hard-drive" href="/docs/documentation/development/use-persistent-storage">
     Use /data to cache downloads across runner restarts.
   </Card>
 </CardGroup>
@@ -86,7 +88,7 @@ Don't over-provision GPU resources. A model that runs fine on an A6000 doesn't n
 
 * Compare inference latency across machine types to find the smallest GPU that meets your requirements
 * Consider that a cheaper machine running slightly longer may cost less than a faster, more expensive one
-* See [Machine Types](/documentation/deployment/machine-types) for available options
+* See [Machine Types](/docs/documentation/deployment/machine-types) for available options
 
 ## Use Scaling Parameters Wisely
 
@@ -114,9 +116,9 @@ class MyApp(fal.App, max_concurrency=5):  # At most 5 runners
 
 Use the platform's observability tools to identify cost optimization opportunities:
 
-* **[App Analytics](/documentation/serverless/observability/app-analytics)**: Identify apps with low utilization (high idle time relative to processing time)
-* **[Error Analytics](/documentation/serverless/observability/error-analytics)**: Find apps with high error rates that waste compute on failed requests
-* **[Exporting Metrics](/documentation/serverless/observability/exporting-metrics)**: Set up alerts for unusual spending patterns
+* **[App Analytics](/docs/documentation/serverless/observability/app-analytics)**: Identify apps with low utilization (high idle time relative to processing time)
+* **[Error Analytics](/docs/documentation/serverless/observability/error-analytics)**: Find apps with high error rates that waste compute on failed requests
+* **[Exporting Metrics](/docs/documentation/serverless/observability/exporting-metrics)**: Set up alerts for unusual spending patterns
 
 <Tip>
   Start with the defaults, then monitor your App Analytics for a few days. Look for runners with high idle-to-processing ratios — those are your best candidates for `keep_alive` and `min_concurrency` adjustments.
