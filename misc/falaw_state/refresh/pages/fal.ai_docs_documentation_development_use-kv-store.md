@@ -70,23 +70,24 @@ import fal
 import json
 from fal.toolkit.kv import KVStore
 
+
 class MyApp(fal.App):
     def setup(self):
         self.kv = KVStore("myapp")
-    
+
     @fal.endpoint("/")
     def process(self, input: Input):
         # Check cache
         cache_key = f"result-{input.id}"
         cached = self.kv.get(cache_key)
-        
+
         if cached:
             return json.loads(cached)
-        
+
         # Compute and cache result
         result = self.expensive_operation(input)
         self.kv.set(cache_key, json.dumps(result))
-        
+
         return result
 ```
 

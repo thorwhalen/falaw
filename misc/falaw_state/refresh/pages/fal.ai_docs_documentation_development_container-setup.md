@@ -31,6 +31,7 @@ When you need full control over the environment, use a Dockerfile. This is the r
 ```python theme={null}
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime

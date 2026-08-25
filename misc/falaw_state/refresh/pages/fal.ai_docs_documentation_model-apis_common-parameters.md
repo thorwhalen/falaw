@@ -69,10 +69,10 @@ Control how long generated files are stored on fal's CDN and who can access them
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
       headers={
-          "X-Fal-Object-Lifecycle-Preference": json.dumps({
-              "expiration_duration_seconds": 3600
-          })
-      }
+          "X-Fal-Object-Lifecycle-Preference": json.dumps(
+              {"expiration_duration_seconds": 3600}
+          )
+      },
   )
   ```
 
@@ -123,7 +123,7 @@ Prevent fal from storing request payloads (JSON inputs and outputs). Payloads ar
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-Store-IO": "0"}
+      headers={"X-Fal-Store-IO": "0"},
   )
   ```
 
@@ -164,7 +164,7 @@ Disable automatic retries for this request. By default, queue-based requests are
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-No-Retry": "1"}
+      headers={"X-Fal-No-Retry": "1"},
   )
   ```
 
@@ -211,7 +211,7 @@ Set a separate retry limit for each retry condition, instead of the all-or-nothi
           "X-Fal-Retry-Config": json.dumps(
               {"timeout": {"retries": 0}, "server_error": {"retries": 3}}
           )
-      }
+      },
   )
   ```
 
@@ -256,7 +256,7 @@ Disable automatic model fallbacks for this request. By default, fal may reroute 
   result = fal_client.subscribe(
       "fal-ai/nano-banana-2",
       arguments={"prompt": "a sunset"},
-      headers={"x-app-fal-disable-fallback": "true"}
+      headers={"x-app-fal-disable-fallback": "true"},
   )
   ```
 

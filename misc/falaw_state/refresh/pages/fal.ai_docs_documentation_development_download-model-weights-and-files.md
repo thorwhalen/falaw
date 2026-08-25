@@ -99,11 +99,7 @@ There are 3 ways to speed up downloads:
   os.environ["HF_XET_CHUNK_CACHE_SIZE_BYTES"] = "1000000000000"
   os.environ["HF_XET_NUM_CONCURRENT_RANGE_GETS"] = "32"
 
-  snapshot_download(
-      repo_id=model_id,
-      local_dir=model_dir,
-      max_workers=32
-  )
+  snapshot_download(repo_id=model_id, local_dir=model_dir, max_workers=32)
   ```
 
 * Download many models in parallel: when downloading multiple models, it helps to start a separate Fal run for each one. The different source IP address reduces the risk of rate limiting.

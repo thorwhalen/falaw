@@ -40,6 +40,7 @@ Create a file called `hello_world.py` with this simple app:
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self) -> dict:

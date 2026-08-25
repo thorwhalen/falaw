@@ -78,8 +78,8 @@
     ```python Python theme={null}
     import fal_client
 
-    result = fal_client.subscribe("fal-ai/nano-banana-2", 
-        arguments={"prompt": "a sunset over mountains"}
+    result = fal_client.subscribe(
+        "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
     )
     print(result["images"][0]["url"])
     ```
@@ -121,15 +121,17 @@
       import fal
       from pydantic import BaseModel
 
+
       class Input(BaseModel):
           prompt: str
 
+
       class MyModel(fal.App):
           machine_type = "GPU-H100"
-          
+
           def setup(self):
               self.model = load_my_model()
-          
+
           @fal.endpoint("/")
           def generate(self, input: Input):
               return self.model(input.prompt)

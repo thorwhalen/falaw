@@ -85,11 +85,13 @@ with fal_client.realtime("your-username/your-app-name") as connection:
 import asyncio
 import fal_client
 
+
 async def main():
     async with fal_client.realtime_async("your-username/your-app-name") as connection:
         await connection.send({"prompt": "Hello, world!"})
         result = await connection.recv()
         print(result)
+
 
 asyncio.run(main())
 ```
@@ -114,12 +116,16 @@ with fal_client.ws_connect("your-username/your-app-name", path="/echo") as ws:
 import asyncio
 import fal_client
 
+
 async def main():
-    async with fal_client.ws_connect_async("your-username/your-app-name", path="/echo") as ws:
+    async with fal_client.ws_connect_async(
+        "your-username/your-app-name", path="/echo"
+    ) as ws:
         await ws.send("Hello, world!")
         for _ in range(3):
             message = await ws.recv()
             print(message)
+
 
 asyncio.run(main())
 ```

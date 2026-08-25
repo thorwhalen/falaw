@@ -14,8 +14,12 @@
 import fal_client
 
 # Switch models by changing one string
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"})
-result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"})
+result = fal_client.subscribe(
+    "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+)
+result = fal_client.subscribe(
+    "fal-ai/nano-banana-2", arguments={"prompt": "a sunset over mountains"}
+)
 ```
 
 **Fastest inference for generative media.** Speed is where fal started and where it continues to invest the most. Proprietary optimizations, including custom CUDA kernels, optimized attention layers, and inference engine tuning, consistently deliver the fastest inference for diffusion and generative media workloads. Reliability matches the speed: 99.99% historical uptime, fault tolerance, and intelligent request queuing are built in.

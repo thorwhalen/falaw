@@ -21,12 +21,9 @@ import fal_client
 
 result = fal_client.subscribe(
     "fal-ai/flux/dev",
-    arguments={
-        "prompt": "a cat wearing a hat",
-        "image_size": "landscape_4_3"
-    },
+    arguments={"prompt": "a cat wearing a hat", "image_size": "landscape_4_3"},
     with_logs=True,
-    on_queue_update=lambda status: print(f"Status: {status}")
+    on_queue_update=lambda status: print(f"Status: {status}"),
 )
 
 print(result["images"][0]["url"])

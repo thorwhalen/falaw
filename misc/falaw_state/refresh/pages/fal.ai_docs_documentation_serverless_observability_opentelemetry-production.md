@@ -109,6 +109,7 @@ import fal
 from fal.toolkit import Image
 from pydantic import BaseModel, Field
 
+
 def setup_tracer(service_name: str):
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
@@ -183,7 +184,9 @@ class ProductionApp(fal.App):
             root.set_attribute("model.name", "stable-diffusion-xl-base-1.0")
 
             with self.tracer.start_as_current_span("inference"):
-                result = self.pipe(input.prompt, num_inference_steps=input.num_inference_steps)
+                result = self.pipe(
+                    input.prompt, num_inference_steps=input.num_inference_steps
+                )
 
             with self.tracer.start_as_current_span("upload"):
                 image = Image.from_pil(result.images[0])

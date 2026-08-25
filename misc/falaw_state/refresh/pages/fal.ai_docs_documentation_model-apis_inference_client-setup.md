@@ -88,9 +88,7 @@ No additional configuration is needed. The client reads `FAL_KEY` from the envir
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.run("fal-ai/flux/schnell", arguments={
-      "prompt": "a sunset"
-  })
+  result = fal_client.run("fal-ai/flux/schnell", arguments={"prompt": "a sunset"})
   ```
 
   ```javascript JavaScript theme={null}
@@ -107,6 +105,7 @@ In some environments (serverless functions, containers) you may not have access 
 <CodeGroup>
   ```python Python theme={null}
   import os
+
   os.environ["FAL_KEY"] = "your-api-key-here"
 
   import fal_client
@@ -169,10 +168,13 @@ Once configured, you can call any model:
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-      "prompt": "a futuristic cityscape at sunset",
-      "image_size": "landscape_16_9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/flux/schnell",
+      arguments={
+          "prompt": "a futuristic cityscape at sunset",
+          "image_size": "landscape_16_9",
+      },
+  )
 
   print(result["images"][0]["url"])
   ```
@@ -181,15 +183,17 @@ Once configured, you can call any model:
   import asyncio
   import fal_client
 
+
   async def main():
       result = await fal_client.subscribe_async(
           "fal-ai/flux/schnell",
           arguments={
               "prompt": "a futuristic cityscape at sunset",
-              "image_size": "landscape_16_9"
+              "image_size": "landscape_16_9",
           },
       )
       print(result["images"][0]["url"])
+
 
   asyncio.run(main())
   ```

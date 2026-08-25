@@ -14,6 +14,7 @@ These platform variables are separate from your own [secrets](/docs/documentatio
 import os
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         app_name = os.getenv("FAL_APP_NAME")
@@ -36,15 +37,17 @@ import fal
 import fal_client
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
     def run(self, input: Input):
-        result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-            "prompt": input.prompt
-        })
+        result = fal_client.subscribe(
+            "fal-ai/flux/schnell", arguments={"prompt": input.prompt}
+        )
         return result
 ```
 
@@ -77,6 +80,7 @@ import logging
 
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         self.logger = logging.getLogger(os.getenv("FAL_APP_NAME", "app"))
@@ -99,6 +103,7 @@ fal sets this variable at each stage of the [runner lifecycle](/docs/documentati
 import os
 
 import fal
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -126,6 +131,7 @@ fal sets `HF_HOME` to a path on the [persistent /data filesystem](/docs/document
 ```python theme={null}
 import fal
 from transformers import AutoModel
+
 
 class MyApp(fal.App):
     def setup(self):

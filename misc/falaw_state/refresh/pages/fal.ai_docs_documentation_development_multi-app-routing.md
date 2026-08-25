@@ -48,10 +48,12 @@ import fal
 from fal.toolkit import Image
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
     width: int = 1024
     height: int = 1024
+
 
 class ImageGenStandard(fal.App):
     machine_type = "GPU-A100"
@@ -59,6 +61,7 @@ class ImageGenStandard(fal.App):
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -66,9 +69,9 @@ class ImageGenStandard(fal.App):
 
     @fal.endpoint("/")
     def generate(self, input: Input) -> dict:
-        image = self.pipe(
-            input.prompt, width=input.width, height=input.height
-        ).images[0]
+        image = self.pipe(input.prompt, width=input.width, height=input.height).images[
+            0
+        ]
         return {"image": Image.from_pil(image)}
 ```
 
@@ -78,10 +81,12 @@ import fal
 from fal.toolkit import Image
 from pydantic import BaseModel
 
+
 class HighResInput(BaseModel):
     prompt: str
     width: int = 2048
     height: int = 2048
+
 
 class ImageGenHighRes(fal.App):
     machine_type = "GPU-H100"
@@ -89,6 +94,7 @@ class ImageGenHighRes(fal.App):
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
         import torch
+
         self.pipe = StableDiffusionXLPipeline.from_pretrained(
             "stabilityai/stable-diffusion-xl-base-1.0",
             torch_dtype=torch.float16,
@@ -96,9 +102,9 @@ class ImageGenHighRes(fal.App):
 
     @fal.endpoint("/")
     def generate(self, input: HighResInput) -> dict:
-        image = self.pipe(
-            input.prompt, width=input.width, height=input.height
-        ).images[0]
+        image = self.pipe(input.prompt, width=input.width, height=input.height).images[
+            0
+        ]
         return {"image": Image.from_pil(image)}
 ```
 
@@ -119,10 +125,12 @@ from pydantic import BaseModel
 
 STANDARD_THRESHOLD = 1024 * 1024  # 1 megapixel
 
+
 class Input(BaseModel):
     prompt: str
     width: int = 1024
     height: int = 1024
+
 
 class ImageRouter(fal.App):
     machine_type = "S"  # Lightweight CPU -- just routing, no GPU needed
@@ -137,11 +145,14 @@ class ImageRouter(fal.App):
         else:
             app_id = "your-username/image-gen-highres"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": input.prompt,
-            "width": input.width,
-            "height": input.height,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": input.prompt,
+                "width": input.width,
+                "height": input.height,
+            },
+        )
 
         return result
 ```
@@ -164,8 +175,10 @@ import fal_client
 import random
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class ABTestRouter(fal.App):
     machine_type = "S"
@@ -179,9 +192,12 @@ class ABTestRouter(fal.App):
         else:
             app_id = "your-username/model-v2"
 
-        result = fal_client.subscribe(app_id, arguments={
-            "prompt": input.prompt,
-        })
+        result = fal_client.subscribe(
+            app_id,
+            arguments={
+                "prompt": input.prompt,
+            },
+        )
 
         # Include which version was used in the response
         result["model_version"] = app_id
@@ -199,8 +215,10 @@ import fal
 import fal_client
 from pydantic import BaseModel
 
+
 class PipelineInput(BaseModel):
     image_url: str
+
 
 class PipelineRouter(fal.App):
     machine_type = "S"
@@ -210,14 +228,12 @@ class PipelineRouter(fal.App):
     def run_pipeline(self, input: PipelineInput) -> dict:
         # Step 1: Upscale
         upscaled = fal_client.subscribe(
-            "fal-ai/real-esrgan",
-            arguments={"image_url": input.image_url, "scale": 4}
+            "fal-ai/real-esrgan", arguments={"image_url": input.image_url, "scale": 4}
         )
 
         # Step 2: Remove background
         result = fal_client.subscribe(
-            "fal-ai/birefnet",
-            arguments={"image_url": upscaled["image"]["url"]}
+            "fal-ai/birefnet", arguments={"image_url": upscaled["image"]["url"]}
         )
 
         return result

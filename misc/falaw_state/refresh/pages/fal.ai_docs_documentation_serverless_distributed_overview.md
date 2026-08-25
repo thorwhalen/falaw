@@ -84,32 +84,33 @@ Returns an async iterator that streams intermediate results from workers. Use th
 ```python theme={null}
 from fal.distributed import DistributedRunner, DistributedWorker
 
+
 class MyWorker(DistributedWorker):
     def setup(self, model_path):
         # Load model on this GPU (called once per worker)
         self.model = load_model(model_path).to(self.device)
-    
+
     def __call__(self, prompt, **kwargs):
         # Process request (called for each request)
         return self.model.generate(prompt)
 
+
 class MyApp(fal.App):
     num_gpus = 4  # Use 4 GPUs
-    
+
     async def setup(self):
         # Create and start the runner
-        self.runner = DistributedRunner(
-            worker_cls=MyWorker,
-            world_size=self.num_gpus
-        )
+        self.runner = DistributedRunner(worker_cls=MyWorker, world_size=self.num_gpus)
         await self.runner.start(model_path="/data/model")
-    
+
     @fal.endpoint("/")
     async def run(self, request: MyRequest):
         # Invoke workers for each request
-        result = await self.runner.invoke({
-            "prompt": request.prompt,
-        })
+        result = await self.runner.invoke(
+            {
+                "prompt": request.prompt,
+            }
+        )
         return result
 ```
 

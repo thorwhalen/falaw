@@ -58,11 +58,13 @@ Unlike [queue-based inference](/docs/documentation/model-apis/inference), real-t
   import fal_client
 
   with fal_client.realtime("fal-ai/fast-lcm-diffusion") as connection:
-      connection.send({
-          "prompt": "a sunset over mountains",
-          "sync_mode": True,
-          "image_url": "data:image/png;base64,..."
-      })
+      connection.send(
+          {
+              "prompt": "a sunset over mountains",
+              "sync_mode": True,
+              "image_url": "data:image/png;base64,...",
+          }
+      )
       result = connection.recv()
       print(result)
   ```
@@ -71,15 +73,19 @@ Unlike [queue-based inference](/docs/documentation/model-apis/inference), real-t
   import asyncio
   import fal_client
 
+
   async def realtime():
       async with fal_client.realtime_async("fal-ai/fast-lcm-diffusion") as connection:
-          await connection.send({
-              "prompt": "a sunset over mountains",
-              "sync_mode": True,
-              "image_url": "data:image/png;base64,..."
-          })
+          await connection.send(
+              {
+                  "prompt": "a sunset over mountains",
+                  "sync_mode": True,
+                  "image_url": "data:image/png;base64,...",
+              }
+          )
           result = await connection.recv()
           print(result)
+
 
   asyncio.run(realtime())
   ```
@@ -255,7 +261,9 @@ const connection = fal.realtime.connect("fal-ai/my-app", {
 In Python, pass the `path` parameter to `realtime()`:
 
 ```python theme={null}
-connection = fal_client.realtime("fal-ai/my-app", path="/my-custom-ws", on_result=handle_result)
+connection = fal_client.realtime(
+    "fal-ai/my-app", path="/my-custom-ws", on_result=handle_result
+)
 ```
 
 ***

@@ -85,7 +85,9 @@ Alternatively, you can use a Dockerfile path to specify the Dockerfile location:
 
 ```python theme={null}
 import pathlib
+
 PWD = Path(__file__).resolve().parent
+
 
 class Test(fal.App):
     image = ContainerImage.from_dockerfile(f"{PWD}/Dockerfile")

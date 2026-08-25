@@ -18,11 +18,14 @@ You write a Python class that inherits from `fal.App`. This class declares what 
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
 
+
 class Output(BaseModel):
     result: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-H100"
@@ -30,6 +33,7 @@ class MyApp(fal.App):
 
     def setup(self):
         from transformers import pipeline
+
         self.pipe = pipeline("text-generation", model="gpt2", device="cuda")
 
     @fal.endpoint("/")
@@ -59,8 +63,10 @@ import fal
 
 CONFIG = {"api_key": os.environ["MY_API_KEY"]}
 
+
 def helper(x):
     import torch
+
     return torch.tensor(x)
 ```
 
@@ -77,15 +83,17 @@ import fal
 
 CONFIG = {"model_name": "stabilityai/sdxl-base"}
 
+
 class MyApp(fal.App):
     machine_type = "GPU-A100"
     requirements = ["torch", "diffusers"]
 
     def setup(self):
         from diffusers import StableDiffusionXLPipeline
-        self.pipe = StableDiffusionXLPipeline.from_pretrained(
-            CONFIG["model_name"]
-        ).to("cuda")
+
+        self.pipe = StableDiffusionXLPipeline.from_pretrained(CONFIG["model_name"]).to(
+            "cuda"
+        )
 
     @fal.endpoint("/")
     def generate(self, input: dict) -> dict:
@@ -164,6 +172,7 @@ Because `teardown()` only runs once in-flight requests complete, it may be skipp
 ```python theme={null}
 import threading
 import fal
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"

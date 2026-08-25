@@ -35,9 +35,11 @@ Now you can write comprehensive tests for this app:
 ```python theme={null}
 def test_myapp():
     with fal.app.AppClient.connect(MyApp) as client:
-        result = client.generate_image(prompt="A cat holding a sign that says hello world")
+        result = client.generate_image(
+            prompt="A cat holding a sign that says hello world"
+        )
         assert result is not None
-        assert hasattr(result, 'url')
+        assert hasattr(result, "url")
 ```
 
 ## Running locally with `fal run --local`

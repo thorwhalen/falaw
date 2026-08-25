@@ -23,15 +23,19 @@ Platform monitoring catches hardware-level failures, but it cannot detect applic
 ```python theme={null}
 import fal
 
+
 class MyApp(fal.App):
     def setup(self):
         self.model = load_model()
         self.db = connect_to_database()
 
-    @fal.endpoint("/health", health_check=fal.HealthCheck(
-        failure_threshold=3,
-        call_regularly=True,
-    ))
+    @fal.endpoint(
+        "/health",
+        health_check=fal.HealthCheck(
+            failure_threshold=3,
+            call_regularly=True,
+        ),
+    )
     def health(self) -> dict:
         if not self.db.is_alive():
             raise RuntimeError("Database connection lost")
@@ -47,10 +51,13 @@ Health checks with `call_regularly=True` run in parallel with request processing
 For more thorough checks that need exclusive GPU access (e.g., running a test inference), set `call_regularly=False`. In this mode, the health check only runs when the gateway sends an `x-fal-runner-health-check` header, which happens between requests or after specific error conditions.
 
 ```python theme={null}
-@fal.endpoint("/health", health_check=fal.HealthCheck(
-    call_regularly=False,
-    timeout_seconds=10,
-))
+@fal.endpoint(
+    "/health",
+    health_check=fal.HealthCheck(
+        call_regularly=False,
+        timeout_seconds=10,
+    ),
+)
 def health(self) -> dict:
     test_result = self.model.run(self.test_input)
     if not validate(test_result):
@@ -70,6 +77,7 @@ def predict(self, input: dict) -> dict:
     except RuntimeError as e:
         if "out of memory" in str(e).lower() or "CUDA" in str(e):
             from fastapi.responses import JSONResponse
+
             return JSONResponse(status_code=503, content={"detail": "GPU error"})
         raise
 ```

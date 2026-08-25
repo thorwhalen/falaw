@@ -43,8 +43,7 @@ Runners that process one request at a time have idle gaps between sequential req
 `max_multiplexing` allows a single runner to process multiple requests concurrently, filling idle time while one request waits on I/O.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4):
-    ...
+class MyApp(fal.App, max_multiplexing=4): ...
 ```
 
 This is especially effective for workloads with I/O waits (network calls, file downloads) where the GPU would otherwise sit idle between operations.
@@ -54,8 +53,7 @@ This is especially effective for workloads with I/O waits (network calls, file d
 `concurrency_buffer` pre-warms runners before existing ones reach capacity. This reduces latency spikes but keeps more runners alive.
 
 ```python theme={null}
-class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2):
-    ...
+class MyApp(fal.App, max_multiplexing=4, concurrency_buffer=2): ...
 ```
 
 Use conservatively — each buffered runner is billed while alive.

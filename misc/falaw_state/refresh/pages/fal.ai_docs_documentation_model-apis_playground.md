@@ -64,10 +64,10 @@ Every Playground result includes generated code that reproduces the exact reques
   ```python Python theme={null}
   import fal_client
 
-  result = fal_client.subscribe("fal-ai/nano-banana-2", arguments={
-      "prompt": "a futuristic cityscape at sunset",
-      "aspect_ratio": "16:9"
-  })
+  result = fal_client.subscribe(
+      "fal-ai/nano-banana-2",
+      arguments={"prompt": "a futuristic cityscape at sunset", "aspect_ratio": "16:9"},
+  )
   print(result["images"][0]["url"])
   ```
 

@@ -53,6 +53,7 @@ def setup_tracer(service_name: str):
 
 # App 1: ImagePipeline - validates and preprocesses the prompt, then calls TextToImageWorker
 
+
 class PipelineInput(BaseModel):
     prompt: str = Field(description="The prompt to generate an image from")
     worker_app: str = Field(description="Deployed app id of TextToImageWorker")
@@ -72,7 +73,9 @@ class ImagePipeline(fal.App):
     ]
 
     def setup(self):
-        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+        from opentelemetry.trace.propagation.tracecontext import (
+            TraceContextTextMapPropagator,
+        )
 
         self.tracer, self.tracer_provider = setup_tracer("image-pipeline")
         self._propagator = TraceContextTextMapPropagator()
@@ -109,6 +112,7 @@ class ImagePipeline(fal.App):
 
 # App 2: TextToImageWorker - receives context and runs SDXL inference
 
+
 class WorkerInput(BaseModel):
     prompt: str
     trace_context: dict  # W3C traceparent injected by ImagePipeline
@@ -136,7 +140,9 @@ class TextToImageWorker(fal.App):
 
         import torch
         from diffusers import StableDiffusionXLPipeline
-        from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+        from opentelemetry.trace.propagation.tracecontext import (
+            TraceContextTextMapPropagator,
+        )
 
         self.tracer, self.tracer_provider = setup_tracer("text-to-image-worker")
         self._propagator = TraceContextTextMapPropagator()

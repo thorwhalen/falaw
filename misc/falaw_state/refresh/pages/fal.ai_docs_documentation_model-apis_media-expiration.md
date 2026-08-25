@@ -27,10 +27,10 @@ Control how long generated media is stored using the `X-Fal-Object-Lifecycle-Pre
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset"},
       headers={
-          "X-Fal-Object-Lifecycle-Preference": json.dumps({
-              "expiration_duration_seconds": 3600
-          })
-      }
+          "X-Fal-Object-Lifecycle-Preference": json.dumps(
+              {"expiration_duration_seconds": 3600}
+          )
+      },
   )
   ```
 
@@ -81,7 +81,7 @@ To prevent fal from storing request payloads entirely, add the `X-Fal-Store-IO: 
   result = fal_client.subscribe(
       "fal-ai/flux/schnell",
       arguments={"prompt": "a sunset"},
-      headers={"X-Fal-Store-IO": "0"}
+      headers={"X-Fal-Store-IO": "0"},
   )
   ```
 

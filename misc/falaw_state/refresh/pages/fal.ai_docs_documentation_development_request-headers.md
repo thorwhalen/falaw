@@ -14,8 +14,10 @@ Request headers are per-request context, complementing [environment variables](/
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -53,8 +55,10 @@ Attach the request ID to Sentry events so you can find the exact fal request tha
 import fal
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -62,13 +66,17 @@ class MyApp(fal.App):
 
     def setup(self):
         import sentry_sdk
+
         sentry_sdk.init(dsn="https://your-sentry-dsn")
         self.model = load_model()
 
     @fal.endpoint("/")
     def generate(self, input: Input) -> dict:
         import sentry_sdk
-        sentry_sdk.set_tag("fal_request_id", self.current_request.headers.get("x-fal-request-id"))
+
+        sentry_sdk.set_tag(
+            "fal_request_id", self.current_request.headers.get("x-fal-request-id")
+        )
         return {"image": self.model(input.prompt)}
 ```
 
@@ -83,8 +91,10 @@ from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -108,18 +118,18 @@ Callers can pass custom headers that are forwarded to your app:
 
 ```python theme={null}
 # Caller passes a custom header
-result = fal_client.subscribe("your-user/your-app", arguments={
-    "prompt": "a sunset"
-}, headers={
-    "X-My-Trace-Id": "abc-123",
-    "X-My-User-Tier": "premium"
-})
+result = fal_client.subscribe(
+    "your-user/your-app",
+    arguments={"prompt": "a sunset"},
+    headers={"X-My-Trace-Id": "abc-123", "X-My-User-Tier": "premium"},
+)
 ```
 
 ```python theme={null}
 # Your app reads it
 class Input(BaseModel):
     prompt: str
+
 
 @fal.endpoint("/")
 def generate(self, input: Input) -> dict:

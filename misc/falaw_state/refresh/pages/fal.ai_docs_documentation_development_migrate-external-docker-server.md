@@ -148,11 +148,14 @@ RUN pip install --no-cache-dir fal requests
 
 SERVER_PORT = 8000
 
+
 class GenerateRequest(BaseModel):
     prompt: str = Field(description="Text prompt")
 
+
 class GenerateResponse(BaseModel):
     image: Image
+
 
 class MyServerProxy(fal.App, keep_alive=300, max_concurrency=1):
     machine_type = "GPU-A100"

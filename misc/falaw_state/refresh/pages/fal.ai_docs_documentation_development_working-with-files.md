@@ -19,8 +19,10 @@ import fal
 from fal.toolkit import download_file
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     video_url: str
+
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -78,9 +80,12 @@ For the common pattern of downloading model weights to persistent storage, `down
 import fal
 from fal.toolkit import download_model_weights
 
+
 class MyModel(fal.App):
     def setup(self):
-        weights_path = download_model_weights("https://huggingface.co/org/model/resolve/main/weights.bin")
+        weights_path = download_model_weights(
+            "https://huggingface.co/org/model/resolve/main/weights.bin"
+        )
         self.model = load_from_weights(weights_path)
 ```
 
@@ -97,8 +102,10 @@ import fal
 from fal.toolkit import Image
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     prompt: str
+
 
 class MyModel(fal.App):
     machine_type = "GPU-A100"
@@ -134,6 +141,7 @@ class MyApp(fal.App):
 import fal
 from fal.ref import get_current_app
 from fal.toolkit import Image
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")
@@ -197,7 +205,9 @@ audio = Audio.from_path("/tmp/output.wav")
 audio = Audio.from_bytes(raw_bytes, content_type="audio/wav", file_name="output.wav")
 
 generic = File.from_path("/tmp/result.obj")
-generic = File.from_bytes(data, content_type="application/octet-stream", file_name="model.glb")
+generic = File.from_bytes(
+    data, content_type="application/octet-stream", file_name="model.glb"
+)
 ```
 
 ### The Type System and Playground
@@ -206,6 +216,7 @@ Using `Image`, `Video`, or `Audio` in your Pydantic output schema tells the Play
 
 ```python theme={null}
 from fal.toolkit import Image, Video, Audio
+
 
 class Output(BaseModel):
     image: Image
@@ -224,8 +235,10 @@ import fal
 from fal.toolkit import CompressedFile
 from pydantic import BaseModel
 
+
 class Input(BaseModel):
     archive_url: str
+
 
 class MyApp(fal.App):
     @fal.endpoint("/")

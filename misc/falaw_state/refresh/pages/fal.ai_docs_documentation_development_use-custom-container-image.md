@@ -34,11 +34,14 @@ RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/list
 RUN pip install --no-cache-dir diffusers transformers accelerate
 """
 
+
 class Input(BaseModel):
     prompt: str = Field(description="The prompt to generate an image from.")
 
+
 class Output(BaseModel):
     image: Image
+
 
 class MyApp(fal.App):
     machine_type = "GPU-A100"
@@ -103,6 +106,7 @@ RUN pip install -r requirements.txt
 COPY src/ ./src/
 """
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str(dockerfile_str)
 ```
@@ -111,8 +115,7 @@ You can customize the build context directory for monorepos or shared code:
 
 ```python theme={null}
 image = ContainerImage.from_dockerfile_str(
-    dockerfile_str,
-    context_dir=Path(__file__).parent / "docker_context"
+    dockerfile_str, context_dir=Path(__file__).parent / "docker_context"
 )
 ```
 
@@ -144,13 +147,13 @@ Create a `.dockerignore` file in your project to exclude files from the build co
 
 ```python theme={null}
 # Inline patterns
-image = ContainerImage.from_dockerfile_str(dockerfile_str, dockerignore=[
-    ".git", "*.pyc", "__pycache__", ".env", "data/"
-])
+image = ContainerImage.from_dockerfile_str(
+    dockerfile_str, dockerignore=[".git", "*.pyc", "__pycache__", ".env", "data/"]
+)
 
 # Or reference an external file
-image = ContainerImage.from_dockerfile_str(dockerfile_str,
-    dockerignore_path=".dockerignore"
+image = ContainerImage.from_dockerfile_str(
+    dockerfile_str, dockerignore_path=".dockerignore"
 )
 
 # Or use the add_dockerignore method
@@ -206,13 +209,16 @@ Use [BuildKit secret mounts](https://docs.docker.com/build/building/secrets/#sec
 
 ```python theme={null}
 class MyApp(fal.App):
-    image = ContainerImage.from_dockerfile_str("""
+    image = ContainerImage.from_dockerfile_str(
+        """
         FROM python:3.11
         RUN --mount=type=secret,id=pip_token \\
             pip install --extra-index-url \\
             https://$(cat /run/secrets/pip_token)@pypi.company.com/simple \\
             my-private-package
-    """, secrets={"pip_token": "$MY_PIP_TOKEN"})
+    """,
+        secrets={"pip_token": "$MY_PIP_TOKEN"},
+    )
 ```
 
 ## Build Args
@@ -221,15 +227,18 @@ Use `build_args` to pass standard Docker build arguments. Build args are not sec
 
 ```python theme={null}
 class MyApp(fal.App):
-    image = ContainerImage.from_dockerfile_str("""
+    image = ContainerImage.from_dockerfile_str(
+        """
         ARG PY_VERSION=3.11
         FROM python:${PY_VERSION}-slim
         ARG EXTRA_INDEX_URL
         RUN pip install --no-cache-dir --extra-index-url ${EXTRA_INDEX_URL} mypkg
-    """, build_args={
-        "PY_VERSION": "3.11",
-        "EXTRA_INDEX_URL": "https://example.com/simple",
-    })
+    """,
+        build_args={
+            "PY_VERSION": "3.11",
+            "EXTRA_INDEX_URL": "https://example.com/simple",
+        },
+    )
 ```
 
 ## Using Private Registries
@@ -256,11 +265,14 @@ Both `ContainerImage.from_dockerfile_str()` and `ContainerImage.from_dockerfile(
 Docker build arguments passed as `--build-arg` during image build. Use to parameterize your Dockerfile.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile_str("""
+image = ContainerImage.from_dockerfile_str(
+    """
     ARG CUDA_VERSION=12.1
     FROM nvidia/cuda:${CUDA_VERSION}-runtime-ubuntu22.04
     RUN pip install torch
-""", build_args={"CUDA_VERSION": "12.4"})
+""",
+    build_args={"CUDA_VERSION": "12.4"},
+)
 ```
 
 ### secrets
@@ -268,13 +280,16 @@ image = ContainerImage.from_dockerfile_str("""
 Build-time secrets mounted via BuildKit `--secret`. Unlike `build_args`, secrets are not baked into image layers. Use for private package indexes or git tokens. Values prefixed with `$` are resolved from your [fal secrets](/docs/documentation/development/manage-secrets-securely) at build time.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile_str("""
+image = ContainerImage.from_dockerfile_str(
+    """
     FROM python:3.11
     RUN --mount=type=secret,id=pip_token \\
         pip install --extra-index-url \\
         https://$(cat /run/secrets/pip_token)@pypi.company.com/simple \\
         my-private-package
-""", secrets={"pip_token": "$MY_PIP_TOKEN"})
+""",
+    secrets={"pip_token": "$MY_PIP_TOKEN"},
+)
 ```
 
 ### context\_dir
@@ -282,9 +297,7 @@ image = ContainerImage.from_dockerfile_str("""
 The build context directory. Files from this directory are available via `COPY` in your Dockerfile. Defaults to the current working directory.
 
 ```python theme={null}
-image = ContainerImage.from_dockerfile("docker/Dockerfile",
-    context_dir="./my-project"
-)
+image = ContainerImage.from_dockerfile("docker/Dockerfile", context_dir="./my-project")
 ```
 
 ### dockerignore / dockerignore\_path

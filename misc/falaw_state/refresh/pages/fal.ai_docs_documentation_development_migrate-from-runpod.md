@@ -52,11 +52,13 @@ The most common pattern on RunPod is a handler function that loads a model at mo
         torch_dtype=torch.float16,
     ).to("cuda")
 
+
     def handler(job):
         prompt = job["input"]["prompt"]
         image = model(prompt).images[0]
         image.save("/tmp/output.png")
         return {"image_path": "/tmp/output.png"}
+
 
     runpod.serverless.start({"handler": handler})
     ```
@@ -68,11 +70,14 @@ The most common pattern on RunPod is a handler function that loads a model at mo
     from pydantic import BaseModel
     from fal.toolkit import Image
 
+
     class Input(BaseModel):
         prompt: str
 
+
     class Output(BaseModel):
         image: Image
+
 
     class MyApp(fal.App):
         machine_type = "GPU-A100"
@@ -128,14 +133,12 @@ RunPod exposes `/run` (async), `/runsync` (sync), and `/stream` endpoints. fal p
     import fal_client
 
     # Sync (subscribe polls automatically)
-    result = fal_client.subscribe("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    result = fal_client.subscribe(
+        "your-username/your-app", arguments={"prompt": "a sunset"}
+    )
 
     # Async
-    handler = fal_client.submit("your-username/your-app", arguments={
-        "prompt": "a sunset"
-    })
+    handler = fal_client.submit("your-username/your-app", arguments={"prompt": "a sunset"})
     status = handler.status()
     result = handler.get()
     ```
@@ -176,8 +179,7 @@ On RunPod, the deployment unit is a Docker image. Your handler code lives inside
         machine_type = "GPU-A100"
         requirements = ["torch", "diffusers", "transformers"]
 
-        def setup(self):
-            ...
+        def setup(self): ...
     ```
 
     ```bash theme={null}
@@ -234,6 +236,7 @@ class MyApp(fal.App):
 ```python theme={null}
 from fal.container import ContainerImage
 
+
 class MyApp(fal.App):
     image = ContainerImage.from_dockerfile_str("""
         FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
@@ -249,9 +252,11 @@ RunPod offers three approaches for model weights: Hugging Face cache, baked into
 ```python theme={null}
 def setup(self):
     import os
+
     os.environ["HF_HOME"] = "/data/.cache/huggingface"
 
     from diffusers import StableDiffusionXLPipeline
+
     self.model = StableDiffusionXLPipeline.from_pretrained(
         "stabilityai/stable-diffusion-xl-base-1.0"
     ).to("cuda")

@@ -18,8 +18,10 @@ Use the `health_check` keyword argument in the `@fal.endpoint()` decorator to de
 import fal
 from pydantic import BaseModel
 
+
 class HealthResponse(BaseModel):
     status: str
+
 
 class MyApp(fal.App):
     def setup(self):

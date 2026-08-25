@@ -35,8 +35,7 @@ import subprocess
 MODEL_DIR = "/data/models/my-model"
 
 subprocess.check_call(
-    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-    shell=True
+    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null", shell=True
 )
 ```
 
@@ -50,6 +49,7 @@ Add the pre-read step at the beginning of your `setup()` method, before model lo
 import fal
 import subprocess
 
+
 class MyModel(fal.App):
     machine_type = "GPU-H100"
 
@@ -62,7 +62,7 @@ class MyModel(fal.App):
         # Pre-read all model files in parallel
         subprocess.check_call(
             f"find '{model_dir}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-            shell=True
+            shell=True,
         )
 
         # Now load the model -- files are already in page cache
@@ -80,11 +80,12 @@ For a cleaner approach, wrap it in a function:
 import subprocess
 from pathlib import Path
 
+
 def preload_files(directory: str, parallelism: int = 32):
     """Pre-read all files in a directory into the OS page cache."""
     subprocess.check_call(
         f"find '{directory}' -type f | xargs -P {parallelism} -I {{}} cat {{}} > /dev/null",
-        shell=True
+        shell=True,
     )
 ```
 

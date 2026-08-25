@@ -72,8 +72,7 @@ For `fal.function`, pass the same option to the decorator:
 
 ```python theme={null}
 @fal.function(requirements=[".[extra]"], requirements_context_dir="../projects/foo")
-def predict(input: MyInput) -> MyOutput:
-    ...
+def predict(input: MyInput) -> MyOutput: ...
 ```
 
 When using `pyproject.toml` app configuration, set the same fields on the app entry:
@@ -251,6 +250,7 @@ The `local_python_modules` attribute ships a Python module alongside your app by
 ```python theme={null}
 from mymodule import myfunction
 
+
 class MyApp(fal.App):
     local_python_modules = ["mymodule"]
 
@@ -269,6 +269,7 @@ Use `clone_repository` to pull code from a Git repository at runner startup. The
 ```python theme={null}
 from fal.toolkit import clone_repository
 
+
 class MyApp(fal.App):
     def setup(self):
         path = clone_repository(
@@ -278,6 +279,7 @@ class MyApp(fal.App):
         )
 
         import myproject
+
         ...
 ```
 

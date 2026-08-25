@@ -24,6 +24,7 @@ from pathlib import Path
 
 DATA_DIR = Path("/data/mnist")
 
+
 class MyModel(fal.App):
     requirements = ["torch>=2.0.0", "torchvision"]
     machine_type = "GPU"
@@ -58,6 +59,7 @@ from pathlib import Path
 
 WEIGHTS_FILE = Path("/data/weights.safetensors")
 
+
 class MyModel(fal.App):
     def setup(self):
         if not WEIGHTS_FILE.exists():
@@ -75,8 +77,7 @@ import subprocess
 
 MODEL_DIR = "/data/models/deepseek-ai"
 subprocess.check_call(
-    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null",
-    shell=True
+    f"find '{MODEL_DIR}' -type f | xargs -P 32 -I {{}} cat {{}} > /dev/null", shell=True
 )
 ```
 
@@ -112,12 +113,14 @@ To upload files programmatically (for example, downloading weights from a URL to
 ```python theme={null}
 import fal
 
+
 @fal.function(machine_type="S")
 def upload_weights():
     import urllib.request
+
     urllib.request.urlretrieve(
         "https://example.com/model-weights.safetensors",
-        "/data/models/weights.safetensors"
+        "/data/models/weights.safetensors",
     )
     print("Weights uploaded to /data")
 ```

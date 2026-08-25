@@ -82,9 +82,9 @@ Both paths start with an [API key](/docs/documentation/model-apis/authentication
           ```python Python theme={null}
           import fal_client
 
-          result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-              "prompt": "a futuristic cityscape at sunset"
-          })
+          result = fal_client.subscribe(
+              "fal-ai/flux/schnell", arguments={"prompt": "a futuristic cityscape at sunset"}
+          )
           print(result["images"][0]["url"])
           ```
 
@@ -196,11 +196,14 @@ Both paths start with an [API key](/docs/documentation/model-apis/authentication
         import fal
         from pydantic import BaseModel
 
+
         class Input(BaseModel):
             prompt: str
 
+
         class Output(BaseModel):
             message: str
+
 
         class MyApp(fal.App):
             @fal.endpoint("/")

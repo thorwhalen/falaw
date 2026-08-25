@@ -50,9 +50,9 @@ The key difference is how the retry happens. With `subscribe()` (or `submit()`),
 import fal_client
 
 # Recommended: queue-based call handles concurrency limits server-side
-result = fal_client.subscribe("fal-ai/flux/schnell", arguments={
-    "prompt": "a sunset over mountains"
-})
+result = fal_client.subscribe(
+    "fal-ai/flux/schnell", arguments={"prompt": "a sunset over mountains"}
+)
 ```
 
 If you are making raw HTTP requests without the SDK, a `429` response with the `concurrent_requests_limit` type indicates you have hit your concurrency limit. The response includes an `X-Fal-needs-retry: 1` header. You should retry with exponential backoff:

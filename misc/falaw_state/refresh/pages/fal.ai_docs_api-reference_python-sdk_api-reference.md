@@ -156,7 +156,7 @@ client.apps.scale("my-app", max_concurrency=10)
   ```python theme={null}
   usage = client.apps.gpus("fal-ai/flux")
   print(usage["total"])  # e.g. 21
-  print(usage["gpus"])   # e.g. {"B200": 21}
+  print(usage["gpus"])  # e.g. {"B200": 21}
   ```
 
   | Parameter  | Type  | Default | Description |
@@ -215,9 +215,7 @@ client.apps.scale("my-app", max_concurrency=10)
   from datetime import datetime, timedelta
 
   runners = client.apps.runners("my-app")
-  recent = client.apps.runners(
-      "my-app", since=datetime.now() - timedelta(hours=1)
-  )
+  recent = client.apps.runners("my-app", since=datetime.now() - timedelta(hours=1))
   running = client.apps.runners("my-app", state=["running"])
   ```
 
@@ -310,7 +308,7 @@ client.runners.stop("runner-id")
   ```python theme={null}
   usage = client.runners.gpus()
   print(usage["total"])  # e.g. 1120
-  print(usage["gpus"])   # e.g. {"H100": 394, "B200": 353, ...}
+  print(usage["gpus"])  # e.g. {"H100": 394, "B200": 353, ...}
   ```
 
   **Returns:** `dict`

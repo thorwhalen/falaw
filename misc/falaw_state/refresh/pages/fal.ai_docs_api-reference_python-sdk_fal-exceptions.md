@@ -265,9 +265,9 @@ from fal.exceptions import catch_gpu_exceptions
 with catch_gpu_exceptions():
     run_inference()
 
+
 @catch_gpu_exceptions()
-def run_inference():
-    ...
+def run_inference(): ...
 ```
 
 > **Inherits from:** `ContextDecorator`

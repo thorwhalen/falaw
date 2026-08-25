@@ -112,15 +112,19 @@ class StreamingSDXLApp(fal.App):
             # Convert to base64 data URI
             buffer = BytesIO()
             image.save(buffer, format="JPEG", quality=70)
-            data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            data_uri = (
+                f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            )
 
             # Stream the image in the format the playground expects
-            event_queue.put({
-                "image": {
-                    "url": data_uri,
-                    "content_type": "image/jpeg",
+            event_queue.put(
+                {
+                    "image": {
+                        "url": data_uri,
+                        "content_type": "image/jpeg",
+                    }
                 }
-            })
+            )
 
             return callback_kwargs
 
@@ -146,12 +150,14 @@ class StreamingSDXLApp(fal.App):
                 data_uri = f"data:image/jpeg;base64,{base64.b64encode(buffer.getvalue()).decode()}"
 
                 # Send final result in the same format
-                event_queue.put({
-                    "image": {
-                        "url": data_uri,
-                        "content_type": "image/jpeg",
+                event_queue.put(
+                    {
+                        "image": {
+                            "url": data_uri,
+                            "content_type": "image/jpeg",
+                        }
                     }
-                })
+                )
                 event_queue.put(None)  # Signal completion
 
             # Run pipeline in background thread
