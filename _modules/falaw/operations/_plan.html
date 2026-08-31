@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations._plan &mdash; falaw 0.0.39 documentation</title>
+  <title>falaw.operations._plan &mdash; falaw 0.0.40 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=e648f5b4"></script>
+      <script src="../../../_static/documentation_options.js?v=84bd753f"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -509,6 +509,70 @@
         <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"text_to_speech"</span><span class="p">,</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
+        <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
+        <span class="n">output_kind</span><span class="o">=</span><span class="s2">"audio"</span><span class="p">,</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1">#: The prompt-driven generative-audio defaults per kind. Deliberately EXPLICIT</span>
+<span class="c1">#: model ids rather than ``pick_model(category=...)``: the ``music`` category's</span>
+<span class="c1">#: first balanced entry is DiffRhythm, which generates songs from LYRICS — a</span>
+<span class="c1">#: bare prompt would make a structurally valid call that runs, bills, and</span>
+<span class="c1">#: produces nothing the caller asked for (the exact failure class working</span>
+<span class="c1">#: rule 10 names). Overridable per call via ``model_id``.</span>
+<span class="n">GENERATE_AUDIO_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"ambient"</span><span class="p">:</span> <span class="s2">"fal-ai/mmaudio-v2/text-to-audio"</span><span class="p">,</span>
+    <span class="s2">"sfx"</span><span class="p">:</span> <span class="s2">"fal-ai/mmaudio-v2/text-to-audio"</span><span class="p">,</span>
+    <span class="s2">"music"</span><span class="p">:</span> <span class="s2">"fal-ai/lyria2"</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="plan_generate_audio">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/_plan.html#falaw.plan_generate_audio">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plan_generate_audio</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"ambient"</span><span class="p">,</span>
+    <span class="n">duration_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Plan a :func:`falaw.generate_audio` call (prompt → ambient/SFX/music).</span>
+
+<span class="sd">    The planning primitive behind an ambient bed or music cue (falaw#10):</span>
+<span class="sd">    the user who leaves their editor to hunt a city-night ambience is the</span>
+<span class="sd">    user this generates one for — costed, cached and planned like every</span>
+<span class="sd">    other call. Mirrors the eager :func:`falaw.generate_audio` signature so</span>
+<span class="sd">    a planned call and an eager call with identical inputs collapse to the</span>
+<span class="sd">    same cache entry. Pure data; no network at plan time.</span>
+
+<span class="sd">    ``kind`` selects the default model (see :data:`GENERATE_AUDIO_DEFAULTS`</span>
+<span class="sd">    for why these are explicit ids). ``duration_s`` reaches the model as its</span>
+<span class="sd">    integer ``duration`` argument where the model takes one (mmaudio does)</span>
+<span class="sd">    AND feeds the cost estimate; for models with no duration argument it is</span>
+<span class="sd">    estimator-only.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">GENERATE_AUDIO_DEFAULTS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"unknown kind </span><span class="si">{</span><span class="n">kind</span><span class="si">!r}</span><span class="s2">; expected one of "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">GENERATE_AUDIO_DEFAULTS</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+    <span class="n">application</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">GENERATE_AUDIO_DEFAULTS</span><span class="p">[</span><span class="n">kind</span><span class="p">]</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">duration_s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">application</span> <span class="o">==</span> <span class="n">GENERATE_AUDIO_DEFAULTS</span><span class="p">[</span><span class="s2">"ambient"</span><span class="p">]:</span>
+        <span class="n">arguments</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">duration_s</span><span class="p">))))</span>
+    <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
+        <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
+        <span class="n">tool</span><span class="o">=</span><span class="s2">"generate_audio"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"audio"</span><span class="p">,</span>
