@@ -4,7 +4,7 @@ Each submodule registers its functions via the `register_tool` decorator,
 so importing this package populates the ToolRegistry as a side effect.
 """
 
-from .audio import text_to_speech, voice_clone  # noqa: F401
+from .audio import generate_audio, text_to_speech, voice_clone  # noqa: F401
 from .avatar import animate_face, lipsync, talking_avatar_from_text  # noqa: F401
 from .images import (  # noqa: F401
     composite_character_in_environment,
@@ -44,5 +44,6 @@ from ._plan import (  # noqa: F401
     plan_image_to_video,
     plan_lipsync,
     plan_llm_complete,
+    plan_generate_audio,
     plan_text_to_speech,
 )

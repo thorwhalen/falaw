@@ -381,6 +381,67 @@ def plan_text_to_speech(
     )
 
 
+#: The prompt-driven generative-audio defaults per kind. Deliberately EXPLICIT
+#: model ids rather than ``pick_model(category=...)``: the ``music`` category's
+#: first balanced entry is DiffRhythm, which generates songs from LYRICS — a
+#: bare prompt would make a structurally valid call that runs, bills, and
+#: produces nothing the caller asked for (the exact failure class working
+#: rule 10 names). Overridable per call via ``model_id``.
+GENERATE_AUDIO_DEFAULTS = {
+    "ambient": "fal-ai/mmaudio-v2/text-to-audio",
+    "sfx": "fal-ai/mmaudio-v2/text-to-audio",
+    "music": "fal-ai/lyria2",
+}
+
+
+def plan_generate_audio(
+    prompt: str,
+    *,
+    kind: str = "ambient",
+    duration_s: Optional[float] = None,
+    model_id: Optional[str] = None,
+    extra: Optional[dict] = None,
+    metadata: Optional[dict] = None,
+    consult_cache: bool = True,
+) -> CallPlan:
+    """Plan a :func:`falaw.generate_audio` call (prompt → ambient/SFX/music).
+
+    The planning primitive behind an ambient bed or music cue (falaw#10):
+    the user who leaves their editor to hunt a city-night ambience is the
+    user this generates one for — costed, cached and planned like every
+    other call. Mirrors the eager :func:`falaw.generate_audio` signature so
+    a planned call and an eager call with identical inputs collapse to the
+    same cache entry. Pure data; no network at plan time.
+
+    ``kind`` selects the default model (see :data:`GENERATE_AUDIO_DEFAULTS`
+    for why these are explicit ids). ``duration_s`` reaches the model as its
+    integer ``duration`` argument where the model takes one (mmaudio does)
+    AND feeds the cost estimate; for models with no duration argument it is
+    estimator-only.
+    """
+    if kind not in GENERATE_AUDIO_DEFAULTS:
+        raise ValueError(
+            f"unknown kind {kind!r}; expected one of "
+            f"{sorted(GENERATE_AUDIO_DEFAULTS)}"
+        )
+    application = model_id or GENERATE_AUDIO_DEFAULTS[kind]
+    record = get_model(application)
+    arguments: dict = {"prompt": prompt}
+    if duration_s is not None and application == GENERATE_AUDIO_DEFAULTS["ambient"]:
+        arguments["duration"] = max(1, int(round(float(duration_s))))
+    if extra:
+        arguments.update(extra)
+    return make_call_plan(
+        tool="generate_audio",
+        application=application,
+        arguments=arguments,
+        output_kind="audio",
+        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        metadata=metadata,
+        consult_cache=consult_cache,
+    )
+
+
 # ---------------------------------------------------------------------------
 # llm_complete  (the planning sibling of falaw.llm_complete)
 # ---------------------------------------------------------------------------
