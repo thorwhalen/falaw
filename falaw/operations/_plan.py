@@ -421,8 +421,7 @@ def plan_generate_audio(
     """
     if kind not in GENERATE_AUDIO_DEFAULTS:
         raise ValueError(
-            f"unknown kind {kind!r}; expected one of "
-            f"{sorted(GENERATE_AUDIO_DEFAULTS)}"
+            f"unknown kind {kind!r}; expected one of {sorted(GENERATE_AUDIO_DEFAULTS)}"
         )
     application = model_id or GENERATE_AUDIO_DEFAULTS[kind]
     record = get_model(application)
