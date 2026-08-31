@@ -101,3 +101,64 @@ def voice_clone(
     }
     raw = call_fal(model, arguments)
     return parse_response(raw, application=model, arguments=arguments)
+
+
+@register_tool(
+    name="generate_audio",
+    description=(
+        "Generate ambient sound, an SFX bed, or music from a text prompt — "
+        "the 'city night' / 'rain on a tin roof' bed a cut needs, without "
+        "leaving the editor. `kind` picks the model family: 'ambient'/'sfx' "
+        "→ mmaudio text-to-audio, 'music' → Lyria 2. Returns a falaw.Result "
+        "whose .first asset is the audio URL."
+    ),
+    tags=("audio", "ambient", "music", "generate"),
+    input_schema={
+        "type": "object",
+        "required": ["prompt"],
+        "properties": {
+            "prompt": {"type": "string"},
+            "kind": {
+                "type": "string",
+                "enum": ["ambient", "sfx", "music"],
+                "default": "ambient",
+            },
+            "duration_s": {
+                "type": "number",
+                "description": "Target seconds (models that take a duration).",
+            },
+            "model_id": {"type": "string"},
+            "extra": {"type": "object"},
+        },
+    },
+    output_schema={"type": "object", "description": "falaw.Result"},
+    examples=(
+        {"prompt": "city street at night, distant traffic", "kind": "ambient"},
+        {"prompt": "gentle acoustic guitar, hopeful", "kind": "music"},
+    ),
+)
+def generate_audio(
+    prompt: str,
+    *,
+    kind: str = "ambient",
+    duration_s: Optional[float] = None,
+    model_id: Optional[str] = None,
+    extra: Optional[dict] = None,
+) -> Result:
+    """Generate ambient/SFX/music from a prompt. Argument shape mirrors
+    :func:`falaw.plan_generate_audio` exactly, so planned and eager calls
+    with identical inputs collapse to the same cache entry."""
+    from ._plan import GENERATE_AUDIO_DEFAULTS
+
+    if kind not in GENERATE_AUDIO_DEFAULTS:
+        raise ValueError(
+            f"unknown kind {kind!r}; expected one of "
+            f"{sorted(GENERATE_AUDIO_DEFAULTS)}"
+        )
+    model = model_id or GENERATE_AUDIO_DEFAULTS[kind]
+    arguments: dict = {"prompt": prompt}
+    if duration_s is not None and model == GENERATE_AUDIO_DEFAULTS["ambient"]:
+        arguments["duration"] = max(1, int(round(float(duration_s))))
+    arguments.update(extra or {})
+    raw = call_fal(model, arguments)
+    return parse_response(raw, application=model, arguments=arguments)
