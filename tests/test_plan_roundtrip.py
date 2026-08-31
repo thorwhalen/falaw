@@ -274,6 +274,59 @@ def test_plan_text_to_speech_pins_explicit_model_id():
     assert p.application == "fal-ai/elevenlabs/tts/multilingual-v2"
 
 
+def test_plan_text_to_speech_prices_per_token_records_via_tokens():
+    """ElevenLabs is per_token (char-billed, per its own registry note):
+    tokens=len(text) yields a real number; without it the plan stays
+    honestly unknown — None, never $0.00."""
+    import pytest
+
+    from falaw import plan_text_to_speech
+
+    text = "Hello narration line"
+    priced = plan_text_to_speech(
+        text=text,
+        model_id="fal-ai/elevenlabs/tts/multilingual-v2",
+        tokens=len(text),
+    )
+    assert priced.estimated_cost_usd == pytest.approx(0.00018 * len(text))
+
+    unpriced = plan_text_to_speech(
+        text=text, model_id="fal-ai/elevenlabs/tts/multilingual-v2"
+    )
+    assert unpriced.estimated_cost_usd is None
+
+
+def test_plan_text_to_speech_tokens_is_an_estimator_hint_not_an_argument():
+    """`tokens` (like `duration_s`) must never move the cache identity: a
+    priced plan and an unpriced plan of the same call are the same call."""
+    from falaw import plan_text_to_speech
+
+    a = plan_text_to_speech(
+        text="x", model_id="fal-ai/elevenlabs/tts/multilingual-v2", tokens=1
+    )
+    b = plan_text_to_speech(
+        text="x", model_id="fal-ai/elevenlabs/tts/multilingual-v2"
+    )
+    assert "tokens" not in a.arguments
+    assert a.arguments == b.arguments
+    assert (a.tool, a.application, a.output_kind) == (
+        b.tool,
+        b.application,
+        b.output_kind,
+    )
+
+
+def test_plan_text_to_speech_minimax_stays_unknown():
+    """minimax's record carries no cost_estimate: unpriceable regardless of
+    hints — None documents the registry gap instead of inventing a price."""
+    from falaw import plan_text_to_speech
+
+    p = plan_text_to_speech(
+        text="x", model_id="fal-ai/minimax/speech-02-hd", tokens=1, duration_s=1.0
+    )
+    assert p.estimated_cost_usd is None
+
+
 def test_full_plan_with_metadata_threading(monkeypatch):
     """Metadata propagates from CallPlan to executed Artifact's
     producer_call_id-adjacent fields. (Today we attach it via the converter
