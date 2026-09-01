@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.mcp &mdash; falaw 0.0.40 documentation</title>
+  <title>falaw.bridges.mcp &mdash; falaw 0.0.41 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=84bd753f"></script>
+      <script src="../../../_static/documentation_options.js?v=20c5f126"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -127,13 +127,21 @@
 <span class="sd">- :func:`build_mcp_server` — build a *standalone* ``FastMCP`` server exposing</span>
 <span class="sd">  just falaw. :func:`serve` runs it over stdio.</span>
 
+<span class="sd">The server's ``instructions`` reach the model before any tool call, so they are</span>
+<span class="sd">behaviour-driving text and are guarded like code:</span>
+<span class="sd">:func:`unresolved_tool_references` reports every tool name or ``name_*`` family</span>
+<span class="sd">a piece of prose names that the registry does not hold. An aggregating server</span>
+<span class="sd">should run it over its own composed preamble too.</span>
+
 <span class="sd">``fastmcp`` is an optional dependency: ``pip install falaw[mcp]``.</span>
 <span class="sd">"""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">fields</span><span class="p">,</span> <span class="n">is_dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fnmatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">fnmatch</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolSpec</span>
@@ -174,9 +182,71 @@
 
 <span class="n">_INSTRUCTIONS</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">"falaw generates and manages AI media (images, video, audio) via fal.ai. "</span>
-    <span class="s2">"Every tool is content-addressed and cached, so re-running an unchanged "</span>
-    <span class="s2">"call is free. Use the plan_* tools to inspect cost before spending."</span>
+    <span class="s2">"Assume every tool spends money; the exceptions are the `refresh_*` "</span>
+    <span class="s2">"maintenance tools, which read docs and vendor prices and make no billed "</span>
+    <span class="s2">"call. There is no free cost preview here — no tool quotes a call before "</span>
+    <span class="s2">"it runs — so the first run of a generating tool is where you commit to "</span>
+    <span class="s2">"its price: confirm with the user before it. What is free is repetition: "</span>
+    <span class="s2">"calls are content-addressed and cached, so re-running one with identical "</span>
+    <span class="s2">"arguments returns the cached result at no charge, while changing any "</span>
+    <span class="s2">"argument makes it a new paid call."</span>
 <span class="p">)</span>
+
+<span class="c1">#: A tool name or ``name_*`` family as it appears in prose. Two shapes: a glob</span>
+<span class="c1">#: family (``refresh_*``) and an exact snake_case name (``generate_image``).</span>
+<span class="c1">#: Ordinary English never spells either, so scanning free text is safe.</span>
+<span class="n">_TOOL_REFERENCE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">"[a-z][a-z0-9]*(?:_[a-z0-9]+)*_\*"</span>  <span class="c1"># a family: refresh_*, plan_*</span>
+    <span class="sa">r</span><span class="s2">"|[a-z][a-z0-9]*(?:_[a-z0-9]+)+"</span>  <span class="c1"># an exact name: generate_image</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="unresolved_tool_references">
+<a class="viewcode-back" href="../../../module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.unresolved_tool_references">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">unresolved_tool_references</span><span class="p">(</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tool_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Tool names and ``name_*`` families named in ``text`` that do not exist.</span>
+
+<span class="sd">    Behaviour-driving prose — the server ``instructions``, a tool description,</span>
+<span class="sd">    an aggregating connector's composed preamble — names tools, and a call-site</span>
+<span class="sd">    sweep cannot see prose. Nothing derives one from the other, so nothing</span>
+<span class="sd">    failed when :data:`_INSTRUCTIONS` spent months telling every model to</span>
+<span class="sd">    "use the ``plan_*`` tools to inspect cost before spending" while the</span>
+<span class="sd">    registry held no such tool (thorwhalen/falaw#47). This is the check that</span>
+<span class="sd">    now fails instead.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text: The prose to scan.</span>
+<span class="sd">        tool_names: The names that count as existing; defaults to the falaw</span>
+<span class="sd">            registry. An aggregating server that registered falaw under a</span>
+<span class="sd">            prefix should pass what :func:`register_tools` returned, so</span>
+<span class="sd">            ``falaw_generate_image`` resolves.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The unresolved references, deduplicated, in order of first appearance.</span>
+
+<span class="sd">    &gt;&gt;&gt; unresolved_tool_references("Use the refresh_* tools.")</span>
+<span class="sd">    ()</span>
+<span class="sd">    &gt;&gt;&gt; unresolved_tool_references("Use the plan_* tools to inspect cost.")</span>
+<span class="sd">    ('plan_*',)</span>
+<span class="sd">    """</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="n">tool_names</span> <span class="k">if</span> <span class="n">tool_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">list_tools</span><span class="p">())</span>
+    <span class="p">)</span>
+    <span class="n">unresolved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">_TOOL_REFERENCE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">unresolved</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">any</span><span class="p">(</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ref</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">names</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matched</span><span class="p">:</span>
+            <span class="n">unresolved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">unresolved</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="register_tools">
