@@ -13,13 +13,21 @@ Two entry points:
 - :func:`build_mcp_server` — build a *standalone* ``FastMCP`` server exposing
   just falaw. :func:`serve` runs it over stdio.
 
+The server's ``instructions`` reach the model before any tool call, so they are
+behaviour-driving text and are guarded like code:
+:func:`unresolved_tool_references` reports every tool name or ``name_*`` family
+a piece of prose names that the registry does not hold. An aggregating server
+should run it over its own composed preamble too.
+
 ``fastmcp`` is an optional dependency: ``pip install falaw[mcp]``.
 """
 
 from __future__ import annotations
 
 import functools
+import re
 from dataclasses import fields, is_dataclass
+from fnmatch import fnmatch
 from typing import Any, Iterable, Optional
 
 from ..base import ToolSpec
@@ -57,9 +65,68 @@ COSTED_TOOLS = costed_tools()
 
 _INSTRUCTIONS = (
     "falaw generates and manages AI media (images, video, audio) via fal.ai. "
-    "Every tool is content-addressed and cached, so re-running an unchanged "
-    "call is free. Use the plan_* tools to inspect cost before spending."
+    "Assume every tool spends money; the exceptions are the `refresh_*` "
+    "maintenance tools, which read docs and vendor prices and make no billed "
+    "call. There is no free cost preview here — no tool quotes a call before "
+    "it runs — so the first run of a generating tool is where you commit to "
+    "its price: confirm with the user before it. What is free is repetition: "
+    "calls are content-addressed and cached, so re-running one with identical "
+    "arguments returns the cached result at no charge, while changing any "
+    "argument makes it a new paid call."
 )
+
+#: A tool name or ``name_*`` family as it appears in prose. Two shapes: a glob
+#: family (``refresh_*``) and an exact snake_case name (``generate_image``).
+#: Ordinary English never spells either, so scanning free text is safe.
+_TOOL_REFERENCE = re.compile(
+    r"[a-z][a-z0-9]*(?:_[a-z0-9]+)*_\*"  # a family: refresh_*, plan_*
+    r"|[a-z][a-z0-9]*(?:_[a-z0-9]+)+"  # an exact name: generate_image
+)
+
+
+def unresolved_tool_references(
+    text: str, *, tool_names: Optional[Iterable[str]] = None
+) -> tuple[str, ...]:
+    """Tool names and ``name_*`` families named in ``text`` that do not exist.
+
+    Behaviour-driving prose — the server ``instructions``, a tool description,
+    an aggregating connector's composed preamble — names tools, and a call-site
+    sweep cannot see prose. Nothing derives one from the other, so nothing
+    failed when :data:`_INSTRUCTIONS` spent months telling every model to
+    "use the ``plan_*`` tools to inspect cost before spending" while the
+    registry held no such tool (thorwhalen/falaw#47). This is the check that
+    now fails instead.
+
+    Args:
+        text: The prose to scan.
+        tool_names: The names that count as existing; defaults to the falaw
+            registry. An aggregating server that registered falaw under a
+            prefix should pass what :func:`register_tools` returned, so
+            ``falaw_generate_image`` resolves.
+
+    Returns:
+        The unresolved references, deduplicated, in order of first appearance.
+
+    >>> unresolved_tool_references("Use the refresh_* tools.")
+    ()
+    >>> unresolved_tool_references("Use the plan_* tools to inspect cost.")
+    ('plan_*',)
+    """
+    names = list(
+        tool_names if tool_names is not None else (t.name for t in list_tools())
+    )
+    unresolved: list[str] = []
+    for ref in _TOOL_REFERENCE.findall(text):
+        if ref in unresolved:
+            continue
+        matched = (
+            any(fnmatch(name, ref) for name in names)
+            if ref.endswith("*")
+            else ref in names
+        )
+        if not matched:
+            unresolved.append(ref)
+    return tuple(unresolved)
 
 
 def register_tools(

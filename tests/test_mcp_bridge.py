@@ -12,7 +12,13 @@ import inspect
 import pytest
 
 from falaw import CallPlan, Plan
-from falaw.bridges.mcp import _jsonable, _jsonable_tool, build_mcp_server, register_tools
+from falaw.bridges.mcp import (
+    _INSTRUCTIONS,
+    _jsonable,
+    _jsonable_tool,
+    build_mcp_server,
+    register_tools,
+)
 from falaw.registry import list_tools
 
 fastmcp = pytest.importorskip("fastmcp")
@@ -31,6 +37,13 @@ def test_build_mcp_server_registers_every_falaw_tool():
     registry_names = {t.name for t in list_tools()}
     assert _tool_names(server) == registry_names
     assert len(registry_names) > 0  # the registry is not empty
+
+
+def test_the_served_instructions_are_the_guarded_string():
+    """``tests/test_mcp_instructions.py`` guards ``_INSTRUCTIONS``; this pins
+    that the server actually serves it, so the guard cannot end up guarding a
+    string nobody sends."""
+    assert build_mcp_server().instructions == _INSTRUCTIONS
 
 
 def test_register_tools_returns_the_registered_names():
