@@ -3,9 +3,10 @@
 ``_INSTRUCTIONS`` reaches the model on every session, before any tool call,
 and is what it reasons from when deciding whether it may spend. For months it
 told every caller to "use the ``plan_*`` tools to inspect cost before
-spending" while the registry held 29 tools and none of them matched
-(thorwhalen/falaw#47) — nothing failed, because the prose and the tool list
-are not derived from each other. These tests are that derivation.
+spending" while no registered tool matched that family — ``plan_*`` is
+falaw's *Python* API, which no MCP caller can reach (thorwhalen/falaw#47).
+Nothing failed, because the prose and the tool list are not derived from each
+other. These tests are that derivation.
 
 Deliberately in its own module: ``test_mcp_bridge.py`` opens with
 ``pytest.importorskip("fastmcp")``, which removes its tests from *collection*
