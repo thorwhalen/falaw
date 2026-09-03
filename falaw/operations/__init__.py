@@ -17,7 +17,9 @@ from .images import (  # noqa: F401
 from .llm import (  # noqa: F401
     apply_note_to_beat,
     apply_note_to_scene,
+    LlmReceipt,
     llm_complete,
+    llm_complete_with_receipt,
     parse_screenplay,
 )
 from .preproduction import (  # noqa: F401

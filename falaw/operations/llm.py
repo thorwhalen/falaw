@@ -13,10 +13,12 @@ from __future__ import annotations
 
 import json
 import re
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from ..cache import cached_call_fal
-from ..registry import register_tool
+from ..cost import estimate_call_cost
+from ..registry import get_model, register_tool
 from ..scene import Beat, Scene, beat_id, make_beat, make_shot, shot_id
 
 _DEFAULT_LLM = "fal-ai/any-llm"
@@ -64,7 +66,102 @@ def llm_complete(
     temperature: float = 0.7,
     extra: Optional[dict] = None,
 ) -> str:
-    """Single-shot LLM completion. Returns the assistant text."""
+    """Single-shot LLM completion. Returns the assistant text.
+
+    Delegates to :func:`llm_complete_with_receipt` (one argument-construction
+    site, so the two spellings share one cache identity) and discards the
+    receipt. A caller that accounts for spend wants the receipt variant.
+    """
+    text, _ = llm_complete_with_receipt(
+        prompt, system=system, model=model, temperature=temperature, extra=extra
+    )
+    return text
+
+
+@dataclass(frozen=True, slots=True)
+class LlmReceipt:
+    """What one eager LLM call cost — the record the eager path never kept.
+
+    The falaw half of falaw#50's option B: the eager :func:`llm_complete`
+    returned a bare string, so LLM spend was invisible to every accounting
+    surface — not because estimates were ``None``, but because *nothing was
+    recorded at all* (the field signature: real dollars spent beside
+    ``plans: 0``). A caller that books receipts uses
+    :func:`llm_complete_with_receipt` and gets this alongside the text.
+
+    Field semantics, honest by construction:
+
+    - ``chars_in`` / ``chars_out`` are **measured facts** (prompt+system in,
+      response text out).
+    - ``tokens_in`` / ``tokens_out`` are **best-effort** from the raw
+      response's usage block (OpenAI ``prompt_tokens``/``completion_tokens``
+      and Anthropic ``input_tokens``/``output_tokens`` shapes). ``None``
+      means *unrecorded by the provider response*, never zero.
+    - ``estimated_cost_usd`` is ``0.0`` on a cache hit (nothing was billed),
+      else the **registry estimate** for the application (any-llm's
+      approximate per-call figure today) — an estimate, not an observed
+      bill; ``None`` when the registry cannot price it at all.
+    - ``cost_source`` says which of those cases produced the number, so a
+      receipt consumer never has to guess: ``"cache_hit"``,
+      ``"registry:<kind>"`` (e.g. ``"registry:per_call"``), or
+      ``"unknown"``.
+    """
+
+    application: str
+    model: str
+    cache_hit: bool
+    chars_in: int
+    chars_out: int
+    tokens_in: Optional[int] = None
+    tokens_out: Optional[int] = None
+    estimated_cost_usd: Optional[float] = None
+    cost_source: str = "unknown"
+
+
+def _extract_llm_usage(raw: Any) -> tuple[Optional[int], Optional[int]]:
+    """Best-effort ``(tokens_in, tokens_out)`` from an LLM response's usage block.
+
+    Recognises the two shapes that exist in the wild — OpenAI
+    (``usage.prompt_tokens`` / ``usage.completion_tokens``) and Anthropic
+    (``usage.input_tokens`` / ``usage.output_tokens``) — wherever the
+    ``usage`` dict sits at the top level. Anything else yields
+    ``(None, None)``: unrecorded, never invented.
+    """
+    if not isinstance(raw, dict):
+        return None, None
+    usage = raw.get("usage")
+    if not isinstance(usage, dict):
+        return None, None
+
+    def _int_or_none(value: Any) -> Optional[int]:
+        return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+    tokens_in = _int_or_none(usage.get("prompt_tokens"))
+    if tokens_in is None:
+        tokens_in = _int_or_none(usage.get("input_tokens"))
+    tokens_out = _int_or_none(usage.get("completion_tokens"))
+    if tokens_out is None:
+        tokens_out = _int_or_none(usage.get("output_tokens"))
+    return tokens_in, tokens_out
+
+
+def llm_complete_with_receipt(
+    prompt: str,
+    *,
+    system: str = "",
+    model: str = _DEFAULT_MODEL,
+    temperature: float = 0.7,
+    extra: Optional[dict] = None,
+) -> tuple[str, LlmReceipt]:
+    """Single-shot LLM completion that also reports what it cost.
+
+    Same arguments, same wire call, same cache identity as
+    :func:`llm_complete` — the receipt is a side channel, observed from the
+    call this function was making anyway (the cache layer's ``cache_hit``
+    event, the response's usage block, the registry's estimate). Library
+    surface only — deliberately NOT a registered tool: the tool surface
+    keeps the one string-returning ``llm_complete``.
+    """
     arguments: dict = {
         "model": model,
         "prompt": prompt,
@@ -73,8 +170,37 @@ def llm_complete(
     if system:
         arguments["system_prompt"] = system
     arguments.update(extra or {})
-    raw = cached_call_fal(_DEFAULT_LLM, arguments)
-    return _extract_llm_text(raw)
+
+    hit_seen: list[bool] = []
+
+    def _watch(event) -> None:
+        if getattr(event, "kind", "") == "cache_hit":
+            hit_seen.append(True)
+
+    raw = cached_call_fal(_DEFAULT_LLM, arguments, on_event=_watch)
+    text = _extract_llm_text(raw)
+    tokens_in, tokens_out = _extract_llm_usage(raw)
+
+    cache_hit = bool(hit_seen)
+    if cache_hit:
+        cost, source = 0.0, "cache_hit"
+    else:
+        record = get_model(_DEFAULT_LLM)
+        cost = estimate_call_cost(record, count=1)
+        ce = record.cost_estimate
+        source = f"registry:{ce.kind}" if ce is not None else "unknown"
+
+    return text, LlmReceipt(
+        application=_DEFAULT_LLM,
+        model=str(arguments.get("model", model)),
+        cache_hit=cache_hit,
+        chars_in=len(prompt) + len(system),
+        chars_out=len(text),
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        estimated_cost_usd=cost,
+        cost_source=source,
+    )
 
 
 def _extract_llm_text(raw: Any) -> str:
