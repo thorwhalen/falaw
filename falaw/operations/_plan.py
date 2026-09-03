@@ -348,6 +348,7 @@ def plan_text_to_speech(
     voice: Optional[str] = None,
     model_id: Optional[str] = None,
     duration_s: Optional[float] = None,
+    tokens: Optional[int] = None,
     extra: Optional[dict] = None,
     metadata: Optional[dict] = None,
     consult_cache: bool = True,
@@ -358,9 +359,15 @@ def plan_text_to_speech(
     call and an eager call with identical inputs collapse to the same
     cache entry. ``voice`` semantics are model-specific.
 
-    ``duration_s`` is an *optional* hint used only by the cost estimator
-    — the produced audio's actual duration comes back on the materialized
-    Artifact.
+    ``duration_s`` and ``tokens`` are *optional* hints used only by the
+    cost estimator — they never enter ``arguments``, so they cannot move
+    the cache identity. ``duration_s`` prices ``per_second`` records (the
+    produced audio's actual duration comes back on the materialized
+    Artifact); ``tokens`` prices ``per_token`` records. For
+    character-billed TTS (ElevenLabs — its registry record says so
+    explicitly) pass ``tokens=len(text)``. Without the matching hint a
+    quantity-priced record stays ``estimated_cost_usd=None`` — unknown,
+    never free, which forces approval downstream.
     """
     application, record = _resolve_model_id_and_record(
         model_id=model_id, category="tts", quality_tier=quality
@@ -375,7 +382,9 @@ def plan_text_to_speech(
         application=application,
         arguments=arguments,
         output_kind="audio",
-        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        estimated_cost_usd=_estimate_cost_with_record(
+            record, seconds=duration_s, tokens=tokens
+        ),
         metadata=metadata,
         consult_cache=consult_cache,
     )
