@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.llm &mdash; falaw 0.0.42 documentation</title>
+  <title>falaw.operations.llm &mdash; falaw 0.0.43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=173d7b4c"></script>
+      <script src="../../../_static/documentation_options.js?v=b345ff55"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -127,10 +127,12 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_call_fal</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_tool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cost</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_call_cost</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">register_tool</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beat</span><span class="p">,</span> <span class="n">Scene</span><span class="p">,</span> <span class="n">beat_id</span><span class="p">,</span> <span class="n">make_beat</span><span class="p">,</span> <span class="n">make_shot</span><span class="p">,</span> <span class="n">shot_id</span>
 
 <span class="n">_DEFAULT_LLM</span> <span class="o">=</span> <span class="s2">"fal-ai/any-llm"</span>
@@ -180,7 +182,108 @@
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Single-shot LLM completion. Returns the assistant text."""</span>
+<span class="w">    </span><span class="sd">"""Single-shot LLM completion. Returns the assistant text.</span>
+
+<span class="sd">    Delegates to :func:`llm_complete_with_receipt` (one argument-construction</span>
+<span class="sd">    site, so the two spellings share one cache identity) and discards the</span>
+<span class="sd">    receipt. A caller that accounts for spend wants the receipt variant.</span>
+<span class="sd">    """</span>
+    <span class="n">text</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">llm_complete_with_receipt</span><span class="p">(</span>
+        <span class="n">prompt</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">text</span></div>
+
+
+
+<div class="viewcode-block" id="LlmReceipt">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/llm.html#falaw.LlmReceipt">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LlmReceipt</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""What one eager LLM call cost — the record the eager path never kept.</span>
+
+<span class="sd">    The falaw half of falaw#50's option B: the eager :func:`llm_complete`</span>
+<span class="sd">    returned a bare string, so LLM spend was invisible to every accounting</span>
+<span class="sd">    surface — not because estimates were ``None``, but because *nothing was</span>
+<span class="sd">    recorded at all* (the field signature: real dollars spent beside</span>
+<span class="sd">    ``plans: 0``). A caller that books receipts uses</span>
+<span class="sd">    :func:`llm_complete_with_receipt` and gets this alongside the text.</span>
+
+<span class="sd">    Field semantics, honest by construction:</span>
+
+<span class="sd">    - ``chars_in`` / ``chars_out`` are **measured facts** (prompt+system in,</span>
+<span class="sd">      response text out).</span>
+<span class="sd">    - ``tokens_in`` / ``tokens_out`` are **best-effort** from the raw</span>
+<span class="sd">      response's usage block (OpenAI ``prompt_tokens``/``completion_tokens``</span>
+<span class="sd">      and Anthropic ``input_tokens``/``output_tokens`` shapes). ``None``</span>
+<span class="sd">      means *unrecorded by the provider response*, never zero.</span>
+<span class="sd">    - ``estimated_cost_usd`` is ``0.0`` on a cache hit (nothing was billed),</span>
+<span class="sd">      else the **registry estimate** for the application (any-llm's</span>
+<span class="sd">      approximate per-call figure today) — an estimate, not an observed</span>
+<span class="sd">      bill; ``None`` when the registry cannot price it at all.</span>
+<span class="sd">    - ``cost_source`` says which of those cases produced the number, so a</span>
+<span class="sd">      receipt consumer never has to guess: ``"cache_hit"``,</span>
+<span class="sd">      ``"registry:&lt;kind&gt;"`` (e.g. ``"registry:per_call"``), or</span>
+<span class="sd">      ``"unknown"``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">application</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">cache_hit</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">chars_in</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">chars_out</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">tokens_in</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tokens_out</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">estimated_cost_usd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cost_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"unknown"</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_llm_usage</span><span class="p">(</span><span class="n">raw</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Best-effort ``(tokens_in, tokens_out)`` from an LLM response's usage block.</span>
+
+<span class="sd">    Recognises the two shapes that exist in the wild — OpenAI</span>
+<span class="sd">    (``usage.prompt_tokens`` / ``usage.completion_tokens``) and Anthropic</span>
+<span class="sd">    (``usage.input_tokens`` / ``usage.output_tokens``) — wherever the</span>
+<span class="sd">    ``usage`` dict sits at the top level. Anything else yields</span>
+<span class="sd">    ``(None, None)``: unrecorded, never invented.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">usage</span> <span class="o">=</span> <span class="n">raw</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"usage"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">usage</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_int_or_none</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">tokens_in</span> <span class="o">=</span> <span class="n">_int_or_none</span><span class="p">(</span><span class="n">usage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"prompt_tokens"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tokens_in</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tokens_in</span> <span class="o">=</span> <span class="n">_int_or_none</span><span class="p">(</span><span class="n">usage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"input_tokens"</span><span class="p">))</span>
+    <span class="n">tokens_out</span> <span class="o">=</span> <span class="n">_int_or_none</span><span class="p">(</span><span class="n">usage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"completion_tokens"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">tokens_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tokens_out</span> <span class="o">=</span> <span class="n">_int_or_none</span><span class="p">(</span><span class="n">usage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output_tokens"</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tokens_in</span><span class="p">,</span> <span class="n">tokens_out</span>
+
+
+<div class="viewcode-block" id="llm_complete_with_receipt">
+<a class="viewcode-back" href="../../../module_docs/falaw/operations/llm.html#falaw.llm_complete_with_receipt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">llm_complete_with_receipt</span><span class="p">(</span>
+    <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">system</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_MODEL</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LlmReceipt</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Single-shot LLM completion that also reports what it cost.</span>
+
+<span class="sd">    Same arguments, same wire call, same cache identity as</span>
+<span class="sd">    :func:`llm_complete` — the receipt is a side channel, observed from the</span>
+<span class="sd">    call this function was making anyway (the cache layer's ``cache_hit``</span>
+<span class="sd">    event, the response's usage block, the registry's estimate). Library</span>
+<span class="sd">    surface only — deliberately NOT a registered tool: the tool surface</span>
+<span class="sd">    keeps the one string-returning ``llm_complete``.</span>
+<span class="sd">    """</span>
     <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
         <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
@@ -189,8 +292,37 @@
     <span class="k">if</span> <span class="n">system</span><span class="p">:</span>
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"system_prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span>
     <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})</span>
-    <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">_DEFAULT_LLM</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_extract_llm_text</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span></div>
+
+    <span class="n">hit_seen</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_watch</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="s2">"kind"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"cache_hit"</span><span class="p">:</span>
+            <span class="n">hit_seen</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">cached_call_fal</span><span class="p">(</span><span class="n">_DEFAULT_LLM</span><span class="p">,</span> <span class="n">arguments</span><span class="p">,</span> <span class="n">on_event</span><span class="o">=</span><span class="n">_watch</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">_extract_llm_text</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+    <span class="n">tokens_in</span><span class="p">,</span> <span class="n">tokens_out</span> <span class="o">=</span> <span class="n">_extract_llm_usage</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="n">cache_hit</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">hit_seen</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cache_hit</span><span class="p">:</span>
+        <span class="n">cost</span><span class="p">,</span> <span class="n">source</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">"cache_hit"</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">_DEFAULT_LLM</span><span class="p">)</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="n">estimate_call_cost</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ce</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">cost_estimate</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"registry:</span><span class="si">{</span><span class="n">ce</span><span class="o">.</span><span class="n">kind</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">ce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"unknown"</span>
+
+    <span class="k">return</span> <span class="n">text</span><span class="p">,</span> <span class="n">LlmReceipt</span><span class="p">(</span>
+        <span class="n">application</span><span class="o">=</span><span class="n">_DEFAULT_LLM</span><span class="p">,</span>
+        <span class="n">model</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">,</span> <span class="n">model</span><span class="p">)),</span>
+        <span class="n">cache_hit</span><span class="o">=</span><span class="n">cache_hit</span><span class="p">,</span>
+        <span class="n">chars_in</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">system</span><span class="p">),</span>
+        <span class="n">chars_out</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">),</span>
+        <span class="n">tokens_in</span><span class="o">=</span><span class="n">tokens_in</span><span class="p">,</span>
+        <span class="n">tokens_out</span><span class="o">=</span><span class="n">tokens_out</span><span class="p">,</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
+        <span class="n">cost_source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
