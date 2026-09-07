@@ -52,6 +52,10 @@ def test_the_exempt_tools_really_make_no_vendor_call():
         # Reads fal's authenticated-but-free pricing endpoint (metadata
         # only, nothing billed) and writes models.json — falaw#18.
         "refresh_model_prices",
+        # Reads fal's any-llm doc and OpenRouter's public model catalogue,
+        # both free and unauthenticated; never writes the committed table —
+        # falaw#56.
+        "refresh_llm_rates",
     }, (
         f"the free-tool exemption changed to {sorted(exempt)}. Each exemption "
         f"removes a tool from every downstream spend gate — justify it here."

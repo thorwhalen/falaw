@@ -24,6 +24,7 @@ from . import account, corpus as _corpus  # noqa: F401  (registers refresh_model
 from . import journal, operations  # noqa: F401  (operations registers tools)
 from . import refresh as _refresh  # noqa: F401  (refresh registers tools too)
 from . import pricing as _pricing  # noqa: F401  (registers refresh_model_prices)
+from . import llm_rates_refresh as _llm_rates_refresh  # noqa: F401  (registers refresh_llm_rates)
 from .account import AccountStatus, health_check
 from .base import CostEstimate, ModelRecord, ToolSpec
 from .cache import (
@@ -143,6 +144,7 @@ from .plan import (
 )
 from .refresh import refresh_full_docs, refresh_llms, refresh_state
 from .pricing import fetch_model_prices, refresh_model_prices
+from .llm_rates_refresh import refresh_llm_rates
 from .registry import (
     get_model,
     get_tool,
@@ -292,6 +294,7 @@ __all__ = [
     "refresh_models_from_corpus",
     "refresh_model_prices",
     "fetch_model_prices",
+    "refresh_llm_rates",
     "refresh_state",
     "register_tool",
     "remove_background",

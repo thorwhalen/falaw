@@ -45,8 +45,10 @@ True
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
+import warnings
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Mapping, Optional
@@ -56,6 +58,56 @@ RATES_FILENAME = "llm_rates.json"
 
 TOKENS_PER_RATE_UNIT = 1_000_000
 """Token count the table's ``*_per_mtok`` columns are quoted per."""
+
+DEFAULT_STALENESS_THRESHOLD_DAYS = 90
+"""Warn once a priced row's ``date`` is this many days old.
+
+``llm_rates.json`` has no refresh job that runs itself (falaw#56): a
+repriced or retiered model does not fail any test, so a quote can go stale
+silently. This is the default threshold :func:`llm_ceiling_usd` checks a
+row's ``date`` against before returning a quote."""
+
+
+class LlmRatesStaleWarning(UserWarning):
+    """A quote was served from a rate row older than the staleness threshold."""
+
+
+def _is_stale(date: str, *, threshold_days: int, today: datetime.date) -> bool:
+    """True when ``date`` (ISO, possibly blank/malformed) is too old to trust."""
+    if not date:
+        return True
+    try:
+        parsed = datetime.date.fromisoformat(date)
+    except ValueError:
+        return True
+    return (today - parsed).days > threshold_days
+
+
+def warn_if_stale(
+    rate: "LlmRate",
+    *,
+    threshold_days: int = DEFAULT_STALENESS_THRESHOLD_DAYS,
+    today: Optional[datetime.date] = None,
+) -> Optional[str]:
+    """Warn (never raise) when ``rate`` is older than ``threshold_days``.
+
+    Safe to call at import time or on every quote: it only ever calls
+    :func:`warnings.warn`, so a stale table degrades a quote's trustworthiness
+    without ever breaking a caller. Returns the warning message when one was
+    issued, else ``None`` (handy for tests, which can assert on it without
+    a ``pytest.warns`` context).
+    """
+    today = today or datetime.date.today()
+    if not _is_stale(rate.date, threshold_days=threshold_days, today=today):
+        return None
+    message = (
+        f"llm_rates: {rate.model!r} is priced as of "
+        f"{rate.date or 'an unknown date'}, more than {threshold_days} days "
+        f"before {today.isoformat()} -- run `falaw refresh-llm-rates` "
+        "(or `python -m falaw refresh-llm-rates`) to check for a repricing."
+    )
+    warnings.warn(message, LlmRatesStaleWarning, stacklevel=3)
+    return message
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -237,6 +289,7 @@ def llm_ceiling_usd(
     rate = get_llm_rate(model, rates=rates)
     if rate is None:
         return None  # unpriceable model → unknown, NOT the router's flat price
+    warn_if_stale(rate)
 
     if input_tokens is None and max_output_tokens is None:
         return rate.per_call_usd * count

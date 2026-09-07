@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# refresh_llm_rates(write=True) output -- a proposal for a human to review
+# and promote, never committed automatically (falaw#56)
+falaw/data/llm_rates.proposed.json
+falaw/data/llm_rates.diff.txt
+
 
 .DS_Store
 # C extensions
