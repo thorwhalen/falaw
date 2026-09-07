@@ -96,6 +96,15 @@ def warn_if_stale(
     without ever breaking a caller. Returns the warning message when one was
     issued, else ``None`` (handy for tests, which can assert on it without
     a ``pytest.warns`` context).
+
+    ``stacklevel=2`` attributes the warning to :func:`llm_ceiling_usd`'s call
+    site here rather than to every external caller of *that* — a fixed
+    location, not one that moves with the caller. That matters because
+    Python's default warning filter only dedups a repeated warning by its
+    exact ``(message, category, module, lineno)``: a fixed location plus a
+    message keyed on ``(model, date)`` means a caller quoting the same stale
+    row in a loop (including a blank/unknown ``date``, which always reads as
+    stale) sees the warning once per process, not once per call.
     """
     today = today or datetime.date.today()
     if not _is_stale(rate.date, threshold_days=threshold_days, today=today):
@@ -106,7 +115,7 @@ def warn_if_stale(
         f"before {today.isoformat()} -- run `falaw refresh-llm-rates` "
         "(or `python -m falaw refresh-llm-rates`) to check for a repricing."
     )
-    warnings.warn(message, LlmRatesStaleWarning, stacklevel=3)
+    warnings.warn(message, LlmRatesStaleWarning, stacklevel=2)
     return message
 
 

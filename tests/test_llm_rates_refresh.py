@@ -165,6 +165,8 @@ def test_diff_reports_a_repriced_model_as_a_changed_field():
             "per_call_usd": 0.001,
             "input_usd_per_mtok": 1.0,
             "output_usd_per_mtok": 2.0,
+            "source": "old source",
+            "date": "2026-01-01",
         }
     ]
     proposed = [
@@ -174,11 +176,20 @@ def test_diff_reports_a_repriced_model_as_a_changed_field():
             "per_call_usd": 0.001,
             "input_usd_per_mtok": 1.5,  # repriced upstream
             "output_usd_per_mtok": 2.0,
+            "source": "new source",
+            "date": "2026-09-07",
         }
     ]
     diff = diff_llm_rate_tables(committed, proposed)
     assert diff["changed"] == [
-        {"model": "a/m", "field": "input_usd_per_mtok", "old": 1.0, "new": 1.5}
+        {
+            "model": "a/m",
+            "field": "input_usd_per_mtok",
+            "old": 1.0,
+            "new": 1.5,
+            "source": "new source",
+            "date": "2026-09-07",
+        }
     ]
 
 
@@ -218,7 +229,14 @@ def test_format_llm_rates_diff_reads_as_a_report():
         "added": ["a/new"],
         "removed": [],
         "changed": [
-            {"model": "a/m", "field": "per_call_usd", "old": 0.001, "new": 0.002}
+            {
+                "model": "a/m",
+                "field": "per_call_usd",
+                "old": 0.001,
+                "new": 0.002,
+                "source": "OpenRouter (https://openrouter.ai/api/v1/models)",
+                "date": "2026-09-07",
+            }
         ],
         "unchanged": 5,
     }
@@ -226,6 +244,23 @@ def test_format_llm_rates_diff_reads_as_a_report():
     assert "a/new" in text
     assert "per_call_usd" in text
     assert "0.001" in text and "0.002" in text
+    # The diff report carries provenance for a changed row, not just the number.
+    assert "2026-09-07" in text
+    assert "openrouter.ai" in text
+
+
+def test_format_llm_rates_diff_says_no_date_or_source_when_missing():
+    diff = {
+        "added": [],
+        "removed": [],
+        "changed": [
+            {"model": "a/m", "field": "per_call_usd", "old": 0.001, "new": 0.002}
+        ],
+        "unchanged": 0,
+    }
+    text = format_llm_rates_diff(diff)
+    assert "no date" in text
+    assert "no source" in text
 
 
 def test_format_llm_rates_diff_says_so_when_nothing_changed():
@@ -319,12 +354,18 @@ def test_refresh_dry_run_reports_a_price_change_without_writing_anything(tmp_pat
 
     assert rates_path.read_text() == json.dumps(stale_table)  # untouched
     changed = summary["diff"]["changed"]
-    assert {
-        "model": "anthropic/claude-sonnet-4.5",
-        "field": "input_usd_per_mtok",
-        "old": 1.0,
-        "new": 3.0,
-    } in changed
+    (entry,) = [
+        c
+        for c in changed
+        if c["model"] == "anthropic/claude-sonnet-4.5"
+        and c["field"] == "input_usd_per_mtok"
+    ]
+    assert entry["old"] == 1.0
+    assert entry["new"] == 3.0
+    # The diff carries where the proposed number came from, not just the
+    # number, so a human reviewing it doesn't have to open the proposed file.
+    assert entry["date"] == "2026-09-07"
+    assert "openrouter.ai" in entry["source"]
 
 
 # --- staleness: warns, never raises, surfaced at quote time -----------------
@@ -418,3 +459,29 @@ def test_load_llm_rates_itself_never_warns_or_raises_on_import():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         load_llm_rates()
+
+
+def test_repeated_quotes_of_the_same_stale_row_warn_once_not_per_call():
+    # A blank date always reads as stale. Without dedup, a caller quoting the
+    # same override row in a loop would get one LlmRatesStaleWarning per
+    # call -- noisy enough to bury a real signal. Python's default warning
+    # filter dedups by (message, category, module, lineno); a fixed
+    # `stacklevel` inside `llm_ceiling_usd` is what makes that collapse work.
+    from falaw.llm_rates import LlmRate
+
+    blank = {
+        "my/blank-date-model": LlmRate(
+            model="my/blank-date-model", tier="standard", per_call_usd=0.001, date=""
+        )
+    }
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        for _ in range(5):
+            llm_ceiling_usd("my/blank-date-model", rates=blank)
+        assert len(caught) == 5  # "always" bypasses dedup, by design, to see this
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.resetwarnings()  # restore the default (deduping) filter
+        for _ in range(5):
+            llm_ceiling_usd("my/blank-date-model", rates=blank)
+        assert len(caught) == 1

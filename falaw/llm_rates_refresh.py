@@ -252,10 +252,13 @@ def diff_llm_rate_tables(
 
     Returns ``{"added", "removed", "changed", "unchanged"}``: ``added``/
     ``removed`` are sorted model-id lists; ``changed`` is a list of
-    ``{"model", "field", "old", "new"}`` for every :data:`_DIFFED_FIELDS`
-    value that moved (``source``/``date``/``notes`` are provenance, not a
-    price fact, so they never appear here even though every row gets a fresh
-    stamp); ``unchanged`` is a count.
+    ``{"model", "field", "old", "new", "source", "date"}`` for every
+    :data:`_DIFFED_FIELDS` value that moved (``source``/``date`` themselves
+    are provenance, not a price fact, so they never appear as a *diffed
+    field* even though every row gets a fresh stamp — but the *proposed*
+    row's own ``source``/``date`` ride along on every change entry, so the
+    human-readable diff carries where the new number came from, not just
+    what it is); ``unchanged`` is a count.
     """
     committed = {r["model"]: r for r in committed_rows}
     proposed = {r["model"]: r for r in proposed_rows}
@@ -275,6 +278,8 @@ def diff_llm_rate_tables(
                         "field": field,
                         "old": old.get(field),
                         "new": new.get(field),
+                        "source": new.get("source", ""),
+                        "date": new.get("date", ""),
                     }
                 )
                 row_changed = True
@@ -307,7 +312,9 @@ def format_llm_rates_diff(diff: dict) -> str:
         for entry in diff["changed"]:
             lines.append(
                 f"  ~ {entry['model']}: {entry['field']} "
-                f"{entry['old']!r} -> {entry['new']!r}"
+                f"{entry['old']!r} -> {entry['new']!r}  "
+                f"[{entry.get('date') or 'no date'} "
+                f"{entry.get('source') or 'no source'}]"
             )
     lines.append(f"Unchanged: {diff['unchanged']} rows.")
     return "\n".join(lines)
@@ -315,7 +322,11 @@ def format_llm_rates_diff(diff: dict) -> str:
 
 # Injectable HTTP seams. Production uses httpx; tests pass a fixture-backed
 # stub so no test ever reaches the network. Two seams, not one, because the
-# two sources have different response shapes (plain text vs. JSON).
+# two sources have different response shapes (plain text vs. JSON). httpx is
+# not a declared falaw dependency -- it rides in transitively via fal-client
+# (same precedent as `pricing.py`'s `_default_http_get`); either default only
+# imports it lazily, inside the function, so a `write=False` refresh with an
+# injected `http_get_*` (as every test uses) never needs it installed.
 HttpGetText = Callable[[str], str]
 HttpGetJson = Callable[[str], dict]
 
