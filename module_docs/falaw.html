@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw &mdash; falaw 0.0.44 documentation</title>
+  <title>falaw &mdash; falaw 0.0.45 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78cc6f98"></script>
+      <script src="../_static/documentation_options.js?v=dcb4eb81"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -141,6 +141,18 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.FalUnauthorized"><code class="docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.LlmRate"><code class="docutils literal notranslate"><span class="pre">LlmRate</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.model"><code class="docutils literal notranslate"><span class="pre">LlmRate.model</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.tier"><code class="docutils literal notranslate"><span class="pre">LlmRate.tier</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.per_call_usd"><code class="docutils literal notranslate"><span class="pre">LlmRate.per_call_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.input_usd_per_mtok"><code class="docutils literal notranslate"><span class="pre">LlmRate.input_usd_per_mtok</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.output_usd_per_mtok"><code class="docutils literal notranslate"><span class="pre">LlmRate.output_usd_per_mtok</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.source"><code class="docutils literal notranslate"><span class="pre">LlmRate.source</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.date"><code class="docutils literal notranslate"><span class="pre">LlmRate.date</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.notes"><code class="docutils literal notranslate"><span class="pre">LlmRate.notes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.LlmRate.has_token_rates"><code class="docutils literal notranslate"><span class="pre">LlmRate.has_token_rates</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.LlmReceipt"><code class="docutils literal notranslate"><span class="pre">LlmReceipt</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.ModelRecord"><code class="docutils literal notranslate"><span class="pre">ModelRecord</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.ModelRecord.default_negative_prompt"><code class="docutils literal notranslate"><span class="pre">ModelRecord.default_negative_prompt</span></code></a></li>
@@ -214,9 +226,12 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.generate_audio"><code class="docutils literal notranslate"><span class="pre">generate_audio()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.generate_image"><code class="docutils literal notranslate"><span class="pre">generate_image()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.generate_image_with_refs"><code class="docutils literal notranslate"><span class="pre">generate_image_with_refs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.get_llm_rate"><code class="docutils literal notranslate"><span class="pre">get_llm_rate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.image_to_video"><code class="docutils literal notranslate"><span class="pre">image_to_video()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.iter_render_scene"><code class="docutils literal notranslate"><span class="pre">iter_render_scene()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.lipsync"><code class="docutils literal notranslate"><span class="pre">lipsync()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.list_llm_rates"><code class="docutils literal notranslate"><span class="pre">list_llm_rates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_ceiling_usd"><code class="docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_complete"><code class="docutils literal notranslate"><span class="pre">llm_complete()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_complete_with_receipt"><code class="docutils literal notranslate"><span class="pre">llm_complete_with_receipt()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.make_call_plan"><code class="docutils literal notranslate"><span class="pre">make_call_plan()</span></code></a></li>
@@ -284,6 +299,7 @@
 <li class="toctree-l1"><a class="reference internal" href="falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="falaw/llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="falaw/operations/_plan.html">falaw.operations._plan</a></li>
@@ -974,6 +990,112 @@ else <code class="docutils literal notranslate"><span class="pre">None</span></c
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="falaw.LlmRate">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">LlmRate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_call_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_usd_per_mtok</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_usd_per_mtok</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/llm_rates.html#LlmRate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.LlmRate" title="Link to this definition"></a></dt>
+<dd><p>What one routed model costs, on every basis the table knows.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#falaw.LlmRate.model" title="Link to this definition"></a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> argument value this row prices, e.g.
+<code class="docutils literal notranslate"><span class="pre">&quot;anthropic/claude-sonnet-4.5&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.tier">
+<span class="sig-name descname"><span class="pre">tier</span></span><a class="headerlink" href="#falaw.LlmRate.tier" title="Link to this definition"></a></dt>
+<dd><p>fal’s billing tier for the router — <code class="docutils literal notranslate"><span class="pre">&quot;standard&quot;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&quot;premium&quot;</span></code>. Informational; <code class="docutils literal notranslate"><span class="pre">per_call_usd</span></code> is already
+materialized, so no multiplier arithmetic happens in code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.per_call_usd">
+<span class="sig-name descname"><span class="pre">per_call_usd</span></span><a class="headerlink" href="#falaw.LlmRate.per_call_usd" title="Link to this definition"></a></dt>
+<dd><p>What fal bills per request when this model is routed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.input_usd_per_mtok">
+<span class="sig-name descname"><span class="pre">input_usd_per_mtok</span></span><a class="headerlink" href="#falaw.LlmRate.input_usd_per_mtok" title="Link to this definition"></a></dt>
+<dd><p>Upstream list price per
+<code class="xref py py-data docutils literal notranslate"><span class="pre">TOKENS_PER_RATE_UNIT</span></code> prompt tokens, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when no
+upstream rate is published for this id — unknown, never zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.output_usd_per_mtok">
+<span class="sig-name descname"><span class="pre">output_usd_per_mtok</span></span><a class="headerlink" href="#falaw.LlmRate.output_usd_per_mtok" title="Link to this definition"></a></dt>
+<dd><p>The same for completion tokens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.source">
+<span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#falaw.LlmRate.source" title="Link to this definition"></a></dt>
+<dd><p>Where these numbers came from.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#falaw.LlmRate.date" title="Link to this definition"></a></dt>
+<dd><p>ISO date they were read on. Rates move; a quote is only as
+fresh as its row.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.LlmRate.notes">
+<span class="sig-name descname"><span class="pre">notes</span></span><a class="headerlink" href="#falaw.LlmRate.notes" title="Link to this definition"></a></dt>
+<dd><p>Free-form caveats.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.LlmRate.has_token_rates">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">has_token_rates</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></span><a class="headerlink" href="#falaw.LlmRate.has_token_rates" title="Link to this definition"></a></dt>
+<dd><p>True when both token columns are populated, so a token quote is possible.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="falaw.LlmReceipt">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">LlmReceipt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_hit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_in</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokens_out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_cost_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'unknown'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/operations/llm.html#LlmReceipt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.LlmReceipt" title="Link to this definition"></a></dt>
 <dd><p>What one eager LLM call cost — the record the eager path never kept.</p>
@@ -992,13 +1114,17 @@ response’s usage block (OpenAI <code class="docutils literal notranslate"><spa
 and Anthropic <code class="docutils literal notranslate"><span class="pre">input_tokens</span></code>/<code class="docutils literal notranslate"><span class="pre">output_tokens</span></code> shapes). <code class="docutils literal notranslate"><span class="pre">None</span></code>
 means <em>unrecorded by the provider response</em>, never zero.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code> is <code class="docutils literal notranslate"><span class="pre">0.0</span></code> on a cache hit (nothing was billed),
-else the <strong>registry estimate</strong> for the application (any-llm’s
-approximate per-call figure today) — an estimate, not an observed
-bill; <code class="docutils literal notranslate"><span class="pre">None</span></code> when the registry cannot price it at all.</p></li>
+else fal’s published per-request price <strong>for the routed model</strong>, read
+off the rate table (<a class="reference internal" href="#falaw.llm_ceiling_usd" title="falaw.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.llm_ceiling_usd()</span></code></a>) — an estimate, not
+an observed bill. It is the routed model and not the <code class="docutils literal notranslate"><span class="pre">fal-ai/any-llm</span></code>
+record because the record carries fal’s <em>standard</em> tier, and a premium
+routed model bills ten times that: pricing every turn from the record
+under-reported premium spend tenfold in the ledger a consumer sums
+(falaw#55). <code class="docutils literal notranslate"><span class="pre">None</span></code> only when nothing can price it at all.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cost_source</span></code> says which of those cases produced the number, so a
 receipt consumer never has to guess: <code class="docutils literal notranslate"><span class="pre">&quot;cache_hit&quot;</span></code>,
-<code class="docutils literal notranslate"><span class="pre">&quot;registry:&lt;kind&gt;&quot;</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;registry:per_call&quot;</span></code>), or
-<code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">&quot;rate_table:per_call&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;registry:&lt;kind&gt;&quot;</span></code> (the fallback for a
+model the table does not price), or <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p></li>
 </ul>
 </dd></dl>
 
@@ -1886,6 +2012,15 @@ actually ingests references. This routes to the <code class="docutils literal no
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.get_llm_rate">
+<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">get_llm_rate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/falaw/llm_rates.html#get_llm_rate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.get_llm_rate" title="Link to this definition"></a></dt>
+<dd><p>The row for <code class="docutils literal notranslate"><span class="pre">model</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when the table does not price it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> is the load-bearing answer: it means <em>unknown</em>, and every caller
+must propagate it as unknown rather than substituting the router’s flat
+price for a model nobody has priced.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.image_to_video">
 <span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">image_to_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'high'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/results.html#falaw.results.Result" title="falaw.results.Result"><span class="pre">Result</span></a></span></span><a class="reference internal" href="../_modules/falaw/operations/video.html#image_to_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.image_to_video" title="Link to this definition"></a></dt>
 <dd><p>Animate a still image into a video.</p>
@@ -1907,6 +2042,93 @@ in close succession even at <code class="docutils literal notranslate"><span cla
 <dt class="sig sig-object py" id="falaw.lipsync">
 <span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">lipsync</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'high'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/results.html#falaw.results.Result" title="falaw.results.Result"><span class="pre">Result</span></a></span></span><a class="reference internal" href="../_modules/falaw/operations/avatar.html#lipsync"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.lipsync" title="Link to this definition"></a></dt>
 <dd><p>Re-sync mouth motion in an existing video to a new audio track.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.list_llm_rates">
+<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">list_llm_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/falaw/llm_rates.html#list_llm_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.list_llm_rates" title="Link to this definition"></a></dt>
+<dd><p>Every row in the table, in file order — the catalogue view.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_ceiling_usd">
+<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">llm_ceiling_usd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_output_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/falaw/llm_rates.html#llm_ceiling_usd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_ceiling_usd" title="Link to this definition"></a></dt>
+<dd><p>Ceiling cost in USD of <code class="docutils literal notranslate"><span class="pre">count</span></code> calls routing <code class="docutils literal notranslate"><span class="pre">model</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<p>Two modes, decided by whether the caller passes a token hint at all.</p>
+<p><strong>No hints</strong> — quote fal’s published per-request price for the routed
+model. That is a known vendor fact, and for the premium tier it is ten
+times what the router’s flat record said:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">flat</span> <span class="o">=</span> <span class="n">llm_ceiling_usd</span><span class="p">(</span><span class="s1">'anthropic/claude-sonnet-4.5'</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flat</span>
+<span class="go">0.01</span>
+</pre></div>
+</div>
+<p><strong>Both hints</strong> — quote the <strong>maximum</strong> of that request price and
+<code class="docutils literal notranslate"><span class="pre">input_tokens</span></code> in plus <code class="docutils literal notranslate"><span class="pre">max_output_tokens</span></code> out at the routed model’s
+upstream rates. Taking the max is what makes it a ceiling: the flat price
+binds a short prompt, the token sum binds a long one, and quoting either
+alone under-quotes the other case.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">long_prompt</span> <span class="o">=</span> <span class="n">llm_ceiling_usd</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">'anthropic/claude-sonnet-4.5'</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="mi">20_000</span><span class="p">,</span> <span class="n">max_output_tokens</span><span class="o">=</span><span class="mi">4_000</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">long_prompt</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">0.12</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">long_prompt</span> <span class="o">&gt;</span> <span class="n">flat</span>        <span class="c1"># length raises the quote; the flat rate is a floor</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Monotone in both hints, so a bigger hint never quotes less:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">llm_ceiling_usd</span><span class="p">(</span><span class="s1">'openai/gpt-4o'</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span> <span class="n">max_output_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">llm_ceiling_usd</span><span class="p">(</span><span class="s1">'openai/gpt-4o'</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="mi">9_000</span><span class="p">,</span> <span class="n">max_output_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">&gt;=</span> <span class="n">a</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Both hints are upper bounds the <em>caller</em> holds at plan time: the prompt is
+already written, and <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code> caps the response. Real output length
+is unknowable before the call, which is exactly why this quotes the cap and
+never a midpoint guess.</p>
+<p>A token quote is therefore <strong>all or nothing</strong>. Asking for one that cannot
+be bounded yields <code class="docutils literal notranslate"><span class="pre">None</span></code> — unknown, which forces approval — rather than a
+number that looks like a ceiling and is not. That covers one hint without
+the other (an uncapped response has no bound to quote):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">llm_ceiling_usd</span><span class="p">(</span><span class="s1">'anthropic/claude-sonnet-4.5'</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="mi">50_000</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>and a row with no published upstream token rates (the request price alone
+is not a ceiling on a token bill nobody has priced):</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">llm_ceiling_usd</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">'google/gemini-flash-1.5'</span><span class="p">,</span> <span class="n">input_tokens</span><span class="o">=</span><span class="mi">50_000</span><span class="p">,</span> <span class="n">max_output_tokens</span><span class="o">=</span><span class="mi">1_000</span>
+<span class="gp">... </span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – The <code class="docutils literal notranslate"><span class="pre">model</span></code> argument the call will send to the router.</p></li>
+<li><p><strong>input_tokens</strong> – Upper bound on prompt tokens. <code class="docutils literal notranslate"><span class="pre">None</span></code> together with
+<code class="docutils literal notranslate"><span class="pre">max_output_tokens</span></code> selects the per-request basis alone.</p></li>
+<li><p><strong>max_output_tokens</strong> – The response cap (any-llm’s <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>).</p></li>
+<li><p><strong>count</strong> – Number of identical calls.</p></li>
+<li><p><strong>rates</strong> – Override table, for a caller who has reconciled real rates
+against their own billing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – a token hint or <code class="docutils literal notranslate"><span class="pre">count</span></code> that is not a plain <code class="docutils literal notranslate"><span class="pre">int</span></code>.
+    A <code class="docutils literal notranslate"><span class="pre">bool</span></code> and a <code class="docutils literal notranslate"><span class="pre">float</span></code> both do the arithmetic silently —
+    <code class="docutils literal notranslate"><span class="pre">True</span></code> prices one token, <code class="docutils literal notranslate"><span class="pre">1.5e4</span></code> prices a fractional one —
+    so a caller who passed the wrong thing would get a number rather
+    than a complaint.</p></li>
+<li><p><strong>ValueError</strong> – a negative token hint or <code class="docutils literal notranslate"><span class="pre">count</span></code>, which would make the
+    token basis <em>lower</em> the ceiling — silently, and in the one
+    direction a spend gate must never err.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -2211,7 +2433,7 @@ in <code class="docutils literal notranslate"><span class="pre">extra</span></co
 
 <dl class="py function">
 <dt class="sig sig-object py" id="falaw.plan_llm_complete">
-<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">plan_llm_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consult_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/plan.html#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span></span><a class="reference internal" href="../_modules/falaw/operations/_plan.html#plan_llm_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan_llm_complete" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">falaw.</span></span><span class="sig-name descname"><span class="pre">plan_llm_complete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_kind</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_output_tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mapping</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="falaw/llm_rates.html#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consult_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="falaw/plan.html#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span></span><a class="reference internal" href="../_modules/falaw/operations/_plan.html#plan_llm_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.plan_llm_complete" title="Link to this definition"></a></dt>
 <dd><p>Plan a <a class="reference internal" href="#falaw.llm_complete" title="falaw.llm_complete"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.llm_complete()</span></code></a> call without executing it.</p>
 <p>Routes through <code class="docutils literal notranslate"><span class="pre">fal-ai/any-llm</span></code> with the <em>exact same</em> application id and
 argument shape as the eager <a class="reference internal" href="#falaw.llm_complete" title="falaw.llm_complete"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.llm_complete()</span></code></a>, so a planned call
@@ -2221,8 +2443,34 @@ the prompt asks for a strict-JSON response — it tells <code class="xref py py-
 what kind of <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.Artifact</span></code> to materialize. Either way the LLM
 response is materialized to a content-addressed cache <em>file</em>
 (<code class="docutils literal notranslate"><span class="pre">Artifact.path</span></code>), because LLM output is text, not a URL.</p>
-<p>Cost is the <code class="docutils literal notranslate"><span class="pre">fal-ai/any-llm</span></code> per-call estimate (<code class="docutils literal notranslate"><span class="pre">source=&quot;approximate&quot;</span></code>
-— real pricing is per-token); pass <code class="docutils literal notranslate"><span class="pre">model</span></code> to pick the underlying model.</p>
+<p><strong>Cost is a ceiling for the routed model</strong>, not the router’s flat price
+(falaw#50, option A). <code class="docutils literal notranslate"><span class="pre">fal-ai/any-llm</span></code> is one registry record routing
+thirty models at two published request tiers, so the record’s single
+<code class="docutils literal notranslate"><span class="pre">per_call</span></code> figure under-quotes every premium model tenfold — including
+this function’s own default. <a class="reference internal" href="#falaw.llm_ceiling_usd" title="falaw.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.llm_ceiling_usd()</span></code></a> prices the
+<code class="docutils literal notranslate"><span class="pre">model</span></code> argument instead:</p>
+<ul class="simple">
+<li><p>no token hints → fal’s published per-request price for that model;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_tokens</span></code> <strong>and</strong> <code class="docutils literal notranslate"><span class="pre">max_output_tokens</span></code> → the greater of that
+price and the upstream per-token cost of a prompt that long capped at
+that many output tokens. Monotone in both hints;</p></li>
+<li><p>a model the rate table does not price, or a token quote that cannot be
+bounded → <code class="docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, which lights up
+<a class="reference internal" href="falaw/plan.html#falaw.plan.Plan.has_unknown_costs" title="falaw.plan.Plan.has_unknown_costs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.plan.Plan.has_unknown_costs</span></code></a> and forces approval. It is
+never quietly the router’s flat price.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">input_tokens</span></code> is what opts a call into a token quote. Given one,
+<code class="docutils literal notranslate"><span class="pre">max_output_tokens</span></code> defaults to whatever the caller already put under
+<code class="xref py py-data docutils literal notranslate"><span class="pre">MAX_OUTPUT_TOKENS_ARGUMENT</span></code> in <code class="docutils literal notranslate"><span class="pre">extra</span></code> — the cap is a fact of the
+call, not a second thing to remember. Without one, <code class="docutils literal notranslate"><span class="pre">extra</span></code> is left alone:
+capping your response is not asking to be quoted by tokens, and reading the
+cap as half a token quote would drop a call that has a perfectly good
+request price down to forced approval.</p>
+<p>Both hints are <strong>estimator-only</strong>: they never enter <code class="docutils literal notranslate"><span class="pre">arguments</span></code>, so adding
+one to an existing call site changes the quote without moving the cache key
+or the plan hash.</p>
+<p><code class="docutils literal notranslate"><span class="pre">llm_rates</span></code> swaps in a caller’s own rate table — the seam for someone who
+has reconciled real numbers against their fal invoice.</p>
 </dd></dl>
 
 <dl class="py function">

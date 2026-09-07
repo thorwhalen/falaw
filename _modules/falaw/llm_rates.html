@@ -1,0 +1,421 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.llm_rates &mdash; falaw 0.0.45 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=dcb4eb81"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/pricing.html">falaw.pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.llm_rates</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.llm_rates</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Per-routed-model LLM rates: the data behind a *ceiling* quote (falaw#50, option A).</span>
+
+<span class="sd">``fal-ai/any-llm`` is one registry record that routes thirty different models,</span>
+<span class="sd">so a single record-level ``cost_estimate`` cannot express what a call actually</span>
+<span class="sd">costs. Until now every planned LLM call quoted that one record's flat</span>
+<span class="sd">$0.001 — which under-quotes in the one direction a cost gate must never err.</span>
+<span class="sd">Two facts, both read off the vendor's own documentation, say by how much:</span>
+
+<span class="sd">1. **fal bills the router per request, at two tiers.** Its endpoint doc says</span>
+<span class="sd">   "$0.001 per requests" and "Premium models are charged at 10x the rate of</span>
+<span class="sd">   standard models", followed by the verbatim premium list. falaw's default</span>
+<span class="sd">   model — ``anthropic/claude-sonnet-4.5`` — is on that list, so *every*</span>
+<span class="sd">   planned LLM call has been quoting a tenth of the published price.</span>
+<span class="sd">2. **The routed model has an upstream per-token rate.** any-llm is "powered by</span>
+<span class="sd">   OpenRouter" and shares its model-id namespace, so OpenRouter's published</span>
+<span class="sd">   prompt/completion rates are what fal resells. A reseller cannot durably</span>
+<span class="sd">   charge less than its own cost, which makes those rates a floor on the true</span>
+<span class="sd">   price of a long prompt on a big model.</span>
+
+<span class="sd">Neither basis dominates the other: the flat request price wins on a short</span>
+<span class="sd">prompt, the token rates win on a long one. So the ceiling is the **maximum</span>
+<span class="sd">over every basis known for that model** (:func:`llm_ceiling_usd`) — the only</span>
+<span class="sd">composition that cannot under-quote either way, and monotone non-decreasing in</span>
+<span class="sd">both token hints.</span>
+
+<span class="sd">The table itself is data, not code: :data:`RATES_FILENAME` under ``falaw/data``,</span>
+<span class="sd">versioned, one row per routed model, each row carrying its own ``source`` and</span>
+<span class="sd">``date``. Nothing here touches the network — planning stays free.</span>
+
+<span class="sd">&gt;&gt;&gt; rate = get_llm_rate('anthropic/claude-sonnet-4.5')</span>
+<span class="sd">&gt;&gt;&gt; rate.tier</span>
+<span class="sd">'premium'</span>
+<span class="sd">&gt;&gt;&gt; rate.per_call_usd</span>
+<span class="sd">0.01</span>
+
+<span class="sd">A model the table does not know is **unknown, not free** — the estimator</span>
+<span class="sd">returns ``None`` so the plan lights up ``has_unknown_costs`` and forces</span>
+<span class="sd">approval, rather than falling back to the router's flat price:</span>
+
+<span class="sd">&gt;&gt;&gt; get_llm_rate('some/model-fal-never-heard-of') is None</span>
+<span class="sd">True</span>
+<span class="sd">&gt;&gt;&gt; llm_ceiling_usd('some/model-fal-never-heard-of') is None</span>
+<span class="sd">True</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="n">RATES_FILENAME</span> <span class="o">=</span> <span class="s2">"llm_rates.json"</span>
+<span class="sd">"""Basename of the rate table under ``falaw/data``."""</span>
+
+<span class="n">TOKENS_PER_RATE_UNIT</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+<span class="sd">"""Token count the table's ``*_per_mtok`` columns are quoted per."""</span>
+
+
+<div class="viewcode-block" id="LlmRate">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.LlmRate">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LlmRate</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""What one routed model costs, on every basis the table knows.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        model: The ``model`` argument value this row prices, e.g.</span>
+<span class="sd">            ``"anthropic/claude-sonnet-4.5"``.</span>
+<span class="sd">        tier: fal's billing tier for the router — ``"standard"`` or</span>
+<span class="sd">            ``"premium"``. Informational; ``per_call_usd`` is already</span>
+<span class="sd">            materialized, so no multiplier arithmetic happens in code.</span>
+<span class="sd">        per_call_usd: What fal bills per request when this model is routed.</span>
+<span class="sd">        input_usd_per_mtok: Upstream list price per</span>
+<span class="sd">            :data:`TOKENS_PER_RATE_UNIT` prompt tokens, or ``None`` when no</span>
+<span class="sd">            upstream rate is published for this id — unknown, never zero.</span>
+<span class="sd">        output_usd_per_mtok: The same for completion tokens.</span>
+<span class="sd">        source: Where these numbers came from.</span>
+<span class="sd">        date: ISO date they were read on. Rates move; a quote is only as</span>
+<span class="sd">            fresh as its row.</span>
+<span class="sd">        notes: Free-form caveats.</span>
+<span class="sd">    """</span>
+
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">tier</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">per_call_usd</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">input_usd_per_mtok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">output_usd_per_mtok</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_token_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""True when both token columns are populated, so a token quote is possible."""</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_usd_per_mtok</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_usd_per_mtok</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="n">LlmRateTable</span> <span class="o">=</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LlmRate</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rates_path</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">"data"</span><span class="p">,</span> <span class="n">RATES_FILENAME</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_llm_rates">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.load_llm_rates">[docs]</a>
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_llm_rates</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">LlmRateTable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The committed rate table, keyed by routed-model id.</span>
+
+<span class="sd">    Cached: the file is read once per process. Tests and callers with their</span>
+<span class="sd">    own reconciled numbers pass a mapping to ``rates=`` instead of mutating</span>
+<span class="sd">    this one.</span>
+<span class="sd">    """</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_rates_path</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">row</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]:</span> <span class="n">LlmRate</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">"model"</span><span class="p">],</span>
+            <span class="n">tier</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">"tier"</span><span class="p">],</span>
+            <span class="n">per_call_usd</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"per_call_usd"</span><span class="p">]),</span>
+            <span class="n">input_usd_per_mtok</span><span class="o">=</span><span class="n">_optional_float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"input_usd_per_mtok"</span><span class="p">)),</span>
+            <span class="n">output_usd_per_mtok</span><span class="o">=</span><span class="n">_optional_float</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"output_usd_per_mtok"</span><span class="p">)),</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">date</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="n">notes</span><span class="o">=</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"notes"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">"rows"</span><span class="p">]</span>
+    <span class="p">}</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_optional_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="list_llm_rates">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.list_llm_rates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_llm_rates</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlmRateTable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">LlmRate</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Every row in the table, in file order — the catalogue view."""</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">((</span><span class="n">rates</span> <span class="k">if</span> <span class="n">rates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">load_llm_rates</span><span class="p">())</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="get_llm_rate">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.get_llm_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_llm_rate</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">rates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlmRateTable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlmRate</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The row for ``model``, or ``None`` when the table does not price it.</span>
+
+<span class="sd">    ``None`` is the load-bearing answer: it means *unknown*, and every caller</span>
+<span class="sd">    must propagate it as unknown rather than substituting the router's flat</span>
+<span class="sd">    price for a model nobody has priced.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">rates</span> <span class="k">if</span> <span class="n">rates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">load_llm_rates</span><span class="p">())</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="llm_ceiling_usd">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.llm_ceiling_usd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">llm_ceiling_usd</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">input_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_output_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">rates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlmRateTable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Ceiling cost in USD of ``count`` calls routing ``model``, or ``None``.</span>
+
+<span class="sd">    Two modes, decided by whether the caller passes a token hint at all.</span>
+
+<span class="sd">    **No hints** — quote fal's published per-request price for the routed</span>
+<span class="sd">    model. That is a known vendor fact, and for the premium tier it is ten</span>
+<span class="sd">    times what the router's flat record said:</span>
+
+<span class="sd">    &gt;&gt;&gt; flat = llm_ceiling_usd('anthropic/claude-sonnet-4.5')</span>
+<span class="sd">    &gt;&gt;&gt; flat</span>
+<span class="sd">    0.01</span>
+
+<span class="sd">    **Both hints** — quote the **maximum** of that request price and</span>
+<span class="sd">    ``input_tokens`` in plus ``max_output_tokens`` out at the routed model's</span>
+<span class="sd">    upstream rates. Taking the max is what makes it a ceiling: the flat price</span>
+<span class="sd">    binds a short prompt, the token sum binds a long one, and quoting either</span>
+<span class="sd">    alone under-quotes the other case.</span>
+
+<span class="sd">    &gt;&gt;&gt; long_prompt = llm_ceiling_usd(</span>
+<span class="sd">    ...     'anthropic/claude-sonnet-4.5', input_tokens=20_000, max_output_tokens=4_000</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; round(long_prompt, 4)</span>
+<span class="sd">    0.12</span>
+<span class="sd">    &gt;&gt;&gt; long_prompt &gt; flat        # length raises the quote; the flat rate is a floor</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Monotone in both hints, so a bigger hint never quotes less:</span>
+
+<span class="sd">    &gt;&gt;&gt; a = llm_ceiling_usd('openai/gpt-4o', input_tokens=1_000, max_output_tokens=100)</span>
+<span class="sd">    &gt;&gt;&gt; b = llm_ceiling_usd('openai/gpt-4o', input_tokens=9_000, max_output_tokens=100)</span>
+<span class="sd">    &gt;&gt;&gt; b &gt;= a</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Both hints are upper bounds the *caller* holds at plan time: the prompt is</span>
+<span class="sd">    already written, and ``max_tokens`` caps the response. Real output length</span>
+<span class="sd">    is unknowable before the call, which is exactly why this quotes the cap and</span>
+<span class="sd">    never a midpoint guess.</span>
+
+<span class="sd">    A token quote is therefore **all or nothing**. Asking for one that cannot</span>
+<span class="sd">    be bounded yields ``None`` — unknown, which forces approval — rather than a</span>
+<span class="sd">    number that looks like a ceiling and is not. That covers one hint without</span>
+<span class="sd">    the other (an uncapped response has no bound to quote):</span>
+
+<span class="sd">    &gt;&gt;&gt; llm_ceiling_usd('anthropic/claude-sonnet-4.5', input_tokens=50_000) is None</span>
+<span class="sd">    True</span>
+
+<span class="sd">    and a row with no published upstream token rates (the request price alone</span>
+<span class="sd">    is not a ceiling on a token bill nobody has priced):</span>
+
+<span class="sd">    &gt;&gt;&gt; llm_ceiling_usd(</span>
+<span class="sd">    ...     'google/gemini-flash-1.5', input_tokens=50_000, max_output_tokens=1_000</span>
+<span class="sd">    ... ) is None</span>
+<span class="sd">    True</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: The ``model`` argument the call will send to the router.</span>
+<span class="sd">        input_tokens: Upper bound on prompt tokens. ``None`` together with</span>
+<span class="sd">            ``max_output_tokens`` selects the per-request basis alone.</span>
+<span class="sd">        max_output_tokens: The response cap (any-llm's ``max_tokens``).</span>
+<span class="sd">        count: Number of identical calls.</span>
+<span class="sd">        rates: Override table, for a caller who has reconciled real rates</span>
+<span class="sd">            against their own billing.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: a token hint or ``count`` that is not a plain ``int``.</span>
+<span class="sd">            A ``bool`` and a ``float`` both do the arithmetic silently —</span>
+<span class="sd">            ``True`` prices one token, ``1.5e4`` prices a fractional one —</span>
+<span class="sd">            so a caller who passed the wrong thing would get a number rather</span>
+<span class="sd">            than a complaint.</span>
+<span class="sd">        ValueError: a negative token hint or ``count``, which would make the</span>
+<span class="sd">            token basis *lower* the ceiling — silently, and in the one</span>
+<span class="sd">            direction a spend gate must never err.</span>
+<span class="sd">    """</span>
+    <span class="n">_require_count</span><span class="p">(</span>
+        <span class="n">input_tokens</span><span class="o">=</span><span class="n">input_tokens</span><span class="p">,</span> <span class="n">max_output_tokens</span><span class="o">=</span><span class="n">max_output_tokens</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">count</span>
+    <span class="p">)</span>
+
+    <span class="n">rate</span> <span class="o">=</span> <span class="n">get_llm_rate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">rates</span><span class="o">=</span><span class="n">rates</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">rate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># unpriceable model → unknown, NOT the router's flat price</span>
+
+    <span class="k">if</span> <span class="n">input_tokens</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_output_tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rate</span><span class="o">.</span><span class="n">per_call_usd</span> <span class="o">*</span> <span class="n">count</span>
+    <span class="k">if</span> <span class="n">input_tokens</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_output_tokens</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rate</span><span class="o">.</span><span class="n">has_token_rates</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># a token quote was asked for and cannot be bounded</span>
+
+    <span class="n">token_cost</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">input_tokens</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">input_usd_per_mtok</span>
+        <span class="o">+</span> <span class="n">max_output_tokens</span> <span class="o">*</span> <span class="n">rate</span><span class="o">.</span><span class="n">output_usd_per_mtok</span>
+    <span class="p">)</span> <span class="o">/</span> <span class="n">TOKENS_PER_RATE_UNIT</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">rate</span><span class="o">.</span><span class="n">per_call_usd</span><span class="p">,</span> <span class="n">token_cost</span><span class="p">)</span> <span class="o">*</span> <span class="n">count</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_require_count</span><span class="p">(</span><span class="o">**</span><span class="n">quantities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Refuse anything but a non-negative ``int`` (or ``None``) for each quantity."""</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">quantities</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an int; got </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be non-negative; got </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

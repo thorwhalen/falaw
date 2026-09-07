@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations._plan &mdash; falaw 0.0.44 documentation</title>
+  <title>falaw.operations._plan &mdash; falaw 0.0.45 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=78cc6f98"></script>
+      <script src="../../../_static/documentation_options.js?v=dcb4eb81"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -65,6 +65,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
@@ -136,6 +137,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..cost</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_call_cost</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..llm_rates</span><span class="w"> </span><span class="kn">import</span> <span class="n">LlmRateTable</span><span class="p">,</span> <span class="n">llm_ceiling_usd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">make_call_plan</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">pick_model</span>
 
@@ -596,6 +598,14 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
 
+<span class="n">MAX_OUTPUT_TOKENS_ARGUMENT</span> <span class="o">=</span> <span class="s2">"max_tokens"</span>
+<span class="sd">"""any-llm's response-cap argument, and hence the default output-token hint.</span>
+
+<span class="sd">The cap the caller already put in ``extra`` is a *fact of the call*, not a</span>
+<span class="sd">guess, so a plan that carries one quotes against it without being told twice.</span>
+<span class="sd">"""</span>
+
+
 <div class="viewcode-block" id="plan_llm_complete">
 <a class="viewcode-back" href="../../../module_docs/falaw/operations/_plan.html#falaw.plan_llm_complete">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plan_llm_complete</span><span class="p">(</span>
@@ -605,6 +615,9 @@
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">temperature</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
     <span class="n">output_kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"text"</span><span class="p">,</span>
+    <span class="n">input_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_output_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">llm_rates</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlmRateTable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -621,31 +634,78 @@
 <span class="sd">    response is materialized to a content-addressed cache *file*</span>
 <span class="sd">    (``Artifact.path``), because LLM output is text, not a URL.</span>
 
-<span class="sd">    Cost is the ``fal-ai/any-llm`` per-call estimate (``source="approximate"``</span>
-<span class="sd">    — real pricing is per-token); pass ``model`` to pick the underlying model.</span>
+<span class="sd">    **Cost is a ceiling for the routed model**, not the router's flat price</span>
+<span class="sd">    (falaw#50, option A). ``fal-ai/any-llm`` is one registry record routing</span>
+<span class="sd">    thirty models at two published request tiers, so the record's single</span>
+<span class="sd">    ``per_call`` figure under-quotes every premium model tenfold — including</span>
+<span class="sd">    this function's own default. :func:`falaw.llm_ceiling_usd` prices the</span>
+<span class="sd">    ``model`` argument instead:</span>
+
+<span class="sd">    - no token hints → fal's published per-request price for that model;</span>
+<span class="sd">    - ``input_tokens`` **and** ``max_output_tokens`` → the greater of that</span>
+<span class="sd">      price and the upstream per-token cost of a prompt that long capped at</span>
+<span class="sd">      that many output tokens. Monotone in both hints;</span>
+<span class="sd">    - a model the rate table does not price, or a token quote that cannot be</span>
+<span class="sd">      bounded → ``estimated_cost_usd`` is ``None``, which lights up</span>
+<span class="sd">      :attr:`falaw.plan.Plan.has_unknown_costs` and forces approval. It is</span>
+<span class="sd">      never quietly the router's flat price.</span>
+
+<span class="sd">    ``input_tokens`` is what opts a call into a token quote. Given one,</span>
+<span class="sd">    ``max_output_tokens`` defaults to whatever the caller already put under</span>
+<span class="sd">    :data:`MAX_OUTPUT_TOKENS_ARGUMENT` in ``extra`` — the cap is a fact of the</span>
+<span class="sd">    call, not a second thing to remember. Without one, ``extra`` is left alone:</span>
+<span class="sd">    capping your response is not asking to be quoted by tokens, and reading the</span>
+<span class="sd">    cap as half a token quote would drop a call that has a perfectly good</span>
+<span class="sd">    request price down to forced approval.</span>
+
+<span class="sd">    Both hints are **estimator-only**: they never enter ``arguments``, so adding</span>
+<span class="sd">    one to an existing call site changes the quote without moving the cache key</span>
+<span class="sd">    or the plan hash.</span>
+
+<span class="sd">    ``llm_rates`` swaps in a caller's own rate table — the seam for someone who</span>
+<span class="sd">    has reconciled real numbers against their fal invoice.</span>
 <span class="sd">    """</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.llm</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DEFAULT_LLM</span><span class="p">,</span> <span class="n">_DEFAULT_MODEL</span>
 
     <span class="n">application</span> <span class="o">=</span> <span class="n">_DEFAULT_LLM</span>
-    <span class="n">record</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+    <span class="n">routed_model</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">_DEFAULT_MODEL</span>
     <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span> <span class="ow">or</span> <span class="n">_DEFAULT_MODEL</span><span class="p">,</span>
+        <span class="s2">"model"</span><span class="p">:</span> <span class="n">routed_model</span><span class="p">,</span>
         <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
         <span class="s2">"temperature"</span><span class="p">:</span> <span class="n">temperature</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">system</span><span class="p">:</span>
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"system_prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">system</span>
     <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="k">if</span> <span class="n">input_tokens</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_output_tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_output_tokens</span> <span class="o">=</span> <span class="n">_int_or_none</span><span class="p">(</span><span class="n">arguments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">MAX_OUTPUT_TOKENS_ARGUMENT</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"llm_complete"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="n">output_kind</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]  # "text" | "json"</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">llm_ceiling_usd</span><span class="p">(</span>
+            <span class="n">routed_model</span><span class="p">,</span>
+            <span class="n">input_tokens</span><span class="o">=</span><span class="n">input_tokens</span><span class="p">,</span>
+            <span class="n">max_output_tokens</span><span class="o">=</span><span class="n">max_output_tokens</span><span class="p">,</span>
+            <span class="n">rates</span><span class="o">=</span><span class="n">llm_rates</span><span class="p">,</span>
+        <span class="p">),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
     <span class="p">)</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_int_or_none</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""``value`` as an int when it genuinely is one, else ``None``.</span>
+
+<span class="sd">    ``extra`` is a free-form pass-through, so ``max_tokens`` may hold anything</span>
+<span class="sd">    a model accepts. Only a real non-negative int is a usable output bound;</span>
+<span class="sd">    anything else leaves the hint unset rather than coercing a guess.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">value</span>
 </pre></div>
 
            </div>

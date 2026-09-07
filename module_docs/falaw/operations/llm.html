@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations.llm &mdash; falaw 0.0.44 documentation</title>
+  <title>falaw.operations.llm &mdash; falaw 0.0.45 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=78cc6f98"></script>
+      <script src="../../../_static/documentation_options.js?v=dcb4eb81"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -68,6 +68,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../errors.html">falaw.errors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="_plan.html">falaw.operations._plan</a></li>
@@ -150,13 +151,17 @@ response’s usage block (OpenAI <code class="docutils literal notranslate"><spa
 and Anthropic <code class="docutils literal notranslate"><span class="pre">input_tokens</span></code>/<code class="docutils literal notranslate"><span class="pre">output_tokens</span></code> shapes). <code class="docutils literal notranslate"><span class="pre">None</span></code>
 means <em>unrecorded by the provider response</em>, never zero.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code> is <code class="docutils literal notranslate"><span class="pre">0.0</span></code> on a cache hit (nothing was billed),
-else the <strong>registry estimate</strong> for the application (any-llm’s
-approximate per-call figure today) — an estimate, not an observed
-bill; <code class="docutils literal notranslate"><span class="pre">None</span></code> when the registry cannot price it at all.</p></li>
+else fal’s published per-request price <strong>for the routed model</strong>, read
+off the rate table (<a class="reference internal" href="../../falaw.html#falaw.llm_ceiling_usd" title="falaw.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.llm_ceiling_usd()</span></code></a>) — an estimate, not
+an observed bill. It is the routed model and not the <code class="docutils literal notranslate"><span class="pre">fal-ai/any-llm</span></code>
+record because the record carries fal’s <em>standard</em> tier, and a premium
+routed model bills ten times that: pricing every turn from the record
+under-reported premium spend tenfold in the ledger a consumer sums
+(falaw#55). <code class="docutils literal notranslate"><span class="pre">None</span></code> only when nothing can price it at all.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cost_source</span></code> says which of those cases produced the number, so a
 receipt consumer never has to guess: <code class="docutils literal notranslate"><span class="pre">&quot;cache_hit&quot;</span></code>,
-<code class="docutils literal notranslate"><span class="pre">&quot;registry:&lt;kind&gt;&quot;</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;registry:per_call&quot;</span></code>), or
-<code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">&quot;rate_table:per_call&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;registry:&lt;kind&gt;&quot;</span></code> (the fallback for a
+model the table does not price), or <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>.</p></li>
 </ul>
 </dd></dl>
 

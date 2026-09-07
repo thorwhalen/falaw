@@ -1,0 +1,4 @@
+falaw.llm_rates
+===============
+.. automodule:: falaw.llm_rates
+   :members:
