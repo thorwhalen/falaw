@@ -73,6 +73,12 @@ from .cost import (
     estimate_call_cost,
     estimate_scene_cost,
 )
+from .llm_rates import (
+    LlmRate,
+    get_llm_rate,
+    list_llm_rates,
+    llm_ceiling_usd,
+)
 from .events import (
     ProgressEvent,
     clear_subscribers,
@@ -211,6 +217,10 @@ __all__ = [
     "clear_subscribers",
     "estimate_call_cost",
     "estimate_scene_cost",
+    "LlmRate",
+    "get_llm_rate",
+    "list_llm_rates",
+    "llm_ceiling_usd",
     "subscribe",
     "unsubscribe",
     "animate_face",

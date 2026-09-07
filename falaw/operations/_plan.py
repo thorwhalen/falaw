@@ -22,6 +22,7 @@ from __future__ import annotations
 from typing import Optional
 
 from ..cost import estimate_call_cost
+from ..llm_rates import LlmRateTable, llm_ceiling_usd
 from ..plan import CallPlan, make_call_plan
 from ..registry import get_model, pick_model
 
@@ -455,6 +456,14 @@ def plan_generate_audio(
 # ---------------------------------------------------------------------------
 
 
+MAX_OUTPUT_TOKENS_ARGUMENT = "max_tokens"
+"""any-llm's response-cap argument, and hence the default output-token hint.
+
+The cap the caller already put in ``extra`` is a *fact of the call*, not a
+guess, so a plan that carries one quotes against it without being told twice.
+"""
+
+
 def plan_llm_complete(
     prompt: str,
     *,
@@ -462,6 +471,9 @@ def plan_llm_complete(
     model: Optional[str] = None,
     temperature: float = 0.7,
     output_kind: str = "text",
+    input_tokens: Optional[int] = None,
+    max_output_tokens: Optional[int] = None,
+    llm_rates: Optional[LlmRateTable] = None,
     extra: Optional[dict] = None,
     metadata: Optional[dict] = None,
     consult_cache: bool = True,
@@ -478,27 +490,74 @@ def plan_llm_complete(
     response is materialized to a content-addressed cache *file*
     (``Artifact.path``), because LLM output is text, not a URL.
 
-    Cost is the ``fal-ai/any-llm`` per-call estimate (``source="approximate"``
-    — real pricing is per-token); pass ``model`` to pick the underlying model.
+    **Cost is a ceiling for the routed model**, not the router's flat price
+    (falaw#50, option A). ``fal-ai/any-llm`` is one registry record routing
+    thirty models at two published request tiers, so the record's single
+    ``per_call`` figure under-quotes every premium model tenfold — including
+    this function's own default. :func:`falaw.llm_ceiling_usd` prices the
+    ``model`` argument instead:
+
+    - no token hints → fal's published per-request price for that model;
+    - ``input_tokens`` **and** ``max_output_tokens`` → the greater of that
+      price and the upstream per-token cost of a prompt that long capped at
+      that many output tokens. Monotone in both hints;
+    - a model the rate table does not price, or a token quote that cannot be
+      bounded → ``estimated_cost_usd`` is ``None``, which lights up
+      :attr:`falaw.plan.Plan.has_unknown_costs` and forces approval. It is
+      never quietly the router's flat price.
+
+    ``input_tokens`` is what opts a call into a token quote. Given one,
+    ``max_output_tokens`` defaults to whatever the caller already put under
+    :data:`MAX_OUTPUT_TOKENS_ARGUMENT` in ``extra`` — the cap is a fact of the
+    call, not a second thing to remember. Without one, ``extra`` is left alone:
+    capping your response is not asking to be quoted by tokens, and reading the
+    cap as half a token quote would drop a call that has a perfectly good
+    request price down to forced approval.
+
+    Both hints are **estimator-only**: they never enter ``arguments``, so adding
+    one to an existing call site changes the quote without moving the cache key
+    or the plan hash.
+
+    ``llm_rates`` swaps in a caller's own rate table — the seam for someone who
+    has reconciled real numbers against their fal invoice.
     """
     from .llm import _DEFAULT_LLM, _DEFAULT_MODEL
 
     application = _DEFAULT_LLM
-    record = get_model(application)
+    routed_model = model or _DEFAULT_MODEL
     arguments: dict = {
-        "model": model or _DEFAULT_MODEL,
+        "model": routed_model,
         "prompt": prompt,
         "temperature": temperature,
     }
     if system:
         arguments["system_prompt"] = system
     arguments.update(extra or {})
+    if input_tokens is not None and max_output_tokens is None:
+        max_output_tokens = _int_or_none(arguments.get(MAX_OUTPUT_TOKENS_ARGUMENT))
     return make_call_plan(
         tool="llm_complete",
         application=application,
         arguments=arguments,
         output_kind=output_kind,  # type: ignore[arg-type]  # "text" | "json"
-        estimated_cost_usd=_estimate_cost_with_record(record),
+        estimated_cost_usd=llm_ceiling_usd(
+            routed_model,
+            input_tokens=input_tokens,
+            max_output_tokens=max_output_tokens,
+            rates=llm_rates,
+        ),
         metadata=metadata,
         consult_cache=consult_cache,
     )
+
+
+def _int_or_none(value) -> Optional[int]:
+    """``value`` as an int when it genuinely is one, else ``None``.
+
+    ``extra`` is a free-form pass-through, so ``max_tokens`` may hold anything
+    a model accepts. Only a real non-negative int is a usable output bound;
+    anything else leaves the hint unset rather than coercing a guess.
+    """
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return None
+    return value

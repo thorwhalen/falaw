@@ -6,7 +6,8 @@ What these pin:
   Anthropic usage shapes; None — never zero — when the response carries no
   usage block);
 * a cache hit is a $0.00 receipt with ``cost_source="cache_hit"``; a fresh
-  call carries the registry estimate with its kind named;
+  call is priced for the *routed* model against the rate table, falling back
+  to the registry (named in ``cost_source``) only for a model no table prices;
 * ``llm_complete`` delegates to the receipt variant — one
   argument-construction site, so the two spellings share one cache entry
   (proved by a cross-spelling cache hit);
@@ -94,14 +95,40 @@ def test_receipt_reports_none_tokens_when_unrecorded(monkeypatch):
     assert (r.tokens_in, r.tokens_out) == (None, None)
 
 
-def test_fresh_call_carries_the_registry_estimate(monkeypatch):
+def test_fresh_call_is_priced_for_the_routed_model(monkeypatch):
+    # Was pinned to the fal-ai/any-llm record. That record carries fal's
+    # *standard* request tier, and the default routed model is on fal's
+    # published premium list at 10x — so this used to under-report every
+    # premium turn tenfold in the ledger a consumer sums (falaw#55).
+    _install_fake_fal(monkeypatch, response=NO_USAGE)
+    from falaw import llm_complete_with_receipt, llm_ceiling_usd
+    from falaw.operations.llm import _DEFAULT_MODEL
+
+    _, r = llm_complete_with_receipt("q")
+    assert r.estimated_cost_usd == pytest.approx(llm_ceiling_usd(_DEFAULT_MODEL))
+    assert r.cost_source == "rate_table:per_call"
+
+
+def test_a_premium_routed_model_is_not_priced_at_the_router_rate(monkeypatch):
     _install_fake_fal(monkeypatch, response=NO_USAGE)
     from falaw import llm_complete_with_receipt
     from falaw.registry import get_model
 
     _, r = llm_complete_with_receipt("q")
+    router_flat = get_model("fal-ai/any-llm").cost_estimate.amount
+    assert r.estimated_cost_usd > router_flat
+
+
+def test_a_model_the_table_does_not_price_falls_back_to_the_registry(monkeypatch):
+    # A receipt records money already spent, so an unpriced routed model keeps
+    # the router's approximate number rather than dropping to None — with
+    # cost_source saying so, unlike a plan-time quote which must go unknown.
+    _install_fake_fal(monkeypatch, response=NO_USAGE)
+    from falaw import llm_complete_with_receipt
+    from falaw.registry import get_model
+
+    _, r = llm_complete_with_receipt("q", model="some/model-nobody-priced")
     record = get_model("fal-ai/any-llm")
-    assert record.cost_estimate is not None  # the premise of this pin
     assert r.estimated_cost_usd == pytest.approx(record.cost_estimate.amount)
     assert r.cost_source == f"registry:{record.cost_estimate.kind}"
 
