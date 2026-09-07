@@ -130,6 +130,32 @@ or "re-verify this" switch. `execute_plan(plan, use_cache=False)` does neither, 
 throws away the result it just paid for and the next caller re-bills; reach for it only
 when you truly want no cache interaction. Both together raises: nothing to key a write on.
 
+### plan_llm_complete quotes a ceiling for the *routed* model
+
+`fal-ai/any-llm` is one endpoint routing thirty models at two published request
+tiers, so its single registry price under-quotes every premium model tenfold ---
+including falaw's own default, `anthropic/claude-sonnet-4.5`. Planned LLM calls
+price the `model` argument against `falaw/data/llm_rates.json` instead:
+
+```python
+from falaw import plan_llm_complete, llm_ceiling_usd
+
+plan_llm_complete(prompt).estimated_cost_usd  # fal's request price for the model
+plan_llm_complete(prompt, input_tokens=180_000, max_output_tokens=8_000)
+# -> max(request price, upstream per-token cost of that prompt capped there)
+```
+
+Give both hints or neither. Half a bound is not a ceiling, so one hint alone ---
+and a model the table does not price --- yields `estimated_cost_usd=None`, which
+lights up `Plan.has_unknown_costs` and forces approval rather than quietly
+quoting the router's flat price. `max_output_tokens` defaults to `extra["max_tokens"]`
+when you already capped the response there. Hints are estimator-only: adding one
+never moves the cache key or the plan hash.
+
+Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
+a caller who has reconciled real numbers against their fal invoice passes their
+own table as `llm_rates=`.
+
 ## Read the journal first
 
 Before novel work, glance at recent entries --- past sessions may have
