@@ -309,17 +309,34 @@ Examples:
   - `falaw.voice_clone(**{'reference_audio_url': 'https://example.com/me.wav', 'text': 'Hello, this is in my voice.'})`
 
 
-### `falaw.lipsync`
+### `falaw.generate_audio`
 
-Generate a lip-synced talking-head video from a face image and an audio track. Returns a falaw.Result whose .first asset is the synced video URL.
+Generate ambient sound, an SFX bed, or music from a text prompt — the 'city night' / 'rain on a tin roof' bed a cut needs, without leaving the editor. `kind` picks the model family: 'ambient'/'sfx' → mmaudio text-to-audio, 'music' → Lyria 2. Returns a falaw.Result whose .first asset is the audio URL.
 
 Examples:
-  - `falaw.lipsync(**{'image_url': 'https://...', 'audio_url': 'https://...'})`
+  - `falaw.generate_audio(**{'prompt': 'city street at night, distant traffic', 'kind': 'ambient'})`
+  - `falaw.generate_audio(**{'prompt': 'gentle acoustic guitar, hopeful', 'kind': 'music'})`
+
+
+### `falaw.animate_face`
+
+Animate a still face image to speak an audio track. Returns a falaw.Result whose .first asset is the talking-head video URL. Use this when you have a portrait + audio but NOT an existing video. Picks ai-avatar (balanced) or omnihuman v1.5 (high).
+
+Examples:
+  - `falaw.animate_face(**{'image_url': 'https://...', 'audio_url': 'https://...', 'prompt': 'warm, attentive listener'})`
+
+
+### `falaw.lipsync`
+
+Re-sync an existing VIDEO clip to a new audio track. Pass `video_url` (NOT a still image) and `audio_url`. The model replaces mouth motion to match the audio while keeping body and motion from the original video. Use `animate_face` if you only have a still image.
+
+Examples:
+  - `falaw.lipsync(**{'video_url': 'https://...', 'audio_url': 'https://...'})`
 
 
 ### `falaw.talking_avatar_from_text`
 
-Composer: text + face image → lip-synced talking video. Internally runs `text_to_speech(text)` then `lipsync(image_url, audio_url)`. Returns the lipsync Result. Use this when you have text and a portrait but no pre-recorded audio.
+Composer: text + face IMAGE → talking-head video. Internally runs `text_to_speech(text)` then `animate_face(image_url, audio_url, prompt)`. Returns the animate_face Result. Use this when you have text and a portrait but no audio.
 
 Examples:
   - `falaw.talking_avatar_from_text(**{'text': 'Welcome to the demo.', 'image_url': 'https://example.com/host.jpg'})`
@@ -341,6 +358,22 @@ Edit an image using a natural-language instruction. Picks a FLUX Kontext / SeedE
 Examples:
   - `falaw.edit_image(**{'image_url': 'https://...', 'prompt': 'make the sky orange'})`
   - `falaw.edit_image(**{'image_url': 'https://...', 'prompt': 'remove the person on the left', 'quality': 'ultra'})`
+
+
+### `falaw.generate_image_with_refs`
+
+Generate a NEW image from a text prompt while conditioning on one or more reference images, so a recurring subject (a character's face, a location, a prop) stays consistent across renders. Unlike generate_image (pure text-to-image — reference images have no effect), this routes to a reference-capable image model (Flux Kontext / OmniGen / SeedEdit) that actually ingests the references. The first reference anchors the primary subject; all references are also passed together. Returns a falaw.Result with the generated image.
+
+Examples:
+  - `falaw.generate_image_with_refs(**{'prompt': 'Alex looks up at the bell, candlelight on his face', 'reference_image_urls': ['https://x/alex-modelsheet.png'], 'quality': 'balanced'})`
+
+
+### `falaw.composite_character_in_environment`
+
+Place a specific character into a specific environment as a single still image, preserving the character's identity. Uses an image-edit model that accepts multiple reference images (Flux Kontext, OmniGen v2, SeedEdit). The character image anchors identity; the environment image anchors location, lighting, and palette. Returns a falaw.Result with the composited still.
+
+Examples:
+  - `falaw.composite_character_in_environment(**{'character_image_url': 'https://x/thor.png', 'environment_image_url': 'https://x/bell_tower.png', 'prompt': 'Thor stands in the bell tower, contemplative gaze, candlelight on his face', 'quality': 'high'})`
 
 
 ### `falaw.upscale_image`
@@ -424,9 +457,7 @@ Render a Shot: a still (storyboard) or short clip if `as_video=True` (image-to-v
 
 ### `falaw.render_scene`
 
-Render an entire Scene: every Shot + every Beat, with caching so unchanged units are no-ops. Returns a manifest dict with per-beat and per-shot results, plus aggregate counts. Pass `force=True` to bypass the cache. `concurrency=N` (default 1) runs N units in parallel through a thread pool. For live progress, use `iter_render_scene(scene, concurrency=N)` which yields `(kind, result)` pairs as each unit completes.
-
-Subscribe to progress events with `falaw.subscribe(callback)` (callback gets `ProgressEvent(kind, application, call_id, message, pct, elapsed_s)`); kinds include `queued`, `progress`, `log`, `done`, `error`, and `cache_hit`. Use `estimate_scene_cost(scene)` to get a USD `CostRollup` before kicking off a render — useful for budget gating.
+Render an entire Scene: every Shot + every Beat, with caching so unchanged units are no-ops. Returns a manifest dict with per-beat and per-shot results, plus aggregate counts. Pass `force=True` to bypass the cache.
 
 
 ### `falaw.text_to_video`
@@ -457,6 +488,11 @@ Refresh `llms.txt` and `llms-full.txt` from fal.ai using conditional GETs (ETag-
 Re-crawl every per-page .md endpoint listed in `fal_ai_docs_index.md` with conditional GETs, then reassemble `fal_ai_docs_full.md`. Heavy. Gated on `is_stale(llms-full)` by default --- pass `force=True` to skip the gate. Pages that 304 are skipped; only changed pages re-download. Logs a single journal entry summarizing the run.
 
 
+### `falaw.refresh_model_prices`
+
+Fetch fal's unit pricing for every model in `falaw/data/models.json` and write structured cost_estimates with source='api'. Hand-written prices the API disagrees with are overwritten and the delta reported. Units with no CostKind mapping (GPU/compute units) are recorded, not guessed. Reads the vendor's free pricing endpoint; makes no billed call. Pass `write=True` to persist; default is a dry-run summary.
+
+
 ### `falaw.refresh_llm_rates`
 
 Fetch fal's any-llm doc and OpenRouter's model catalogue and diff them against `falaw/data/llm_rates.json`. Never overwrites the committed table -- a repriced or retiered model is a decision, not an auto-apply. Pass `write=True` to persist a proposed table (`llm_rates.proposed.json`) plus a human-readable diff (`llm_rates.diff.txt`) for a human to review and promote; default is a dry-run summary. Reads two free, unauthenticated endpoints; makes no billed call.
@@ -469,8 +505,8 @@ The model registry lives at `falaw/data/models.json`. Refresh it from
 
 ```
   audio                balanced   fal-ai/elevenlabs/audio-isolation
-  audio                balanced   fal-ai/playai/inpaint/diffusion
   avatar               balanced   fal-ai/ai-avatar
+  avatar               high       fal-ai/bytedance/omnihuman/v1.5
   background_removal   balanced   fal-ai/bria/background/remove
   background_removal   balanced   fal-ai/ideogram/v3/reframe
   background_removal   high       fal-ai/birefnet/v2
@@ -504,8 +540,6 @@ The model registry lives at `falaw/data/models.json`. Refresh it from
   training             balanced   fal-ai/flux-lora-portrait-trainer
   training             fast       fal-ai/flux-lora-fast-training
   training             high       fal-ai/flux-pro-trainer
-  tts                  balanced   fal-ai/playai/tts/dialog
-  tts                  balanced   fal-ai/playai/tts/v3
   tts                  high       fal-ai/elevenlabs/tts/multilingual-v2
   tts                  high       fal-ai/minimax/speech-02-hd
   upscale              high       fal-ai/clarity-upscaler
