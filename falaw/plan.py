@@ -583,12 +583,43 @@ once. (:func:`falaw.render_scene` makes the same choice for the same reason.)
 """
 
 
+def _resolved_cache_mode(use_cache: bool, refresh: bool) -> tuple[bool, bool]:
+    """Validate the ``(use_cache, refresh)`` pair, returning it unchanged.
+
+    Three modes, one of which is new (falaw#49):
+
+    ============================  ==========  ===========  ==========
+    ``(use_cache, refresh)``      cache read  cache write  meaning
+    ============================  ==========  ===========  ==========
+    ``(True, False)`` — default   yes         yes          reuse, then keep
+    ``(True, True)``  — new       no          yes          re-run, but keep
+    ``(False, False)``            no          no           do not touch it
+    ============================  ==========  ===========  ==========
+
+    ``(False, True)`` is the fourth corner and it has no meaning: the write
+    needs a key, and the key args are only resolved when ``use_cache`` is on
+    (the key ref is stricter than the wire ref — see :func:`execute`). Picking
+    one of the two intents silently would hand the caller a spend policy they
+    did not ask for, so it raises.
+    """
+    if refresh and not use_cache:
+        raise ValueError(
+            "refresh=True requires use_cache=True. refresh means 'skip the "
+            "cache read, keep the cache write', so it needs the cache on; "
+            "use_cache=False means 'do not touch the cache at all' and writes "
+            "nothing. Pass use_cache=True, refresh=True to re-run a plan and "
+            "keep what the re-run paid for."
+        )
+    return use_cache, refresh
+
+
 def execute(
     plan: Plan,
     *,
     on_event: Optional[Callable] = None,
     dry_run: bool = False,
     use_cache: bool = True,
+    refresh: bool = False,
     artifact_converter: Optional[ResultToArtifact] = None,
     content_store=None,
     fetch_bytes: Optional[bool] = None,
@@ -611,7 +642,21 @@ def execute(
             returned with placeholder ``asset_id`` and ``url=None``. Useful
             for exercising downstream composition without an API key.
         use_cache: When True (default), executes via ``cached_call_fal`` so
-            cache hits skip the network. When False, every call is fresh.
+            cache hits skip the network. When False, the cache is not touched
+            **at all** — neither read nor written. That is the historical
+            meaning and it is unchanged: a caller who genuinely wants no cache
+            interaction still has it. To re-run a plan and *keep* what the
+            re-run paid for, leave ``use_cache=True`` and pass ``refresh``.
+        refresh: When True, skip the cache **read** and keep the cache
+            **write** — the third mode (falaw#49). Every call executes fresh,
+            and every fresh result is stored under the key it would have been
+            read from, so the next run (or a downstream consumer) hits it.
+            Requires ``use_cache=True``, since there is no key to write under
+            when the cache is off; the contradictory combination raises rather
+            than silently picking one. This is the mode to reach for behind a
+            ``force`` / "re-verify this" switch: without it, forcing a re-run
+            discards the result it just paid for and guarantees the next
+            consumer re-bills.
         artifact_converter: Per-CallPlan converter from raw fal response to
             :class:`lacing.Artifact`. When ``None`` (default), a built-in
             converter handles the common shapes (``{images: [{url}]}``,
@@ -712,6 +757,7 @@ def execute(
         on_event=on_event,
         dry_run=dry_run,
         use_cache=use_cache,
+        refresh=refresh,
         artifact_converter=artifact_converter,
         content_store=content_store,
         fetch_bytes=fetch_bytes,
@@ -727,6 +773,7 @@ def execute_isolated(
     on_event: Optional[Callable] = None,
     dry_run: bool = False,
     use_cache: bool = True,
+    refresh: bool = False,
     artifact_converter: Optional[ResultToArtifact] = None,
     content_store=None,
     fetch_bytes: Optional[bool] = None,
@@ -779,6 +826,7 @@ def execute_isolated(
             f"concurrency must be at least 1, got {concurrency!r}. "
             "It bounds how many calls are in flight at once; 1 is sequential."
         )
+    use_cache, refresh = _resolved_cache_mode(use_cache, refresh)
 
     if dry_run:
         # Per-call isolation applies to dry runs too: a hand-built CallPlan
@@ -819,6 +867,7 @@ def execute_isolated(
         converter=converter,
         usable_from_cache=usable_from_cache,
         use_cache=use_cache,
+        refresh=refresh,
         on_event=on_event,
         concurrency=concurrency,
         halt_on_failure=halt_on_failure,
@@ -834,6 +883,7 @@ def _run_plan(
     converter: "ResultToArtifact",
     usable_from_cache,
     use_cache: bool,
+    refresh: bool = False,
     on_event,
     concurrency: int,
     halt_on_failure: bool,
@@ -897,6 +947,7 @@ def _run_plan(
             converter=converter,
             usable_from_cache=usable_from_cache,
             use_cache=use_cache,
+            refresh=refresh,
             on_event=on_event,
         )
 
@@ -1087,6 +1138,7 @@ def _execute_call(
     converter: "ResultToArtifact",
     usable_from_cache,
     use_cache: bool,
+    refresh: bool = False,
     on_event,
 ) -> tuple:
     """Run one :class:`CallPlan`, returning ``(artifact, cache_hit)``.
@@ -1096,6 +1148,13 @@ def _execute_call(
     accounting must be based on (a plan-time ``cache_status`` can be wrong in
     both directions). The returned artifact's ``cost_usd`` is stamped from
     this observed outcome too — see :func:`_stamp_observed_cost`.
+
+    ``use_cache`` and ``refresh`` are read/write halves, not one switch
+    (falaw#49). ``refresh=True`` suppresses the ``cache_get`` and falls
+    straight through to ``cached_call_fal(..., refresh=True)`` — the same
+    executing-and-writing path a miss already takes — so a deliberate re-run
+    still leaves its paid result in the cache. ``use_cache=False`` remains the
+    only mode that bypasses ``cached_call_fal`` and therefore writes nothing.
 
     Split out of the loop because a cache hit is not unconditionally usable:
     the response may name an asset fal has since deleted, whose bytes are not
@@ -1110,12 +1169,16 @@ def _execute_call(
     if use_cache:
         from .cache import cache_get
 
-        hit = cache_get(
-            call.application,
-            key_args,
-            backend=call.backend,
-            key_extra=call.key_extra or None,
-        )
+        # ``refresh`` suppresses the read and nothing else: execution falls
+        # through to ``cached_call_fal`` below, which still writes (falaw#49).
+        hit = None
+        if not refresh:
+            hit = cache_get(
+                call.application,
+                key_args,
+                backend=call.backend,
+                key_extra=call.key_extra or None,
+            )
         if hit is not None:
             # Speculative: the conversion may turn out to be unusable, in which
             # case its own complaints are noise the caller must not see (we are
