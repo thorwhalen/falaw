@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.skill &mdash; falaw 0.0.46 documentation</title>
+  <title>falaw.bridges.skill &mdash; falaw 0.0.47 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=eb4c61eb"></script>
+      <script src="../../../_static/documentation_options.js?v=4f34e5f2"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -163,21 +163,31 @@
 <span class="s2">from falaw import parse_screenplay, Scene, Character, Environment, make_beat, make_shot</span>
 
 <span class="s2"># Option A: feed prose / treatment text and let any-llm draft the structure.</span>
-<span class="s2">scene = parse_screenplay(prose_text, title="Diner Encounter",</span>
-<span class="s2">                         style="Wes-Anderson pastel")</span>
+<span class="s2">scene = parse_screenplay(</span>
+<span class="s2">    prose_text, title="Diner Encounter", style="Wes-Anderson pastel"</span>
+<span class="s2">)</span>
 
 <span class="s2"># Option B: build the Scene directly.</span>
 <span class="s2">scene = Scene(</span>
 <span class="s2">    title="Diner Encounter",</span>
 <span class="s2">    style="Wes-Anderson symmetrical pastel",</span>
 <span class="s2">    characters=(Character(name="Sarah", description="mid-30s, dark curly hair"),),</span>
-<span class="s2">    environments=(Environment(name="diner", description="1950s chrome diner",</span>
-<span class="s2">                              time_of_day="midnight"),),</span>
-<span class="s2">    shots=(make_shot("two-shot at the booth", framing="medium",</span>
-<span class="s2">                     environment="diner", characters=("Sarah", "Tom"), index=0),),</span>
+<span class="s2">    environments=(</span>
+<span class="s2">        Environment(</span>
+<span class="s2">            name="diner", description="1950s chrome diner", time_of_day="midnight"</span>
+<span class="s2">        ),</span>
+<span class="s2">    ),</span>
+<span class="s2">    shots=(</span>
+<span class="s2">        make_shot(</span>
+<span class="s2">            "two-shot at the booth",</span>
+<span class="s2">            framing="medium",</span>
+<span class="s2">            environment="diner",</span>
+<span class="s2">            characters=("Sarah", "Tom"),</span>
+<span class="s2">            index=0,</span>
+<span class="s2">        ),</span>
+<span class="s2">    ),</span>
 <span class="s2">    beats=(</span>
-<span class="s2">        make_beat("Sarah", "Why are you here?",</span>
-<span class="s2">                  shot_id="...", emotion="wary", index=0),</span>
+<span class="s2">        make_beat("Sarah", "Why are you here?", shot_id="...", emotion="wary", index=0),</span>
 <span class="s2">        make_beat("Tom", "I came to apologize.", index=1),</span>
 <span class="s2">    ),</span>
 <span class="s2">)</span>
@@ -192,11 +202,17 @@
 <span class="s2">```python</span>
 <span class="s2">from falaw import cast_character, establish_environment</span>
 
-<span class="s2">sarah = cast_character("Sarah", "mid-30s, dark curly hair, wary eyes",</span>
-<span class="s2">                       reference_audio_url="https://.../sarah_sample.wav")</span>
-<span class="s2">diner = establish_environment("diner",</span>
-<span class="s2">                              "1950s chrome diner, neon outside, half-empty booths",</span>
-<span class="s2">                              time_of_day="midnight", lighting="cool fluorescents")</span>
+<span class="s2">sarah = cast_character(</span>
+<span class="s2">    "Sarah",</span>
+<span class="s2">    "mid-30s, dark curly hair, wary eyes",</span>
+<span class="s2">    reference_audio_url="https://.../sarah_sample.wav",</span>
+<span class="s2">)</span>
+<span class="s2">diner = establish_environment(</span>
+<span class="s2">    "diner",</span>
+<span class="s2">    "1950s chrome diner, neon outside, half-empty booths",</span>
+<span class="s2">    time_of_day="midnight",</span>
+<span class="s2">    lighting="cool fluorescents",</span>
+<span class="s2">)</span>
 <span class="s2">scene = scene.with_character(sarah).with_environment(diner)</span>
 <span class="s2">```</span>
 
@@ -205,8 +221,8 @@
 <span class="s2">```python</span>
 <span class="s2">from falaw import render_scene, save_scene</span>
 
-<span class="s2">manifest = render_scene(scene)             # all beats + shots</span>
-<span class="s2">save_scene(scene, "out/diner_v1.json")     # snapshot the IR alongside</span>
+<span class="s2">manifest = render_scene(scene)  # all beats + shots</span>
+<span class="s2">save_scene(scene, "out/diner_v1.json")  # snapshot the IR alongside</span>
 <span class="s2">```</span>
 
 <span class="s2">### Phase 4: Direct (notes -&gt; IR edits -&gt; re-render)</span>
@@ -218,8 +234,8 @@
 <span class="s2">beat = scene.beat("002-tom-...")</span>
 <span class="s2">edited = apply_note_to_beat(beat, "He cracks on this line; tries to hide it.")</span>
 <span class="s2">scene2 = scene.with_beat(edited)</span>
-<span class="s2">manifest2 = render_scene(scene2)   # only the edited beat re-renders;</span>
-<span class="s2">                                   # the rest are cache hits.</span>
+<span class="s2">manifest2 = render_scene(scene2)  # only the edited beat re-renders;</span>
+<span class="s2"># the rest are cache hits.</span>
 <span class="s2">```</span>
 
 <span class="s2">For cross-cutting notes like "tighten the pacing", use</span>
@@ -234,9 +250,87 @@
 
 <span class="s2">```python</span>
 <span class="s2">from falaw.local import concatenate_clips</span>
-<span class="s2">concatenate_clips([m["url"] for m in manifest["beats"]],</span>
-<span class="s2">                  output_path="out/scene.mp4", transition_s=0.2)</span>
+
+<span class="s2">concatenate_clips(</span>
+<span class="s2">    [m["url"] for m in manifest["beats"]], output_path="out/scene.mp4", transition_s=0.2</span>
+<span class="s2">)</span>
 <span class="s2">```</span>
+
+<span class="s2">### Reference images and local files: falaw checks, you don't have to</span>
+
+<span class="s2">falaw caches `url -&gt; content hash`, but only a **fal** URL can be trusted</span>
+<span class="s2">outright (fal mints one per upload, so it never re-points at other bytes).</span>
+<span class="s2">Anything else --- a reference image on your own server, a `file://` clip you</span>
+<span class="s2">re-rendered to the same path --- is **revalidated** before reuse:</span>
+
+<span class="s2">```python</span>
+<span class="s2">falaw.materialize_asset("https://mysite.com/reference.png")</span>
+<span class="s2"># changed on the server? you get the new bytes and a new content hash.</span>
+<span class="s2"># unchanged? one conditional request, no download.</span>
+<span class="s2">```</span>
+
+<span class="s2">You do **not** need to pass `refresh=True` for a mutable URL any more. If falaw</span>
+<span class="s2">cannot check (the origin offers no `ETag`/`Last-Modified`, or you injected a</span>
+<span class="s2">transport with no conditional-request support) it re-downloads rather than</span>
+<span class="s2">trusting a hint it cannot verify. If the origin is *gone*, it falls back to the</span>
+<span class="s2">bytes it already stored and warns.</span>
+
+<span class="s2">Serving your own media from an immutable-by-construction store? Add the host so</span>
+<span class="s2">falaw skips the check:</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw.content import IMMUTABLE_URL_HOSTS</span>
+
+<span class="s2">IMMUTABLE_URL_HOSTS.add("cdn.mysite.com")  # only if you mint URLs per upload</span>
+<span class="s2">```</span>
+
+<span class="s2">### The cache holds bytes now --- keep an eye on the disk</span>
+
+<span class="s2">Since falaw#14 the cache content-addresses every result, so it stores the</span>
+<span class="s2">**bytes** of every image, clip and audio track, not just JSON manifests. On a</span>
+<span class="s2">machine that has rendered a real project that is gigabytes.</span>
+
+<span class="s2">```python</span>
+<span class="s2">import falaw</span>
+
+<span class="s2">print(falaw.cache_usage().summary())  # per-area breakdown, largest first</span>
+<span class="s2">```</span>
+
+<span class="s2">Six areas, and only one of them is cheap to reclaim:</span>
+
+<span class="s2">| area | dropping one costs | prunable |</span>
+<span class="s2">|---|---|---|</span>
+<span class="s2">| `assets` | **nothing**, while the blob survives (it is a *copy*) --- reclaim here first | yes |</span>
+<span class="s2">| `content` | a **re-render**, for any call whose fal URL has since expired | yes |</span>
+<span class="s2">| `manifests` | a **re-billed call**, unconditionally | yes |</span>
+<span class="s2">| `url_index` | **the whole content area.** Blobs are reachable *only* through this index, so deleting it orphans them: expired-URL entries re-render while their bytes sit unreachable on disk | no |</span>
+<span class="s2">| `scenes` | authored Scene IR --- lost work, not a re-render | no |</span>
+<span class="s2">| `other` | unknown; falaw did not put it there | no |</span>
+
+<span class="s2">So eviction is a spending decision, and nothing runs automatically. Every</span>
+<span class="s2">prune is a dry run unless you say otherwise, and refuses to run unbounded</span>
+<span class="s2">(or with a non-positive `older_than`, which is almost always a computed-zero</span>
+<span class="s2">bug that would wipe the area):</span>
+
+<span class="s2">```python</span>
+<span class="s2">from datetime import timedelta</span>
+
+<span class="s2">report = falaw.prune_assets(older_than=timedelta(days=30))  # dry run</span>
+<span class="s2">print(report.summary())</span>
+<span class="s2">falaw.prune_assets(older_than=timedelta(days=30), dry_run=False)</span>
+<span class="s2">```</span>
+
+<span class="s2">**Read the two warning numbers before passing `dry_run=False`:**</span>
+
+<span class="s2">- `report.rebillable_entries` --- cache entries the prune puts back on the</span>
+<span class="s2">  invoice (an upper bound).</span>
+<span class="s2">- `report.unreferenced_candidates` --- blobs **no cache entry points at**.</span>
+<span class="s2">  falaw cannot tell garbage from the last copy of a reference image you</span>
+<span class="s2">  materialized, so it reports them rather than calling the prune free.</span>
+
+<span class="s2">`report.freed_bytes` counts what was actually deleted, so a failed deletion</span>
+<span class="s2">does not read as reclaimed space. `prune_content` and `prune_manifests` take</span>
+<span class="s2">the same arguments; `max_bytes=N` evicts oldest-first until the area fits.</span>
 
 <span class="s2">### execute_plan: three cache modes --- a re-run is not a cache bypass</span>
 
@@ -288,18 +382,25 @@
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
+
 <span class="s2">for e in journal.recent(20):</span>
-<span class="s2">    print(e.kind, '-', e.text[:120])</span>
+<span class="s2">    print(e.kind, "-", e.text[:120])</span>
 <span class="s2">```</span>
 
 <span class="s2">## Leave a journal entry when something surprises you</span>
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import journal</span>
-<span class="s2">journal.issue("FLUX dev returned NSFW=True for a benign prompt",</span>
-<span class="s2">              suggestion="Try guidance_scale=2.0", tags=("flux", "safety"))</span>
-<span class="s2">journal.improvement("Pass beat.emotion as a TTS prompt arg for emotion-aware models",</span>
-<span class="s2">                    tags=("backlog", "directorial"))</span>
+
+<span class="s2">journal.issue(</span>
+<span class="s2">    "FLUX dev returned NSFW=True for a benign prompt",</span>
+<span class="s2">    suggestion="Try guidance_scale=2.0",</span>
+<span class="s2">    tags=("flux", "safety"),</span>
+<span class="s2">)</span>
+<span class="s2">journal.improvement(</span>
+<span class="s2">    "Pass beat.emotion as a TTS prompt arg for emotion-aware models",</span>
+<span class="s2">    tags=("backlog", "directorial"),</span>
+<span class="s2">)</span>
 <span class="s2">journal.note("schnell at quality='fast' returns 1024x1024 by default")</span>
 <span class="s2">```</span>
 
@@ -307,8 +408,9 @@
 
 <span class="s2">```python</span>
 <span class="s2">from falaw import list_models, pick_model</span>
-<span class="s2">[m.id for m in list_models(category='image_to_video')]</span>
-<span class="s2">pick_model(category='image_edit', quality_tier='ultra').id</span>
+
+<span class="s2">[m.id for m in list_models(category="image_to_video")]</span>
+<span class="s2">pick_model(category="image_edit", quality_tier="ultra").id</span>
 <span class="s2">```</span>
 
 <span class="s2">## Tools</span>
@@ -316,6 +418,7 @@
 <span class="s2">Every function below is a registered tool; bridges (MCP server, HTTP</span>
 <span class="s2">service, UI) derive their surfaces from the same registry.</span>
 <span class="s2">"""</span>
+
 
 <span class="n">_FOOTER_TEMPLATE</span> <span class="o">=</span> <span class="s2">"""</span>
 <span class="s2">## Models known to falaw</span>
