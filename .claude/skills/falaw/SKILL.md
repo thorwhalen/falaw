@@ -422,6 +422,11 @@ Refresh `llms.txt` and `llms-full.txt` from fal.ai using conditional GETs (ETag-
 Re-crawl every per-page .md endpoint listed in `fal_ai_docs_index.md` with conditional GETs, then reassemble `fal_ai_docs_full.md`. Heavy. Gated on `is_stale(llms-full)` by default --- pass `force=True` to skip the gate. Pages that 304 are skipped; only changed pages re-download. Logs a single journal entry summarizing the run.
 
 
+### `falaw.refresh_llm_rates`
+
+Fetch fal's any-llm doc and OpenRouter's model catalogue and diff them against `falaw/data/llm_rates.json`. Never overwrites the committed table -- a repriced or retiered model is a decision, not an auto-apply. Pass `write=True` to persist a proposed table (`llm_rates.proposed.json`) plus a human-readable diff (`llm_rates.diff.txt`) for a human to review and promote; default is a dry-run summary. Reads two free, unauthenticated endpoints; makes no billed call.
+
+
 ## Models known to falaw
 
 The model registry lives at `falaw/data/models.json`. Refresh it from

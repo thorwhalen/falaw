@@ -159,7 +159,11 @@ ledger that sums receipts and a gate that reads quotes agree.
 
 Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
 a caller who has reconciled real numbers against their fal invoice passes their
-own table as `llm_rates=`.
+own table as `llm_rates=`. `llm_rates.json` has no refresh job that runs
+itself, so a quote is only as fresh as its last check --- run
+`falaw.refresh_llm_rates()` (or `python -m falaw refresh-llm-rates`) to diff
+it against fal's any-llm doc and OpenRouter's catalogue; it never overwrites
+the committed table, only proposes one for a human to review.
 
 ## Read the journal first
 

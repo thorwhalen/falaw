@@ -237,7 +237,11 @@ ledger that sums receipts and a gate that reads quotes agree.
 
 Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
 a caller who has reconciled real numbers against their fal invoice passes their
-own table as `llm_rates=`.
+own table as `llm_rates=`. `llm_rates.json` has no refresh job that runs
+itself, so a quote is only as fresh as its last check --- run
+`falaw.refresh_llm_rates()` (or `python -m falaw refresh-llm-rates`) to diff
+it against fal's any-llm doc and OpenRouter's catalogue; it never overwrites
+the committed table, only proposes one for a human to review.
 
 ## Read the journal first
 
@@ -451,6 +455,11 @@ Refresh `llms.txt` and `llms-full.txt` from fal.ai using conditional GETs (ETag-
 ### `falaw.refresh_full_docs`
 
 Re-crawl every per-page .md endpoint listed in `fal_ai_docs_index.md` with conditional GETs, then reassemble `fal_ai_docs_full.md`. Heavy. Gated on `is_stale(llms-full)` by default --- pass `force=True` to skip the gate. Pages that 304 are skipped; only changed pages re-download. Logs a single journal entry summarizing the run.
+
+
+### `falaw.refresh_llm_rates`
+
+Fetch fal's any-llm doc and OpenRouter's model catalogue and diff them against `falaw/data/llm_rates.json`. Never overwrites the committed table -- a repriced or retiered model is a decision, not an auto-apply. Pass `write=True` to persist a proposed table (`llm_rates.proposed.json`) plus a human-readable diff (`llm_rates.diff.txt`) for a human to review and promote; default is a dry-run summary. Reads two free, unauthenticated endpoints; makes no billed call.
 
 
 ## Models known to falaw
