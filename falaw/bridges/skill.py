@@ -122,6 +122,14 @@ concatenate_clips([m["url"] for m in manifest["beats"]],
                   output_path="out/scene.mp4", transition_s=0.2)
 ```
 
+### execute_plan: three cache modes --- a re-run is not a cache bypass
+
+`execute_plan(plan)` reads the cache and writes it. `execute_plan(plan, refresh=True)`
+skips the read and **keeps the write** --- this is the one to use behind a "redo it"
+or "re-verify this" switch. `execute_plan(plan, use_cache=False)` does neither, so it
+throws away the result it just paid for and the next caller re-bills; reach for it only
+when you truly want no cache interaction. Both together raises: nothing to key a write on.
+
 ## Read the journal first
 
 Before novel work, glance at recent entries --- past sessions may have

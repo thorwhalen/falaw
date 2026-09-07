@@ -32,22 +32,30 @@ def _install_counting_fal(monkeypatch) -> list[str]:
 
     Returns the (live) list of applications called, in order. Its ``len`` is
     the spend: every entry is a call falaw would have been billed for.
+
+    Every call mints a **fresh** URL, as fal does — that is the property the
+    content-addressing tests turn on. The counter is per application, not
+    global, so the n-th image is always ``i{n}.png`` however many video calls
+    happen around it; a test that pins bytes to a URL needs to be able to name
+    that URL without simulating the whole call sequence in its head.
     """
     called: list[str] = []
+    minted: dict[str, int] = {}
 
     def subscribe(application, *, arguments, with_logs, on_queue_update):
         called.append(application)
+        nth = minted[application] = minted.get(application, 0) + 1
         if "image-to-video" in application:
             return {
                 "video": {
-                    "url": f"https://fal.media/v{len(called)}.mp4",
+                    "url": f"https://fal.media/v{nth}.mp4",
                     "content_type": "video/mp4",
                 }
             }
         return {
             "images": [
                 {
-                    "url": f"https://fal.media/i{len(called)}.png",
+                    "url": f"https://fal.media/i{nth}.png",
                     "content_type": "image/png",
                 }
             ]
@@ -134,10 +142,12 @@ def test_refresh_run_leaves_its_paid_result_in_the_cache(monkeypatch):
 def test_refresh_over_a_chained_plan_caches_every_call(monkeypatch):
     """The placeholder case: both entries survive, including the downstream one.
 
-    The downstream call is keyed on the upstream's *content* hash, so this also
-    proves the key arguments are still resolved under ``refresh`` — a mode that
-    fell back to the wire arguments would key the video on a fal URL that is
-    minted fresh per upload, and could never be hit again.
+    Necessary but **not sufficient** — it cannot tell content-keying from
+    URL-keying, because the second run's upstream is itself a cache hit and
+    replays the same recorded URL, so a URL-keyed downstream would hit too.
+    :func:`test_refresh_keys_the_downstream_call_on_content_not_url` and
+    :func:`test_a_regenerated_upstream_still_hits_the_downstream_entry` are the
+    two that discriminate.
     """
     called = _install_counting_fal(monkeypatch)
     plan = _chained_plan()
@@ -148,6 +158,94 @@ def test_refresh_over_a_chained_plan_caches_every_call(monkeypatch):
     execute(plan)
 
     assert len(called) == 2, "both entries — image and video — must be reusable"
+
+
+def _manifests_for(application: str) -> list[dict]:
+    """Every cache manifest written for ``application``, read off disk.
+
+    Read rather than reconstructed: recomputing the key here would use the same
+    code path the test is trying to hold to account, so the assertion would
+    agree with the bug.
+    """
+    import json
+    import os
+
+    from falaw.cache import _cache_dir
+
+    found = []
+    for root, _dirs, files in os.walk(_cache_dir()):
+        for name in files:
+            if name != "manifest.json":
+                continue
+            with open(os.path.join(root, name)) as f:
+                manifest = json.load(f)
+            if manifest.get("application") == application:
+                found.append(manifest)
+    return found
+
+
+def test_refresh_keys_the_downstream_call_on_content_not_url(monkeypatch):
+    """Under ``refresh``, the downstream entry is keyed on the upstream's hash.
+
+    ``refresh`` leaves ``use_cache`` True, so ``_run_plan`` still resolves the
+    *key* arguments with the strict ref. A mode that fell back to the wire
+    arguments would key the video on a fal URL — minted fresh per upload — and
+    the entry could never be reached again. Asserted on the manifest that was
+    actually written, not on a recomputed key.
+    """
+    _install_counting_fal(monkeypatch)
+
+    execute(_chained_plan(), use_cache=True, refresh=True)
+
+    (video,) = _manifests_for(VIDEO_APPLICATION)
+    keyed_on = video["arguments"]["image_url"]
+    assert keyed_on.startswith("sha256:"), (
+        f"the downstream entry is keyed on {keyed_on!r}; a fal URL there means "
+        "refresh dropped back to the wire arguments and the entry is dead"
+    )
+    assert video["wire_arguments"]["image_url"].startswith("https://fal.media/"), (
+        "the wire arguments must still carry the URL fal needs to fetch"
+    )
+
+
+def test_a_regenerated_upstream_still_hits_the_downstream_entry(
+    monkeypatch, fake_assets
+):
+    """The behavioural half: a *new* upstream URL over identical bytes still hits.
+
+    This is the sequence a URL-keyed downstream cannot survive, and the one the
+    plain "run it twice" test cannot produce (there the upstream is a cache hit
+    replaying its recorded URL, so the URL never changes):
+
+    1. render the chain under ``refresh`` — upstream ``i1.png``, downstream
+       keyed on the bytes behind it;
+    2. re-render the **upstream alone** under ``refresh`` — fal mints
+       ``i2.png``, a different URL over byte-identical content;
+    3. run the whole chain at the default — the upstream now resolves to
+       ``i2.png``.
+
+    Keyed on content, step 3 costs nothing. Keyed on the URL, the downstream
+    misses and re-bills the expensive call.
+    """
+    shared = fake_assets.serve("https://fal.media/i1.png", b"one upstream render")
+    fake_assets.serve("https://fal.media/i2.png", shared)
+
+    called = _install_counting_fal(monkeypatch)
+    chained, upstream_only = _chained_plan(), _image_plan()
+
+    execute(chained, use_cache=True, refresh=True)
+    assert called == [IMAGE_APPLICATION, VIDEO_APPLICATION]
+
+    execute(upstream_only, use_cache=True, refresh=True)
+    assert len(called) == 3, "the upstream re-render is its own vendor call"
+
+    execute(chained)
+
+    assert len(called) == 3, (
+        "a byte-identical upstream regeneration must leave the downstream "
+        "entry reachable — an extra call here means it was keyed on the fal "
+        "URL, which is minted fresh per upload"
+    )
 
 
 def test_refresh_skips_the_read_so_a_warm_cache_still_re_executes(monkeypatch):
