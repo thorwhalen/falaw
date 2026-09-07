@@ -47,21 +47,31 @@ beats don't re-render.
 from falaw import parse_screenplay, Scene, Character, Environment, make_beat, make_shot
 
 # Option A: feed prose / treatment text and let any-llm draft the structure.
-scene = parse_screenplay(prose_text, title="Diner Encounter",
-                         style="Wes-Anderson pastel")
+scene = parse_screenplay(
+    prose_text, title="Diner Encounter", style="Wes-Anderson pastel"
+)
 
 # Option B: build the Scene directly.
 scene = Scene(
     title="Diner Encounter",
     style="Wes-Anderson symmetrical pastel",
     characters=(Character(name="Sarah", description="mid-30s, dark curly hair"),),
-    environments=(Environment(name="diner", description="1950s chrome diner",
-                              time_of_day="midnight"),),
-    shots=(make_shot("two-shot at the booth", framing="medium",
-                     environment="diner", characters=("Sarah", "Tom"), index=0),),
+    environments=(
+        Environment(
+            name="diner", description="1950s chrome diner", time_of_day="midnight"
+        ),
+    ),
+    shots=(
+        make_shot(
+            "two-shot at the booth",
+            framing="medium",
+            environment="diner",
+            characters=("Sarah", "Tom"),
+            index=0,
+        ),
+    ),
     beats=(
-        make_beat("Sarah", "Why are you here?",
-                  shot_id="...", emotion="wary", index=0),
+        make_beat("Sarah", "Why are you here?", shot_id="...", emotion="wary", index=0),
         make_beat("Tom", "I came to apologize.", index=1),
     ),
 )
@@ -76,11 +86,17 @@ identity continuity.
 ```python
 from falaw import cast_character, establish_environment
 
-sarah = cast_character("Sarah", "mid-30s, dark curly hair, wary eyes",
-                       reference_audio_url="https://.../sarah_sample.wav")
-diner = establish_environment("diner",
-                              "1950s chrome diner, neon outside, half-empty booths",
-                              time_of_day="midnight", lighting="cool fluorescents")
+sarah = cast_character(
+    "Sarah",
+    "mid-30s, dark curly hair, wary eyes",
+    reference_audio_url="https://.../sarah_sample.wav",
+)
+diner = establish_environment(
+    "diner",
+    "1950s chrome diner, neon outside, half-empty booths",
+    time_of_day="midnight",
+    lighting="cool fluorescents",
+)
 scene = scene.with_character(sarah).with_environment(diner)
 ```
 
@@ -89,8 +105,8 @@ scene = scene.with_character(sarah).with_environment(diner)
 ```python
 from falaw import render_scene, save_scene
 
-manifest = render_scene(scene)             # all beats + shots
-save_scene(scene, "out/diner_v1.json")     # snapshot the IR alongside
+manifest = render_scene(scene)  # all beats + shots
+save_scene(scene, "out/diner_v1.json")  # snapshot the IR alongside
 ```
 
 ### Phase 4: Direct (notes -> IR edits -> re-render)
@@ -102,8 +118,8 @@ from falaw import apply_note_to_beat
 beat = scene.beat("002-tom-...")
 edited = apply_note_to_beat(beat, "He cracks on this line; tries to hide it.")
 scene2 = scene.with_beat(edited)
-manifest2 = render_scene(scene2)   # only the edited beat re-renders;
-                                   # the rest are cache hits.
+manifest2 = render_scene(scene2)  # only the edited beat re-renders;
+# the rest are cache hits.
 ```
 
 For cross-cutting notes like "tighten the pacing", use
@@ -118,9 +134,87 @@ a watchable scene:
 
 ```python
 from falaw.local import concatenate_clips
-concatenate_clips([m["url"] for m in manifest["beats"]],
-                  output_path="out/scene.mp4", transition_s=0.2)
+
+concatenate_clips(
+    [m["url"] for m in manifest["beats"]], output_path="out/scene.mp4", transition_s=0.2
+)
 ```
+
+### Reference images and local files: falaw checks, you don't have to
+
+falaw caches `url -> content hash`, but only a **fal** URL can be trusted
+outright (fal mints one per upload, so it never re-points at other bytes).
+Anything else --- a reference image on your own server, a `file://` clip you
+re-rendered to the same path --- is **revalidated** before reuse:
+
+```python
+falaw.materialize_asset("https://mysite.com/reference.png")
+# changed on the server? you get the new bytes and a new content hash.
+# unchanged? one conditional request, no download.
+```
+
+You do **not** need to pass `refresh=True` for a mutable URL any more. If falaw
+cannot check (the origin offers no `ETag`/`Last-Modified`, or you injected a
+transport with no conditional-request support) it re-downloads rather than
+trusting a hint it cannot verify. If the origin is *gone*, it falls back to the
+bytes it already stored and warns.
+
+Serving your own media from an immutable-by-construction store? Add the host so
+falaw skips the check:
+
+```python
+from falaw.content import IMMUTABLE_URL_HOSTS
+
+IMMUTABLE_URL_HOSTS.add("cdn.mysite.com")  # only if you mint URLs per upload
+```
+
+### The cache holds bytes now --- keep an eye on the disk
+
+Since falaw#14 the cache content-addresses every result, so it stores the
+**bytes** of every image, clip and audio track, not just JSON manifests. On a
+machine that has rendered a real project that is gigabytes.
+
+```python
+import falaw
+
+print(falaw.cache_usage().summary())  # per-area breakdown, largest first
+```
+
+Six areas, and only one of them is cheap to reclaim:
+
+| area | dropping one costs | prunable |
+|---|---|---|
+| `assets` | **nothing**, while the blob survives (it is a *copy*) --- reclaim here first | yes |
+| `content` | a **re-render**, for any call whose fal URL has since expired | yes |
+| `manifests` | a **re-billed call**, unconditionally | yes |
+| `url_index` | **the whole content area.** Blobs are reachable *only* through this index, so deleting it orphans them: expired-URL entries re-render while their bytes sit unreachable on disk | no |
+| `scenes` | authored Scene IR --- lost work, not a re-render | no |
+| `other` | unknown; falaw did not put it there | no |
+
+So eviction is a spending decision, and nothing runs automatically. Every
+prune is a dry run unless you say otherwise, and refuses to run unbounded
+(or with a non-positive `older_than`, which is almost always a computed-zero
+bug that would wipe the area):
+
+```python
+from datetime import timedelta
+
+report = falaw.prune_assets(older_than=timedelta(days=30))  # dry run
+print(report.summary())
+falaw.prune_assets(older_than=timedelta(days=30), dry_run=False)
+```
+
+**Read the two warning numbers before passing `dry_run=False`:**
+
+- `report.rebillable_entries` --- cache entries the prune puts back on the
+  invoice (an upper bound).
+- `report.unreferenced_candidates` --- blobs **no cache entry points at**.
+  falaw cannot tell garbage from the last copy of a reference image you
+  materialized, so it reports them rather than calling the prune free.
+
+`report.freed_bytes` counts what was actually deleted, so a failed deletion
+does not read as reclaimed space. `prune_content` and `prune_manifests` take
+the same arguments; `max_bytes=N` evicts oldest-first until the area fits.
 
 ### execute_plan: three cache modes --- a re-run is not a cache bypass
 
@@ -172,18 +266,25 @@ left notes that save you time:
 
 ```python
 from falaw import journal
+
 for e in journal.recent(20):
-    print(e.kind, '-', e.text[:120])
+    print(e.kind, "-", e.text[:120])
 ```
 
 ## Leave a journal entry when something surprises you
 
 ```python
 from falaw import journal
-journal.issue("FLUX dev returned NSFW=True for a benign prompt",
-              suggestion="Try guidance_scale=2.0", tags=("flux", "safety"))
-journal.improvement("Pass beat.emotion as a TTS prompt arg for emotion-aware models",
-                    tags=("backlog", "directorial"))
+
+journal.issue(
+    "FLUX dev returned NSFW=True for a benign prompt",
+    suggestion="Try guidance_scale=2.0",
+    tags=("flux", "safety"),
+)
+journal.improvement(
+    "Pass beat.emotion as a TTS prompt arg for emotion-aware models",
+    tags=("backlog", "directorial"),
+)
 journal.note("schnell at quality='fast' returns 1024x1024 by default")
 ```
 
@@ -191,8 +292,9 @@ journal.note("schnell at quality='fast' returns 1024x1024 by default")
 
 ```python
 from falaw import list_models, pick_model
-[m.id for m in list_models(category='image_to_video')]
-pick_model(category='image_edit', quality_tier='ultra').id
+
+[m.id for m in list_models(category="image_to_video")]
+pick_model(category="image_edit", quality_tier="ultra").id
 ```
 
 ## Tools
@@ -200,6 +302,7 @@ pick_model(category='image_edit', quality_tier='ultra').id
 Every function below is a registered tool; bridges (MCP server, HTTP
 service, UI) derive their surfaces from the same registry.
 """
+
 
 _FOOTER_TEMPLATE = """
 ## Models known to falaw
