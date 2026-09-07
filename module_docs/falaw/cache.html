@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.43 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.44 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=b345ff55"></script>
+      <script src="../../_static/documentation_options.js?v=78cc6f98"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -264,8 +264,14 @@ call site already spells it this way.</p></li>
 from becoming a <em>trap</em>. An entry whose response can no longer be turned
 into a usable artifact — fal deleted the URL and the bytes are not in the
 content store — must be a <strong>miss</strong>, not a permanent failure: without this,
-the only escape is <code class="docutils literal notranslate"><span class="pre">use_cache=False</span></code>, which re-bills the whole plan
-rather than the one dead call. <a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> calls it.</p>
+escaping one dead call means re-running the whole plan.
+<a class="reference internal" href="plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> calls it.</p>
+<p>The plan-level escapes are <code class="docutils literal notranslate"><span class="pre">execute_plan(plan,</span> <span class="pre">refresh=True)</span></code>, which
+re-runs every call and <strong>keeps</strong> what it pays for, and
+<code class="docutils literal notranslate"><span class="pre">execute_plan(plan,</span> <span class="pre">use_cache=False)</span></code>, which re-runs and keeps nothing —
+so the second one bills again on the next run (falaw#49). Neither is a
+substitute for this function: both re-bill <em>every</em> call in the plan, and
+this drops the one entry that actually went bad.</p>
 <p>Only the manifest is removed. Blobs in the content store are shared by
 content hash across entries and are never dropped from here.</p>
 </dd></dl>

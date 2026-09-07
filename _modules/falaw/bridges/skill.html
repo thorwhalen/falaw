@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.skill &mdash; falaw 0.0.43 documentation</title>
+  <title>falaw.bridges.skill &mdash; falaw 0.0.44 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=b345ff55"></script>
+      <script src="../../../_static/documentation_options.js?v=78cc6f98"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -235,6 +235,14 @@
 <span class="s2">concatenate_clips([m["url"] for m in manifest["beats"]],</span>
 <span class="s2">                  output_path="out/scene.mp4", transition_s=0.2)</span>
 <span class="s2">```</span>
+
+<span class="s2">### execute_plan: three cache modes --- a re-run is not a cache bypass</span>
+
+<span class="s2">`execute_plan(plan)` reads the cache and writes it. `execute_plan(plan, refresh=True)`</span>
+<span class="s2">skips the read and **keeps the write** --- this is the one to use behind a "redo it"</span>
+<span class="s2">or "re-verify this" switch. `execute_plan(plan, use_cache=False)` does neither, so it</span>
+<span class="s2">throws away the result it just paid for and the next caller re-bills; reach for it only</span>
+<span class="s2">when you truly want no cache interaction. Both together raises: nothing to key a write on.</span>
 
 <span class="s2">## Read the journal first</span>
 

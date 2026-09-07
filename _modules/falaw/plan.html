@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.43 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.44 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=b345ff55"></script>
+      <script src="../../_static/documentation_options.js?v=78cc6f98"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -724,6 +724,36 @@
 <span class="sd">"""</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolved_cache_mode</span><span class="p">(</span><span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Validate the ``(use_cache, refresh)`` pair, returning it unchanged.</span>
+
+<span class="sd">    Three modes, one of which is new (falaw#49):</span>
+
+<span class="sd">    ============================  ==========  ===========  ==========</span>
+<span class="sd">    ``(use_cache, refresh)``      cache read  cache write  meaning</span>
+<span class="sd">    ============================  ==========  ===========  ==========</span>
+<span class="sd">    ``(True, False)`` — default   yes         yes          reuse, then keep</span>
+<span class="sd">    ``(True, True)``  — new       no          yes          re-run, but keep</span>
+<span class="sd">    ``(False, False)``            no          no           do not touch it</span>
+<span class="sd">    ============================  ==========  ===========  ==========</span>
+
+<span class="sd">    ``(False, True)`` is the fourth corner and it has no meaning: the write</span>
+<span class="sd">    needs a key, and the key args are only resolved when ``use_cache`` is on</span>
+<span class="sd">    (the key ref is stricter than the wire ref — see :func:`execute`). Picking</span>
+<span class="sd">    one of the two intents silently would hand the caller a spend policy they</span>
+<span class="sd">    did not ask for, so it raises.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">refresh</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">use_cache</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"refresh=True requires use_cache=True. refresh means 'skip the "</span>
+            <span class="s2">"cache read, keep the cache write', so it needs the cache on; "</span>
+            <span class="s2">"use_cache=False means 'do not touch the cache at all' and writes "</span>
+            <span class="s2">"nothing. Pass use_cache=True, refresh=True to re-run a plan and "</span>
+            <span class="s2">"keep what the re-run paid for."</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">use_cache</span><span class="p">,</span> <span class="n">refresh</span>
+
+
 <div class="viewcode-block" id="execute">
 <a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.execute">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
@@ -732,6 +762,7 @@
     <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">artifact_converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultToArtifact</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fetch_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -754,7 +785,21 @@
 <span class="sd">            returned with placeholder ``asset_id`` and ``url=None``. Useful</span>
 <span class="sd">            for exercising downstream composition without an API key.</span>
 <span class="sd">        use_cache: When True (default), executes via ``cached_call_fal`` so</span>
-<span class="sd">            cache hits skip the network. When False, every call is fresh.</span>
+<span class="sd">            cache hits skip the network. When False, the cache is not touched</span>
+<span class="sd">            **at all** — neither read nor written. That is the historical</span>
+<span class="sd">            meaning and it is unchanged: a caller who genuinely wants no cache</span>
+<span class="sd">            interaction still has it. To re-run a plan and *keep* what the</span>
+<span class="sd">            re-run paid for, leave ``use_cache=True`` and pass ``refresh``.</span>
+<span class="sd">        refresh: When True, skip the cache **read** and keep the cache</span>
+<span class="sd">            **write** — the third mode (falaw#49). Every call executes fresh,</span>
+<span class="sd">            and every fresh result is stored under the key it would have been</span>
+<span class="sd">            read from, so the next run (or a downstream consumer) hits it.</span>
+<span class="sd">            Requires ``use_cache=True``, since there is no key to write under</span>
+<span class="sd">            when the cache is off; the contradictory combination raises rather</span>
+<span class="sd">            than silently picking one. This is the mode to reach for behind a</span>
+<span class="sd">            ``force`` / "re-verify this" switch: without it, forcing a re-run</span>
+<span class="sd">            discards the result it just paid for and guarantees the next</span>
+<span class="sd">            consumer re-bills.</span>
 <span class="sd">        artifact_converter: Per-CallPlan converter from raw fal response to</span>
 <span class="sd">            :class:`lacing.Artifact`. When ``None`` (default), a built-in</span>
 <span class="sd">            converter handles the common shapes (``{images: [{url}]}``,</span>
@@ -855,6 +900,7 @@
         <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
         <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
         <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+        <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">,</span>
         <span class="n">artifact_converter</span><span class="o">=</span><span class="n">artifact_converter</span><span class="p">,</span>
         <span class="n">content_store</span><span class="o">=</span><span class="n">content_store</span><span class="p">,</span>
         <span class="n">fetch_bytes</span><span class="o">=</span><span class="n">fetch_bytes</span><span class="p">,</span>
@@ -873,6 +919,7 @@
     <span class="n">on_event</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">artifact_converter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ResultToArtifact</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">content_store</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fetch_bytes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -925,6 +972,7 @@
             <span class="sa">f</span><span class="s2">"concurrency must be at least 1, got </span><span class="si">{</span><span class="n">concurrency</span><span class="si">!r}</span><span class="s2">. "</span>
             <span class="s2">"It bounds how many calls are in flight at once; 1 is sequential."</span>
         <span class="p">)</span>
+    <span class="n">use_cache</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="n">_resolved_cache_mode</span><span class="p">(</span><span class="n">use_cache</span><span class="p">,</span> <span class="n">refresh</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
         <span class="c1"># Per-call isolation applies to dry runs too: a hand-built CallPlan</span>
@@ -965,6 +1013,7 @@
         <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
         <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
         <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+        <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">,</span>
         <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
         <span class="n">concurrency</span><span class="o">=</span><span class="n">concurrency</span><span class="p">,</span>
         <span class="n">halt_on_failure</span><span class="o">=</span><span class="n">halt_on_failure</span><span class="p">,</span>
@@ -981,6 +1030,7 @@
     <span class="n">converter</span><span class="p">:</span> <span class="s2">"ResultToArtifact"</span><span class="p">,</span>
     <span class="n">usable_from_cache</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">on_event</span><span class="p">,</span>
     <span class="n">concurrency</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">halt_on_failure</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1044,6 +1094,7 @@
             <span class="n">converter</span><span class="o">=</span><span class="n">converter</span><span class="p">,</span>
             <span class="n">usable_from_cache</span><span class="o">=</span><span class="n">usable_from_cache</span><span class="p">,</span>
             <span class="n">use_cache</span><span class="o">=</span><span class="n">use_cache</span><span class="p">,</span>
+            <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">,</span>
             <span class="n">on_event</span><span class="o">=</span><span class="n">on_event</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1234,6 +1285,7 @@
     <span class="n">converter</span><span class="p">:</span> <span class="s2">"ResultToArtifact"</span><span class="p">,</span>
     <span class="n">usable_from_cache</span><span class="p">,</span>
     <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">refresh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">on_event</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Run one :class:`CallPlan`, returning ``(artifact, cache_hit)``.</span>
@@ -1243,6 +1295,13 @@
 <span class="sd">    accounting must be based on (a plan-time ``cache_status`` can be wrong in</span>
 <span class="sd">    both directions). The returned artifact's ``cost_usd`` is stamped from</span>
 <span class="sd">    this observed outcome too — see :func:`_stamp_observed_cost`.</span>
+
+<span class="sd">    ``use_cache`` and ``refresh`` are read/write halves, not one switch</span>
+<span class="sd">    (falaw#49). ``refresh=True`` suppresses the ``cache_get`` and falls</span>
+<span class="sd">    straight through to ``cached_call_fal(..., refresh=True)`` — the same</span>
+<span class="sd">    executing-and-writing path a miss already takes — so a deliberate re-run</span>
+<span class="sd">    still leaves its paid result in the cache. ``use_cache=False`` remains the</span>
+<span class="sd">    only mode that bypasses ``cached_call_fal`` and therefore writes nothing.</span>
 
 <span class="sd">    Split out of the loop because a cache hit is not unconditionally usable:</span>
 <span class="sd">    the response may name an asset fal has since deleted, whose bytes are not</span>
@@ -1257,12 +1316,16 @@
     <span class="k">if</span> <span class="n">use_cache</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_get</span>
 
-        <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span>
-            <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
-            <span class="n">key_args</span><span class="p">,</span>
-            <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
-            <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># ``refresh`` suppresses the read and nothing else: execution falls</span>
+        <span class="c1"># through to ``cached_call_fal`` below, which still writes (falaw#49).</span>
+        <span class="n">hit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">refresh</span><span class="p">:</span>
+            <span class="n">hit</span> <span class="o">=</span> <span class="n">cache_get</span><span class="p">(</span>
+                <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
+                <span class="n">key_args</span><span class="p">,</span>
+                <span class="n">backend</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
+                <span class="n">key_extra</span><span class="o">=</span><span class="n">call</span><span class="o">.</span><span class="n">key_extra</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">hit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Speculative: the conversion may turn out to be unusable, in which</span>
             <span class="c1"># case its own complaints are noise the caller must not see (we are</span>

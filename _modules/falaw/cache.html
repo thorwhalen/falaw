@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.cache &mdash; falaw 0.0.43 documentation</title>
+  <title>falaw.cache &mdash; falaw 0.0.44 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=b345ff55"></script>
+      <script src="../../_static/documentation_options.js?v=78cc6f98"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -331,8 +331,15 @@
 <span class="sd">    from becoming a *trap*. An entry whose response can no longer be turned</span>
 <span class="sd">    into a usable artifact — fal deleted the URL and the bytes are not in the</span>
 <span class="sd">    content store — must be a **miss**, not a permanent failure: without this,</span>
-<span class="sd">    the only escape is ``use_cache=False``, which re-bills the whole plan</span>
-<span class="sd">    rather than the one dead call. :func:`falaw.plan.execute` calls it.</span>
+<span class="sd">    escaping one dead call means re-running the whole plan.</span>
+<span class="sd">    :func:`falaw.plan.execute` calls it.</span>
+
+<span class="sd">    The plan-level escapes are ``execute_plan(plan, refresh=True)``, which</span>
+<span class="sd">    re-runs every call and **keeps** what it pays for, and</span>
+<span class="sd">    ``execute_plan(plan, use_cache=False)``, which re-runs and keeps nothing —</span>
+<span class="sd">    so the second one bills again on the next run (falaw#49). Neither is a</span>
+<span class="sd">    substitute for this function: both re-bill *every* call in the plan, and</span>
+<span class="sd">    this drops the one entry that actually went bad.</span>
 
 <span class="sd">    Only the manifest is removed. Blobs in the content store are shared by</span>
 <span class="sd">    content hash across entries and are never dropped from here.</span>
