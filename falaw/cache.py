@@ -209,8 +209,15 @@ def drop_cache_entry(
     from becoming a *trap*. An entry whose response can no longer be turned
     into a usable artifact — fal deleted the URL and the bytes are not in the
     content store — must be a **miss**, not a permanent failure: without this,
-    the only escape is ``use_cache=False``, which re-bills the whole plan
-    rather than the one dead call. :func:`falaw.plan.execute` calls it.
+    escaping one dead call means re-running the whole plan.
+    :func:`falaw.plan.execute` calls it.
+
+    The plan-level escapes are ``execute_plan(plan, refresh=True)``, which
+    re-runs every call and **keeps** what it pays for, and
+    ``execute_plan(plan, use_cache=False)``, which re-runs and keeps nothing —
+    so the second one bills again on the next run (falaw#49). Neither is a
+    substitute for this function: both re-bill *every* call in the plan, and
+    this drops the one entry that actually went bad.
 
     Only the manifest is removed. Blobs in the content store are shared by
     content hash across entries and are never dropped from here.

@@ -119,6 +119,20 @@ same kind of thread pool (fal calls are HTTP-bound). Use
 `iter_render_scene(...)` to yield `(kind, result)` pairs as each unit completes
 — handy for live UI updates.
 
+## Three cache modes, because a re-run is not a cache bypass
+
+`execute_plan` reads the cache and writes to it. Those are separate decisions, and it takes two flags rather than one so a caller can ask for either half.
+
+| | cache read | cache write | ask for it with |
+|---|---|---|---|
+| **reuse, then keep** — the default | yes | yes | `execute_plan(plan)` |
+| **re-run, but keep** | no | yes | `execute_plan(plan, refresh=True)` |
+| **do not touch the cache** | no | no | `execute_plan(plan, use_cache=False)` |
+
+`refresh=True` is what belongs behind a `force` / "re-verify this" switch. `use_cache=False` re-runs *and discards*, so the next consumer of the same plan pays for the result the forced run already bought — a guaranteed double charge, noise on an LLM plan and a real charge for nothing on an image or video one. Reach for `use_cache=False` only when you genuinely want no cache interaction at all.
+
+`use_cache=False, refresh=True` raises: there is no key to write under when the cache is off.
+
 ## Testing code that uses falaw
 
 falaw content-addresses every media result, so `execute_plan` **reads the
