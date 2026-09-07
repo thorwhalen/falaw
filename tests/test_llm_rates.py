@@ -55,10 +55,37 @@ ANY_LLM_MODEL_ENUM = (
     "moonshotai/kimi-k2.5",
 )
 
+# The premium list fal's any-llm doc enumerates verbatim: "Premium models are
+# charged at 10x the rate of standard models, they include: ...". Pinned as an
+# exact set because `tier` is hand-transcribed — a typo that moved a model to
+# the standard tier would quietly restore the 10x under-quote this issue is
+# about, and a coverage check that only tests membership would not see it.
+# meta-llama/llama-3.2-90b-vision-instruct appears on that list but not in the
+# `model` enum (it belongs to the vision endpoint), so it is not a table row.
+ANY_LLM_PREMIUM_MODELS = frozenset(
+    {
+        "openai/gpt-4.1",
+        "anthropic/claude-3.5-sonnet",
+        "anthropic/claude-haiku-4.5",
+        "deepseek/deepseek-r1",
+        "openai/gpt-4o",
+        "openai/o3",
+        "anthropic/claude-3-5-haiku",
+        "google/gemini-2.5-pro",
+        "anthropic/claude-3.7-sonnet",
+        "anthropic/claude-sonnet-4.5",
+        "google/gemini-pro-1.5",
+        "openai/gpt-5-chat",
+        "deepseek/deepseek-v3.1-terminus",
+    }
+)
+
 # A model with both bases populated, used wherever a test needs token rates.
 PRICED_MODEL = "anthropic/claude-sonnet-4.5"
 # A model fal routes but nobody publishes upstream token rates for.
 PER_CALL_ONLY_MODEL = "google/gemini-flash-1.5"
+# "Premium models are charged at 10x the rate of standard models" — same doc.
+PREMIUM_MULTIPLE = 10
 
 
 # --- the table is data, and the data is well-formed -------------------------
@@ -96,6 +123,20 @@ def test_token_rates_are_both_present_or_both_absent_and_non_negative():
         for value in (rate.input_usd_per_mtok, rate.output_usd_per_mtok):
             if value is not None:
                 assert value >= 0, rate.model
+
+
+def test_the_premium_tier_is_exactly_the_set_fal_publishes():
+    priced_premium = {r.model for r in list_llm_rates() if r.tier == "premium"}
+    assert priced_premium == set(ANY_LLM_PREMIUM_MODELS)
+
+
+def test_every_premium_row_bills_the_published_multiple_of_the_standard_rate():
+    rates = {r.model: r for r in list_llm_rates()}
+    standard = {r.per_call_usd for r in rates.values() if r.tier == "standard"}
+    assert len(standard) == 1, "fal publishes one standard request rate"
+    base = standard.pop()
+    for model in ANY_LLM_PREMIUM_MODELS:
+        assert rates[model].per_call_usd == pytest.approx(base * PREMIUM_MULTIPLE)
 
 
 def test_tier_is_one_of_the_two_fal_publishes():
@@ -221,6 +262,23 @@ def test_negative_quantities_are_refused(kwargs):
         llm_ceiling_usd(PRICED_MODEL, **kwargs)
 
 
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"input_tokens": True, "max_output_tokens": 10},
+        {"input_tokens": 1.5e4, "max_output_tokens": 10},
+        {"input_tokens": 10, "max_output_tokens": "4000"},
+        {"count": 2.0},
+    ],
+)
+def test_non_integer_quantities_are_refused(kwargs):
+    # A bool and a float both do the arithmetic silently — True prices one
+    # token — so a caller who passed the wrong thing would get a number back
+    # rather than a complaint.
+    with pytest.raises(TypeError):
+        llm_ceiling_usd(PRICED_MODEL, **kwargs)
+
+
 # --- the override seam ------------------------------------------------------
 
 
@@ -276,6 +334,15 @@ def test_plan_takes_the_output_cap_from_extra_max_tokens():
     from_extra = _plan(input_tokens=200_000, extra={"max_tokens": 8_000})
     explicit = _plan(input_tokens=200_000, max_output_tokens=8_000)
     assert from_extra.estimated_cost_usd == explicit.estimated_cost_usd
+
+
+def test_a_response_cap_alone_still_quotes_the_request_price():
+    # Capping your response is not asking to be quoted by tokens. Reading
+    # `extra["max_tokens"]` as half a token quote dropped a call with a
+    # perfectly good request price down to forced approval.
+    capped = _plan(extra={"max_tokens": 8_000})
+    assert capped.estimated_cost_usd == _plan().estimated_cost_usd
+    assert Plan(calls=(capped,)).has_unknown_costs is False
 
 
 def test_an_explicit_hint_wins_over_extra_max_tokens():

@@ -506,11 +506,17 @@ def plan_llm_complete(
       :attr:`falaw.plan.Plan.has_unknown_costs` and forces approval. It is
       never quietly the router's flat price.
 
+    ``input_tokens`` is what opts a call into a token quote. Given one,
     ``max_output_tokens`` defaults to whatever the caller already put under
     :data:`MAX_OUTPUT_TOKENS_ARGUMENT` in ``extra`` — the cap is a fact of the
-    call, not a second thing to remember. Both hints are **estimator-only**:
-    they never enter ``arguments``, so adding one to an existing call site
-    changes the quote without moving the cache key or the plan hash.
+    call, not a second thing to remember. Without one, ``extra`` is left alone:
+    capping your response is not asking to be quoted by tokens, and reading the
+    cap as half a token quote would drop a call that has a perfectly good
+    request price down to forced approval.
+
+    Both hints are **estimator-only**: they never enter ``arguments``, so adding
+    one to an existing call site changes the quote without moving the cache key
+    or the plan hash.
 
     ``llm_rates`` swaps in a caller's own rate table — the seam for someone who
     has reconciled real numbers against their fal invoice.
@@ -527,7 +533,7 @@ def plan_llm_complete(
     if system:
         arguments["system_prompt"] = system
     arguments.update(extra or {})
-    if max_output_tokens is None:
+    if input_tokens is not None and max_output_tokens is None:
         max_output_tokens = _int_or_none(arguments.get(MAX_OUTPUT_TOKENS_ARGUMENT))
     return make_call_plan(
         tool="llm_complete",

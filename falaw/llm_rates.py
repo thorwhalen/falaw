@@ -221,13 +221,18 @@ def llm_ceiling_usd(
             against their own billing.
 
     Raises:
+        TypeError: a token hint or ``count`` that is not a plain ``int``.
+            A ``bool`` and a ``float`` both do the arithmetic silently —
+            ``True`` prices one token, ``1.5e4`` prices a fractional one —
+            so a caller who passed the wrong thing would get a number rather
+            than a complaint.
         ValueError: a negative token hint or ``count``, which would make the
             token basis *lower* the ceiling — silently, and in the one
             direction a spend gate must never err.
     """
-    _reject_negative(input_tokens=input_tokens, max_output_tokens=max_output_tokens)
-    if count < 0:
-        raise ValueError(f"count must be non-negative; got {count!r}")
+    _require_count(
+        input_tokens=input_tokens, max_output_tokens=max_output_tokens, count=count
+    )
 
     rate = get_llm_rate(model, rates=rates)
     if rate is None:
@@ -245,7 +250,12 @@ def llm_ceiling_usd(
     return max(rate.per_call_usd, token_cost) * count
 
 
-def _reject_negative(**hints: Optional[int]) -> None:
-    for name, value in hints.items():
-        if value is not None and value < 0:
+def _require_count(**quantities: Optional[int]) -> None:
+    """Refuse anything but a non-negative ``int`` (or ``None``) for each quantity."""
+    for name, value in quantities.items():
+        if value is None:
+            continue
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise TypeError(f"{name} must be an int; got {value!r}")
+        if value < 0:
             raise ValueError(f"{name} must be non-negative; got {value!r}")

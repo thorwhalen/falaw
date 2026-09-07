@@ -18,6 +18,7 @@ from typing import Any, Optional
 
 from ..cache import cached_call_fal
 from ..cost import estimate_call_cost
+from ..llm_rates import llm_ceiling_usd
 from ..registry import get_model, register_tool
 from ..scene import Beat, Scene, beat_id, make_beat, make_shot, shot_id
 
@@ -98,13 +99,17 @@ class LlmReceipt:
       and Anthropic ``input_tokens``/``output_tokens`` shapes). ``None``
       means *unrecorded by the provider response*, never zero.
     - ``estimated_cost_usd`` is ``0.0`` on a cache hit (nothing was billed),
-      else the **registry estimate** for the application (any-llm's
-      approximate per-call figure today) — an estimate, not an observed
-      bill; ``None`` when the registry cannot price it at all.
+      else fal's published per-request price **for the routed model**, read
+      off the rate table (:func:`falaw.llm_ceiling_usd`) — an estimate, not
+      an observed bill. It is the routed model and not the ``fal-ai/any-llm``
+      record because the record carries fal's *standard* tier, and a premium
+      routed model bills ten times that: pricing every turn from the record
+      under-reported premium spend tenfold in the ledger a consumer sums
+      (falaw#55). ``None`` only when nothing can price it at all.
     - ``cost_source`` says which of those cases produced the number, so a
       receipt consumer never has to guess: ``"cache_hit"``,
-      ``"registry:<kind>"`` (e.g. ``"registry:per_call"``), or
-      ``"unknown"``.
+      ``"rate_table:per_call"``, ``"registry:<kind>"`` (the fallback for a
+      model the table does not price), or ``"unknown"``.
     """
 
     application: str
@@ -182,17 +187,12 @@ def llm_complete_with_receipt(
     tokens_in, tokens_out = _extract_llm_usage(raw)
 
     cache_hit = bool(hit_seen)
-    if cache_hit:
-        cost, source = 0.0, "cache_hit"
-    else:
-        record = get_model(_DEFAULT_LLM)
-        cost = estimate_call_cost(record, count=1)
-        ce = record.cost_estimate
-        source = f"registry:{ce.kind}" if ce is not None else "unknown"
+    routed_model = str(arguments.get("model", model))
+    cost, source = (0.0, "cache_hit") if cache_hit else _billed_cost_of(routed_model)
 
     return text, LlmReceipt(
         application=_DEFAULT_LLM,
-        model=str(arguments.get("model", model)),
+        model=routed_model,
         cache_hit=cache_hit,
         chars_in=len(prompt) + len(system),
         chars_out=len(text),
@@ -200,6 +200,33 @@ def llm_complete_with_receipt(
         tokens_out=tokens_out,
         estimated_cost_usd=cost,
         cost_source=source,
+    )
+
+
+def _billed_cost_of(routed_model: str) -> tuple[Optional[float], str]:
+    """``(estimated_cost_usd, cost_source)`` for a call that was actually billed.
+
+    Prices the **routed model** against the rate table (falaw#50, option A),
+    not the ``fal-ai/any-llm`` record. The router's single ``per_call`` figure
+    is fal's *standard* tier; a premium routed model — falaw's own default
+    among them — bills ten times that, so the record under-reported every
+    premium turn tenfold in the very ledger a consumer sums to answer "what
+    have I spent?" (falaw#55).
+
+    The registry stays as a named fallback for a model the table does not
+    price. Unlike a plan-time quote, a receipt is a record of money already
+    spent: dropping to ``None`` there deletes a known-approximate number rather
+    than gating anything, and ``cost_source`` says which case produced it, so
+    a consumer can tell a table-priced row from a router-priced one.
+    """
+    table_cost = llm_ceiling_usd(routed_model)
+    if table_cost is not None:
+        return table_cost, "rate_table:per_call"
+    record = get_model(_DEFAULT_LLM)
+    ce = record.cost_estimate
+    return (
+        estimate_call_cost(record, count=1),
+        f"registry:{ce.kind}" if ce is not None else "unknown",
     )
 
 
