@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; falaw 0.0.45 documentation</title>
+  <title>Index &mdash; falaw 0.0.46 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=dcb4eb81"></script>
+      <script src="_static/documentation_options.js?v=eb4c61eb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -66,6 +66,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
@@ -160,6 +161,10 @@
         <li><a href="module_docs/falaw/operations/avatar.html#falaw.operations.avatar.animate_face">(in module falaw.operations.avatar)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.ANY_LLM_DOC_URL">ANY_LLM_DOC_URL (in module falaw.llm_rates_refresh)</a>
+</li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc">AnyLlmDoc (class in falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.CallPlan.application">application (falaw.CallPlan attribute)</a>
 
       <ul>
@@ -176,14 +181,14 @@
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.apply_note_to_beat">(in module falaw.operations.llm)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.apply_note_to_scene">apply_note_to_scene() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/operations/llm.html#falaw.operations.llm.apply_note_to_scene">(in module falaw.operations.llm)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.CacheUsage.area">area() (falaw.CacheUsage method)</a>
 
       <ul>
@@ -238,6 +243,8 @@
 </li>
       <li><a href="module_docs/falaw/backends.html#falaw.backends.backends">backends (in module falaw.backends)</a>
 </li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc.base_per_call_usd">base_per_call_usd (falaw.llm_rates_refresh.AnyLlmDoc attribute)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Beat">Beat (class in falaw)</a>
 
       <ul>
@@ -275,6 +282,8 @@
       <li><a href="module_docs/falaw/testing.html#falaw.testing.blocked_outbound_network">blocked_outbound_network() (in module falaw.testing)</a>
 </li>
       <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.build_mcp_server">build_mcp_server() (in module falaw.bridges.mcp)</a>
+</li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.build_proposed_rows">build_proposed_rows() (in module falaw.llm_rates_refresh)</a>
 </li>
       <li><a href="module_docs/falaw/bridges/skill.html#falaw.bridges.skill.build_skill_md">build_skill_md() (in module falaw.bridges.skill)</a>
 </li>
@@ -510,6 +519,8 @@
         <li><a href="module_docs/falaw.html#falaw.ModelRecord.default_negative_prompt">(falaw.ModelRecord attribute)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS">DEFAULT_STALENESS_THRESHOLD_DAYS (in module falaw.llm_rates)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.default_url_fetcher">default_url_fetcher() (in module falaw)</a>
 
       <ul>
@@ -537,6 +548,8 @@
       <li><a href="module_docs/falaw/testing.html#falaw.testing.DFLT_SYNTHETIC_PREFIX">DFLT_SYNTHETIC_PREFIX (in module falaw.testing)</a>
 </li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.diff_against_previous">diff_against_previous() (in module falaw.refresh)</a>
+</li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.diff_llm_rate_tables">diff_llm_rate_tables() (in module falaw.llm_rates_refresh)</a>
 </li>
       <li><a href="module_docs/falaw/refresh.html#falaw.refresh.DocSource">DocSource (class in falaw.refresh)</a>
 </li>
@@ -821,6 +834,13 @@
 </li>
       </ul></li>
       <li>
+    falaw.llm_rates_refresh
+
+      <ul>
+        <li><a href="module_docs/falaw/llm_rates_refresh.html#module-falaw.llm_rates_refresh">module</a>
+</li>
+      </ul></li>
+      <li>
     falaw.local
 
       <ul>
@@ -994,6 +1014,8 @@
         <li><a href="module_docs/falaw/pricing.html#falaw.pricing.fetch_model_prices">(in module falaw.pricing)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.format_llm_rates_diff">format_llm_rates_diff() (in module falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.FREE_TAG">FREE_TAG (in module falaw.bridges.mcp)</a>
 </li>
       <li><a href="module_docs/falaw/prune.html#falaw.prune.PruneReport.freed_bytes">freed_bytes (falaw.prune.PruneReport property)</a>
@@ -1198,6 +1220,8 @@
         <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.LlmRate">(class in falaw.llm_rates)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.LlmRatesStaleWarning">LlmRatesStaleWarning</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.LlmReceipt">LlmReceipt (class in falaw)</a>
 
       <ul>
@@ -1282,6 +1306,8 @@
         <li><a href="module_docs/falaw/registry.html#falaw.registry.model_constraints">(in module falaw.registry)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc.model_enum">model_enum (falaw.llm_rates_refresh.AnyLlmDoc attribute)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.ModelRecord">ModelRecord (class in falaw)</a>
 
       <ul>
@@ -1331,6 +1357,8 @@
         <li><a href="module_docs/falaw/journal.html#module-falaw.journal">falaw.journal</a>
 </li>
         <li><a href="module_docs/falaw/llm_rates.html#module-falaw.llm_rates">falaw.llm_rates</a>
+</li>
+        <li><a href="module_docs/falaw/llm_rates_refresh.html#module-falaw.llm_rates_refresh">falaw.llm_rates_refresh</a>
 </li>
         <li><a href="module_docs/falaw/local.html#module-falaw.local">falaw.local</a>
 </li>
@@ -1409,6 +1437,8 @@
         <li><a href="module_docs/falaw/outcomes.html#falaw.outcomes.CallOutcome.ok">(falaw.outcomes.CallOutcome property)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.OPENROUTER_MODELS_URL">OPENROUTER_MODELS_URL (in module falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw/testing.html#falaw.testing.OutboundNetworkAttempt">OutboundNetworkAttempt</a>
 </li>
   </ul></td>
@@ -1435,6 +1465,10 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.parse_any_llm_doc">parse_any_llm_doc() (in module falaw.llm_rates_refresh)</a>
+</li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.parse_openrouter_models">parse_openrouter_models() (in module falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.parse_response">parse_response() (in module falaw)</a>
 
       <ul>
@@ -1561,6 +1595,10 @@
         <li><a href="module_docs/falaw/plan.html#falaw.plan.plan_to_dict">(in module falaw.plan)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc.premium_models">premium_models (falaw.llm_rates_refresh.AnyLlmDoc attribute)</a>
+</li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc.premium_multiple">premium_multiple (falaw.llm_rates_refresh.AnyLlmDoc attribute)</a>
+</li>
       <li><a href="module_docs/falaw/pricing.html#falaw.pricing.PRICING_URL">PRICING_URL (in module falaw.pricing)</a>
 </li>
       <li><a href="module_docs/falaw.html#falaw.ExecutionReport.produced">produced (falaw.ExecutionReport property)</a>
@@ -1575,6 +1613,8 @@
         <li><a href="module_docs/falaw/events.html#falaw.events.ProgressEvent">(class in falaw.events)</a>
 </li>
       </ul></li>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.PROPOSED_RATES_FILENAME">PROPOSED_RATES_FILENAME (in module falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.prune_assets">prune_assets() (in module falaw)</a>
 
       <ul>
@@ -1611,6 +1651,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.RATES_DIFF_FILENAME">RATES_DIFF_FILENAME (in module falaw.llm_rates_refresh)</a>
+</li>
       <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.RATES_FILENAME">RATES_FILENAME (in module falaw.llm_rates)</a>
 </li>
       <li><a href="module_docs/falaw.html#falaw.CallOutcome.reason">reason (falaw.CallOutcome attribute)</a>
@@ -1623,6 +1665,12 @@
 
       <ul>
         <li><a href="module_docs/falaw/refresh.html#falaw.refresh.refresh_full_docs">(in module falaw.refresh)</a>
+</li>
+      </ul></li>
+      <li><a href="module_docs/falaw.html#falaw.refresh_llm_rates">refresh_llm_rates() (in module falaw)</a>
+
+      <ul>
+        <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.refresh_llm_rates">(in module falaw.llm_rates_refresh)</a>
 </li>
       </ul></li>
       <li><a href="module_docs/falaw.html#falaw.refresh_llms">refresh_llms() (in module falaw)</a>
@@ -1649,14 +1697,14 @@
         <li><a href="module_docs/falaw/refresh.html#falaw.refresh.refresh_state">(in module falaw.refresh)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.register_tool">register_tool() (in module falaw)</a>
 
       <ul>
         <li><a href="module_docs/falaw/registry.html#falaw.registry.register_tool">(in module falaw.registry)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/bridges/mcp.html#falaw.bridges.mcp.register_tools">register_tools() (in module falaw.bridges.mcp)</a>
 </li>
       <li><a href="module_docs/falaw/content.html#falaw.content.remembered_ref">remembered_ref() (in module falaw.content)</a>
@@ -1833,10 +1881,12 @@
         <li><a href="module_docs/falaw.html#falaw.LlmRate.tier">(falaw.LlmRate attribute)</a>
 </li>
       </ul></li>
-      <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.TOKENS_PER_RATE_UNIT">TOKENS_PER_RATE_UNIT (in module falaw.llm_rates)</a>
+      <li><a href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.TOKEN_RATE_PRECISION">TOKEN_RATE_PRECISION (in module falaw.llm_rates_refresh)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.TOKENS_PER_RATE_UNIT">TOKENS_PER_RATE_UNIT (in module falaw.llm_rates)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.CallPlan.tool">tool (falaw.CallPlan attribute)</a>
 
       <ul>
@@ -1951,20 +2001,22 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="module_docs/falaw/llm_rates.html#falaw.llm_rates.warn_if_stale">warn_if_stale() (in module falaw.llm_rates)</a>
+</li>
       <li><a href="module_docs/falaw.html#falaw.Scene.with_beat">with_beat() (falaw.Scene method)</a>
 
       <ul>
         <li><a href="module_docs/falaw/scene.html#falaw.scene.Scene.with_beat">(falaw.scene.Scene method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw.html#falaw.Plan.with_call_replaced">with_call_replaced() (falaw.Plan method)</a>
 
       <ul>
         <li><a href="module_docs/falaw/plan.html#falaw.plan.Plan.with_call_replaced">(falaw.plan.Plan method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="module_docs/falaw/content.html#falaw.content.write_blob_to_file">write_blob_to_file() (in module falaw.content)</a>
 </li>
       <li><a href="module_docs/falaw/bridges/skill.html#falaw.bridges.skill.write_skill_files">write_skill_files() (in module falaw.bridges.skill)</a>

@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.llm_rates_refresh &mdash; falaw 0.0.46 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=eb4c61eb"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/pricing.html">falaw.pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.llm_rates_refresh</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.llm_rates_refresh</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Refresh proposals for the LLM rate table, never a silent overwrite (falaw#56).</span>
+
+<span class="sd">``falaw/data/llm_rates.json`` was assembled by hand from two live sources and</span>
+<span class="sd">has no refresh job, so it ages without saying so (falaw#50 option A found</span>
+<span class="sd">this). Both sources move on their own schedule:</span>
+
+<span class="sd">1. fal's own any-llm endpoint doc (``ANY_LLM_DOC_URL``) — the ``model`` enum,</span>
+<span class="sd">   the flat per-request price, and the verbatim premium list.</span>
+<span class="sd">2. OpenRouter's public catalogue (``OPENROUTER_MODELS_URL``) — the upstream</span>
+<span class="sd">   ``pricing.prompt`` / ``pricing.completion`` any-llm resells.</span>
+
+<span class="sd">:func:`refresh_llm_rates` fetches both through an injectable seam, parses them</span>
+<span class="sd">with pure functions (:func:`parse_any_llm_doc`, :func:`parse_openrouter_models`),</span>
+<span class="sd">and diffs the result against the committed table. A price change is a</span>
+<span class="sd">decision, not something this module gets to make on your behalf — the</span>
+<span class="sd">committed ``llm_rates.json`` a test pins the premium set against is **never**</span>
+<span class="sd">written here. ``write=True`` persists a *proposed* table plus a</span>
+<span class="sd">human-readable diff alongside it; promoting the proposal over the committed</span>
+<span class="sd">file is a separate, human step.</span>
+
+<span class="sd">&gt;&gt;&gt; from falaw.llm_rates_refresh import parse_any_llm_doc</span>
+<span class="sd">&gt;&gt;&gt; doc = parse_any_llm_doc(</span>
+<span class="sd">...     '- **Price**: $0.001 per requests\\n'</span>
+<span class="sd">...     '- **`model`** (`ModelEnum`, _optional_):\\n'</span>
+<span class="sd">...     '  Name of the model to use. Premium models are charged at 10x the '</span>
+<span class="sd">...     'rate of standard models, they include: a/b, c/d. Default value: `"a/b"`\\n'</span>
+<span class="sd">...     '  - Options: `"a/b"`, `"c/d"`, `"e/f"`\\n'</span>
+<span class="sd">... )</span>
+<span class="sd">&gt;&gt;&gt; doc.base_per_call_usd</span>
+<span class="sd">0.001</span>
+<span class="sd">&gt;&gt;&gt; doc.premium_multiple</span>
+<span class="sd">10</span>
+<span class="sd">&gt;&gt;&gt; sorted(doc.premium_models)</span>
+<span class="sd">['a/b', 'c/d']</span>
+<span class="sd">&gt;&gt;&gt; doc.model_enum</span>
+<span class="sd">('a/b', 'c/d', 'e/f')</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.llm_rates</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rates_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_tool</span>
+
+<span class="n">ANY_LLM_DOC_URL</span> <span class="o">=</span> <span class="s2">"https://fal.ai/models/fal-ai/any-llm/llms.txt"</span>
+<span class="sd">"""fal's any-llm endpoint doc: model enum, flat price, premium list."""</span>
+
+<span class="n">OPENROUTER_MODELS_URL</span> <span class="o">=</span> <span class="s2">"https://openrouter.ai/api/v1/models"</span>
+<span class="sd">"""OpenRouter's public model catalogue: upstream per-token list prices."""</span>
+
+<span class="n">PROPOSED_RATES_FILENAME</span> <span class="o">=</span> <span class="s2">"llm_rates.proposed.json"</span>
+<span class="sd">"""Basename of the proposed table a refresh writes under ``falaw/data``."""</span>
+
+<span class="n">RATES_DIFF_FILENAME</span> <span class="o">=</span> <span class="s2">"llm_rates.diff.txt"</span>
+<span class="sd">"""Basename of the human-readable diff a refresh writes under ``falaw/data``."""</span>
+
+<span class="n">TOKEN_RATE_PRECISION</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="sd">"""Decimal places kept for a converted ``*_usd_per_mtok`` rate."""</span>
+
+<span class="n">_PRICE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\*\*Price\*\*:\s*\$(?P&lt;amount&gt;[0-9.]+)\s*per\s*requests?"</span><span class="p">)</span>
+<span class="n">_MODEL_FIELD_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"\*\*`model`\*\*.*?(?=\n- \*\*`|\Z)"</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+<span class="n">_PREMIUM_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">"Premium models are charged at (?P&lt;mult&gt;\d+)x the rate of standard "</span>
+    <span class="sa">r</span><span class="s2">"models, they include:\s*(?P&lt;list&gt;.+?)\.\s*Default value:"</span><span class="p">,</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="sd">"""Stops at the literal ``. Default value:`` that follows the list, not the</span>
+<span class="sd">first ``.`` — several model ids (``gpt-4.1``, ``claude-3.5-sonnet``, ...)</span>
+<span class="sd">contain a period of their own."""</span>
+<span class="n">_OPTIONS_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"Options:\s*(?P&lt;opts&gt;(?:`</span><span class="se">\"</span><span class="s2">[^</span><span class="se">\"</span><span class="s2">]+</span><span class="se">\"</span><span class="s2">`,?\s*)+)"</span><span class="p">)</span>
+<span class="n">_QUOTED_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'`"([^"]+)"`'</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AnyLlmDoc">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.AnyLlmDoc">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnyLlmDoc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The pricing-relevant facts parsed out of fal's any-llm doc.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        base_per_call_usd: The flat per-request price fal publishes for the</span>
+<span class="sd">            standard tier.</span>
+<span class="sd">        premium_multiple: How many times the base price a premium-tier</span>
+<span class="sd">            request costs.</span>
+<span class="sd">        premium_models: The routed-model ids fal's doc lists as premium,</span>
+<span class="sd">            verbatim (a model here that is not in ``model_enum`` belongs to a</span>
+<span class="sd">            different endpoint, e.g. a vision-only variant, and is not a rate</span>
+<span class="sd">            table row).</span>
+<span class="sd">        model_enum: Every routed-model id the ``model`` argument accepts, in</span>
+<span class="sd">            the doc's own order.</span>
+<span class="sd">    """</span>
+
+    <span class="n">base_per_call_usd</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">premium_multiple</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">premium_models</span><span class="p">:</span> <span class="nb">frozenset</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">model_enum</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="parse_any_llm_doc">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.parse_any_llm_doc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_any_llm_doc</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnyLlmDoc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Pure parse of fal's any-llm ``llms.txt`` into :class:`AnyLlmDoc`.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: the doc is missing the price line, the ``model`` field,</span>
+<span class="sd">            its premium sentence, or its options list — any of which means</span>
+<span class="sd">            fal changed the doc's shape and a human should look, not that the</span>
+<span class="sd">            refresh should guess.</span>
+<span class="sd">    """</span>
+    <span class="n">price_match</span> <span class="o">=</span> <span class="n">_PRICE_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">price_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"any-llm doc: no '$X per requests' price line found"</span><span class="p">)</span>
+    <span class="n">base_per_call_usd</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">price_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"amount"</span><span class="p">))</span>
+
+    <span class="n">model_field_match</span> <span class="o">=</span> <span class="n">_MODEL_FIELD_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_field_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"any-llm doc: no `model` field block found"</span><span class="p">)</span>
+    <span class="n">model_field</span> <span class="o">=</span> <span class="n">model_field_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">premium_match</span> <span class="o">=</span> <span class="n">_PREMIUM_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">model_field</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">premium_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"any-llm doc: no premium-tier sentence found"</span><span class="p">)</span>
+    <span class="n">premium_multiple</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">premium_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"mult"</span><span class="p">))</span>
+    <span class="n">premium_models</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">premium_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"list"</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">","</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="n">options_match</span> <span class="o">=</span> <span class="n">_OPTIONS_RE</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">model_field</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">options_match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"any-llm doc: no `model` Options list found"</span><span class="p">)</span>
+    <span class="n">model_enum</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_QUOTED_RE</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">options_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">"opts"</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">model_enum</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"any-llm doc: `model` Options list parsed empty"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">AnyLlmDoc</span><span class="p">(</span>
+        <span class="n">base_per_call_usd</span><span class="o">=</span><span class="n">base_per_call_usd</span><span class="p">,</span>
+        <span class="n">premium_multiple</span><span class="o">=</span><span class="n">premium_multiple</span><span class="p">,</span>
+        <span class="n">premium_models</span><span class="o">=</span><span class="n">premium_models</span><span class="p">,</span>
+        <span class="n">model_enum</span><span class="o">=</span><span class="n">model_enum</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="parse_openrouter_models">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.parse_openrouter_models">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_openrouter_models</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""``{model_id: (input_usd_per_mtok, output_usd_per_mtok)}`` from OpenRouter.</span>
+
+<span class="sd">    Pure parse of the ``GET /api/v1/models`` body. OpenRouter quotes</span>
+<span class="sd">    ``pricing.prompt``/``pricing.completion`` as USD-per-token strings; this</span>
+<span class="sd">    scales them to the table's per-million-token unit. A model with a</span>
+<span class="sd">    missing, non-numeric, or non-positive prompt/completion price is left out</span>
+<span class="sd">    — unknown, never a guessed zero.</span>
+<span class="sd">    """</span>
+    <span class="n">rates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">()):</span>
+        <span class="n">model_id</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"id"</span><span class="p">)</span>
+        <span class="n">pricing</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"pricing"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model_id</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">_positive_float</span><span class="p">(</span><span class="n">pricing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"prompt"</span><span class="p">))</span>
+        <span class="n">completion</span> <span class="o">=</span> <span class="n">_positive_float</span><span class="p">(</span><span class="n">pricing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"completion"</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">prompt</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">completion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="c1"># Rounded to TOKEN_RATE_PRECISION: scaling a per-token float (e.g.</span>
+        <span class="c1"># 0.0000004) by 1e6 reintroduces binary-float noise (0.39999999999999997)</span>
+        <span class="c1"># that would diff as "changed" against a hand-typed 0.4 forever.</span>
+        <span class="n">rates</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">round</span><span class="p">(</span><span class="n">prompt</span> <span class="o">*</span> <span class="mi">1_000_000</span><span class="p">,</span> <span class="n">TOKEN_RATE_PRECISION</span><span class="p">),</span>
+            <span class="nb">round</span><span class="p">(</span><span class="n">completion</span> <span class="o">*</span> <span class="mi">1_000_000</span><span class="p">,</span> <span class="n">TOKEN_RATE_PRECISION</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">rates</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_positive_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">amount</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">amount</span> <span class="k">if</span> <span class="n">amount</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="build_proposed_rows">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.build_proposed_rows">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_proposed_rows</span><span class="p">(</span>
+    <span class="n">any_llm</span><span class="p">:</span> <span class="n">AnyLlmDoc</span><span class="p">,</span>
+    <span class="n">openrouter_rates</span><span class="p">:</span> <span class="s2">"dict[str, tuple[float, float]]"</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"list[dict]"</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One rate-table row per id in ``any_llm.model_enum``, freshly derived.</span>
+
+<span class="sd">    The whole table is regenerated from the two sources every run — there is</span>
+<span class="sd">    no merge with the committed file here. The committed file only changes</span>
+<span class="sd">    when a human promotes a proposal, so there is nothing stale to carry</span>
+<span class="sd">    forward into it.</span>
+<span class="sd">    """</span>
+    <span class="n">any_llm_source</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"fal any-llm endpoint doc (</span><span class="si">{</span><span class="n">ANY_LLM_DOC_URL</span><span class="si">}</span><span class="s2">)"</span>
+    <span class="n">both_source</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">any_llm_source</span><span class="si">}</span><span class="s2">; upstream per-token rates from OpenRouter (</span><span class="si">{</span><span class="n">OPENROUTER_MODELS_URL</span><span class="si">}</span><span class="s2">)"</span>
+    <span class="n">rows</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">any_llm</span><span class="o">.</span><span class="n">model_enum</span><span class="p">:</span>
+        <span class="n">premium</span> <span class="o">=</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">any_llm</span><span class="o">.</span><span class="n">premium_models</span>
+        <span class="n">per_call_usd</span> <span class="o">=</span> <span class="n">any_llm</span><span class="o">.</span><span class="n">base_per_call_usd</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">any_llm</span><span class="o">.</span><span class="n">premium_multiple</span> <span class="k">if</span> <span class="n">premium</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">token_rates</span> <span class="o">=</span> <span class="n">openrouter_rates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">token_rates</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                    <span class="s2">"tier"</span><span class="p">:</span> <span class="s2">"premium"</span> <span class="k">if</span> <span class="n">premium</span> <span class="k">else</span> <span class="s2">"standard"</span><span class="p">,</span>
+                    <span class="s2">"per_call_usd"</span><span class="p">:</span> <span class="n">per_call_usd</span><span class="p">,</span>
+                    <span class="s2">"input_usd_per_mtok"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">"output_usd_per_mtok"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s2">"source"</span><span class="p">:</span> <span class="n">any_llm_source</span><span class="p">,</span>
+                    <span class="s2">"date"</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+                    <span class="s2">"notes"</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s2">"no per-token rate published upstream for this id on "</span>
+                        <span class="s2">"the fetch date; the per-request tier is the only "</span>
+                        <span class="s2">"known basis"</span>
+                    <span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_rate</span><span class="p">,</span> <span class="n">output_rate</span> <span class="o">=</span> <span class="n">token_rates</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                    <span class="s2">"tier"</span><span class="p">:</span> <span class="s2">"premium"</span> <span class="k">if</span> <span class="n">premium</span> <span class="k">else</span> <span class="s2">"standard"</span><span class="p">,</span>
+                    <span class="s2">"per_call_usd"</span><span class="p">:</span> <span class="n">per_call_usd</span><span class="p">,</span>
+                    <span class="s2">"input_usd_per_mtok"</span><span class="p">:</span> <span class="n">input_rate</span><span class="p">,</span>
+                    <span class="s2">"output_usd_per_mtok"</span><span class="p">:</span> <span class="n">output_rate</span><span class="p">,</span>
+                    <span class="s2">"source"</span><span class="p">:</span> <span class="n">both_source</span><span class="p">,</span>
+                    <span class="s2">"date"</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span>
+                    <span class="s2">"notes"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">rows</span></div>
+
+
+
+<span class="n">_DIFFED_FIELDS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"tier"</span><span class="p">,</span>
+    <span class="s2">"per_call_usd"</span><span class="p">,</span>
+    <span class="s2">"input_usd_per_mtok"</span><span class="p">,</span>
+    <span class="s2">"output_usd_per_mtok"</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="diff_llm_rate_tables">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.diff_llm_rate_tables">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diff_llm_rate_tables</span><span class="p">(</span>
+    <span class="n">committed_rows</span><span class="p">:</span> <span class="s2">"list[dict]"</span><span class="p">,</span> <span class="n">proposed_rows</span><span class="p">:</span> <span class="s2">"list[dict]"</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Compare two ``rows`` lists (as loaded from the table JSON) by model id.</span>
+
+<span class="sd">    Returns ``{"added", "removed", "changed", "unchanged"}``: ``added``/</span>
+<span class="sd">    ``removed`` are sorted model-id lists; ``changed`` is a list of</span>
+<span class="sd">    ``{"model", "field", "old", "new", "source", "date"}`` for every</span>
+<span class="sd">    :data:`_DIFFED_FIELDS` value that moved (``source``/``date`` themselves</span>
+<span class="sd">    are provenance, not a price fact, so they never appear as a *diffed</span>
+<span class="sd">    field* even though every row gets a fresh stamp — but the *proposed*</span>
+<span class="sd">    row's own ``source``/``date`` ride along on every change entry, so the</span>
+<span class="sd">    human-readable diff carries where the new number came from, not just</span>
+<span class="sd">    what it is); ``unchanged`` is a count.</span>
+<span class="sd">    """</span>
+    <span class="n">committed</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]:</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">committed_rows</span><span class="p">}</span>
+    <span class="n">proposed</span> <span class="o">=</span> <span class="p">{</span><span class="n">r</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]:</span> <span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">proposed_rows</span><span class="p">}</span>
+
+    <span class="n">added</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">proposed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">committed</span><span class="p">))</span>
+    <span class="n">removed</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">committed</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">proposed</span><span class="p">))</span>
+    <span class="n">changed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">unchanged</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">committed</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">proposed</span><span class="p">)):</span>
+        <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="o">=</span> <span class="n">committed</span><span class="p">[</span><span class="n">model</span><span class="p">],</span> <span class="n">proposed</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>
+        <span class="n">row_changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_DIFFED_FIELDS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">)</span> <span class="o">!=</span> <span class="n">new</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
+                <span class="n">changed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"model"</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+                        <span class="s2">"field"</span><span class="p">:</span> <span class="n">field</span><span class="p">,</span>
+                        <span class="s2">"old"</span><span class="p">:</span> <span class="n">old</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">),</span>
+                        <span class="s2">"new"</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">field</span><span class="p">),</span>
+                        <span class="s2">"source"</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                        <span class="s2">"date"</span><span class="p">:</span> <span class="n">new</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"date"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+                <span class="n">row_changed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">row_changed</span><span class="p">:</span>
+            <span class="n">unchanged</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"added"</span><span class="p">:</span> <span class="n">added</span><span class="p">,</span>
+        <span class="s2">"removed"</span><span class="p">:</span> <span class="n">removed</span><span class="p">,</span>
+        <span class="s2">"changed"</span><span class="p">:</span> <span class="n">changed</span><span class="p">,</span>
+        <span class="s2">"unchanged"</span><span class="p">:</span> <span class="n">unchanged</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="format_llm_rates_diff">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.format_llm_rates_diff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_llm_rates_diff</span><span class="p">(</span><span class="n">diff</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Render :func:`diff_llm_rate_tables`'s result as a human-readable report."""</span>
+    <span class="n">lines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"added"</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"removed"</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"changed"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"No changes (</span><span class="si">{</span><span class="n">diff</span><span class="p">[</span><span class="s1">'unchanged'</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows unchanged)."</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"added"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Added (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'added'</span><span class="p">])</span><span class="si">}</span><span class="s2">):"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  + </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"added"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"removed"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Removed (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'removed'</span><span class="p">])</span><span class="si">}</span><span class="s2">):"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  - </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"removed"</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"changed"</span><span class="p">]:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Changed (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'changed'</span><span class="p">])</span><span class="si">}</span><span class="s2"> fields):"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">diff</span><span class="p">[</span><span class="s2">"changed"</span><span class="p">]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"  ~ </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'field'</span><span class="p">]</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'old'</span><span class="p">]</span><span class="si">!r}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">entry</span><span class="p">[</span><span class="s1">'new'</span><span class="p">]</span><span class="si">!r}</span><span class="s2">  "</span>
+                <span class="sa">f</span><span class="s2">"[</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'date'</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'no date'</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'source'</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'no source'</span><span class="si">}</span><span class="s2">]"</span>
+            <span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unchanged: </span><span class="si">{</span><span class="n">diff</span><span class="p">[</span><span class="s1">'unchanged'</span><span class="p">]</span><span class="si">}</span><span class="s2"> rows."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Injectable HTTP seams. Production uses httpx; tests pass a fixture-backed</span>
+<span class="c1"># stub so no test ever reaches the network. Two seams, not one, because the</span>
+<span class="c1"># two sources have different response shapes (plain text vs. JSON). httpx is</span>
+<span class="c1"># not a declared falaw dependency -- it rides in transitively via fal-client</span>
+<span class="c1"># (same precedent as `pricing.py`'s `_default_http_get`); either default only</span>
+<span class="c1"># imports it lazily, inside the function, so a `write=False` refresh with an</span>
+<span class="c1"># injected `http_get_*` (as every test uses) never needs it installed.</span>
+<span class="n">HttpGetText</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span>
+<span class="n">HttpGetJson</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_http_get_text</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>  <span class="c1"># type: ignore[import-untyped]</span>
+
+    <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_http_get_json</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>  <span class="c1"># type: ignore[import-untyped]</span>
+
+    <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_data_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_rates_path</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_proposed_path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span> <span class="ow">or</span> <span class="n">_data_dir</span><span class="p">(),</span> <span class="n">PROPOSED_RATES_FILENAME</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_diff_path</span><span class="p">(</span><span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span> <span class="ow">or</span> <span class="n">_data_dir</span><span class="p">(),</span> <span class="n">RATES_DIFF_FILENAME</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="refresh_llm_rates">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates_refresh.html#falaw.refresh_llm_rates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">refresh_llm_rates</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">http_get_any_llm_doc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HttpGetText</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">http_get_openrouter_models</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HttpGetJson</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rates_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">proposed_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">diff_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">today</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Fetch both sources, propose a fresh table, diff it — never overwrite.</span>
+
+<span class="sd">    ``rates_path`` (default: the committed ``llm_rates.json``) is read only,</span>
+<span class="sd">    never written: this function has no code path that touches the committed</span>
+<span class="sd">    table, by design — a repriced or retiered model is a decision for a human</span>
+<span class="sd">    to promote, not something a refresh job gets to make silently. With</span>
+<span class="sd">    ``write=True``, the freshly-derived table is written to ``proposed_path``</span>
+<span class="sd">    (default: ``llm_rates.proposed.json`` next to the committed file) and the</span>
+<span class="sd">    diff report to ``diff_path`` (default: ``llm_rates.diff.txt``).</span>
+
+<span class="sd">    Returns a summary dict: ``{"fetched_at", "committed_models",</span>
+<span class="sd">    "proposed_models", "diff", "write", "proposed_path", "diff_path"}``. The</span>
+<span class="sd">    two path keys are ``None`` when ``write=False``.</span>
+<span class="sd">    """</span>
+    <span class="n">get_text</span> <span class="o">=</span> <span class="n">http_get_any_llm_doc</span> <span class="ow">or</span> <span class="n">_default_http_get_text</span>
+    <span class="n">get_json</span> <span class="o">=</span> <span class="n">http_get_openrouter_models</span> <span class="ow">or</span> <span class="n">_default_http_get_json</span>
+
+    <span class="n">any_llm_text</span> <span class="o">=</span> <span class="n">get_text</span><span class="p">(</span><span class="n">ANY_LLM_DOC_URL</span><span class="p">)</span>
+    <span class="n">openrouter_body</span> <span class="o">=</span> <span class="n">get_json</span><span class="p">(</span><span class="n">OPENROUTER_MODELS_URL</span><span class="p">)</span>
+
+    <span class="n">any_llm</span> <span class="o">=</span> <span class="n">parse_any_llm_doc</span><span class="p">(</span><span class="n">any_llm_text</span><span class="p">)</span>
+    <span class="n">openrouter_rates</span> <span class="o">=</span> <span class="n">parse_openrouter_models</span><span class="p">(</span><span class="n">openrouter_body</span><span class="p">)</span>
+
+    <span class="n">stamp</span> <span class="o">=</span> <span class="n">today</span> <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="n">proposed_rows</span> <span class="o">=</span> <span class="n">build_proposed_rows</span><span class="p">(</span><span class="n">any_llm</span><span class="p">,</span> <span class="n">openrouter_rates</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">stamp</span><span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">rates_path</span> <span class="ow">or</span> <span class="n">_rates_path</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">committed_table</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">committed_rows</span> <span class="o">=</span> <span class="n">committed_table</span><span class="p">[</span><span class="s2">"rows"</span><span class="p">]</span>
+
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">diff_llm_rate_tables</span><span class="p">(</span><span class="n">committed_rows</span><span class="p">,</span> <span class="n">proposed_rows</span><span class="p">)</span>
+    <span class="n">diff_text</span> <span class="o">=</span> <span class="n">format_llm_rates_diff</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+
+    <span class="n">summary</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"fetched_at"</span><span class="p">:</span> <span class="n">stamp</span><span class="p">,</span>
+        <span class="s2">"committed_models"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">committed_rows</span><span class="p">),</span>
+        <span class="s2">"proposed_models"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">proposed_rows</span><span class="p">),</span>
+        <span class="s2">"diff"</span><span class="p">:</span> <span class="n">diff</span><span class="p">,</span>
+        <span class="s2">"write"</span><span class="p">:</span> <span class="n">write</span><span class="p">,</span>
+        <span class="s2">"proposed_path"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">"diff_path"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">write</span><span class="p">:</span>
+        <span class="n">out_proposed</span> <span class="o">=</span> <span class="n">proposed_path</span> <span class="ow">or</span> <span class="n">_proposed_path</span><span class="p">()</span>
+        <span class="n">out_diff</span> <span class="o">=</span> <span class="n">diff_path</span> <span class="ow">or</span> <span class="n">_diff_path</span><span class="p">()</span>
+        <span class="n">proposed_table</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">committed_table</span><span class="p">)</span>
+        <span class="n">proposed_table</span><span class="p">[</span><span class="s2">"rows"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">proposed_rows</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">"model"</span><span class="p">])</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_proposed</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">proposed_table</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_diff</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">diff_text</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s2">"proposed_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_proposed</span>
+        <span class="n">summary</span><span class="p">[</span><span class="s2">"diff_path"</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_diff</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.journal</span><span class="w"> </span><span class="kn">import</span> <span class="n">_default_journal</span>
+
+        <span class="n">_default_journal</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"note"</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"refresh_llm_rates: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'added'</span><span class="p">])</span><span class="si">}</span><span class="s2"> added, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'removed'</span><span class="p">])</span><span class="si">}</span><span class="s2"> removed, "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="s1">'changed'</span><span class="p">])</span><span class="si">}</span><span class="s2"> fields changed across "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">({</span><span class="n">c</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">diff</span><span class="p">[</span><span class="s1">'changed'</span><span class="p">]})</span><span class="si">}</span><span class="s2"> models -- "</span>
+                <span class="sa">f</span><span class="s2">"proposal written to </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">out_proposed</span><span class="p">)</span><span class="si">}</span><span class="s2">, "</span>
+                <span class="s2">"committed table untouched"</span>
+            <span class="p">),</span>
+            <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"refresh"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">,</span> <span class="s2">"llm_rates"</span><span class="p">),</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"diff"</span><span class="p">:</span> <span class="n">diff</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">summary</span></div>
+
+
+
+<span class="nd">@register_tool</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"refresh_llm_rates"</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">"Fetch fal's any-llm doc and OpenRouter's model catalogue and diff "</span>
+        <span class="s2">"them against `falaw/data/llm_rates.json`. Never overwrites the "</span>
+        <span class="s2">"committed table -- a repriced or retiered model is a decision, not "</span>
+        <span class="s2">"an auto-apply. Pass `write=True` to persist a proposed table "</span>
+        <span class="s2">"(`llm_rates.proposed.json`) plus a human-readable diff "</span>
+        <span class="s2">"(`llm_rates.diff.txt`) for a human to review and promote; default "</span>
+        <span class="s2">"is a dry-run summary. Reads two free, unauthenticated endpoints; "</span>
+        <span class="s2">"makes no billed call."</span>
+    <span class="p">),</span>
+    <span class="n">tags</span><span class="o">=</span><span class="p">(</span><span class="s2">"refresh"</span><span class="p">,</span> <span class="s2">"maintenance"</span><span class="p">,</span> <span class="s2">"cost"</span><span class="p">,</span> <span class="s2">"free"</span><span class="p">),</span>
+    <span class="n">input_schema</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">,</span>
+        <span class="s2">"properties"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"write"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"boolean"</span><span class="p">,</span> <span class="s2">"default"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">output_schema</span><span class="o">=</span><span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"object"</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_refresh_llm_rates_tool</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">write</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Bridge-facing wrapper for :func:`refresh_llm_rates`.</span>
+
+<span class="sd">    Separate because bridges derive a JSON schema from the function</span>
+<span class="sd">    signature, and the real function's dependency-injection seams are not</span>
+<span class="sd">    JSON-schema representable -- nor anything a tool caller should reach.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">refresh_llm_rates</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="n">write</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

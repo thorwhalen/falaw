@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.llm_rates &mdash; falaw 0.0.45 documentation</title>
+  <title>falaw.llm_rates &mdash; falaw 0.0.46 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dcb4eb81"></script>
+      <script src="../../_static/documentation_options.js?v=eb4c61eb"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -24,7 +24,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="falaw.local" href="local.html" />
+    <link rel="next" title="falaw.llm_rates_refresh" href="llm_rates_refresh.html" />
     <link rel="prev" title="falaw.journal" href="journal.html" /> 
 </head>
 
@@ -69,6 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.llm_rates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_STALENESS_THRESHOLD_DAYS</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.LlmRate"><code class="docutils literal notranslate"><span class="pre">LlmRate</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates.LlmRate.model"><code class="docutils literal notranslate"><span class="pre">LlmRate.model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates.LlmRate.tier"><code class="docutils literal notranslate"><span class="pre">LlmRate.tier</span></code></a></li>
@@ -81,14 +82,17 @@
 <li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates.LlmRate.has_token_rates"><code class="docutils literal notranslate"><span class="pre">LlmRate.has_token_rates</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.LlmRatesStaleWarning"><code class="docutils literal notranslate"><span class="pre">LlmRatesStaleWarning</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.RATES_FILENAME"><code class="docutils literal notranslate"><span class="pre">RATES_FILENAME</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.TOKENS_PER_RATE_UNIT"><code class="docutils literal notranslate"><span class="pre">TOKENS_PER_RATE_UNIT</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.get_llm_rate"><code class="docutils literal notranslate"><span class="pre">get_llm_rate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.list_llm_rates"><code class="docutils literal notranslate"><span class="pre">list_llm_rates()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.llm_ceiling_usd"><code class="docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.load_llm_rates"><code class="docutils literal notranslate"><span class="pre">load_llm_rates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.warn_if_stale"><code class="docutils literal notranslate"><span class="pre">warn_if_stale()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
@@ -179,6 +183,16 @@ approval, rather than falling back to the router’s flat price:</p>
 <span class="go">True</span>
 </pre></div>
 </div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_STALENESS_THRESHOLD_DAYS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">90</span></span><a class="headerlink" href="#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS" title="Link to this definition"></a></dt>
+<dd><p>Warn once a priced row’s <code class="docutils literal notranslate"><span class="pre">date</span></code> is this many days old.</p>
+<p><code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code> has no refresh job that runs itself (falaw#56): a
+repriced or retiered model does not fail any test, so a quote can go stale
+silently. This is the default threshold <a class="reference internal" href="#falaw.llm_rates.llm_ceiling_usd" title="falaw.llm_rates.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a> checks a
+row’s <code class="docutils literal notranslate"><span class="pre">date</span></code> against before returning a quote.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="falaw.llm_rates.LlmRate">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">LlmRate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_call_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_usd_per_mtok</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_usd_per_mtok</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/llm_rates.html#LlmRate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates.LlmRate" title="Link to this definition"></a></dt>
@@ -283,6 +297,12 @@ fresh as its row.</p>
 <dd><p>True when both token columns are populated, so a token quote is possible.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.llm_rates.LlmRatesStaleWarning">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">LlmRatesStaleWarning</span></span><a class="reference internal" href="../../_modules/falaw/llm_rates.html#LlmRatesStaleWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates.LlmRatesStaleWarning" title="Link to this definition"></a></dt>
+<dd><p>A quote was served from a rate row older than the staleness threshold.</p>
 </dd></dl>
 
 <dl class="py data">
@@ -402,6 +422,25 @@ own reconciled numbers pass a mapping to <code class="docutils literal notransla
 this one.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates.warn_if_stale">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">warn_if_stale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.llm_rates.LlmRate" title="falaw.llm_rates.LlmRate"><span class="pre">LlmRate</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_days</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">today</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">date</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates.html#warn_if_stale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates.warn_if_stale" title="Link to this definition"></a></dt>
+<dd><p>Warn (never raise) when <code class="docutils literal notranslate"><span class="pre">rate</span></code> is older than <code class="docutils literal notranslate"><span class="pre">threshold_days</span></code>.</p>
+<p>Safe to call at import time or on every quote: it only ever calls
+<code class="xref py py-func docutils literal notranslate"><span class="pre">warnings.warn()</span></code>, so a stale table degrades a quote’s trustworthiness
+without ever breaking a caller. Returns the warning message when one was
+issued, else <code class="docutils literal notranslate"><span class="pre">None</span></code> (handy for tests, which can assert on it without
+a <code class="docutils literal notranslate"><span class="pre">pytest.warns</span></code> context).</p>
+<p><code class="docutils literal notranslate"><span class="pre">stacklevel=2</span></code> attributes the warning to <a class="reference internal" href="#falaw.llm_rates.llm_ceiling_usd" title="falaw.llm_rates.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a>’s call
+site here rather than to every external caller of <em>that</em> — a fixed
+location, not one that moves with the caller. That matters because
+Python’s default warning filter only dedups a repeated warning by its
+exact <code class="docutils literal notranslate"><span class="pre">(message,</span> <span class="pre">category,</span> <span class="pre">module,</span> <span class="pre">lineno)</span></code>: a fixed location plus a
+message keyed on <code class="docutils literal notranslate"><span class="pre">(model,</span> <span class="pre">date)</span></code> means a caller quoting the same stale
+row in a loop (including a blank/unknown <code class="docutils literal notranslate"><span class="pre">date</span></code>, which always reads as
+stale) sees the warning once per process, not once per call.</p>
+</dd></dl>
+
 </section>
 
 
@@ -409,7 +448,7 @@ this one.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="journal.html" class="btn btn-neutral float-left" title="falaw.journal" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="local.html" class="btn btn-neutral float-right" title="falaw.local" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="llm_rates_refresh.html" class="btn btn-neutral float-right" title="falaw.llm_rates_refresh" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

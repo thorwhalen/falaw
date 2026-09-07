@@ -22,6 +22,7 @@
    module_docs/falaw/events
    module_docs/falaw/journal
    module_docs/falaw/llm_rates
+   module_docs/falaw/llm_rates_refresh
    module_docs/falaw/local
    module_docs/falaw/operations
    module_docs/falaw/operations/_plan

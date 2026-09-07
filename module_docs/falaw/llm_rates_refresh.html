@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.llm_rates_refresh &mdash; falaw 0.0.46 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=eb4c61eb"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="falaw.local" href="local.html" />
+    <link rel="prev" title="falaw.llm_rates" href="llm_rates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.llm_rates_refresh</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.ANY_LLM_DOC_URL"><code class="docutils literal notranslate"><span class="pre">ANY_LLM_DOC_URL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc.base_per_call_usd"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc.base_per_call_usd</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc.premium_multiple"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc.premium_multiple</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc.premium_models"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc.premium_models</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc.model_enum"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc.model_enum</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.OPENROUTER_MODELS_URL"><code class="docutils literal notranslate"><span class="pre">OPENROUTER_MODELS_URL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.PROPOSED_RATES_FILENAME"><code class="docutils literal notranslate"><span class="pre">PROPOSED_RATES_FILENAME</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.RATES_DIFF_FILENAME"><code class="docutils literal notranslate"><span class="pre">RATES_DIFF_FILENAME</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.TOKEN_RATE_PRECISION"><code class="docutils literal notranslate"><span class="pre">TOKEN_RATE_PRECISION</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.build_proposed_rows"><code class="docutils literal notranslate"><span class="pre">build_proposed_rows()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.diff_llm_rate_tables"><code class="docutils literal notranslate"><span class="pre">diff_llm_rate_tables()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.format_llm_rates_diff"><code class="docutils literal notranslate"><span class="pre">format_llm_rates_diff()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.parse_any_llm_doc"><code class="docutils literal notranslate"><span class="pre">parse_any_llm_doc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.parse_openrouter_models"><code class="docutils literal notranslate"><span class="pre">parse_openrouter_models()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates_refresh.refresh_llm_rates"><code class="docutils literal notranslate"><span class="pre">refresh_llm_rates()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pricing.html">falaw.pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prune.html">falaw.prune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">falaw.llm_rates_refresh</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/module_docs/falaw/llm_rates_refresh.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-falaw.llm_rates_refresh">
+<span id="falaw-llm-rates-refresh"></span><h1>falaw.llm_rates_refresh<a class="headerlink" href="#module-falaw.llm_rates_refresh" title="Link to this heading"></a></h1>
+<p>Refresh proposals for the LLM rate table, never a silent overwrite (falaw#56).</p>
+<p><code class="docutils literal notranslate"><span class="pre">falaw/data/llm_rates.json</span></code> was assembled by hand from two live sources and
+has no refresh job, so it ages without saying so (falaw#50 option A found
+this). Both sources move on their own schedule:</p>
+<ol class="arabic simple">
+<li><p>fal’s own any-llm endpoint doc (<code class="docutils literal notranslate"><span class="pre">ANY_LLM_DOC_URL</span></code>) — the <code class="docutils literal notranslate"><span class="pre">model</span></code> enum,
+the flat per-request price, and the verbatim premium list.</p></li>
+<li><p>OpenRouter’s public catalogue (<code class="docutils literal notranslate"><span class="pre">OPENROUTER_MODELS_URL</span></code>) — the upstream
+<code class="docutils literal notranslate"><span class="pre">pricing.prompt</span></code> / <code class="docutils literal notranslate"><span class="pre">pricing.completion</span></code> any-llm resells.</p></li>
+</ol>
+<p><a class="reference internal" href="#falaw.llm_rates_refresh.refresh_llm_rates" title="falaw.llm_rates_refresh.refresh_llm_rates"><code class="xref py py-func docutils literal notranslate"><span class="pre">refresh_llm_rates()</span></code></a> fetches both through an injectable seam, parses them
+with pure functions (<a class="reference internal" href="#falaw.llm_rates_refresh.parse_any_llm_doc" title="falaw.llm_rates_refresh.parse_any_llm_doc"><code class="xref py py-func docutils literal notranslate"><span class="pre">parse_any_llm_doc()</span></code></a>, <a class="reference internal" href="#falaw.llm_rates_refresh.parse_openrouter_models" title="falaw.llm_rates_refresh.parse_openrouter_models"><code class="xref py py-func docutils literal notranslate"><span class="pre">parse_openrouter_models()</span></code></a>),
+and diffs the result against the committed table. A price change is a
+decision, not something this module gets to make on your behalf — the
+committed <code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code> a test pins the premium set against is <strong>never</strong>
+written here. <code class="docutils literal notranslate"><span class="pre">write=True</span></code> persists a <em>proposed</em> table plus a
+human-readable diff alongside it; promoting the proposal over the committed
+file is a separate, human step.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw.llm_rates_refresh</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_any_llm_doc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span> <span class="o">=</span> <span class="n">parse_any_llm_doc</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s1">'- **Price**: $0.001 per requests</span><span class="se">\n</span><span class="s1">'</span>
+<span class="gp">... </span>    <span class="s1">'- **`model`** (`ModelEnum`, _optional_):</span><span class="se">\n</span><span class="s1">'</span>
+<span class="gp">... </span>    <span class="s1">'  Name of the model to use. Premium models are charged at 10x the '</span>
+<span class="gp">... </span>    <span class="s1">'rate of standard models, they include: a/b, c/d. Default value: `"a/b"`</span><span class="se">\n</span><span class="s1">'</span>
+<span class="gp">... </span>    <span class="s1">'  - Options: `"a/b"`, `"c/d"`, `"e/f"`</span><span class="se">\n</span><span class="s1">'</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="o">.</span><span class="n">base_per_call_usd</span>
+<span class="go">0.001</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="o">.</span><span class="n">premium_multiple</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">premium_models</span><span class="p">)</span>
+<span class="go">['a/b', 'c/d']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="o">.</span><span class="n">model_enum</span>
+<span class="go">('a/b', 'c/d', 'e/f')</span>
+</pre></div>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.ANY_LLM_DOC_URL">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">ANY_LLM_DOC_URL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://fal.ai/models/fal-ai/any-llm/llms.txt'</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.ANY_LLM_DOC_URL" title="Link to this definition"></a></dt>
+<dd><p>model enum, flat price, premium list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fal’s any-llm endpoint doc</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.AnyLlmDoc">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">AnyLlmDoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_per_call_usd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">premium_multiple</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">premium_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">frozenset</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_enum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#AnyLlmDoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.AnyLlmDoc" title="Link to this definition"></a></dt>
+<dd><p>The pricing-relevant facts parsed out of fal’s any-llm doc.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.AnyLlmDoc.base_per_call_usd">
+<span class="sig-name descname"><span class="pre">base_per_call_usd</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.AnyLlmDoc.base_per_call_usd" title="Link to this definition"></a></dt>
+<dd><p>The flat per-request price fal publishes for the
+standard tier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.AnyLlmDoc.premium_multiple">
+<span class="sig-name descname"><span class="pre">premium_multiple</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.AnyLlmDoc.premium_multiple" title="Link to this definition"></a></dt>
+<dd><p>How many times the base price a premium-tier
+request costs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.AnyLlmDoc.premium_models">
+<span class="sig-name descname"><span class="pre">premium_models</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.AnyLlmDoc.premium_models" title="Link to this definition"></a></dt>
+<dd><p>The routed-model ids fal’s doc lists as premium,
+verbatim (a model here that is not in <code class="docutils literal notranslate"><span class="pre">model_enum</span></code> belongs to a
+different endpoint, e.g. a vision-only variant, and is not a rate
+table row).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>frozenset[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.AnyLlmDoc.model_enum">
+<span class="sig-name descname"><span class="pre">model_enum</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.AnyLlmDoc.model_enum" title="Link to this definition"></a></dt>
+<dd><p>Every routed-model id the <code class="docutils literal notranslate"><span class="pre">model</span></code> argument accepts, in
+the doc’s own order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[str, …]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.OPENROUTER_MODELS_URL">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">OPENROUTER_MODELS_URL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://openrouter.ai/api/v1/models'</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.OPENROUTER_MODELS_URL" title="Link to this definition"></a></dt>
+<dd><p>upstream per-token list prices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>OpenRouter’s public model catalogue</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.PROPOSED_RATES_FILENAME">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">PROPOSED_RATES_FILENAME</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'llm_rates.proposed.json'</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.PROPOSED_RATES_FILENAME" title="Link to this definition"></a></dt>
+<dd><p>Basename of the proposed table a refresh writes under <code class="docutils literal notranslate"><span class="pre">falaw/data</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.RATES_DIFF_FILENAME">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">RATES_DIFF_FILENAME</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'llm_rates.diff.txt'</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.RATES_DIFF_FILENAME" title="Link to this definition"></a></dt>
+<dd><p>Basename of the human-readable diff a refresh writes under <code class="docutils literal notranslate"><span class="pre">falaw/data</span></code>.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.TOKEN_RATE_PRECISION">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">TOKEN_RATE_PRECISION</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></span><a class="headerlink" href="#falaw.llm_rates_refresh.TOKEN_RATE_PRECISION" title="Link to this definition"></a></dt>
+<dd><p>Decimal places kept for a converted <code class="docutils literal notranslate"><span class="pre">*_usd_per_mtok</span></code> rate.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.build_proposed_rows">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">build_proposed_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">any_llm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc" title="falaw.llm_rates_refresh.AnyLlmDoc"><span class="pre">AnyLlmDoc</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">openrouter_rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#build_proposed_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.build_proposed_rows" title="Link to this definition"></a></dt>
+<dd><p>One rate-table row per id in <code class="docutils literal notranslate"><span class="pre">any_llm.model_enum</span></code>, freshly derived.</p>
+<p>The whole table is regenerated from the two sources every run — there is
+no merge with the committed file here. The committed file only changes
+when a human promotes a proposal, so there is nothing stale to carry
+forward into it.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.diff_llm_rate_tables">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">diff_llm_rate_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committed_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposed_rows</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#diff_llm_rate_tables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.diff_llm_rate_tables" title="Link to this definition"></a></dt>
+<dd><p>Compare two <code class="docutils literal notranslate"><span class="pre">rows</span></code> lists (as loaded from the table JSON) by model id.</p>
+<p>Returns <code class="docutils literal notranslate"><span class="pre">{&quot;added&quot;,</span> <span class="pre">&quot;removed&quot;,</span> <span class="pre">&quot;changed&quot;,</span> <span class="pre">&quot;unchanged&quot;}</span></code>: <code class="docutils literal notranslate"><span class="pre">added</span></code>/
+<code class="docutils literal notranslate"><span class="pre">removed</span></code> are sorted model-id lists; <code class="docutils literal notranslate"><span class="pre">changed</span></code> is a list of
+<code class="docutils literal notranslate"><span class="pre">{&quot;model&quot;,</span> <span class="pre">&quot;field&quot;,</span> <span class="pre">&quot;old&quot;,</span> <span class="pre">&quot;new&quot;,</span> <span class="pre">&quot;source&quot;,</span> <span class="pre">&quot;date&quot;}</span></code> for every
+<code class="xref py py-data docutils literal notranslate"><span class="pre">_DIFFED_FIELDS</span></code> value that moved (<code class="docutils literal notranslate"><span class="pre">source</span></code>/<code class="docutils literal notranslate"><span class="pre">date</span></code> themselves
+are provenance, not a price fact, so they never appear as a <em>diffed
+field</em> even though every row gets a fresh stamp — but the <em>proposed</em>
+row’s own <code class="docutils literal notranslate"><span class="pre">source</span></code>/<code class="docutils literal notranslate"><span class="pre">date</span></code> ride along on every change entry, so the
+human-readable diff carries where the new number came from, not just
+what it is); <code class="docutils literal notranslate"><span class="pre">unchanged</span></code> is a count.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.format_llm_rates_diff">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">format_llm_rates_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#format_llm_rates_diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.format_llm_rates_diff" title="Link to this definition"></a></dt>
+<dd><p>Render <a class="reference internal" href="#falaw.llm_rates_refresh.diff_llm_rate_tables" title="falaw.llm_rates_refresh.diff_llm_rate_tables"><code class="xref py py-func docutils literal notranslate"><span class="pre">diff_llm_rate_tables()</span></code></a>’s result as a human-readable report.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.parse_any_llm_doc">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">parse_any_llm_doc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc" title="falaw.llm_rates_refresh.AnyLlmDoc"><span class="pre">AnyLlmDoc</span></a></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#parse_any_llm_doc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.parse_any_llm_doc" title="Link to this definition"></a></dt>
+<dd><p>Pure parse of fal’s any-llm <code class="docutils literal notranslate"><span class="pre">llms.txt</span></code> into <a class="reference internal" href="#falaw.llm_rates_refresh.AnyLlmDoc" title="falaw.llm_rates_refresh.AnyLlmDoc"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnyLlmDoc</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – the doc is missing the price line, the <code class="docutils literal notranslate"><span class="pre">model</span></code> field,
+    its premium sentence, or its options list — any of which means
+    fal changed the doc’s shape and a human should look, not that the
+    refresh should guess.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.parse_openrouter_models">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">parse_openrouter_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#parse_openrouter_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.parse_openrouter_models" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{model_id:</span> <span class="pre">(input_usd_per_mtok,</span> <span class="pre">output_usd_per_mtok)}</span></code> from OpenRouter.</p>
+<p>Pure parse of the <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/models</span></code> body. OpenRouter quotes
+<code class="docutils literal notranslate"><span class="pre">pricing.prompt</span></code>/<code class="docutils literal notranslate"><span class="pre">pricing.completion</span></code> as USD-per-token strings; this
+scales them to the table’s per-million-token unit. A model with a
+missing, non-numeric, or non-positive prompt/completion price is left out
+— unknown, never a guessed zero.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates_refresh.refresh_llm_rates">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates_refresh.</span></span><span class="sig-name descname"><span class="pre">refresh_llm_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">write</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_get_any_llm_doc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">http_get_openrouter_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rates_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proposed_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">today</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates_refresh.html#refresh_llm_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates_refresh.refresh_llm_rates" title="Link to this definition"></a></dt>
+<dd><p>Fetch both sources, propose a fresh table, diff it — never overwrite.</p>
+<p><code class="docutils literal notranslate"><span class="pre">rates_path</span></code> (default: the committed <code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code>) is read only,
+never written: this function has no code path that touches the committed
+table, by design — a repriced or retiered model is a decision for a human
+to promote, not something a refresh job gets to make silently. With
+<code class="docutils literal notranslate"><span class="pre">write=True</span></code>, the freshly-derived table is written to <code class="docutils literal notranslate"><span class="pre">proposed_path</span></code>
+(default: <code class="docutils literal notranslate"><span class="pre">llm_rates.proposed.json</span></code> next to the committed file) and the
+diff report to <code class="docutils literal notranslate"><span class="pre">diff_path</span></code> (default: <code class="docutils literal notranslate"><span class="pre">llm_rates.diff.txt</span></code>).</p>
+<p>Returns a summary dict: <code class="docutils literal notranslate"><span class="pre">{&quot;fetched_at&quot;,</span> <span class="pre">&quot;committed_models&quot;,</span>
+<span class="pre">&quot;proposed_models&quot;,</span> <span class="pre">&quot;diff&quot;,</span> <span class="pre">&quot;write&quot;,</span> <span class="pre">&quot;proposed_path&quot;,</span> <span class="pre">&quot;diff_path&quot;}</span></code>. The
+two path keys are <code class="docutils literal notranslate"><span class="pre">None</span></code> when <code class="docutils literal notranslate"><span class="pre">write=False</span></code>.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="llm_rates.html" class="btn btn-neutral float-left" title="falaw.llm_rates" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="local.html" class="btn btn-neutral float-right" title="falaw.local" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

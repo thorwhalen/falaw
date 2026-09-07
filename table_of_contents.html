@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>&lt;no title&gt; &mdash; falaw 0.0.45 documentation</title>
+  <title>&lt;no title&gt; &mdash; falaw 0.0.46 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=dcb4eb81"></script>
+      <script src="_static/documentation_options.js?v=eb4c61eb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/journal.html">falaw.journal</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations.html">falaw.operations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
@@ -221,6 +222,7 @@
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.prune_content"><code class="docutils literal notranslate"><span class="pre">prune_content()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.prune_manifests"><code class="docutils literal notranslate"><span class="pre">prune_manifests()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_full_docs"><code class="docutils literal notranslate"><span class="pre">refresh_full_docs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_llm_rates"><code class="docutils literal notranslate"><span class="pre">refresh_llm_rates()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_llms"><code class="docutils literal notranslate"><span class="pre">refresh_llms()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_model_prices"><code class="docutils literal notranslate"><span class="pre">refresh_model_prices()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw.html#falaw.refresh_models_from_corpus"><code class="docutils literal notranslate"><span class="pre">refresh_models_from_corpus()</span></code></a></li>
@@ -366,13 +368,31 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates.html">falaw.llm_rates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_STALENESS_THRESHOLD_DAYS</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.LlmRate"><code class="docutils literal notranslate"><span class="pre">LlmRate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.LlmRatesStaleWarning"><code class="docutils literal notranslate"><span class="pre">LlmRatesStaleWarning</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.RATES_FILENAME"><code class="docutils literal notranslate"><span class="pre">RATES_FILENAME</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.TOKENS_PER_RATE_UNIT"><code class="docutils literal notranslate"><span class="pre">TOKENS_PER_RATE_UNIT</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.get_llm_rate"><code class="docutils literal notranslate"><span class="pre">get_llm_rate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.list_llm_rates"><code class="docutils literal notranslate"><span class="pre">list_llm_rates()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.llm_ceiling_usd"><code class="docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.load_llm_rates"><code class="docutils literal notranslate"><span class="pre">load_llm_rates()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates.html#falaw.llm_rates.warn_if_stale"><code class="docutils literal notranslate"><span class="pre">warn_if_stale()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html">falaw.llm_rates_refresh</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.ANY_LLM_DOC_URL"><code class="docutils literal notranslate"><span class="pre">ANY_LLM_DOC_URL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.AnyLlmDoc"><code class="docutils literal notranslate"><span class="pre">AnyLlmDoc</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.OPENROUTER_MODELS_URL"><code class="docutils literal notranslate"><span class="pre">OPENROUTER_MODELS_URL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.PROPOSED_RATES_FILENAME"><code class="docutils literal notranslate"><span class="pre">PROPOSED_RATES_FILENAME</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.RATES_DIFF_FILENAME"><code class="docutils literal notranslate"><span class="pre">RATES_DIFF_FILENAME</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.TOKEN_RATE_PRECISION"><code class="docutils literal notranslate"><span class="pre">TOKEN_RATE_PRECISION</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.build_proposed_rows"><code class="docutils literal notranslate"><span class="pre">build_proposed_rows()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.diff_llm_rate_tables"><code class="docutils literal notranslate"><span class="pre">diff_llm_rate_tables()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.format_llm_rates_diff"><code class="docutils literal notranslate"><span class="pre">format_llm_rates_diff()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.parse_any_llm_doc"><code class="docutils literal notranslate"><span class="pre">parse_any_llm_doc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.parse_openrouter_models"><code class="docutils literal notranslate"><span class="pre">parse_openrouter_models()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="module_docs/falaw/llm_rates_refresh.html#falaw.llm_rates_refresh.refresh_llm_rates"><code class="docutils literal notranslate"><span class="pre">refresh_llm_rates()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="module_docs/falaw/local.html">falaw.local</a><ul>
