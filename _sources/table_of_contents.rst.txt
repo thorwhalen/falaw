@@ -39,6 +39,7 @@
    module_docs/falaw/prune
    module_docs/falaw/refresh
    module_docs/falaw/registry
+   module_docs/falaw/reprice
    module_docs/falaw/results
    module_docs/falaw/scene
    module_docs/falaw/session

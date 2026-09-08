@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.llm_rates &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.llm_rates &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -83,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
@@ -168,6 +169,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">data_table_version</span>
 
 <span class="n">RATES_FILENAME</span> <span class="o">=</span> <span class="s2">"llm_rates.json"</span>
 <span class="sd">"""Basename of the rate table under ``falaw/data``."""</span>
@@ -319,6 +322,33 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_optional_float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
     <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="n">LLM_RATES_TABLE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"falaw/data/</span><span class="si">{</span><span class="n">RATES_FILENAME</span><span class="si">}</span><span class="s2">"</span>
+<span class="sd">"""Identity a :class:`falaw.CostBasis` records for an LLM-priced call."""</span>
+
+<span class="n">CUSTOM_LLM_RATES_TABLE</span> <span class="o">=</span> <span class="s2">"caller-supplied"</span>
+<span class="sd">"""What a basis records when the caller quoted against their own ``rates=`` table.</span>
+
+<span class="sd">It has no file to digest, so its ``table_version`` stays empty — and, more</span>
+<span class="sd">importantly, **the committed table must never re-price it**. Two tables are two</span>
+<span class="sd">sets of books: re-quoting a $0.50 row from a caller's reconciled invoice against</span>
+<span class="sd">falaw's $0.01 published rate is a 50x *under-quote* wearing the clothes of a</span>
+<span class="sd">price drop. :func:`falaw.reprice_plan` therefore refuses a basis whose ``table``</span>
+<span class="sd">does not match the pricer's, reporting it as unknown; a caller who wants their</span>
+<span class="sd">own numbers re-quoted passes a :class:`falaw.Pricer` that names this table."""</span>
+
+
+<div class="viewcode-block" id="llm_rates_table_version">
+<a class="viewcode-back" href="../../module_docs/falaw/llm_rates.html#falaw.llm_rates_table_version">[docs]</a>
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">llm_rates_table_version</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The rate table's version — see :func:`falaw.base.data_table_version`.</span>
+
+<span class="sd">    Cached per process, like the table itself.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">data_table_version</span><span class="p">(</span><span class="n">_rates_path</span><span class="p">())</span></div>
+
 
 
 <div class="viewcode-block" id="list_llm_rates">

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.operations._plan &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.operations._plan &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -83,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
@@ -139,8 +140,9 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..cost</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_call_cost</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..llm_rates</span><span class="w"> </span><span class="kn">import</span> <span class="n">LlmRateTable</span><span class="p">,</span> <span class="n">llm_ceiling_usd</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">..plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">make_call_plan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">CostBasis</span><span class="p">,</span> <span class="n">make_call_plan</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">pick_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..reprice</span><span class="w"> </span><span class="kn">import</span> <span class="n">catalogue_cost_basis</span><span class="p">,</span> <span class="n">llm_cost_basis</span>
 
 
 <span class="c1"># ---------------------------------------------------------------------------</span>
@@ -165,16 +167,34 @@
     <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">record</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_estimate_cost_with_record</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_catalogue_price</span><span class="p">(</span>
     <span class="n">record</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">megapixels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">"""Thin wrapper around :func:`estimate_call_cost` for planner use."""</span>
-    <span class="k">return</span> <span class="n">estimate_call_cost</span><span class="p">(</span>
-        <span class="n">record</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">seconds</span><span class="p">,</span> <span class="n">megapixels</span><span class="o">=</span><span class="n">megapixels</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">CostBasis</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""``(estimated_cost_usd, cost_basis)`` for a catalogue-priced call.</span>
+
+<span class="sd">    Both come out of one call site on purpose (falaw#60): the basis is the</span>
+<span class="sd">    recipe for reproducing the figure, so computing them apart is how the two</span>
+<span class="sd">    drift and a re-quote silently stops matching the quote it replaces. Hints</span>
+<span class="sd">    left ``None`` are dropped rather than recorded as ``null`` — absent is what</span>
+<span class="sd">    :func:`estimate_call_cost` actually saw, and what makes a quantity-priced</span>
+<span class="sd">    record unpriceable.</span>
+<span class="sd">    """</span>
+    <span class="n">supplied</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s2">"seconds"</span><span class="p">,</span> <span class="n">seconds</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"megapixels"</span><span class="p">,</span> <span class="n">megapixels</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">"tokens"</span><span class="p">,</span> <span class="n">tokens</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">estimate_call_cost</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">supplied</span><span class="p">),</span>
+        <span class="n">catalogue_cost_basis</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">**</span><span class="n">supplied</span><span class="p">),</span>
     <span class="p">)</span>
 
 
@@ -200,14 +220,16 @@
         <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span>
     <span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">"image_size"</span><span class="p">:</span> <span class="n">image_size</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -234,14 +256,16 @@
         <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">"image_edit"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span>
     <span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"edit_image"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -285,14 +309,16 @@
         <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">"image_edit"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span>
     <span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="n">_refs_arguments</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">refs</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image_with_refs"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -337,14 +363,16 @@
         <span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span> <span class="ow">or</span> <span class="n">_DEFAULT_COMPOSITE_PROMPT</span><span class="p">,</span>
         <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{}),</span>
     <span class="p">}</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"composite_character_in_environment"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -379,14 +407,16 @@
     <span class="n">arguments</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"image_url"</span><span class="p">:</span> <span class="n">image_url</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
     <span class="k">if</span> <span class="n">prompt</span><span class="p">:</span>
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"image_to_video"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -427,14 +457,16 @@
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"prompt"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"natural delivery"</span>
     <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
         <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"animate_face"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -462,14 +494,16 @@
         <span class="n">model_id</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="s2">"lipsync"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span>
     <span class="p">)</span>
     <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"video_url"</span><span class="p">:</span> <span class="n">video_url</span><span class="p">,</span> <span class="s2">"audio_url"</span><span class="p">:</span> <span class="n">audio_url</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"lipsync"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"video"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -517,16 +551,16 @@
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"voice"</span><span class="p">]</span> <span class="o">=</span> <span class="n">voice</span>
     <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
         <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"text_to_speech"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"audio"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span>
-            <span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">,</span> <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span>
-        <span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -582,14 +616,16 @@
         <span class="n">arguments</span><span class="p">[</span><span class="s2">"duration"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">duration_s</span><span class="p">))))</span>
     <span class="k">if</span> <span class="n">extra</span><span class="p">:</span>
         <span class="n">arguments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span>
+    <span class="n">cost</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">_catalogue_price</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">make_call_plan</span><span class="p">(</span>
         <span class="n">tool</span><span class="o">=</span><span class="s2">"generate_audio"</span><span class="p">,</span>
         <span class="n">application</span><span class="o">=</span><span class="n">application</span><span class="p">,</span>
         <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">,</span>
         <span class="n">output_kind</span><span class="o">=</span><span class="s2">"audio"</span><span class="p">,</span>
-        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">_estimate_cost_with_record</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="n">duration_s</span><span class="p">),</span>
+        <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">cost</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -693,6 +729,16 @@
         <span class="p">),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="n">consult_cache</span><span class="o">=</span><span class="n">consult_cache</span><span class="p">,</span>
+        <span class="c1"># The basis records the *routed* model, not ``application``: the router</span>
+        <span class="c1"># is one record, the price belongs to the model it routes to — and the</span>
+        <span class="c1"># hints below never enter ``arguments``, so nothing else on a persisted</span>
+        <span class="c1"># call could reconstruct this quote (falaw#60).</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">llm_cost_basis</span><span class="p">(</span>
+            <span class="n">routed_model</span><span class="p">,</span>
+            <span class="n">input_tokens</span><span class="o">=</span><span class="n">input_tokens</span><span class="p">,</span>
+            <span class="n">max_output_tokens</span><span class="o">=</span><span class="n">max_output_tokens</span><span class="p">,</span>
+            <span class="n">custom_rates</span><span class="o">=</span><span class="n">llm_rates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">),</span>
     <span class="p">)</span></div>
 
 

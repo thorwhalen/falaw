@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.bridges.skill &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.bridges.skill &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -83,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../module_docs/falaw/session.html">falaw.session</a></li>
@@ -366,6 +367,57 @@
 <span class="s2">The eager `llm_complete_with_receipt` prices the same way --- a receipt for a</span>
 <span class="s2">premium routed model reads $0.01 with `cost_source="rate_table:per_call"`, so a</span>
 <span class="s2">ledger that sums receipts and a gate that reads quotes agree.</span>
+
+<span class="s2">Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);</span>
+<span class="s2">### A saved plan's price is a past fact --- re-quote it before you gate on it</span>
+
+<span class="s2">Rates move, and 0.0.46 moved the LLM table **tenfold upward**. A plan you</span>
+<span class="s2">persisted last month still carries last month's `estimated_cost_usd`, so</span>
+<span class="s2">gating today's spend on it under-quotes --- the one direction a cost gate must</span>
+<span class="s2">never err in. Every `plan_*` records how it priced each call in</span>
+<span class="s2">`CallPlan.cost_basis` (which pricer, which rate table and version, and the</span>
+<span class="s2">quantity hints --- a clip's `duration_s`, a prompt's token bounds --- that</span>
+<span class="s2">never enter `arguments`), so the quote can be re-run:</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import plan_from_dict, reprice_plan</span>
+
+<span class="s2"># frozen figures from plan time; re-quoting is pure data (no network, no cache peek)</span>
+<span class="s2">out = reprice_plan(plan_from_dict(saved_row))</span>
+
+<span class="s2">out.plan  # same calls, same plan_hash, today's costs</span>
+<span class="s2">out.known_delta_usd  # how much the priced part moved</span>
+<span class="s2">[(c.index, c.status, c.old_cost_usd, c.new_cost_usd) for c in out.changed]</span>
+<span class="s2">```</span>
+
+<span class="s2">Four per-call statuses: `unchanged`, `changed`, `unknown` (a basis that</span>
+<span class="s2">today's tables cannot price --- a retired model, an unregistered pricer), and</span>
+<span class="s2">`no_basis` (a plan saved before falaw#60, or built by something that recorded</span>
+<span class="s2">nothing). **The last two clear the call's cost to `None`.** A stale number</span>
+<span class="s2">re-presented as a current quote is the bug this exists to fix, so `no_basis`</span>
+<span class="s2">is reported, never trusted --- read `out.unpriced` and refuse the gate, the</span>
+<span class="s2">same judgement `Plan.has_unknown_costs` asks for.</span>
+
+<span class="s2">`c.basis_changed` answers the audit question the frozen number never could:</span>
+<span class="s2">did the price move because the *rate table* moved?</span>
+
+<span class="s2">Quoted a call against your own `llm_rates=` table? Its basis says so, and</span>
+<span class="s2">falaw's table will **not** re-quote it --- it comes back `unknown`. Two tables</span>
+<span class="s2">are two sets of books, and re-pricing your reconciled $0.50 row at falaw's</span>
+<span class="s2">published $0.01 would be a 50x under-quote wearing the clothes of a price</span>
+<span class="s2">drop. Bring your own books instead:</span>
+
+<span class="s2">```python</span>
+<span class="s2">from falaw import DFLT_PRICERS, Pricer, llm_ceiling_usd</span>
+<span class="s2">from falaw.llm_rates import CUSTOM_LLM_RATES_TABLE</span>
+
+<span class="s2">mine = Pricer(</span>
+<span class="s2">    quote=lambda b: llm_ceiling_usd(b.priced, rates=my_table, **b.quantities),</span>
+<span class="s2">    table=CUSTOM_LLM_RATES_TABLE,  # must match the basis, or it is refused</span>
+<span class="s2">    version=lambda: "2026-09",</span>
+<span class="s2">)</span>
+<span class="s2">reprice_plan(plan, pricers={**DFLT_PRICERS, "llm_rates": mine})</span>
+<span class="s2">```</span>
 
 <span class="s2">Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);</span>
 <span class="s2">a caller who has reconciled real numbers against their fal invoice passes their</span>

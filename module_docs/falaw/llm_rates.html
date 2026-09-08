@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.llm_rates &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.llm_rates &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -69,7 +69,9 @@
 <li class="toctree-l1"><a class="reference internal" href="events.html">falaw.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="journal.html">falaw.journal</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">falaw.llm_rates</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.CUSTOM_LLM_RATES_TABLE"><code class="docutils literal notranslate"><span class="pre">CUSTOM_LLM_RATES_TABLE</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS"><code class="docutils literal notranslate"><span class="pre">DEFAULT_STALENESS_THRESHOLD_DAYS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.LLM_RATES_TABLE"><code class="docutils literal notranslate"><span class="pre">LLM_RATES_TABLE</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.LlmRate"><code class="docutils literal notranslate"><span class="pre">LlmRate</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates.LlmRate.model"><code class="docutils literal notranslate"><span class="pre">LlmRate.model</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#falaw.llm_rates.LlmRate.tier"><code class="docutils literal notranslate"><span class="pre">LlmRate.tier</span></code></a></li>
@@ -88,6 +90,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.get_llm_rate"><code class="docutils literal notranslate"><span class="pre">get_llm_rate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.list_llm_rates"><code class="docutils literal notranslate"><span class="pre">list_llm_rates()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.llm_ceiling_usd"><code class="docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.llm_rates_table_version"><code class="docutils literal notranslate"><span class="pre">llm_rates_table_version()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.load_llm_rates"><code class="docutils literal notranslate"><span class="pre">load_llm_rates()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.llm_rates.warn_if_stale"><code class="docutils literal notranslate"><span class="pre">warn_if_stale()</span></code></a></li>
 </ul>
@@ -109,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
@@ -184,6 +188,19 @@ approval, rather than falling back to the router’s flat price:</p>
 </pre></div>
 </div>
 <dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates.CUSTOM_LLM_RATES_TABLE">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">CUSTOM_LLM_RATES_TABLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'caller-supplied'</span></span><a class="headerlink" href="#falaw.llm_rates.CUSTOM_LLM_RATES_TABLE" title="Link to this definition"></a></dt>
+<dd><p>What a basis records when the caller quoted against their own <code class="docutils literal notranslate"><span class="pre">rates=</span></code> table.</p>
+<p>It has no file to digest, so its <code class="docutils literal notranslate"><span class="pre">table_version</span></code> stays empty — and, more
+importantly, <strong>the committed table must never re-price it</strong>. Two tables are two
+sets of books: re-quoting a $0.50 row from a caller’s reconciled invoice against
+falaw’s $0.01 published rate is a 50x <em>under-quote</em> wearing the clothes of a
+price drop. <a class="reference internal" href="../falaw.html#falaw.reprice_plan" title="falaw.reprice_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.reprice_plan()</span></code></a> therefore refuses a basis whose <code class="docutils literal notranslate"><span class="pre">table</span></code>
+does not match the pricer’s, reporting it as unknown; a caller who wants their
+own numbers re-quoted passes a <a class="reference internal" href="../falaw.html#falaw.Pricer" title="falaw.Pricer"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.Pricer</span></code></a> that names this table.</p>
+</dd></dl>
+
+<dl class="py data">
 <dt class="sig sig-object py" id="falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS">
 <span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">DEFAULT_STALENESS_THRESHOLD_DAYS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">90</span></span><a class="headerlink" href="#falaw.llm_rates.DEFAULT_STALENESS_THRESHOLD_DAYS" title="Link to this definition"></a></dt>
 <dd><p>Warn once a priced row’s <code class="docutils literal notranslate"><span class="pre">date</span></code> is this many days old.</p>
@@ -191,6 +208,12 @@ approval, rather than falling back to the router’s flat price:</p>
 repriced or retiered model does not fail any test, so a quote can go stale
 silently. This is the default threshold <a class="reference internal" href="#falaw.llm_rates.llm_ceiling_usd" title="falaw.llm_rates.llm_ceiling_usd"><code class="xref py py-func docutils literal notranslate"><span class="pre">llm_ceiling_usd()</span></code></a> checks a
 row’s <code class="docutils literal notranslate"><span class="pre">date</span></code> against before returning a quote.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.llm_rates.LLM_RATES_TABLE">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">LLM_RATES_TABLE</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'falaw/data/llm_rates.json'</span></span><a class="headerlink" href="#falaw.llm_rates.LLM_RATES_TABLE" title="Link to this definition"></a></dt>
+<dd><p>Identity a <a class="reference internal" href="../falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> records for an LLM-priced call.</p>
 </dd></dl>
 
 <dl class="py class">
@@ -411,6 +434,13 @@ against their own billing.</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.llm_rates.llm_rates_table_version">
+<span class="sig-prename descclassname"><span class="pre">falaw.llm_rates.</span></span><span class="sig-name descname"><span class="pre">llm_rates_table_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/llm_rates.html#llm_rates_table_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.llm_rates.llm_rates_table_version" title="Link to this definition"></a></dt>
+<dd><p>The rate table’s version — see <a class="reference internal" href="base.html#falaw.base.data_table_version" title="falaw.base.data_table_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.base.data_table_version()</span></code></a>.</p>
+<p>Cached per process, like the table itself.</p>
 </dd></dl>
 
 <dl class="py function">

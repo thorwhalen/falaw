@@ -1,0 +1,597 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>falaw.reprice &mdash; falaw 0.0.48 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=a72e4630"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            falaw
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw.html">falaw</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/__main__.html">falaw.__main__</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/account.html">falaw.account</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/backends.html">falaw.backends</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/base.html">falaw.base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges.html">falaw.bridges</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/service.html">falaw.bridges.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/bridges/skill.html">falaw.bridges.skill</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cache.html">falaw.cache</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/canonical.html">falaw.canonical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/content.html">falaw.content</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/core.html">falaw.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/corpus.html">falaw.corpus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/cost.html">falaw.cost</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/degrade.html">falaw.degrade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/errors.html">falaw.errors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/events.html">falaw.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/journal.html">falaw.journal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/local.html">falaw.local</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations.html">falaw.operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/_plan.html">falaw.operations._plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/images.html">falaw.operations.images</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/render.html">falaw.operations.render</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/operations/video.html">falaw.operations.video</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/plan.html">falaw.plan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/pricing.html">falaw.pricing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/reprice.html">falaw.reprice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/testing.html">falaw.testing</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">falaw</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">falaw.reprice</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for falaw.reprice</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Re-quote a persisted :class:`falaw.Plan` at today's rates (falaw#60).</span>
+
+<span class="sd">A ``CallPlan``'s ``estimated_cost_usd`` is frozen at plan time. That is right —</span>
+<span class="sd">a quote is a statement about a moment — but rate tables move: falaw 0.0.46</span>
+<span class="sd">re-quoted every premium LLM call **tenfold upward**, so a preview saved the day</span>
+<span class="sd">before under-quotes the run it is being used to price. Under-quoting is the one</span>
+<span class="sd">direction a cost gate must never err in.</span>
+
+<span class="sd">Re-quoting cannot be done from ``application`` and ``arguments`` alone. The</span>
+<span class="sd">quantity hints that priced a call — a clip's duration, a prompt's token bound —</span>
+<span class="sd">are estimator-only and deliberately never enter the wire arguments, so they are</span>
+<span class="sd">not on the serialized call. :class:`falaw.CostBasis` is where a ``plan_*``</span>
+<span class="sd">records them, together with which rate table it consulted; this module is what</span>
+<span class="sd">reads one back:</span>
+
+<span class="sd">&gt;&gt;&gt; from falaw import plan_generate_image, Plan, reprice_plan</span>
+<span class="sd">&gt;&gt;&gt; plan = Plan(calls=(plan_generate_image("a tiger", consult_cache=False),))</span>
+<span class="sd">&gt;&gt;&gt; repriced = reprice_plan(plan)</span>
+<span class="sd">&gt;&gt;&gt; [c.status for c in repriced.calls]</span>
+<span class="sd">['unchanged']</span>
+<span class="sd">&gt;&gt;&gt; repriced.plan.total_cost_usd == plan.total_cost_usd</span>
+<span class="sd">True</span>
+
+<span class="sd">Three rules, in order of importance:</span>
+
+<span class="sd">- **Pure data.** Nothing here touches the network or a billing API, exactly</span>
+<span class="sd">  like ``plan_*``. Re-pricing reads the committed tables and does arithmetic.</span>
+<span class="sd">- **A plan with no basis is never assumed current.** Such a call comes back as</span>
+<span class="sd">  ``"no_basis"`` with its cost *cleared to* ``None``. Keeping the frozen figure</span>
+<span class="sd">  would be the bug this module exists to fix, dressed as a feature.</span>
+<span class="sd">- **Unknown is unknown, never free.** A basis whose model has left the</span>
+<span class="sd">  catalogue, whose pricer is not registered, or whose table no longer prices it</span>
+<span class="sd">  re-prices to ``None`` — which lights up</span>
+<span class="sd">  :attr:`falaw.Plan.has_unknown_costs` and forces approval.</span>
+
+<span class="sd">The per-call diff says which of those happened, and</span>
+<span class="sd">:attr:`CallRepricing.basis_changed` says whether the *table* moved underneath</span>
+<span class="sd">the quote — the audit answer the frozen number could never give.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">replace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cost</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_call_cost</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.llm_rates</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CUSTOM_LLM_RATES_TABLE</span><span class="p">,</span>
+    <span class="n">LLM_RATES_TABLE</span><span class="p">,</span>
+    <span class="n">llm_ceiling_usd</span><span class="p">,</span>
+    <span class="n">llm_rates_table_version</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plan</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">CostBasis</span><span class="p">,</span> <span class="n">Plan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">MODEL_CATALOGUE_TABLE</span><span class="p">,</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">models_table_version</span>
+
+
+<span class="n">RepriceStatus</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"unchanged"</span><span class="p">,</span> <span class="s2">"changed"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">,</span> <span class="s2">"no_basis"</span><span class="p">]</span>
+<span class="sd">"""What re-pricing was able to say about one call.</span>
+
+<span class="sd">- ``unchanged``: re-quoted, and today's rates give the same number.</span>
+<span class="sd">- ``changed``: re-quoted to a different number — the interesting case.</span>
+<span class="sd">- ``unknown``: a basis was present but could not be re-quoted — the model has</span>
+<span class="sd">  left the catalogue, no pricer is registered under that name, the table no</span>
+<span class="sd">  longer prices it, or the basis names a **different table** than the pricer</span>
+<span class="sd">  reads (two sets of books do not re-quote each other). The new cost is</span>
+<span class="sd">  ``None``.</span>
+<span class="sd">- ``no_basis``: the call carries no :class:`falaw.CostBasis` at all — it was</span>
+<span class="sd">  planned before falaw#60, or by something that never recorded one. The new</span>
+<span class="sd">  cost is ``None``, because the honest answer to "what does this cost today?"</span>
+<span class="sd">  is that nobody can tell.</span>
+<span class="sd">"""</span>
+
+
+<span class="n">CATALOGUE_PRICER</span> <span class="o">=</span> <span class="s2">"model_catalogue"</span>
+<span class="sd">"""``CostBasis.pricer`` for a call priced from a ``models.json`` record."""</span>
+
+<span class="n">LLM_RATES_PRICER</span> <span class="o">=</span> <span class="s2">"llm_rates"</span>
+<span class="sd">"""``CostBasis.pricer`` for a routed LLM call priced from ``llm_rates.json``."""</span>
+
+
+<div class="viewcode-block" id="Pricer">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.Pricer">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Pricer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One pricing rule, and the table that backs it.</span>
+
+<span class="sd">    The seam for a caller with their own numbers: build a ``Pricer`` closing</span>
+<span class="sd">    over a reconciled rate table and pass ``pricers={**DFLT_PRICERS,</span>
+<span class="sd">    LLM_RATES_PRICER: mine}`` to :func:`reprice_plan`. The ``table`` /</span>
+<span class="sd">    ``version`` pair is stamped onto the re-priced call's basis, so the next</span>
+<span class="sd">    audit can see which table produced which number.</span>
+
+<span class="sd">    ``table`` is also a **gate, not just a label**: a call whose basis names a</span>
+<span class="sd">    different table is reported as ``unknown`` rather than re-quoted, so a row</span>
+<span class="sd">    priced from your invoice is never silently re-quoted at falaw's published</span>
+<span class="sd">    rate (or the reverse). Give your ``Pricer`` the same ``table`` string the</span>
+<span class="sd">    basis carries — :data:`falaw.llm_rates.CUSTOM_LLM_RATES_TABLE` for anything</span>
+<span class="sd">    a ``plan_*`` priced with ``llm_rates=``.</span>
+<span class="sd">    """</span>
+
+    <span class="n">quote</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">CostBasis</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
+<span class="w">    </span><span class="sd">"""Price ``basis`` in USD, or return ``None`` for *unknown*. May raise; a</span>
+<span class="sd">    raise is reported as ``"unknown"`` with the exception text as the reason,</span>
+<span class="sd">    so one unpriceable row never aborts a whole plan's re-quote."""</span>
+
+    <span class="n">table</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Identity of the table this pricer reads, for the refreshed basis."""</span>
+
+    <span class="n">version</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s2">""</span>
+<span class="w">    </span><span class="sd">"""Today's version of that table, for the refreshed basis."""</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_quote_from_catalogue</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">CostBasis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Re-run :func:`falaw.estimate_call_cost` for a catalogue-priced call."""</span>
+    <span class="k">return</span> <span class="n">estimate_call_cost</span><span class="p">(</span><span class="n">get_model</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">priced</span><span class="p">),</span> <span class="o">**</span><span class="n">basis</span><span class="o">.</span><span class="n">quantities</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_quote_from_llm_rates</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">CostBasis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Re-run :func:`falaw.llm_ceiling_usd` for a routed-LLM call."""</span>
+    <span class="k">return</span> <span class="n">llm_ceiling_usd</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">priced</span><span class="p">,</span> <span class="o">**</span><span class="n">basis</span><span class="o">.</span><span class="n">quantities</span><span class="p">)</span>
+
+
+<span class="n">DFLT_PRICERS</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pricer</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">CATALOGUE_PRICER</span><span class="p">:</span> <span class="n">Pricer</span><span class="p">(</span>
+        <span class="n">quote</span><span class="o">=</span><span class="n">_quote_from_catalogue</span><span class="p">,</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">MODEL_CATALOGUE_TABLE</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">models_table_version</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">LLM_RATES_PRICER</span><span class="p">:</span> <span class="n">Pricer</span><span class="p">(</span>
+        <span class="n">quote</span><span class="o">=</span><span class="n">_quote_from_llm_rates</span><span class="p">,</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">LLM_RATES_TABLE</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="n">llm_rates_table_version</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+<span class="sd">"""The pricers falaw ships — one per rate table it owns.</span>
+
+<span class="sd">Keyed by :attr:`falaw.CostBasis.pricer`. A basis naming anything else</span>
+<span class="sd">re-prices as ``"unknown"``: an unrecognized rule is a reason to refuse a</span>
+<span class="sd">number, not to keep the old one.</span>
+<span class="sd">"""</span>
+
+
+<div class="viewcode-block" id="CallRepricing">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.CallRepricing">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CallRepricing</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The before/after for one call in a re-priced plan."""</span>
+
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="w">    </span><span class="sd">"""Position in the original :class:`falaw.Plan`."""</span>
+
+    <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span>
+<span class="w">    </span><span class="sd">"""The re-priced call — the same call with today's</span>
+<span class="sd">    ``estimated_cost_usd`` and a basis stamped with today's table version."""</span>
+
+    <span class="n">old_cost_usd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""What the persisted plan said, ``None`` if it said unknown."""</span>
+
+    <span class="n">new_cost_usd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""What today's rates say, ``None`` for unknown or no-basis."""</span>
+
+    <span class="n">status</span><span class="p">:</span> <span class="n">RepriceStatus</span>
+<span class="w">    </span><span class="sd">"""Which of the four cases this call fell into — see :data:`RepriceStatus`."""</span>
+
+    <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="w">    </span><span class="sd">"""Why, when the status is ``"unknown"`` or ``"no_basis"``. Empty otherwise."""</span>
+
+    <span class="n">basis_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">    </span><span class="sd">"""True when the rate table's identity or version moved between the</span>
+<span class="sd">    persisted basis and today's — the audit answer to "did the price change</span>
+<span class="sd">    because the *table* changed?". Always ``False`` for ``"no_basis"``, which</span>
+<span class="sd">    has nothing to compare against."""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""``new - old``, or ``None`` when either side is unknown.</span>
+
+<span class="sd">        ``None`` rather than ``0.0``: a call that lost or gained its price did</span>
+<span class="sd">        not move by zero, and a caller summing deltas must not be handed a</span>
+<span class="sd">        number that says it did.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_cost_usd</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_cost_usd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_cost_usd</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">old_cost_usd</span></div>
+
+
+
+<div class="viewcode-block" id="RepricedPlan">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.RepricedPlan">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RepricedPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Result of :func:`reprice_plan` — the new Plan plus the per-call diff.</span>
+
+<span class="sd">    Read :attr:`plan` for the re-quoted plan (it is an ordinary</span>
+<span class="sd">    :class:`falaw.Plan`, so ``known_cost_usd`` / ``unknown_call_count`` /</span>
+<span class="sd">    ``has_unknown_costs`` mean what they always mean), and :attr:`calls` for</span>
+<span class="sd">    what changed and why.</span>
+<span class="sd">    """</span>
+
+    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span>
+<span class="w">    </span><span class="sd">"""The re-priced plan. Structurally identical to the input — same calls,</span>
+<span class="sd">    same order, same arguments, so ``plan_hash`` is unmoved — with today's</span>
+<span class="sd">    costs."""</span>
+
+    <span class="n">calls</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallRepricing</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+<span class="w">    </span><span class="sd">"""One entry per call of the input plan, in order."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">CallRepricing</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">changed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallRepricing</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Calls whose price moved — the ones a re-quote exists to surface."""</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"changed"</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unpriced</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CallRepricing</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Calls today's rates cannot price: ``"unknown"`` plus ``"no_basis"``.</span>
+
+<span class="sd">        A budget gate refuses while this is non-empty, the same way it refuses</span>
+<span class="sd">        on :attr:`falaw.Plan.has_unknown_costs` — the two are the same</span>
+<span class="sd">        judgement, one made at re-quote time.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"unknown"</span><span class="p">,</span> <span class="s2">"no_basis"</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">known_delta_usd</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Sum of :attr:`CallRepricing.delta_usd` over calls priced both times.</span>
+
+<span class="sd">        The movement you can actually see. It says nothing about the calls in</span>
+<span class="sd">        :attr:`unpriced` — read that alongside it, never this alone.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">((</span><span class="n">c</span><span class="o">.</span><span class="n">delta_usd</span> <span class="ow">or</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">calls</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="reprice_plan">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.reprice_plan">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reprice_plan</span><span class="p">(</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">pricers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pricer</span><span class="p">]</span> <span class="o">=</span> <span class="n">DFLT_PRICERS</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RepricedPlan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Re-quote every call in ``plan`` against today's rate tables.</span>
+
+<span class="sd">    Pure data: no network, no billing API, nothing executed. Returns a new</span>
+<span class="sd">    :class:`RepricedPlan` — the input plan is untouched.</span>
+
+<span class="sd">    A call carrying a :class:`falaw.CostBasis` is re-quoted through the pricer</span>
+<span class="sd">    its basis names, with the exact quantity hints that produced the original</span>
+<span class="sd">    figure, and comes back with a basis re-stamped to today's table version. A</span>
+<span class="sd">    call carrying no basis is reported as ``"no_basis"`` and its cost is</span>
+<span class="sd">    **cleared to** ``None``: the frozen number is a fact about a past moment,</span>
+<span class="sd">    and silently re-presenting it as a current quote is the failure this</span>
+<span class="sd">    function exists to prevent. That clearing lights up</span>
+<span class="sd">    :attr:`falaw.Plan.has_unknown_costs`, which is exactly right — nobody can</span>
+<span class="sd">    say what that call costs today.</span>
+
+<span class="sd">    A basis is only re-quoted by a pricer reading the **same table** it names.</span>
+<span class="sd">    A mismatch is ``"unknown"``, not a re-quote: two tables are two sets of</span>
+<span class="sd">    books, and pricing a caller's reconciled $0.50 row at falaw's published</span>
+<span class="sd">    $0.01 would be a 50x under-quote wearing the clothes of a price drop. Pass</span>
+<span class="sd">    a :class:`Pricer` naming that table to re-quote against the same books.</span>
+
+<span class="sd">    ``cache_status`` is carried through unchanged. Re-pricing answers "what</span>
+<span class="sd">    would this cost?", not "is it still cached?"; peeking the cache here would</span>
+<span class="sd">    quietly turn a re-quote into an I/O operation and make a hit look like a</span>
+<span class="sd">    price drop. Re-plan the calls if you want a fresh cache reading.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        plan: The plan to re-quote, typically just deserialized with</span>
+<span class="sd">            :func:`falaw.plan_from_dict`.</span>
+<span class="sd">        pricers: Pricing rules by :attr:`falaw.CostBasis.pricer` name. The seam</span>
+<span class="sd">            for a caller who has reconciled real numbers against their own</span>
+<span class="sd">            invoice — see :class:`Pricer`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from falaw import Plan, CallPlan, reprice_plan</span>
+<span class="sd">    &gt;&gt;&gt; stale = CallPlan(tool="generate_image", application="fal-ai/flux/dev",</span>
+<span class="sd">    ...                  arguments={"prompt": "a tiger"}, output_kind="image",</span>
+<span class="sd">    ...                  estimated_cost_usd=0.025)</span>
+<span class="sd">    &gt;&gt;&gt; out = reprice_plan(Plan(calls=(stale,)))</span>
+<span class="sd">    &gt;&gt;&gt; out.calls[0].status</span>
+<span class="sd">    'no_basis'</span>
+<span class="sd">    &gt;&gt;&gt; out.plan.calls[0].estimated_cost_usd is None   # unknown, not $0.025</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; out.plan.has_unknown_costs</span>
+<span class="sd">    True</span>
+<span class="sd">    """</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">_reprice_call</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">call</span><span class="p">,</span> <span class="n">pricers</span><span class="o">=</span><span class="n">pricers</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">call</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">RepricedPlan</span><span class="p">(</span>
+        <span class="n">plan</span><span class="o">=</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">call</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">)),</span>
+        <span class="n">calls</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_reprice_call</span><span class="p">(</span>
+    <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">call</span><span class="p">:</span> <span class="n">CallPlan</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">pricers</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Pricer</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallRepricing</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One call's re-quote — the whole decision, in one place.</span>
+
+<span class="sd">    Every ``unknown`` path leaves the *original* basis on the call: nothing</span>
+<span class="sd">    re-priced it, so nothing new gets to claim it did. Only a call that came</span>
+<span class="sd">    back with a number is re-stamped with the pricer's table and version.</span>
+<span class="sd">    """</span>
+    <span class="n">old</span> <span class="o">=</span> <span class="n">call</span><span class="o">.</span><span class="n">estimated_cost_usd</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">call</span><span class="o">.</span><span class="n">cost_basis</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">unknown</span><span class="p">(</span><span class="n">reason</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">basis_changed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallRepricing</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CallRepricing</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">call</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+            <span class="n">old_cost_usd</span><span class="o">=</span><span class="n">old</span><span class="p">,</span>
+            <span class="n">new_cost_usd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"unknown"</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">,</span>
+            <span class="n">basis_changed</span><span class="o">=</span><span class="n">basis_changed</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CallRepricing</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">call</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+            <span class="n">old_cost_usd</span><span class="o">=</span><span class="n">old</span><span class="p">,</span>
+            <span class="n">new_cost_usd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"no_basis"</span><span class="p">,</span>
+            <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">"no cost_basis recorded, so the quote cannot be re-run; the "</span>
+                <span class="s2">"plan-time figure is a past fact, not a current price"</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">pricer</span> <span class="o">=</span> <span class="n">pricers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">pricer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pricer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">unknown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"no pricer registered as </span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">pricer</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">table</span> <span class="o">!=</span> <span class="n">pricer</span><span class="o">.</span><span class="n">table</span><span class="p">:</span>
+        <span class="c1"># Two tables are two sets of books. Re-quoting a row priced against a</span>
+        <span class="c1"># caller's reconciled invoice ($0.50) with falaw's published rate</span>
+        <span class="c1"># ($0.01) is a 50x *under-quote* dressed as a price drop — the exact</span>
+        <span class="c1"># direction this module exists to prevent, on the exact caller the</span>
+        <span class="c1"># Pricer seam is advertised for. A caller who wants their own numbers</span>
+        <span class="c1"># re-quoted passes a Pricer that names their table.</span>
+        <span class="k">return</span> <span class="n">unknown</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"basis was priced against </span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">table</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">'an unnamed table'</span><span class="si">!r}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"but pricer </span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">pricer</span><span class="si">!r}</span><span class="s2"> reads </span><span class="si">{</span><span class="n">pricer</span><span class="o">.</span><span class="n">table</span><span class="si">!r}</span><span class="s2">; pass a Pricer "</span>
+            <span class="s2">"naming that table to re-quote against the same books"</span><span class="p">,</span>
+            <span class="n">basis_changed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">new_basis</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="n">pricer</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">table_version</span><span class="o">=</span><span class="n">pricer</span><span class="o">.</span><span class="n">version</span><span class="p">())</span>
+    <span class="n">basis_changed</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">table_version</span> <span class="o">!=</span> <span class="n">new_basis</span><span class="o">.</span><span class="n">table_version</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">pricer</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 — one bad row must not abort the plan</span>
+        <span class="c1"># A persisted basis can name a model the catalogue has since dropped,</span>
+        <span class="c1"># or carry a quantity a pricer no longer accepts. Both are honest</span>
+        <span class="c1"># "unknown"s with a reason attached; raising here would make one stale</span>
+        <span class="c1"># row cost the caller the other 199 re-quotes.</span>
+        <span class="k">return</span> <span class="n">unknown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">basis_changed</span><span class="o">=</span><span class="n">basis_changed</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">new</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">unknown</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">pricer</span><span class="si">!r}</span><span class="s2"> cannot price </span><span class="si">{</span><span class="n">basis</span><span class="o">.</span><span class="n">priced</span><span class="si">!r}</span><span class="s2"> today"</span><span class="p">,</span>
+            <span class="n">basis_changed</span><span class="o">=</span><span class="n">basis_changed</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">CallRepricing</span><span class="p">(</span>
+        <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="n">call</span><span class="o">=</span><span class="n">replace</span><span class="p">(</span><span class="n">call</span><span class="p">,</span> <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="n">new</span><span class="p">,</span> <span class="n">cost_basis</span><span class="o">=</span><span class="n">new_basis</span><span class="p">),</span>
+        <span class="n">old_cost_usd</span><span class="o">=</span><span class="n">old</span><span class="p">,</span>
+        <span class="n">new_cost_usd</span><span class="o">=</span><span class="n">new</span><span class="p">,</span>
+        <span class="n">status</span><span class="o">=</span><span class="s2">"unchanged"</span> <span class="k">if</span> <span class="n">new</span> <span class="o">==</span> <span class="n">old</span> <span class="k">else</span> <span class="s2">"changed"</span><span class="p">,</span>
+        <span class="n">basis_changed</span><span class="o">=</span><span class="n">basis_changed</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="catalogue_cost_basis">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.catalogue_cost_basis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">catalogue_cost_basis</span><span class="p">(</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">quantities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CostBasis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A :class:`falaw.CostBasis` for a call priced from ``models.json``.</span>
+
+<span class="sd">    ``quantities`` are :func:`falaw.estimate_call_cost` keywords (``count``,</span>
+<span class="sd">    ``seconds``, ``megapixels``, ``tokens``); ``None`` values are dropped, so a</span>
+<span class="sd">    hint that was never supplied is recorded as absent rather than as ``null``</span>
+<span class="sd">    — the same thing the estimator saw.</span>
+
+<span class="sd">    &gt;&gt;&gt; catalogue_cost_basis("fal-ai/flux/dev", seconds=None).quantities</span>
+<span class="sd">    {}</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">CostBasis</span><span class="p">(</span>
+        <span class="n">pricer</span><span class="o">=</span><span class="n">CATALOGUE_PRICER</span><span class="p">,</span>
+        <span class="n">priced</span><span class="o">=</span><span class="n">model_id</span><span class="p">,</span>
+        <span class="n">quantities</span><span class="o">=</span><span class="n">_supplied</span><span class="p">(</span><span class="n">quantities</span><span class="p">),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">MODEL_CATALOGUE_TABLE</span><span class="p">,</span>
+        <span class="n">table_version</span><span class="o">=</span><span class="n">models_table_version</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="llm_cost_basis">
+<a class="viewcode-back" href="../../module_docs/falaw/reprice.html#falaw.llm_cost_basis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">llm_cost_basis</span><span class="p">(</span>
+    <span class="n">routed_model</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">input_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_output_tokens</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_rates</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CostBasis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A :class:`falaw.CostBasis` for a routed LLM call priced from the rate table.</span>
+
+<span class="sd">    ``custom_rates=True`` records that the quote came from a caller-supplied</span>
+<span class="sd">    ``rates=`` table rather than the committed one: there is no file to digest,</span>
+<span class="sd">    so the version stays empty and the table names itself</span>
+<span class="sd">    :data:`falaw.llm_rates.CUSTOM_LLM_RATES_TABLE`. :func:`reprice_plan` then</span>
+<span class="sd">    **refuses** to re-quote it with the committed table, reporting ``unknown``</span>
+<span class="sd">    — a caller's reconciled $0.50 row re-priced at falaw's published $0.01 is a</span>
+<span class="sd">    50x under-quote, not a price drop. Re-quote it by passing a</span>
+<span class="sd">    :class:`Pricer` over your table that names that same identity.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">CostBasis</span><span class="p">(</span>
+        <span class="n">pricer</span><span class="o">=</span><span class="n">LLM_RATES_PRICER</span><span class="p">,</span>
+        <span class="n">priced</span><span class="o">=</span><span class="n">routed_model</span><span class="p">,</span>
+        <span class="n">quantities</span><span class="o">=</span><span class="n">_supplied</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"input_tokens"</span><span class="p">:</span> <span class="n">input_tokens</span><span class="p">,</span> <span class="s2">"max_output_tokens"</span><span class="p">:</span> <span class="n">max_output_tokens</span><span class="p">}</span>
+        <span class="p">),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">CUSTOM_LLM_RATES_TABLE</span> <span class="k">if</span> <span class="n">custom_rates</span> <span class="k">else</span> <span class="n">LLM_RATES_TABLE</span><span class="p">,</span>
+        <span class="n">table_version</span><span class="o">=</span><span class="s2">""</span> <span class="k">if</span> <span class="n">custom_rates</span> <span class="k">else</span> <span class="n">llm_rates_table_version</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_supplied</span><span class="p">(</span><span class="n">quantities</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""``quantities`` minus the keys whose value was ``None``."""</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">quantities</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

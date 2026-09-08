@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.plan &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.plan &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -83,6 +83,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../module_docs/falaw/session.html">falaw.session</a></li>
@@ -210,6 +211,59 @@
 <span class="sd">so the producer knows what shape of Artifact to materialize."""</span>
 
 
+<div class="viewcode-block" id="CostBasis">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.CostBasis">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CostBasis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""How a :attr:`CallPlan.estimated_cost_usd` was arrived at (falaw#60).</span>
+
+<span class="sd">    A frozen quote goes stale the moment the rate table moves — 0.0.46 moved</span>
+<span class="sd">    falaw's LLM prices tenfold — and a persisted plan cannot be re-quoted from</span>
+<span class="sd">    ``application`` and ``arguments`` alone: the quantity hints that priced it</span>
+<span class="sd">    (the clip's duration, the prompt's token bound) are estimator-only and</span>
+<span class="sd">    never enter the wire arguments. This records them, plus *which* table</span>
+<span class="sd">    priced them, so a saved plan can be re-quoted faithfully</span>
+<span class="sd">    (:func:`falaw.reprice_plan`) and audited after the fact.</span>
+
+<span class="sd">    Pure data. Nothing here reaches the network, and nothing here enters</span>
+<span class="sd">    :func:`plan_hash` or the per-call cache key: a basis says what a call</span>
+<span class="sd">    *cost*, never what it *produces*, so stamping one leaves every existing</span>
+<span class="sd">    digest byte-identical.</span>
+<span class="sd">    """</span>
+
+    <span class="n">pricer</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""Which pricing rule produced the figure — a key into</span>
+<span class="sd">    :data:`falaw.reprice.DFLT_PRICERS`. ``"model_catalogue"`` for a record</span>
+<span class="sd">    priced out of ``models.json``, ``"llm_rates"`` for a routed LLM priced out</span>
+<span class="sd">    of ``llm_rates.json``. An unrecognized name re-prices as *unknown*, never</span>
+<span class="sd">    as the old number."""</span>
+
+    <span class="n">priced</span><span class="p">:</span> <span class="nb">str</span>
+<span class="w">    </span><span class="sd">"""The entity that was priced: a :attr:`falaw.ModelRecord.id` for the</span>
+<span class="sd">    catalogue pricer, the routed ``model`` argument for the LLM pricer.</span>
+<span class="sd">    Distinct from :attr:`CallPlan.application`, which for ``fal-ai/any-llm``</span>
+<span class="sd">    names the router rather than the model that sets the price."""</span>
+
+    <span class="n">quantities</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""The estimator-only shape hints fed to the pricer, by keyword —</span>
+<span class="sd">    ``{"seconds": 6.0}``, ``{"input_tokens": 20000, "max_output_tokens": 4000}``.</span>
+<span class="sd">    Absent keys mean the hint was not supplied, which is what made a</span>
+<span class="sd">    quantity-priced call unpriceable in the first place. Omit-when-unset: a</span>
+<span class="sd">    hint that was ``None`` at plan time is left out rather than written as</span>
+<span class="sd">    ``null``."""</span>
+
+    <span class="n">table</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="w">    </span><span class="sd">"""Identity of the rate table consulted, e.g.</span>
+<span class="sd">    ``"falaw/data/llm_rates.json"``. Free-form so a caller's own reconciled</span>
+<span class="sd">    table can name itself."""</span>
+
+    <span class="n">table_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
+<span class="w">    </span><span class="sd">"""The version of that table at plan time — falaw stamps a short content</span>
+<span class="sd">    digest, so a table whose numbers moved gets a different value even when</span>
+<span class="sd">    its declared version did not. Empty means unversioned/unknown."""</span></div>
+
+
+
 <div class="viewcode-block" id="CallPlan">
 <a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.CallPlan">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -273,6 +327,16 @@
 <span class="sd">    cached result minted without this value must not be reused". First</span>
 <span class="sd">    customer: nw's Transform ``impl_version`` (nw#27) — "same interface,</span>
 <span class="sd">    changed behaviour" must miss the cache without renaming anything."""</span>
+
+    <span class="n">cost_basis</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostBasis</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">"""How :attr:`estimated_cost_usd` was computed, or ``None`` when nothing</span>
+<span class="sd">    recorded it (falaw#60). Present, the quote can be re-run against today's</span>
+<span class="sd">    rate table by :func:`falaw.reprice_plan`; absent, that function reports the</span>
+<span class="sd">    call as ``"no_basis"`` and clears its cost to unknown rather than passing a</span>
+<span class="sd">    stale figure off as current. Purely descriptive — it stays out of</span>
+<span class="sd">    :func:`plan_hash` and the per-call cache key, and out of the serialized</span>
+<span class="sd">    dict entirely when unset, so every plan falaw has ever hashed or persisted</span>
+<span class="sd">    is unmoved."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Every cost sum and the executor's per-artifact stamp read this</span>
@@ -428,8 +492,13 @@
 <span class="sd">    absent, so a dict from before this field existed still parses, and a</span>
 <span class="sd">    dict written by this version still parses under older falaw (the extra</span>
 <span class="sd">    key is simply never read there). No migration needed either direction.</span>
+
+<span class="sd">    ``cost_basis`` (falaw#60) is the same kind of addition under a stricter</span>
+<span class="sd">    rule — **omit-when-unset**: the key is written only when a basis exists, so</span>
+<span class="sd">    a plan built without one serializes to the exact bytes it did before the</span>
+<span class="sd">    field existed, and every stored plan, fixture and cassette is unmoved.</span>
 <span class="sd">    """</span>
-    <span class="k">return</span> <span class="p">{</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">"tool"</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">tool</span><span class="p">,</span>
         <span class="s2">"application"</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">application</span><span class="p">,</span>
         <span class="s2">"backend"</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">backend</span><span class="p">,</span>
@@ -444,7 +513,46 @@
         <span class="p">),</span>
         <span class="s2">"metadata"</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
         <span class="s2">"key_extra"</span><span class="p">:</span> <span class="n">call</span><span class="o">.</span><span class="n">key_extra</span><span class="p">,</span>
-    <span class="p">}</span></div>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">call</span><span class="o">.</span><span class="n">cost_basis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"cost_basis"</span><span class="p">]</span> <span class="o">=</span> <span class="n">cost_basis_to_dict</span><span class="p">(</span><span class="n">call</span><span class="o">.</span><span class="n">cost_basis</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="cost_basis_to_dict">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.cost_basis_to_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cost_basis_to_dict</span><span class="p">(</span><span class="n">basis</span><span class="p">:</span> <span class="n">CostBasis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert a :class:`CostBasis` to a plain JSON-serializable dict.</span>
+
+<span class="sd">    ``table`` / ``table_version`` are omitted when empty, matching the</span>
+<span class="sd">    omit-when-unset discipline the rest of the wire shape follows — a basis</span>
+<span class="sd">    that names no table writes no key rather than a pair of ``""``.</span>
+<span class="sd">    """</span>
+    <span class="n">out</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"pricer"</span><span class="p">:</span> <span class="n">basis</span><span class="o">.</span><span class="n">pricer</span><span class="p">,</span>
+        <span class="s2">"priced"</span><span class="p">:</span> <span class="n">basis</span><span class="o">.</span><span class="n">priced</span><span class="p">,</span>
+        <span class="s2">"quantities"</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">basis</span><span class="o">.</span><span class="n">quantities</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">table</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"table"</span><span class="p">]</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">table</span>
+    <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">table_version</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">"table_version"</span><span class="p">]</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">table_version</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+
+<div class="viewcode-block" id="cost_basis_from_dict">
+<a class="viewcode-back" href="../../module_docs/falaw/plan.html#falaw.cost_basis_from_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cost_basis_from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CostBasis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Rebuild a :class:`CostBasis` from a :func:`cost_basis_to_dict` dict."""</span>
+    <span class="k">return</span> <span class="n">CostBasis</span><span class="p">(</span>
+        <span class="n">pricer</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"pricer"</span><span class="p">],</span>
+        <span class="n">priced</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s2">"priced"</span><span class="p">],</span>
+        <span class="n">quantities</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"quantities"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="n">table</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"table"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+        <span class="n">table_version</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"table_version"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 
@@ -457,6 +565,11 @@
 <span class="sd">    data); ``expected_duration_s`` is re-tupled. ``backend`` defaults to</span>
 <span class="sd">    :data:`DFLT_BACKEND` when absent — a dict written before falaw#15 names no</span>
 <span class="sd">    backend, and it always meant ``"fal"``.</span>
+
+<span class="sd">    ``cost_basis`` is absent on any plan written before falaw#60 and on any</span>
+<span class="sd">    call nothing stamped; it comes back as ``None``, which</span>
+<span class="sd">    :func:`falaw.reprice_plan` reports as ``"no_basis"`` — never as a quote</span>
+<span class="sd">    that is still current.</span>
 <span class="sd">    """</span>
     <span class="n">duration</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"expected_duration_s"</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">CallPlan</span><span class="p">(</span>
@@ -470,6 +583,11 @@
         <span class="n">expected_duration_s</span><span class="o">=</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span> <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">metadata</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"metadata"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span>
         <span class="n">key_extra</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"key_extra"</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}),</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">cost_basis_from_dict</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">basis</span> <span class="o">:=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cost_basis"</span><span class="p">))</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">),</span>
     <span class="p">)</span></div>
 
 
@@ -595,6 +713,7 @@
     <span class="n">expected_duration_s</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metadata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">consult_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">cost_basis</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CostBasis</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CallPlan</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Build a :class:`CallPlan` and (optionally) check the cache.</span>
 
@@ -616,6 +735,11 @@
 <span class="sd">    which under prepaid billing (a quote that may be *deducted*) is a billing</span>
 <span class="sd">    bug. ``cache_status`` is ``"unknown"`` here instead, exactly the case</span>
 <span class="sd">    :data:`CacheStatus` documents it for.</span>
+
+<span class="sd">    ``cost_basis`` records how ``estimated_cost_usd`` was arrived at so the</span>
+<span class="sd">    quote can be re-run later (falaw#60). It is descriptive only: it never</span>
+<span class="sd">    reaches the cache key or :func:`plan_hash`, and a plan built without one</span>
+<span class="sd">    is byte-identical to one built before the field existed.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        falaw.errors.FalNonCanonicalArgument: an argument cannot be hashed</span>
@@ -665,6 +789,7 @@
         <span class="n">cache_status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
         <span class="n">expected_duration_s</span><span class="o">=</span><span class="n">expected_duration_s</span><span class="p">,</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="n">cost_basis</span><span class="o">=</span><span class="n">cost_basis</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 

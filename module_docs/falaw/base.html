@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>falaw.base &mdash; falaw 0.0.47 documentation</title>
+  <title>falaw.base &mdash; falaw 0.0.48 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=4f34e5f2"></script>
+      <script src="../../_static/documentation_options.js?v=a72e4630"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/toggleprompt.js?v=d7ede5d2"></script>
@@ -69,7 +69,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#falaw.base.ModelRecord.supported_resolutions"><code class="docutils literal notranslate"><span class="pre">ModelRecord.supported_resolutions</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.base.TABLE_VERSION_CHARS"><code class="docutils literal notranslate"><span class="pre">TABLE_VERSION_CHARS</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#falaw.base.ToolSpec"><code class="docutils literal notranslate"><span class="pre">ToolSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#falaw.base.data_table_version"><code class="docutils literal notranslate"><span class="pre">data_table_version()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="bridges.html">falaw.bridges</a></li>
@@ -104,6 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="prune.html">falaw.prune</a></li>
 <li class="toctree-l1"><a class="reference internal" href="refresh.html">falaw.refresh</a></li>
 <li class="toctree-l1"><a class="reference internal" href="registry.html">falaw.registry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reprice.html">falaw.reprice</a></li>
 <li class="toctree-l1"><a class="reference internal" href="results.html">falaw.results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="scene.html">falaw.scene</a></li>
 <li class="toctree-l1"><a class="reference internal" href="session.html">falaw.session</a></li>
@@ -243,12 +246,31 @@ shot/reverse-shot” warning.</p>
 
 </dd></dl>
 
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.base.TABLE_VERSION_CHARS">
+<span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">TABLE_VERSION_CHARS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></span><a class="headerlink" href="#falaw.base.TABLE_VERSION_CHARS" title="Link to this definition"></a></dt>
+<dd><p>Hex characters of the digest <a class="reference internal" href="#falaw.base.data_table_version" title="falaw.base.data_table_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">data_table_version()</span></code></a> returns.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="falaw.base.ToolSpec">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">ToolSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*,</span> <span class="pre">name:</span> <span class="pre">str,</span> <span class="pre">description:</span> <span class="pre">str,</span> <span class="pre">func:</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">~typing.Any],</span> <span class="pre">input_schema:</span> <span class="pre">~typing.Mapping[str,</span> <span class="pre">~typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">output_schema:</span> <span class="pre">~typing.Mapping[str,</span> <span class="pre">~typing.Any]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;,</span> <span class="pre">tags:</span> <span class="pre">tuple[str,</span> <span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(),</span> <span class="pre">examples:</span> <span class="pre">tuple[~typing.Mapping[str,</span> <span class="pre">~typing.Any],</span> <span class="pre">...]</span> <span class="pre">=</span> <span class="pre">(),</span> <span class="pre">version:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'0.0.1'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/falaw/base.html#ToolSpec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.base.ToolSpec" title="Link to this definition"></a></dt>
 <dd><p>Single source of truth for a tool exposed by falaw.</p>
 <p>A ToolSpec is what the registry stores. Bridges read it to produce
 Claude-skill instructions, MCP tool descriptors, HTTP endpoints, etc.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.base.data_table_version">
+<span class="sig-prename descclassname"><span class="pre">falaw.base.</span></span><span class="sig-name descname"><span class="pre">data_table_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../_modules/falaw/base.html#data_table_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.base.data_table_version" title="Link to this definition"></a></dt>
+<dd><p>Short content digest naming the version of a committed data table.</p>
+<p>The one definition for every table falaw ships (<code class="docutils literal notranslate"><span class="pre">models.json</span></code>,
+<code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code>), so a <a class="reference internal" href="../falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> stamped by one is
+comparable with a basis stamped by another.</p>
+<p>Deliberately the <em>bytes</em>, not a declared <code class="docutils literal notranslate"><span class="pre">version</span></code> field: 0.0.46 moved
+every premium LLM row’s price tenfold without touching one, and that drift
+is exactly what a persisted quote must be able to detect. A digest cannot
+forget to be bumped.</p>
 </dd></dl>
 
 </section>
