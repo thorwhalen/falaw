@@ -46,13 +46,14 @@ True
 from __future__ import annotations
 
 import datetime
-import hashlib
 import json
 import os
 import warnings
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import Mapping, Optional
+
+from .base import data_table_version
 
 RATES_FILENAME = "llm_rates.json"
 """Basename of the rate table under ``falaw/data``."""
@@ -198,23 +199,24 @@ LLM_RATES_TABLE = f"falaw/data/{RATES_FILENAME}"
 """Identity a :class:`falaw.CostBasis` records for an LLM-priced call."""
 
 CUSTOM_LLM_RATES_TABLE = "caller-supplied"
-"""What a basis records when the caller quoted against their own ``rates=``
-table. It has no file to digest, so its ``table_version`` stays empty — a
-re-price against the committed table is still meaningful, and the changed
-table identity is what tells an auditor the two quotes are not comparable."""
+"""What a basis records when the caller quoted against their own ``rates=`` table.
+
+It has no file to digest, so its ``table_version`` stays empty — and, more
+importantly, **the committed table must never re-price it**. Two tables are two
+sets of books: re-quoting a $0.50 row from a caller's reconciled invoice against
+falaw's $0.01 published rate is a 50x *under-quote* wearing the clothes of a
+price drop. :func:`falaw.reprice_plan` therefore refuses a basis whose ``table``
+does not match the pricer's, reporting it as unknown; a caller who wants their
+own numbers re-quoted passes a :class:`falaw.Pricer` that names this table."""
 
 
 @lru_cache(maxsize=1)
 def llm_rates_table_version() -> str:
-    """Short content digest of ``llm_rates.json`` — the rate table's version.
+    """The rate table's version — see :func:`falaw.base.data_table_version`.
 
-    Deliberately not the file's declared ``version`` key: 0.0.46 moved every
-    premium row's price tenfold without touching it, which is exactly the drift
-    a persisted quote needs to be able to detect. Digesting the bytes cannot
-    forget to be bumped. Cached per process, like the table itself.
+    Cached per process, like the table itself.
     """
-    with open(_rates_path(), "rb") as f:
-        return hashlib.sha256(f.read()).hexdigest()[:12]
+    return data_table_version(_rates_path())
 
 
 def list_llm_rates(*, rates: Optional[LlmRateTable] = None) -> list[LlmRate]:

@@ -282,8 +282,25 @@ is reported, never trusted --- read `out.unpriced` and refuse the gate, the
 same judgement `Plan.has_unknown_costs` asks for.
 
 `c.basis_changed` answers the audit question the frozen number never could:
-did the price move because the *rate table* moved? Reconciled your own
-numbers? Pass a `Pricer` over your table via `reprice_plan(plan, pricers=...)`.
+did the price move because the *rate table* moved?
+
+Quoted a call against your own `llm_rates=` table? Its basis says so, and
+falaw's table will **not** re-quote it --- it comes back `unknown`. Two tables
+are two sets of books, and re-pricing your reconciled $0.50 row at falaw's
+published $0.01 would be a 50x under-quote wearing the clothes of a price
+drop. Bring your own books instead:
+
+```python
+from falaw import DFLT_PRICERS, Pricer, llm_ceiling_usd
+from falaw.llm_rates import CUSTOM_LLM_RATES_TABLE
+
+mine = Pricer(
+    quote=lambda b: llm_ceiling_usd(b.priced, rates=my_table, **b.quantities),
+    table=CUSTOM_LLM_RATES_TABLE,  # must match the basis, or it is refused
+    version=lambda: "2026-09",
+)
+reprice_plan(plan, pricers={**DFLT_PRICERS, "llm_rates": mine})
+```
 
 Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
 a caller who has reconciled real numbers against their fal invoice passes their

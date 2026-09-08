@@ -33,6 +33,7 @@ from falaw import (
     plan_to_dict,
     reprice_plan,
 )
+from falaw.llm_rates import CUSTOM_LLM_RATES_TABLE
 from falaw.reprice import CATALOGUE_PRICER, DFLT_PRICERS, LLM_RATES_PRICER
 
 
@@ -86,16 +87,21 @@ def test_a_basis_free_call_serializes_without_the_key():
 
 
 def test_a_basis_does_not_change_the_hash_or_the_cache_key():
-    """A basis says what a call *cost*, never what it *produces*."""
-    bare = _unbased_call()
-    stamped = replace(bare, cost_basis=catalogue_cost_basis("fal-ai/flux/dev"))
+    """A basis says what a call *cost*, never what it *produces*, so it must
+    appear in neither identity payload."""
+    from falaw.canonical import cache_key_payload, plan_identity_payload
+
+    stamped = replace(
+        _unbased_call(), cost_basis=catalogue_cost_basis("fal-ai/flux/dev")
+    )
     assert plan_hash(Plan(calls=(stamped,))) == PINNED_UNBASED_PLAN_HASH
 
-    from falaw.cache import _key
-
-    assert _key(bare.application, bare.arguments) == _key(
-        stamped.application, stamped.arguments
+    identity = plan_identity_payload(
+        stamped.application, stamped.arguments, tool=stamped.tool
     )
+    key = cache_key_payload(stamped.application, stamped.arguments)
+    assert "cost_basis" not in identity
+    assert "cost_basis" not in key
 
 
 def test_a_dict_written_before_falaw60_still_parses():
@@ -171,19 +177,73 @@ def test_the_llm_basis_prices_the_routed_model_not_the_router():
     assert call.cost_basis.priced == "anthropic/claude-sonnet-4.5"
 
 
-def test_a_caller_supplied_rate_table_is_recorded_as_such():
-    mine = {
+def _my_rates(per_call_usd=0.5):
+    return {
         "anthropic/claude-sonnet-4.5": falaw.LlmRate(
             model="anthropic/claude-sonnet-4.5",
             tier="premium",
-            per_call_usd=0.5,
+            per_call_usd=per_call_usd,
             date="2999-01-01",
         )
     }
-    call = falaw.plan_llm_complete("hi", llm_rates=mine, consult_cache=False)
+
+
+def test_a_caller_supplied_rate_table_is_recorded_as_such():
+    call = falaw.plan_llm_complete("hi", llm_rates=_my_rates(), consult_cache=False)
     assert call.estimated_cost_usd == 0.5
-    assert call.cost_basis.table == "caller-supplied"
+    assert call.cost_basis.table == CUSTOM_LLM_RATES_TABLE
     assert call.cost_basis.table_version == ""
+
+
+def test_the_committed_table_never_requotes_a_caller_supplied_basis():
+    """Two tables are two sets of books.
+
+    A row priced at the caller's reconciled $0.50 must not come back as
+    falaw's published $0.01 — that is a 50x *under-quote* wearing the clothes
+    of a price drop, and it lands on exactly the caller the ``Pricer`` seam is
+    advertised for.
+    """
+    call = falaw.plan_llm_complete("hi", llm_rates=_my_rates(), consult_cache=False)
+    out = reprice_plan(Plan(calls=(call,)))
+
+    (row,) = out.calls
+    assert row.status == "unknown"
+    assert row.new_cost_usd is None
+    assert CUSTOM_LLM_RATES_TABLE in row.reason
+    assert "falaw/data/llm_rates.json" in row.reason
+    assert row.basis_changed
+    assert out.plan.has_unknown_costs
+    # And the refused call keeps the basis that actually priced it.
+    assert out.plan.calls[0].cost_basis == call.cost_basis
+
+
+def test_a_pricer_naming_the_same_table_does_requote_it():
+    """The escape hatch the refusal points at: bring your own books."""
+    call = falaw.plan_llm_complete("hi", llm_rates=_my_rates(), consult_cache=False)
+    mine = Pricer(
+        quote=lambda basis: falaw.llm_ceiling_usd(
+            basis.priced, rates=_my_rates(0.75), **basis.quantities
+        ),
+        table=CUSTOM_LLM_RATES_TABLE,
+        version=lambda: "2026-09",
+    )
+    (row,) = reprice_plan(
+        Plan(calls=(call,)), pricers={**DFLT_PRICERS, LLM_RATES_PRICER: mine}
+    ).calls
+    assert row.status == "changed"
+    assert (row.old_cost_usd, row.new_cost_usd) == (0.5, 0.75)
+    assert row.call.cost_basis.table_version == "2026-09"
+
+
+def test_a_basis_naming_no_table_is_not_assumed_to_be_falaws():
+    """An unstated book is an unknown book, not the committed one."""
+    call = replace(
+        _unbased_call(),
+        cost_basis=CostBasis(pricer=CATALOGUE_PRICER, priced="fal-ai/flux/dev"),
+    )
+    (row,) = reprice_plan(Plan(calls=(call,))).calls
+    assert row.status == "unknown"
+    assert "unnamed table" in row.reason
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +286,41 @@ def test_a_moved_rate_table_shows_up_as_a_changed_call():
     assert out.known_delta_usd == pytest.approx(old * 9)
     assert row.basis_changed  # the *table* moved, not just the number
     assert out.plan.calls[0].cost_basis.table_version == "moved"
+
+
+def _repriced_at(factor=None, *, delta=None):
+    """One image call re-quoted through a synthetic pricer, and its diff row."""
+    plan = Plan(calls=(falaw.plan_generate_image("a tiger", consult_cache=False),))
+    old = plan.calls[0].estimated_cost_usd
+    new = old + delta if delta is not None else old * factor
+    moved = Pricer(
+        quote=lambda basis: new,
+        table="falaw/data/models.json",
+        version=lambda: "moved",
+    )
+    out = reprice_plan(plan, pricers={**DFLT_PRICERS, CATALOGUE_PRICER: moved})
+    return old, new, out
+
+
+def test_a_price_drop_is_reported_as_a_drop_not_as_unchanged():
+    """A re-quote must be able to move *down*. Clamping to the old figure
+    would over-quote every cheapened model — and hide the drop from an audit."""
+    old, new, out = _repriced_at(0.5)
+    (row,) = out.calls
+    assert row.status == "changed"
+    assert row.new_cost_usd == new < old
+    assert row.delta_usd == pytest.approx(-old / 2)
+    assert out.known_delta_usd == pytest.approx(-old / 2)
+
+
+def test_a_sub_cent_move_is_still_a_move():
+    """No epsilon anywhere: a 1e-9 change across 200 calls is real money, and
+    a tolerance is how a slow repricing goes unnoticed for a quarter."""
+    _, new, out = _repriced_at(delta=1e-9)
+    (row,) = out.calls
+    assert row.status == "changed"
+    assert row.new_cost_usd == new
+    assert row.delta_usd == pytest.approx(1e-9)
 
 
 def test_a_call_with_no_basis_is_never_passed_off_as_current():

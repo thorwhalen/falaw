@@ -11,13 +11,12 @@ Bridges (skill / MCP / HTTP) read the tool registry. Operations call
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 from functools import lru_cache
 from typing import Callable, Optional
 
-from .base import CostEstimate, ModelRecord, ToolSpec
+from .base import CostEstimate, ModelRecord, ToolSpec, data_table_version
 
 _TOOLS: dict[str, ToolSpec] = {}
 
@@ -80,16 +79,11 @@ MODEL_CATALOGUE_TABLE = "falaw/data/models.json"
 
 @lru_cache(maxsize=1)
 def models_table_version() -> str:
-    """Short content digest of ``models.json`` — the catalogue's version.
+    """The catalogue's version — see :func:`falaw.base.data_table_version`.
 
-    The catalogue carries no declared version field, and a declared one would
-    lie anyway: the number that matters is whether the *prices* moved, and a
-    refresh job rewrites amounts without anyone remembering to bump a version.
-    Digesting the bytes cannot forget. Cached per process — the file is read
-    once, like the catalogue itself.
+    Cached per process, like the catalogue itself.
     """
-    with open(_models_path(), "rb") as f:
-        return hashlib.sha256(f.read()).hexdigest()[:12]
+    return data_table_version(_models_path())
 
 
 def model_constraints(id: str) -> dict:

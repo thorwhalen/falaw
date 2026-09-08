@@ -89,7 +89,9 @@ out.changed  # per-call diffs: index, status, old, new, basis_changed
 out.unpriced  # calls today's rates cannot price — refuse the gate
 ```
 
-Per-call status is `unchanged`, `changed`, `unknown` (a basis today's tables cannot price) or `no_basis` (a plan saved before this existed). The last two **clear the call's cost to `None`** and light up `Plan.has_unknown_costs`: a stale figure re-presented as a current quote is the failure this fixes, so an unknown basis is reported, never trusted. `cost_basis` is descriptive only — it is omitted from the serialized dict when unset, and never enters `plan_hash` or the cache key, so existing plans and cassettes are unmoved. Reconciled your own numbers? Pass a `Pricer` over your table as `reprice_plan(plan, pricers=...)`.
+Per-call status is `unchanged`, `changed`, `unknown` (a basis today's tables cannot price) or `no_basis` (a plan saved before this existed). The last two **clear the call's cost to `None`** and light up `Plan.has_unknown_costs`: a stale figure re-presented as a current quote is the failure this fixes, so an unknown basis is reported, never trusted. `cost_basis` is descriptive only — it is omitted from the serialized dict when unset, and never enters `plan_hash` or the cache key, so existing plans and cassettes are unmoved.
+
+A basis is only re-quoted by a pricer reading the **same table** it names; a mismatch is `unknown`, never a re-quote. Two tables are two sets of books, and re-pricing a caller's reconciled $0.50 row at falaw's published $0.01 is a 50x under-quote wearing the clothes of a price drop. So a call you quoted with your own `llm_rates=` needs your own `Pricer` to re-quote it: `reprice_plan(plan, pricers={**DFLT_PRICERS, "llm_rates": mine})`, where `mine.table` is the identity the basis carries.
 
 ### Fan-out: partial results, bounded concurrency, per-call isolation
 

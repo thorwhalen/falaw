@@ -59,9 +59,11 @@ RepriceStatus = Literal["unchanged", "changed", "unknown", "no_basis"]
 
 - ``unchanged``: re-quoted, and today's rates give the same number.
 - ``changed``: re-quoted to a different number — the interesting case.
-- ``unknown``: a basis was present but could not be re-quoted (model gone from
-  the catalogue, pricer not registered, table no longer prices it). The new
-  cost is ``None``.
+- ``unknown``: a basis was present but could not be re-quoted — the model has
+  left the catalogue, no pricer is registered under that name, the table no
+  longer prices it, or the basis names a **different table** than the pricer
+  reads (two sets of books do not re-quote each other). The new cost is
+  ``None``.
 - ``no_basis``: the call carries no :class:`falaw.CostBasis` at all — it was
   planned before falaw#60, or by something that never recorded one. The new
   cost is ``None``, because the honest answer to "what does this cost today?"
@@ -85,6 +87,13 @@ class Pricer:
     LLM_RATES_PRICER: mine}`` to :func:`reprice_plan`. The ``table`` /
     ``version`` pair is stamped onto the re-priced call's basis, so the next
     audit can see which table produced which number.
+
+    ``table`` is also a **gate, not just a label**: a call whose basis names a
+    different table is reported as ``unknown`` rather than re-quoted, so a row
+    priced from your invoice is never silently re-quoted at falaw's published
+    rate (or the reverse). Give your ``Pricer`` the same ``table`` string the
+    basis carries — :data:`falaw.llm_rates.CUSTOM_LLM_RATES_TABLE` for anything
+    a ``plan_*`` priced with ``llm_rates=``.
     """
 
     quote: Callable[[CostBasis], Optional[float]]
@@ -243,6 +252,12 @@ def reprice_plan(
     :attr:`falaw.Plan.has_unknown_costs`, which is exactly right — nobody can
     say what that call costs today.
 
+    A basis is only re-quoted by a pricer reading the **same table** it names.
+    A mismatch is ``"unknown"``, not a re-quote: two tables are two sets of
+    books, and pricing a caller's reconciled $0.50 row at falaw's published
+    $0.01 would be a 50x under-quote wearing the clothes of a price drop. Pass
+    a :class:`Pricer` naming that table to re-quote against the same books.
+
     ``cache_status`` is carried through unchanged. Re-pricing answers "what
     would this cost?", not "is it still cached?"; peeking the cache here would
     quietly turn a re-quote into an I/O operation and make a hit look like a
@@ -282,9 +297,25 @@ def _reprice_call(
     *,
     pricers: Mapping[str, Pricer],
 ) -> CallRepricing:
-    """One call's re-quote — the whole four-way decision, in one place."""
+    """One call's re-quote — the whole decision, in one place.
+
+    Every ``unknown`` path leaves the *original* basis on the call: nothing
+    re-priced it, so nothing new gets to claim it did. Only a call that came
+    back with a number is re-stamped with the pricer's table and version.
+    """
     old = call.estimated_cost_usd
     basis = call.cost_basis
+
+    def unknown(reason: str, *, basis_changed: bool = False) -> CallRepricing:
+        return CallRepricing(
+            index=index,
+            call=replace(call, estimated_cost_usd=None),
+            old_cost_usd=old,
+            new_cost_usd=None,
+            status="unknown",
+            reason=reason,
+            basis_changed=basis_changed,
+        )
 
     if basis is None:
         return CallRepricing(
@@ -301,20 +332,24 @@ def _reprice_call(
 
     pricer = pricers.get(basis.pricer)
     if pricer is None:
-        return CallRepricing(
-            index=index,
-            call=replace(call, estimated_cost_usd=None),
-            old_cost_usd=old,
-            new_cost_usd=None,
-            status="unknown",
-            reason=f"no pricer registered as {basis.pricer!r}",
+        return unknown(f"no pricer registered as {basis.pricer!r}")
+
+    if basis.table != pricer.table:
+        # Two tables are two sets of books. Re-quoting a row priced against a
+        # caller's reconciled invoice ($0.50) with falaw's published rate
+        # ($0.01) is a 50x *under-quote* dressed as a price drop — the exact
+        # direction this module exists to prevent, on the exact caller the
+        # Pricer seam is advertised for. A caller who wants their own numbers
+        # re-quoted passes a Pricer that names their table.
+        return unknown(
+            f"basis was priced against {basis.table or 'an unnamed table'!r}, "
+            f"but pricer {basis.pricer!r} reads {pricer.table!r}; pass a Pricer "
+            "naming that table to re-quote against the same books",
+            basis_changed=True,
         )
 
     new_basis = replace(basis, table=pricer.table, table_version=pricer.version())
-    basis_changed = (basis.table, basis.table_version) != (
-        new_basis.table,
-        new_basis.table_version,
-    )
+    basis_changed = basis.table_version != new_basis.table_version
     try:
         new = pricer.quote(basis)
     except Exception as exc:  # noqa: BLE001 — one bad row must not abort the plan
@@ -322,31 +357,20 @@ def _reprice_call(
         # or carry a quantity a pricer no longer accepts. Both are honest
         # "unknown"s with a reason attached; raising here would make one stale
         # row cost the caller the other 199 re-quotes.
-        return CallRepricing(
-            index=index,
-            call=replace(call, estimated_cost_usd=None, cost_basis=new_basis),
-            old_cost_usd=old,
-            new_cost_usd=None,
-            status="unknown",
-            reason=f"{type(exc).__name__}: {exc}",
-            basis_changed=basis_changed,
-        )
+        return unknown(f"{type(exc).__name__}: {exc}", basis_changed=basis_changed)
 
     if new is None:
-        status: RepriceStatus = "unknown"
-        reason = f"{basis.pricer!r} cannot price {basis.priced!r} today"
-    elif new == old:
-        status, reason = "unchanged", ""
-    else:
-        status, reason = "changed", ""
+        return unknown(
+            f"{basis.pricer!r} cannot price {basis.priced!r} today",
+            basis_changed=basis_changed,
+        )
 
     return CallRepricing(
         index=index,
         call=replace(call, estimated_cost_usd=new, cost_basis=new_basis),
         old_cost_usd=old,
         new_cost_usd=new,
-        status=status,
-        reason=reason,
+        status="unchanged" if new == old else "changed",
         basis_changed=basis_changed,
     )
 
@@ -386,10 +410,11 @@ def llm_cost_basis(
     ``custom_rates=True`` records that the quote came from a caller-supplied
     ``rates=`` table rather than the committed one: there is no file to digest,
     so the version stays empty and the table names itself
-    :data:`falaw.llm_rates.CUSTOM_LLM_RATES_TABLE`. Re-pricing such a call
-    against the committed table still works and is still useful — the changed
-    table identity is what tells an auditor the two numbers came from
-    different books.
+    :data:`falaw.llm_rates.CUSTOM_LLM_RATES_TABLE`. :func:`reprice_plan` then
+    **refuses** to re-quote it with the committed table, reporting ``unknown``
+    — a caller's reconciled $0.50 row re-priced at falaw's published $0.01 is a
+    50x under-quote, not a price drop. Re-quote it by passing a
+    :class:`Pricer` over your table that names that same identity.
     """
     return CostBasis(
         pricer=LLM_RATES_PRICER,
