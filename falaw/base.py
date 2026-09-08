@@ -6,10 +6,30 @@ surface (Claude skill, MCP server, HTTP service, UI) is derived.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass, field
 from typing import Any, Callable, Literal, Mapping, Optional
 
 JSONSchema = Mapping[str, Any]
+
+TABLE_VERSION_CHARS = 12
+"""Hex characters of the digest :func:`data_table_version` returns."""
+
+
+def data_table_version(path: str) -> str:
+    """Short content digest naming the version of a committed data table.
+
+    The one definition for every table falaw ships (``models.json``,
+    ``llm_rates.json``), so a :class:`falaw.CostBasis` stamped by one is
+    comparable with a basis stamped by another.
+
+    Deliberately the *bytes*, not a declared ``version`` field: 0.0.46 moved
+    every premium LLM row's price tenfold without touching one, and that drift
+    is exactly what a persisted quote must be able to detect. A digest cannot
+    forget to be bumped.
+    """
+    with open(path, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:TABLE_VERSION_CHARS]
 
 
 CostKind = Literal["per_call", "per_image", "per_second", "per_token", "per_megapixel"]

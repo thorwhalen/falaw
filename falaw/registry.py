@@ -16,7 +16,7 @@ import os
 from functools import lru_cache
 from typing import Callable, Optional
 
-from .base import CostEstimate, ModelRecord, ToolSpec
+from .base import CostEstimate, ModelRecord, ToolSpec, data_table_version
 
 _TOOLS: dict[str, ToolSpec] = {}
 
@@ -71,6 +71,19 @@ def _load_models() -> dict[str, ModelRecord]:
         # else: None or already a CostEstimate — pass through unchanged.
         out[r["id"]] = ModelRecord(**r)
     return out
+
+
+MODEL_CATALOGUE_TABLE = "falaw/data/models.json"
+"""Identity a :class:`falaw.CostBasis` records for a catalogue-priced call."""
+
+
+@lru_cache(maxsize=1)
+def models_table_version() -> str:
+    """The catalogue's version — see :func:`falaw.base.data_table_version`.
+
+    Cached per process, like the catalogue itself.
+    """
+    return data_table_version(_models_path())
 
 
 def model_constraints(id: str) -> dict:

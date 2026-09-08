@@ -130,10 +130,13 @@ from .operations import (
 from .outcomes import CallOutcome, ExecutionReport
 from .plan import (
     CallPlan,
+    CostBasis,
     Plan,
     PLAN_DICT_SCHEMA,
     call_plan_from_dict,
     call_plan_to_dict,
+    cost_basis_from_dict,
+    cost_basis_to_dict,
     execute as execute_plan,
     execute_isolated as execute_plan_isolated,
     make_call_plan,
@@ -141,6 +144,15 @@ from .plan import (
     plan_from_dict,
     plan_hash,
     plan_to_dict,
+)
+from .reprice import (
+    CallRepricing,
+    DFLT_PRICERS,
+    Pricer,
+    RepricedPlan,
+    catalogue_cost_basis,
+    llm_cost_basis,
+    reprice_plan,
 )
 from .refresh import refresh_full_docs, refresh_llms, refresh_state
 from .pricing import fetch_model_prices, refresh_model_prices
@@ -206,6 +218,16 @@ __all__ = [
     "plan_from_dict",
     "plan_hash",
     "plan_to_dict",
+    "CallRepricing",
+    "CostBasis",
+    "DFLT_PRICERS",
+    "Pricer",
+    "RepricedPlan",
+    "catalogue_cost_basis",
+    "cost_basis_from_dict",
+    "cost_basis_to_dict",
+    "llm_cost_basis",
+    "reprice_plan",
     "Result",
     "CostEstimate",
     "CostLine",

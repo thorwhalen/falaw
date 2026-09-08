@@ -23,8 +23,9 @@ from typing import Optional
 
 from ..cost import estimate_call_cost
 from ..llm_rates import LlmRateTable, llm_ceiling_usd
-from ..plan import CallPlan, make_call_plan
+from ..plan import CallPlan, CostBasis, make_call_plan
 from ..registry import get_model, pick_model
+from ..reprice import catalogue_cost_basis, llm_cost_basis
 
 
 # ---------------------------------------------------------------------------
@@ -49,16 +50,34 @@ def _resolve_model_id_and_record(
     return record.id, record
 
 
-def _estimate_cost_with_record(
+def _catalogue_price(
     record,
     *,
     seconds: Optional[float] = None,
     megapixels: Optional[float] = None,
     tokens: Optional[int] = None,
-) -> Optional[float]:
-    """Thin wrapper around :func:`estimate_call_cost` for planner use."""
-    return estimate_call_cost(
-        record, count=1, seconds=seconds, megapixels=megapixels, tokens=tokens
+) -> tuple[Optional[float], CostBasis]:
+    """``(estimated_cost_usd, cost_basis)`` for a catalogue-priced call.
+
+    Both come out of one call site on purpose (falaw#60): the basis is the
+    recipe for reproducing the figure, so computing them apart is how the two
+    drift and a re-quote silently stops matching the quote it replaces. Hints
+    left ``None`` are dropped rather than recorded as ``null`` — absent is what
+    :func:`estimate_call_cost` actually saw, and what makes a quantity-priced
+    record unpriceable.
+    """
+    supplied = {
+        k: v
+        for k, v in (
+            ("seconds", seconds),
+            ("megapixels", megapixels),
+            ("tokens", tokens),
+        )
+        if v is not None
+    }
+    return (
+        estimate_call_cost(record, count=1, **supplied),
+        catalogue_cost_basis(record.id, **supplied),
     )
 
 
@@ -82,14 +101,16 @@ def plan_generate_image(
         model_id=model_id, category="image", quality_tier=quality
     )
     arguments = {"prompt": prompt, "image_size": image_size, **(extra or {})}
+    cost, basis = _catalogue_price(record)
     return make_call_plan(
         tool="generate_image",
         application=application,
         arguments=arguments,
         output_kind="image",
-        estimated_cost_usd=_estimate_cost_with_record(record),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -113,14 +134,16 @@ def plan_edit_image(
         model_id=model_id, category="image_edit", quality_tier=quality
     )
     arguments = {"image_url": image_url, "prompt": prompt, **(extra or {})}
+    cost, basis = _catalogue_price(record)
     return make_call_plan(
         tool="edit_image",
         application=application,
         arguments=arguments,
         output_kind="image",
-        estimated_cost_usd=_estimate_cost_with_record(record),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -161,14 +184,16 @@ def plan_generate_image_with_refs(
         model_id=model_id, category="image_edit", quality_tier=quality
     )
     arguments = _refs_arguments(prompt, refs, extra)
+    cost, basis = _catalogue_price(record)
     return make_call_plan(
         tool="generate_image_with_refs",
         application=application,
         arguments=arguments,
         output_kind="image",
-        estimated_cost_usd=_estimate_cost_with_record(record),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -210,14 +235,16 @@ def plan_composite_character_in_environment(
         "prompt": prompt or _DEFAULT_COMPOSITE_PROMPT,
         **(extra or {}),
     }
+    cost, basis = _catalogue_price(record)
     return make_call_plan(
         tool="composite_character_in_environment",
         application=application,
         arguments=arguments,
         output_kind="image",
-        estimated_cost_usd=_estimate_cost_with_record(record),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -249,14 +276,16 @@ def plan_image_to_video(
     arguments: dict = {"image_url": image_url, **(extra or {})}
     if prompt:
         arguments["prompt"] = prompt
+    cost, basis = _catalogue_price(record, seconds=duration_s)
     return make_call_plan(
         tool="image_to_video",
         application=application,
         arguments=arguments,
         output_kind="video",
-        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -294,14 +323,16 @@ def plan_animate_face(
         arguments["prompt"] = "natural delivery"
     if extra:
         arguments.update(extra)
+    cost, basis = _catalogue_price(record, seconds=duration_s)
     return make_call_plan(
         tool="animate_face",
         application=application,
         arguments=arguments,
         output_kind="video",
-        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -326,14 +357,16 @@ def plan_lipsync(
         model_id=model_id, category="lipsync", quality_tier=quality
     )
     arguments = {"video_url": video_url, "audio_url": audio_url, **(extra or {})}
+    cost, basis = _catalogue_price(record, seconds=duration_s)
     return make_call_plan(
         tool="lipsync",
         application=application,
         arguments=arguments,
         output_kind="video",
-        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -378,16 +411,16 @@ def plan_text_to_speech(
         arguments["voice"] = voice
     if extra:
         arguments.update(extra)
+    cost, basis = _catalogue_price(record, seconds=duration_s, tokens=tokens)
     return make_call_plan(
         tool="text_to_speech",
         application=application,
         arguments=arguments,
         output_kind="audio",
-        estimated_cost_usd=_estimate_cost_with_record(
-            record, seconds=duration_s, tokens=tokens
-        ),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -440,14 +473,16 @@ def plan_generate_audio(
         arguments["duration"] = max(1, int(round(float(duration_s))))
     if extra:
         arguments.update(extra)
+    cost, basis = _catalogue_price(record, seconds=duration_s)
     return make_call_plan(
         tool="generate_audio",
         application=application,
         arguments=arguments,
         output_kind="audio",
-        estimated_cost_usd=_estimate_cost_with_record(record, seconds=duration_s),
+        estimated_cost_usd=cost,
         metadata=metadata,
         consult_cache=consult_cache,
+        cost_basis=basis,
     )
 
 
@@ -548,6 +583,16 @@ def plan_llm_complete(
         ),
         metadata=metadata,
         consult_cache=consult_cache,
+        # The basis records the *routed* model, not ``application``: the router
+        # is one record, the price belongs to the model it routes to — and the
+        # hints below never enter ``arguments``, so nothing else on a persisted
+        # call could reconstruct this quote (falaw#60).
+        cost_basis=llm_cost_basis(
+            routed_model,
+            input_tokens=input_tokens,
+            max_output_tokens=max_output_tokens,
+            custom_rates=llm_rates is not None,
+        ),
     )
 
 

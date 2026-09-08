@@ -53,6 +53,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Mapping, Optional
 
+from .base import data_table_version
+
 RATES_FILENAME = "llm_rates.json"
 """Basename of the rate table under ``falaw/data``."""
 
@@ -191,6 +193,30 @@ def load_llm_rates() -> LlmRateTable:
 
 def _optional_float(value) -> Optional[float]:
     return None if value is None else float(value)
+
+
+LLM_RATES_TABLE = f"falaw/data/{RATES_FILENAME}"
+"""Identity a :class:`falaw.CostBasis` records for an LLM-priced call."""
+
+CUSTOM_LLM_RATES_TABLE = "caller-supplied"
+"""What a basis records when the caller quoted against their own ``rates=`` table.
+
+It has no file to digest, so its ``table_version`` stays empty — and, more
+importantly, **the committed table must never re-price it**. Two tables are two
+sets of books: re-quoting a $0.50 row from a caller's reconciled invoice against
+falaw's $0.01 published rate is a 50x *under-quote* wearing the clothes of a
+price drop. :func:`falaw.reprice_plan` therefore refuses a basis whose ``table``
+does not match the pricer's, reporting it as unknown; a caller who wants their
+own numbers re-quoted passes a :class:`falaw.Pricer` that names this table."""
+
+
+@lru_cache(maxsize=1)
+def llm_rates_table_version() -> str:
+    """The rate table's version — see :func:`falaw.base.data_table_version`.
+
+    Cached per process, like the table itself.
+    """
+    return data_table_version(_rates_path())
 
 
 def list_llm_rates(*, rates: Optional[LlmRateTable] = None) -> list[LlmRate]:
