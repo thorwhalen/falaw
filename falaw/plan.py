@@ -95,6 +95,56 @@ so the producer knows what shape of Artifact to materialize."""
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
+class CostBasis:
+    """How a :attr:`CallPlan.estimated_cost_usd` was arrived at (falaw#60).
+
+    A frozen quote goes stale the moment the rate table moves — 0.0.46 moved
+    falaw's LLM prices tenfold — and a persisted plan cannot be re-quoted from
+    ``application`` and ``arguments`` alone: the quantity hints that priced it
+    (the clip's duration, the prompt's token bound) are estimator-only and
+    never enter the wire arguments. This records them, plus *which* table
+    priced them, so a saved plan can be re-quoted faithfully
+    (:func:`falaw.reprice_plan`) and audited after the fact.
+
+    Pure data. Nothing here reaches the network, and nothing here enters
+    :func:`plan_hash` or the per-call cache key: a basis says what a call
+    *cost*, never what it *produces*, so stamping one leaves every existing
+    digest byte-identical.
+    """
+
+    pricer: str
+    """Which pricing rule produced the figure — a key into
+    :data:`falaw.reprice.DFLT_PRICERS`. ``"model_catalogue"`` for a record
+    priced out of ``models.json``, ``"llm_rates"`` for a routed LLM priced out
+    of ``llm_rates.json``. An unrecognized name re-prices as *unknown*, never
+    as the old number."""
+
+    priced: str
+    """The entity that was priced: a :attr:`falaw.ModelRecord.id` for the
+    catalogue pricer, the routed ``model`` argument for the LLM pricer.
+    Distinct from :attr:`CallPlan.application`, which for ``fal-ai/any-llm``
+    names the router rather than the model that sets the price."""
+
+    quantities: dict = field(default_factory=dict)
+    """The estimator-only shape hints fed to the pricer, by keyword —
+    ``{"seconds": 6.0}``, ``{"input_tokens": 20000, "max_output_tokens": 4000}``.
+    Absent keys mean the hint was not supplied, which is what made a
+    quantity-priced call unpriceable in the first place. Omit-when-unset: a
+    hint that was ``None`` at plan time is left out rather than written as
+    ``null``."""
+
+    table: str = ""
+    """Identity of the rate table consulted, e.g.
+    ``"falaw/data/llm_rates.json"``. Free-form so a caller's own reconciled
+    table can name itself."""
+
+    table_version: str = ""
+    """The version of that table at plan time — falaw stamps a short content
+    digest, so a table whose numbers moved gets a different value even when
+    its declared version did not. Empty means unversioned/unknown."""
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
 class CallPlan:
     """A single planned fal call. Pure data — no API contact yet.
 
@@ -155,6 +205,16 @@ class CallPlan:
     cached result minted without this value must not be reused". First
     customer: nw's Transform ``impl_version`` (nw#27) — "same interface,
     changed behaviour" must miss the cache without renaming anything."""
+
+    cost_basis: Optional[CostBasis] = None
+    """How :attr:`estimated_cost_usd` was computed, or ``None`` when nothing
+    recorded it (falaw#60). Present, the quote can be re-run against today's
+    rate table by :func:`falaw.reprice_plan`; absent, that function reports the
+    call as ``"no_basis"`` and clears its cost to unknown rather than passing a
+    stale figure off as current. Purely descriptive — it stays out of
+    :func:`plan_hash` and the per-call cache key, and out of the serialized
+    dict entirely when unset, so every plan falaw has ever hashed or persisted
+    is unmoved."""
 
     def __post_init__(self) -> None:
         # Every cost sum and the executor's per-artifact stamp read this
@@ -301,8 +361,13 @@ def call_plan_to_dict(call: CallPlan) -> dict:
     absent, so a dict from before this field existed still parses, and a
     dict written by this version still parses under older falaw (the extra
     key is simply never read there). No migration needed either direction.
+
+    ``cost_basis`` (falaw#60) is the same kind of addition under a stricter
+    rule — **omit-when-unset**: the key is written only when a basis exists, so
+    a plan built without one serializes to the exact bytes it did before the
+    field existed, and every stored plan, fixture and cassette is unmoved.
     """
-    return {
+    out = {
         "tool": call.tool,
         "application": call.application,
         "backend": call.backend,
@@ -318,6 +383,39 @@ def call_plan_to_dict(call: CallPlan) -> dict:
         "metadata": call.metadata,
         "key_extra": call.key_extra,
     }
+    if call.cost_basis is not None:
+        out["cost_basis"] = cost_basis_to_dict(call.cost_basis)
+    return out
+
+
+def cost_basis_to_dict(basis: CostBasis) -> dict:
+    """Convert a :class:`CostBasis` to a plain JSON-serializable dict.
+
+    ``table`` / ``table_version`` are omitted when empty, matching the
+    omit-when-unset discipline the rest of the wire shape follows — a basis
+    that names no table writes no key rather than a pair of ``""``.
+    """
+    out: dict = {
+        "pricer": basis.pricer,
+        "priced": basis.priced,
+        "quantities": dict(basis.quantities),
+    }
+    if basis.table:
+        out["table"] = basis.table
+    if basis.table_version:
+        out["table_version"] = basis.table_version
+    return out
+
+
+def cost_basis_from_dict(d: dict) -> CostBasis:
+    """Rebuild a :class:`CostBasis` from a :func:`cost_basis_to_dict` dict."""
+    return CostBasis(
+        pricer=d["pricer"],
+        priced=d["priced"],
+        quantities=dict(d.get("quantities") or {}),
+        table=d.get("table", ""),
+        table_version=d.get("table_version", ""),
+    )
 
 
 def call_plan_from_dict(d: dict) -> CallPlan:
@@ -327,6 +425,11 @@ def call_plan_from_dict(d: dict) -> CallPlan:
     data); ``expected_duration_s`` is re-tupled. ``backend`` defaults to
     :data:`DFLT_BACKEND` when absent — a dict written before falaw#15 names no
     backend, and it always meant ``"fal"``.
+
+    ``cost_basis`` is absent on any plan written before falaw#60 and on any
+    call nothing stamped; it comes back as ``None``, which
+    :func:`falaw.reprice_plan` reports as ``"no_basis"`` — never as a quote
+    that is still current.
     """
     duration = d.get("expected_duration_s")
     return CallPlan(
@@ -340,6 +443,11 @@ def call_plan_from_dict(d: dict) -> CallPlan:
         expected_duration_s=(tuple(duration) if duration is not None else None),
         metadata=dict(d.get("metadata") or {}),
         key_extra=dict(d.get("key_extra") or {}),
+        cost_basis=(
+            cost_basis_from_dict(basis)
+            if (basis := d.get("cost_basis")) is not None
+            else None
+        ),
     )
 
 
@@ -453,6 +561,7 @@ def make_call_plan(
     expected_duration_s: Optional[tuple[float, float]] = None,
     metadata: Optional[dict] = None,
     consult_cache: bool = True,
+    cost_basis: Optional[CostBasis] = None,
 ) -> CallPlan:
     """Build a :class:`CallPlan` and (optionally) check the cache.
 
@@ -474,6 +583,11 @@ def make_call_plan(
     which under prepaid billing (a quote that may be *deducted*) is a billing
     bug. ``cache_status`` is ``"unknown"`` here instead, exactly the case
     :data:`CacheStatus` documents it for.
+
+    ``cost_basis`` records how ``estimated_cost_usd`` was arrived at so the
+    quote can be re-run later (falaw#60). It is descriptive only: it never
+    reaches the cache key or :func:`plan_hash`, and a plan built without one
+    is byte-identical to one built before the field existed.
 
     Raises:
         falaw.errors.FalNonCanonicalArgument: an argument cannot be hashed
@@ -523,6 +637,7 @@ def make_call_plan(
         cache_status=status,
         expected_duration_s=expected_duration_s,
         metadata=metadata or {},
+        cost_basis=cost_basis,
     )
 
 

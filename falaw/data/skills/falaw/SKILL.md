@@ -236,6 +236,40 @@ premium routed model reads $0.01 with `cost_source="rate_table:per_call"`, so a
 ledger that sums receipts and a gate that reads quotes agree.
 
 Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
+### A saved plan's price is a past fact --- re-quote it before you gate on it
+
+Rates move, and 0.0.46 moved the LLM table **tenfold upward**. A plan you
+persisted last month still carries last month's `estimated_cost_usd`, so
+gating today's spend on it under-quotes --- the one direction a cost gate must
+never err in. Every `plan_*` records how it priced each call in
+`CallPlan.cost_basis` (which pricer, which rate table and version, and the
+quantity hints --- a clip's `duration_s`, a prompt's token bounds --- that
+never enter `arguments`), so the quote can be re-run:
+
+```python
+from falaw import plan_from_dict, reprice_plan
+
+# frozen figures from plan time; re-quoting is pure data (no network, no cache peek)
+out = reprice_plan(plan_from_dict(saved_row))
+
+out.plan  # same calls, same plan_hash, today's costs
+out.known_delta_usd  # how much the priced part moved
+[(c.index, c.status, c.old_cost_usd, c.new_cost_usd) for c in out.changed]
+```
+
+Four per-call statuses: `unchanged`, `changed`, `unknown` (a basis that
+today's tables cannot price --- a retired model, an unregistered pricer), and
+`no_basis` (a plan saved before falaw#60, or built by something that recorded
+nothing). **The last two clear the call's cost to `None`.** A stale number
+re-presented as a current quote is the bug this exists to fix, so `no_basis`
+is reported, never trusted --- read `out.unpriced` and refuse the gate, the
+same judgement `Plan.has_unknown_costs` asks for.
+
+`c.basis_changed` answers the audit question the frozen number never could:
+did the price move because the *rate table* moved? Reconciled your own
+numbers? Pass a `Pricer` over your table via `reprice_plan(plan, pricers=...)`.
+
+Rates move. Every row carries its own `source` and `date` (`llm_rates.json`);
 a caller who has reconciled real numbers against their fal invoice passes their
 own table as `llm_rates=`. `llm_rates.json` has no refresh job that runs
 itself, so a quote is only as fresh as its last check --- run

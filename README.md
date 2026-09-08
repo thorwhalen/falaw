@@ -75,6 +75,22 @@ sums per-call costs and returns a `CostRollup` with per-line
 breakdown. Models without a populated `cost_estimate` appear in the
 rollup's `skipped` list so audits surface drift.
 
+### Re-pricing a saved plan
+
+A `CallPlan`'s `estimated_cost_usd` is frozen at plan time — right for a quote, wrong for a gate, because rate tables move (0.0.46 re-quoted every premium LLM call tenfold *upward*). Every `plan_*` therefore records **how** it priced the call in `CallPlan.cost_basis`: which pricer, which rate table and version, and the quantity hints (`duration_s`, token bounds) that price the call but deliberately never enter `arguments`. `reprice_plan(plan)` reads that back and re-quotes at today's rates — pure data, no network, no cache peek:
+
+```python
+from falaw import plan_from_dict, reprice_plan
+
+out = reprice_plan(plan_from_dict(saved_row))
+out.plan  # same calls, same plan_hash, today's costs
+out.known_delta_usd  # how much the priced part moved
+out.changed  # per-call diffs: index, status, old, new, basis_changed
+out.unpriced  # calls today's rates cannot price — refuse the gate
+```
+
+Per-call status is `unchanged`, `changed`, `unknown` (a basis today's tables cannot price) or `no_basis` (a plan saved before this existed). The last two **clear the call's cost to `None`** and light up `Plan.has_unknown_costs`: a stale figure re-presented as a current quote is the failure this fixes, so an unknown basis is reported, never trusted. `cost_basis` is descriptive only — it is omitted from the serialized dict when unset, and never enters `plan_hash` or the cache key, so existing plans and cassettes are unmoved. Reconciled your own numbers? Pass a `Pricer` over your table as `reprice_plan(plan, pricers=...)`.
+
 ### Fan-out: partial results, bounded concurrency, per-call isolation
 
 A `Plan` is a fan-out — 200 panels is 200 `CallPlan`s in one Plan — so
@@ -216,6 +232,7 @@ falaw/
   base.py            ToolSpec, ModelRecord
   core.py            call_fal: subscribe + auto-journal
   registry.py        register_tool, list/get/pick model
+  reprice.py         reprice_plan: re-quote a saved Plan at today's rates
   results.py         Asset, Result, parse_response
   session.py         Session
   journal.py         file-backed journal

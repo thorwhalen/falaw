@@ -46,6 +46,7 @@ True
 from __future__ import annotations
 
 import datetime
+import hashlib
 import json
 import os
 import warnings
@@ -191,6 +192,29 @@ def load_llm_rates() -> LlmRateTable:
 
 def _optional_float(value) -> Optional[float]:
     return None if value is None else float(value)
+
+
+LLM_RATES_TABLE = f"falaw/data/{RATES_FILENAME}"
+"""Identity a :class:`falaw.CostBasis` records for an LLM-priced call."""
+
+CUSTOM_LLM_RATES_TABLE = "caller-supplied"
+"""What a basis records when the caller quoted against their own ``rates=``
+table. It has no file to digest, so its ``table_version`` stays empty — a
+re-price against the committed table is still meaningful, and the changed
+table identity is what tells an auditor the two quotes are not comparable."""
+
+
+@lru_cache(maxsize=1)
+def llm_rates_table_version() -> str:
+    """Short content digest of ``llm_rates.json`` — the rate table's version.
+
+    Deliberately not the file's declared ``version`` key: 0.0.46 moved every
+    premium row's price tenfold without touching it, which is exactly the drift
+    a persisted quote needs to be able to detect. Digesting the bytes cannot
+    forget to be bumped. Cached per process, like the table itself.
+    """
+    with open(_rates_path(), "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()[:12]
 
 
 def list_llm_rates(*, rates: Optional[LlmRateTable] = None) -> list[LlmRate]:
