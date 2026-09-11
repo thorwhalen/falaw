@@ -182,11 +182,11 @@ delta for two films.** Track 1 outranks everything.
 
 ## Provenance of this roadmap
 
-Derived from the `video_gen` research programme (private `priv` repo):
-`data/groups/video_gen/docs/reelee_comfyui_decisions_and_rationale.md` (decisions of record) and
+Derived from the `video_gen` research programme (private `av` group repo, formerly `priv` `data/groups/video_gen/`):
+`$PP/g/av/docs/reelee_comfyui_decisions_and_rationale.md` (decisions of record) and
 briefs **B** (evaluation / incrementality / caching), **J** (extension and licence boundary),
 **K** (ComfyUI execution semantics — the defect register), **M** (deployment and cost), **O**
-(the facade spec and build order) under `data/groups/video_gen/docs/research/`.
+(the facade spec and build order) under `$PP/g/av/docs/research/`.
 
 Every claim above was re-verified against this repo's source on 2026-08-04 (v0.0.22, 210 tests
 collected); where a research claim and the code disagreed, the code won and the issue says so.
