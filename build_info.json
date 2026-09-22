@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-09-22T14:03:37Z",
+  "built_at": "2026-09-22T14:35:46Z",
   "package": {
     "name": "falaw",
-    "version": "0.0.50",
+    "version": "0.0.51",
     "display_name": "falaw",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "eef87d12f47fff87feb3067aa256f9944053fd2b",
-    "short_commit": "eef87d1",
+    "commit": "619bc3f8ca342cc407495a380b121566a1f3d76e",
+    "short_commit": "619bc3f",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/falaw",
-    "commit_url": "https://github.com/thorwhalen/falaw/commit/eef87d12f47fff87feb3067aa256f9944053fd2b",
+    "commit_url": "https://github.com/thorwhalen/falaw/commit/619bc3f8ca342cc407495a380b121566a1f3d76e",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/falaw",
-    "sha": "eef87d12f47fff87feb3067aa256f9944053fd2b",
+    "sha": "619bc3f8ca342cc407495a380b121566a1f3d76e",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "35737426624",
-    "run_url": "https://github.com/thorwhalen/falaw/actions/runs/35737426624",
+    "run_id": "35741204171",
+    "run_url": "https://github.com/thorwhalen/falaw/actions/runs/35741204171",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.50",
+    "latest": "0.0.51",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/falaw && cd falaw\ngit checkout eef87d12f47fff87feb3067aa256f9944053fd2b\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/falaw && cd falaw\ngit checkout 619bc3f8ca342cc407495a380b121566a1f3d76e\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

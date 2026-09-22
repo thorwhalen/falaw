@@ -1,4 +1,4 @@
-> built 2026-09-22 14:03 UTC from eef87d1 (main) · falaw 0.0.50. Details: build_info.json
+> built 2026-09-22 14:35 UTC from 619bc3f (main) · falaw 0.0.51. Details: build_info.json
 
 # index.html.md
 
@@ -8718,7 +8718,7 @@ False
 
 # About this build
 
-This documentation was built on **2026-09-22 14:03 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/eef87d12f47fff87feb3067aa256f9944053fd2b"><code>eef87d1</code></a> on branch <code>main</code>, for **falaw 0.0.50** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-09-22 14:35 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/619bc3f8ca342cc407495a380b121566a1f3d76e"><code>619bc3f</code></a> on branch <code>main</code>, for **falaw 0.0.51** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8727,7 +8727,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/eef87d12f47fff87feb3067aa256f9944053fd2b"><code>eef87d12f47fff87feb3067aa256f9944053fd2b</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/619bc3f8ca342cc407495a380b121566a1f3d76e"><code>619bc3f8ca342cc407495a380b121566a1f3d76e</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8738,9 +8738,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/35737426624">35737426624</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/35741204171">35741204171</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>eef87d12f47fff87feb3067aa256f9944053fd2b</code> (in the history of the built commit) |
+| Event commit | <code>619bc3f8ca342cc407495a380b121566a1f3d76e</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8765,13 +8765,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.50/">0.0.50</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/falaw/0.0.51/">0.0.51</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout eef87d12f47fff87feb3067aa256f9944053fd2b
+git checkout 619bc3f8ca342cc407495a380b121566a1f3d76e
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
@@ -8810,6 +8810,12 @@ Generate and manage AI media (images, video, audio) via fal.ai. Use this skill w
 Source: [`.claude/skills/falaw`](https://github.com/thorwhalen/falaw/tree/HEAD/.claude/skills/falaw).
 
 The bundled skills are also on disk after `pip install falaw`, under the package’s `data/skills/` directory; link them into an agent without network access with `skill link-skills <that directory>`.
+
+## Instruction files
+
+Files agents read before working in this repository.
+
+- [`.claude/CLAUDE.md`](https://github.com/thorwhalen/falaw/tree/HEAD/.claude/CLAUDE.md): read by Claude Code
 
 ## Machine-readable documentation
 

@@ -30,6 +30,13 @@ Source: [`.claude/skills/falaw`](https://github.com/thorwhalen/falaw/tree/HEAD/.
 The bundled skills are also on disk after `pip install falaw`, under the package's `data/skills/` directory; link them into an agent without network access with `skill link-skills <that directory>`.
 
 
+## Instruction files
+
+Files agents read before working in this repository.
+
+- [`.claude/CLAUDE.md`](https://github.com/thorwhalen/falaw/tree/HEAD/.claude/CLAUDE.md): read by Claude Code
+
+
 ## Machine-readable documentation
 
 This site publishes the same documentation in forms that fit an agent's context window:
