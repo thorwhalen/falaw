@@ -99,7 +99,7 @@ doctest_optionflags = [
 ]
 
 [tool.wads.ci]
-project_name = ""
+project_name = "falaw"
 
 [tool.wads.ci.commands]
 pre_test = []

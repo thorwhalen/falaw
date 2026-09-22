@@ -8,7 +8,7 @@ from falaw import generate_image, list_models, journal
 r = generate_image("a tiger eye, macro, 35mm", quality="fast")
 r.first.download(to="./tiger.png")
 
-[m.id for m in list_models(category="video")]
+[m.id for m in list_models(category="image_to_video")]
 journal.note("schnell at quality='fast' defaults to 1024x1024")
 ```
 
