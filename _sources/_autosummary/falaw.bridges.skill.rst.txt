@@ -1,0 +1,13 @@
+falaw.bridges.skill
+===================
+
+.. automodule:: falaw.bridges.skill
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      build_skill_md
+      write_skill_files
+   

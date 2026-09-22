@@ -1,0 +1,30 @@
+falaw.errors
+============
+
+.. automodule:: falaw.errors
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      translate
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      FalAccountLocked
+      FalAssetFetchError
+      FalBadRequest
+      FalDurationOutOfRange
+      FalError
+      FalHTTPError
+      FalInsufficientFunds
+      FalModelHung
+      FalNonCanonicalArgument
+      FalRateLimited
+      FalServerError
+      FalTimeout
+      FalUnauthorized
+   

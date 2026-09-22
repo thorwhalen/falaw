@@ -1,4 +1,0 @@
-falaw.corpus
-============
-.. automodule:: falaw.corpus
-   :members:

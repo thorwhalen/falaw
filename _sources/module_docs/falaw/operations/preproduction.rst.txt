@@ -1,4 +1,0 @@
-falaw.operations.preproduction
-==============================
-.. automodule:: falaw.operations.preproduction
-   :members:

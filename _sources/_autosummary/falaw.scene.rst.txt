@@ -1,0 +1,32 @@
+falaw.scene
+===========
+
+.. automodule:: falaw.scene
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      beat_content_hash
+      beat_id
+      load_scene
+      make_beat
+      make_shot
+      save_scene
+      scene_from_dict
+      scene_to_dict
+      shot_content_hash
+      shot_id
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Beat
+      Character
+      Environment
+      Scene
+      Shot
+      Voice
+   

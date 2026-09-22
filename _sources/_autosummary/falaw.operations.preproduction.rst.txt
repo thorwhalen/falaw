@@ -1,0 +1,15 @@
+falaw.operations.preproduction
+==============================
+
+.. automodule:: falaw.operations.preproduction
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cast_character
+      cast_voice
+      establish_environment
+      storyboard_shot
+   

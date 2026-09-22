@@ -1,0 +1,26 @@
+falaw.registry
+==============
+
+.. automodule:: falaw.registry
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      MODEL_CATALOGUE_TABLE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_model
+      get_tool
+      list_models
+      list_tools
+      model_constraints
+      models_table_version
+      pick_model
+      register_tool
+      video_model_constraints
+   

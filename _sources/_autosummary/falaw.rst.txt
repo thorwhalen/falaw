@@ -1,0 +1,201 @@
+﻿falaw
+=====
+
+.. automodule:: falaw
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      call_plan_from_dict
+      call_plan_to_dict
+      plan_dependencies
+      plan_from_dict
+      plan_hash
+      plan_to_dict
+      catalogue_cost_basis
+      cost_basis_from_dict
+      cost_basis_to_dict
+      llm_cost_basis
+      reprice_plan
+      clear_subscribers
+      estimate_call_cost
+      estimate_scene_cost
+      get_llm_rate
+      list_llm_rates
+      llm_ceiling_usd
+      subscribe
+      unsubscribe
+      animate_face
+      apply_note_to_beat
+      apply_note_to_scene
+      beat_content_hash
+      cache_get
+      cache_put
+      cache_stats
+      cache_usage
+      prune_assets
+      prune_content
+      prune_manifests
+      drop_cache_entry
+      cached_call_fal
+      content_ref_for_url
+      default_content_store
+      default_url_fetcher
+      using_url_fetcher
+      call_fal
+      cast_character
+      current_fal_key
+      cast_voice
+      composite_character_in_environment
+      edit_image
+      establish_environment
+      execute_plan
+      execute_plan_isolated
+      extract_models_from_corpus
+      generate_image
+      generate_image_with_refs
+      get_model
+      get_tool
+      image_to_video
+      iter_render_scene
+      lipsync
+      list_models
+      list_tools
+      llm_complete
+      llm_complete_with_receipt
+      load_scene
+      make_beat
+      make_call_plan
+      make_shot
+      materialize_asset
+      parse_response
+      parse_screenplay
+      pick_model
+      model_constraints
+      video_model_constraints
+      plan_animate_face
+      plan_composite_character_in_environment
+      plan_edit_image
+      plan_generate_image
+      plan_generate_image_with_refs
+      plan_image_to_video
+      plan_lipsync
+      plan_llm_complete
+      plan_generate_audio
+      plan_text_to_speech
+      refresh_full_docs
+      refresh_llms
+      refresh_models_from_corpus
+      refresh_model_prices
+      fetch_model_prices
+      refresh_llm_rates
+      refresh_state
+      register_tool
+      remove_background
+      render_beat
+      render_scene
+      render_shot
+      save_scene
+      scene_from_dict
+      scene_to_dict
+      shot_content_hash
+      storyboard_shot
+      talking_avatar_from_text
+      generate_audio
+      text_to_speech
+      text_to_video
+      upscale_image
+      using_fal_credentials
+      voice_clone
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AccountStatus
+      Asset
+      Beat
+      CallOutcome
+      CallPlan
+      Character
+      ContentRef
+      Environment
+      ExecutionReport
+      ModelRecord
+      Plan
+      CallRepricing
+      CostBasis
+      Pricer
+      RepricedPlan
+      Result
+      CostEstimate
+      CostLine
+      CostRollup
+      ProgressEvent
+      Scene
+      Session
+      Shot
+      ToolSpec
+      Voice
+      LlmRate
+      AreaUsage
+      CacheUsage
+      PruneCandidate
+      PruneReport
+      LlmReceipt
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      FalAccountLocked
+      FalAssetFetchError
+      FalBadRequest
+      FalDurationOutOfRange
+      FalError
+      FalHTTPError
+      FalInsufficientFunds
+      FalModelHung
+      FalNonCanonicalArgument
+      FalRateLimited
+      FalServerError
+      FalTimeout
+      FalUnauthorized
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   journal
+   account
+   backends
+   base
+   bridges
+   cache
+   canonical
+   content
+   core
+   corpus
+   cost
+   degrade
+   errors
+   events
+   llm_rates
+   llm_rates_refresh
+   local
+   operations
+   outcomes
+   plan
+   pricing
+   prune
+   refresh
+   registry
+   reprice
+   results
+   scene
+   session
+   testing

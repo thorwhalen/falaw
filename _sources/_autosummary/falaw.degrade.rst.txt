@@ -1,0 +1,13 @@
+falaw.degrade
+=============
+
+.. automodule:: falaw.degrade
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      deferred_degrade_warnings
+      emit_degradation
+   

@@ -1,0 +1,24 @@
+falaw.cache
+===========
+
+.. automodule:: falaw.cache
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ASSETS_DIRNAME
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_get
+      cache_put
+      cache_stats
+      cached_call_fal
+      drop_cache_entry
+      emit_cache_hit
+      materialize_asset
+   

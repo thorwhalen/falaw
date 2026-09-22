@@ -1,0 +1,22 @@
+falaw.journal
+=============
+
+.. automodule:: falaw.journal
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      improvement
+      issue
+      note
+      recent
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Journal
+      JournalEntry
+   

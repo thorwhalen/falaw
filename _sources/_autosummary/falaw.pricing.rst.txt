@@ -1,0 +1,21 @@
+falaw.pricing
+=============
+
+.. automodule:: falaw.pricing
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      PRICING_URL
+      MAX_IDS_PER_REQUEST
+      MAX_429_RETRIES
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      fetch_model_prices
+      refresh_model_prices
+   

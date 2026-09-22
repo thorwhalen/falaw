@@ -1,4 +1,0 @@
-falaw.local
-===========
-.. automodule:: falaw.local
-   :members:

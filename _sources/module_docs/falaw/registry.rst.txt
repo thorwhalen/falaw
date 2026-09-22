@@ -1,4 +1,0 @@
-falaw.registry
-==============
-.. automodule:: falaw.registry
-   :members:

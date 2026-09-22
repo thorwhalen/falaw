@@ -1,0 +1,14 @@
+falaw.core
+==========
+
+.. automodule:: falaw.core
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      call_fal
+      current_fal_key
+      using_fal_credentials
+   

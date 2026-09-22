@@ -1,4 +1,0 @@
-falaw.cache
-===========
-.. automodule:: falaw.cache
-   :members:

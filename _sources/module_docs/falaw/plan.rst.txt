@@ -1,4 +1,0 @@
-falaw.plan
-==========
-.. automodule:: falaw.plan
-   :members:

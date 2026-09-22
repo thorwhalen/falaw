@@ -1,0 +1,18 @@
+falaw.account
+=============
+
+.. automodule:: falaw.account
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      health_check
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AccountStatus
+   

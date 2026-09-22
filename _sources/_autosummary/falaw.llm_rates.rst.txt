@@ -1,0 +1,39 @@
+falaw.llm\_rates
+================
+
+.. automodule:: falaw.llm_rates
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      RATES_FILENAME
+      TOKENS_PER_RATE_UNIT
+      DEFAULT_STALENESS_THRESHOLD_DAYS
+      LLM_RATES_TABLE
+      CUSTOM_LLM_RATES_TABLE
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_llm_rate
+      list_llm_rates
+      llm_ceiling_usd
+      llm_rates_table_version
+      load_llm_rates
+      warn_if_stale
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      LlmRate
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      LlmRatesStaleWarning
+   

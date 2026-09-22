@@ -1,4 +1,0 @@
-falaw
-=====
-.. automodule:: falaw
-   :members:

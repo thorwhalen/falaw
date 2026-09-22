@@ -1,4 +1,0 @@
-falaw.reprice
-=============
-.. automodule:: falaw.reprice
-   :members:

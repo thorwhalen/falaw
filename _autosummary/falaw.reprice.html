@@ -1,0 +1,935 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="falaw.reprice.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="falaw.reprice.html.md">
+<link rel="describedby" href="llms.txt">
+    <title>falaw.reprice &#8212; falaw</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=f0eeacdc" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="../_static/documentation_options.js?v=e072a57b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.reprice';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="falaw.results" href="falaw.results.html" />
+    <link rel="prev" title="falaw.registry" href="falaw.registry.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.50" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">falaw</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/falaw" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/falaw" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="falaw.html">falaw</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="falaw.journal.html">falaw.journal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.account.html">falaw.account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.backends.html">falaw.backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.base.html">falaw.base</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="falaw.bridges.html">falaw.bridges</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.service.html">falaw.bridges.service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.skill.html">falaw.bridges.skill</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.cache.html">falaw.cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.canonical.html">falaw.canonical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.content.html">falaw.content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.core.html">falaw.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.corpus.html">falaw.corpus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.cost.html">falaw.cost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.degrade.html">falaw.degrade</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.errors.html">falaw.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="falaw.operations.html">falaw.operations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.images.html">falaw.operations.images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.render.html">falaw.operations.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.video.html">falaw.operations.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.plan.html">falaw.plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.pricing.html">falaw.pricing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.prune.html">falaw.prune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.refresh.html">falaw.refresh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.registry.html">falaw.registry</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">falaw.reprice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.results.html">falaw.results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.scene.html">falaw.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.session.html">falaw.session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.testing.html">falaw.testing</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="falaw.html" class="nav-link">falaw</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.reprice</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-falaw.reprice">
+<span id="falaw-reprice"></span><h1>falaw.reprice<a class="headerlink" href="#module-falaw.reprice" title="Link to this heading">#</a></h1>
+<p>Re-quote a persisted <a class="reference internal" href="falaw.html#falaw.Plan" title="falaw.Plan"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.Plan</span></code></a> at today’s rates (falaw#60).</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">CallPlan</span></code>’s <code class="docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code> is frozen at plan time. That is right —
+a quote is a statement about a moment — but rate tables move: falaw 0.0.46
+re-quoted every premium LLM call <strong>tenfold upward</strong>, so a preview saved the day
+before under-quotes the run it is being used to price. Under-quoting is the one
+direction a cost gate must never err in.</p>
+<p>Re-quoting cannot be done from <code class="docutils literal notranslate"><span class="pre">application</span></code> and <code class="docutils literal notranslate"><span class="pre">arguments</span></code> alone. The
+quantity hints that priced a call — a clip’s duration, a prompt’s token bound —
+are estimator-only and deliberately never enter the wire arguments, so they are
+not on the serialized call. <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> is where a <code class="docutils literal notranslate"><span class="pre">plan_*</span></code>
+records them, together with which rate table it consulted; this module is what
+reads one back:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_generate_image</span><span class="p">,</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">reprice_plan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plan</span> <span class="o">=</span> <span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">plan_generate_image</span><span class="p">(</span><span class="s2">"a tiger"</span><span class="p">,</span> <span class="n">consult_cache</span><span class="o">=</span><span class="kc">False</span><span class="p">),))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repriced</span> <span class="o">=</span> <span class="n">reprice_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">status</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">repriced</span><span class="o">.</span><span class="n">calls</span><span class="p">]</span>
+<span class="go">['unchanged']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">repriced</span><span class="o">.</span><span class="n">plan</span><span class="o">.</span><span class="n">total_cost_usd</span> <span class="o">==</span> <span class="n">plan</span><span class="o">.</span><span class="n">total_cost_usd</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>Three rules, in order of importance:</p>
+<ul class="simple">
+<li><p><strong>Pure data.</strong> Nothing here touches the network or a billing API, exactly
+like <code class="docutils literal notranslate"><span class="pre">plan_*</span></code>. Re-pricing reads the committed tables and does arithmetic.</p></li>
+<li><p><strong>A plan with no basis is never assumed current.</strong> Such a call comes back as
+<code class="docutils literal notranslate"><span class="pre">&quot;no_basis&quot;</span></code> with its cost <em>cleared to</em> <code class="docutils literal notranslate"><span class="pre">None</span></code>. Keeping the frozen figure
+would be the bug this module exists to fix, dressed as a feature.</p></li>
+<li><p><strong>Unknown is unknown, never free.</strong> A basis whose model has left the
+catalogue, whose pricer is not registered, or whose table no longer prices it
+re-prices to <code class="docutils literal notranslate"><span class="pre">None</span></code> — which lights up
+<a class="reference internal" href="falaw.html#falaw.Plan.has_unknown_costs" title="falaw.Plan.has_unknown_costs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.Plan.has_unknown_costs</span></code></a> and forces approval.</p></li>
+</ul>
+<p>The per-call diff says which of those happened, and
+<a class="reference internal" href="#falaw.reprice.CallRepricing.basis_changed" title="falaw.reprice.CallRepricing.basis_changed"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CallRepricing.basis_changed</span></code></a> says whether the <em>table</em> moved underneath
+the quote — the audit answer the frozen number could never give.</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.RepriceStatus" title="falaw.reprice.RepriceStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RepriceStatus</span></code></a></p></td>
+<td><p>What re-pricing was able to say about one call.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.reprice.CATALOGUE_PRICER" title="falaw.reprice.CATALOGUE_PRICER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CATALOGUE_PRICER</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CostBasis.pricer</span></code> for a call priced from a <code class="docutils literal notranslate"><span class="pre">models.json</span></code> record.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.LLM_RATES_PRICER" title="falaw.reprice.LLM_RATES_PRICER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LLM_RATES_PRICER</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">CostBasis.pricer</span></code> for a routed LLM call priced from <code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.reprice.DFLT_PRICERS" title="falaw.reprice.DFLT_PRICERS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DFLT_PRICERS</span></code></a></p></td>
+<td><p>The pricers falaw ships — one per rate table it owns.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.catalogue_cost_basis" title="falaw.reprice.catalogue_cost_basis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">catalogue_cost_basis</span></code></a>(model_id, **quantities)</p></td>
+<td><p>A <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> for a call priced from <code class="docutils literal notranslate"><span class="pre">models.json</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.reprice.llm_cost_basis" title="falaw.reprice.llm_cost_basis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">llm_cost_basis</span></code></a>(routed_model, *[, ...])</p></td>
+<td><p>A <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> for a routed LLM call priced from the rate table.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.reprice_plan" title="falaw.reprice.reprice_plan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reprice_plan</span></code></a>(plan, *[, pricers])</p></td>
+<td><p>Re-quote every call in <code class="docutils literal notranslate"><span class="pre">plan</span></code> against today's rate tables.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.CallRepricing" title="falaw.reprice.CallRepricing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CallRepricing</span></code></a>(*, index, call, old_cost_usd, ...)</p></td>
+<td><p>The before/after for one call in a re-priced plan.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pricer</span></code></a>(*, quote, table[, version])</p></td>
+<td><p>One pricing rule, and the table that backs it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.reprice.RepricedPlan" title="falaw.reprice.RepricedPlan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RepricedPlan</span></code></a>(*, plan[, calls])</p></td>
+<td><p>Result of <a class="reference internal" href="#falaw.reprice.reprice_plan" title="falaw.reprice.reprice_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">reprice_plan()</span></code></a> — the new Plan plus the per-call diff.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.reprice.CATALOGUE_PRICER">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">CATALOGUE_PRICER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'model_catalogue'</span></span><a class="headerlink" href="#falaw.reprice.CATALOGUE_PRICER" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">CostBasis.pricer</span></code> for a call priced from a <code class="docutils literal notranslate"><span class="pre">models.json</span></code> record.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">CallRepricing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_cost_usd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cost_usd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_changed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#CallRepricing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.CallRepricing" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The before/after for one call in a re-priced plan.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.basis_changed">
+<span class="sig-name descname"><span class="pre">basis_changed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.basis_changed" title="Link to this definition">#</a></dt>
+<dd><p>True when the rate table’s identity or version moved between the
+persisted basis and today’s — the audit answer to “did the price change
+because the <em>table</em> changed?”. Always <code class="docutils literal notranslate"><span class="pre">False</span></code> for <code class="docutils literal notranslate"><span class="pre">&quot;no_basis&quot;</span></code>, which
+has nothing to compare against.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.call">
+<span class="sig-name descname"><span class="pre">call</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="falaw.plan.html#falaw.plan.CallPlan" title="falaw.plan.CallPlan"><span class="pre">CallPlan</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.call" title="Link to this definition">#</a></dt>
+<dd><p>The re-priced call — the same call with today’s
+<code class="docutils literal notranslate"><span class="pre">estimated_cost_usd</span></code> and a basis stamped with today’s table version.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.delta_usd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">delta_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.delta_usd" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">new</span> <span class="pre">-</span> <span class="pre">old</span></code>, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when either side is unknown.</p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> rather than <code class="docutils literal notranslate"><span class="pre">0.0</span></code>: a call that lost or gained its price did
+not move by zero, and a caller summing deltas must not be handed a
+number that says it did.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.index">
+<span class="sig-name descname"><span class="pre">index</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.index" title="Link to this definition">#</a></dt>
+<dd><p>Position in the original <a class="reference internal" href="falaw.html#falaw.Plan" title="falaw.Plan"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.Plan</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.new_cost_usd">
+<span class="sig-name descname"><span class="pre">new_cost_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.new_cost_usd" title="Link to this definition">#</a></dt>
+<dd><p>What today’s rates say, <code class="docutils literal notranslate"><span class="pre">None</span></code> for unknown or no-basis.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.old_cost_usd">
+<span class="sig-name descname"><span class="pre">old_cost_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.old_cost_usd" title="Link to this definition">#</a></dt>
+<dd><p>What the persisted plan said, <code class="docutils literal notranslate"><span class="pre">None</span></code> if it said unknown.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.reason">
+<span class="sig-name descname"><span class="pre">reason</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#falaw.reprice.CallRepricing.reason" title="Link to this definition">#</a></dt>
+<dd><p>Why, when the status is <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;no_basis&quot;</span></code>. Empty otherwise.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.CallRepricing.status">
+<span class="sig-name descname"><span class="pre">status</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'unchanged'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'changed'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'unknown'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'no_basis'</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.CallRepricing.status" title="Link to this definition">#</a></dt>
+<dd><p>Which of the four cases this call fell into — see <a class="reference internal" href="#falaw.reprice.RepriceStatus" title="falaw.reprice.RepriceStatus"><code class="xref py py-data docutils literal notranslate"><span class="pre">RepriceStatus</span></code></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.reprice.DFLT_PRICERS">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">DFLT_PRICERS</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><span class="pre">Mapping</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><span class="pre">Pricer</span></a><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'llm_rates':</span> <span class="pre">Pricer(quote=&lt;function</span> <span class="pre">_quote_from_llm_rates&gt;,</span> <span class="pre">table='falaw/data/llm_rates.json',</span> <span class="pre">version=&lt;functools._lru_cache_wrapper</span> <span class="pre">object&gt;),</span> <span class="pre">'model_catalogue':</span> <span class="pre">Pricer(quote=&lt;function</span> <span class="pre">_quote_from_catalogue&gt;,</span> <span class="pre">table='falaw/data/models.json',</span> <span class="pre">version=&lt;functools._lru_cache_wrapper</span> <span class="pre">object&gt;)}</span></span><a class="headerlink" href="#falaw.reprice.DFLT_PRICERS" title="Link to this definition">#</a></dt>
+<dd><p>The pricers falaw ships — one per rate table it owns.</p>
+<p>Keyed by <a class="reference internal" href="falaw.html#falaw.CostBasis.pricer" title="falaw.CostBasis.pricer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.CostBasis.pricer</span></code></a>. A basis naming anything else
+re-prices as <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>: an unrecognized rule is a reason to refuse a
+number, not to keep the old one.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.reprice.LLM_RATES_PRICER">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">LLM_RATES_PRICER</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'llm_rates'</span></span><a class="headerlink" href="#falaw.reprice.LLM_RATES_PRICER" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">CostBasis.pricer</span></code> for a routed LLM call priced from <code class="docutils literal notranslate"><span class="pre">llm_rates.json</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.reprice.Pricer">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">Pricer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quote</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">Pricer.&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#Pricer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.Pricer" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One pricing rule, and the table that backs it.</p>
+<p>The seam for a caller with their own numbers: build a <code class="docutils literal notranslate"><span class="pre">Pricer</span></code> closing
+over a reconciled rate table and pass <code class="docutils literal notranslate"><span class="pre">pricers={\*\*DFLT_PRICERS,</span>
+<span class="pre">LLM_RATES_PRICER:</span> <span class="pre">mine}</span></code> to <a class="reference internal" href="#falaw.reprice.reprice_plan" title="falaw.reprice.reprice_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">reprice_plan()</span></code></a>. The <code class="docutils literal notranslate"><span class="pre">table</span></code> /
+<code class="docutils literal notranslate"><span class="pre">version</span></code> pair is stamped onto the re-priced call’s basis, so the next
+audit can see which table produced which number.</p>
+<p><code class="docutils literal notranslate"><span class="pre">table</span></code> is also a <strong>gate, not just a label</strong>: a call whose basis names a
+different table is reported as <code class="docutils literal notranslate"><span class="pre">unknown</span></code> rather than re-quoted, so a row
+priced from your invoice is never silently re-quoted at falaw’s published
+rate (or the reverse). Give your <code class="docutils literal notranslate"><span class="pre">Pricer</span></code> the same <code class="docutils literal notranslate"><span class="pre">table</span></code> string the
+basis carries — <a class="reference internal" href="falaw.llm_rates.html#falaw.llm_rates.CUSTOM_LLM_RATES_TABLE" title="falaw.llm_rates.CUSTOM_LLM_RATES_TABLE"><code class="xref py py-data docutils literal notranslate"><span class="pre">falaw.llm_rates.CUSTOM_LLM_RATES_TABLE</span></code></a> for anything
+a <code class="docutils literal notranslate"><span class="pre">plan_*</span></code> priced with <code class="docutils literal notranslate"><span class="pre">llm_rates=</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.Pricer.quote">
+<span class="sig-name descname"><span class="pre">quote</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="falaw.plan.html#falaw.plan.CostBasis" title="falaw.plan.CostBasis"><span class="pre">CostBasis</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.Pricer.quote" title="Link to this definition">#</a></dt>
+<dd><p>Price <code class="docutils literal notranslate"><span class="pre">basis</span></code> in USD, or return <code class="docutils literal notranslate"><span class="pre">None</span></code> for <em>unknown</em>. May raise; a
+raise is reported as <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code> with the exception text as the reason,
+so one unpriceable row never aborts a whole plan’s re-quote.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.Pricer.table">
+<span class="sig-name descname"><span class="pre">table</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><a class="headerlink" href="#falaw.reprice.Pricer.table" title="Link to this definition">#</a></dt>
+<dd><p>Identity of the table this pricer reads, for the refreshed basis.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.Pricer.version">
+<span class="sig-name descname"><span class="pre">version</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.Pricer.version" title="Link to this definition">#</a></dt>
+<dd><p>Today’s version of that table, for the refreshed basis.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.reprice.RepriceStatus">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">RepriceStatus</span></span><a class="headerlink" href="#falaw.reprice.RepriceStatus" title="Link to this definition">#</a></dt>
+<dd><p>What re-pricing was able to say about one call.</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unchanged</span></code>: re-quoted, and today’s rates give the same number.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">changed</span></code>: re-quoted to a different number — the interesting case.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unknown</span></code>: a basis was present but could not be re-quoted — the model has
+left the catalogue, no pricer is registered under that name, the table no
+longer prices it, or the basis names a <strong>different table</strong> than the pricer
+reads (two sets of books do not re-quote each other). The new cost is
+<code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">no_basis</span></code>: the call carries no <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> at all — it was
+planned before falaw#60, or by something that never recorded one. The new
+cost is <code class="docutils literal notranslate"><span class="pre">None</span></code>, because the honest answer to “what does this cost today?”
+is that nobody can tell.</p></li>
+</ul>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Literal</span></code></a>[‘unchanged’, ‘changed’, ‘unknown’, ‘no_basis’]</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">RepricedPlan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#RepricedPlan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.RepricedPlan" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Result of <a class="reference internal" href="#falaw.reprice.reprice_plan" title="falaw.reprice.reprice_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">reprice_plan()</span></code></a> — the new Plan plus the per-call diff.</p>
+<p>Read <a class="reference internal" href="#falaw.reprice.RepricedPlan.plan" title="falaw.reprice.RepricedPlan.plan"><code class="xref py py-attr docutils literal notranslate"><span class="pre">plan</span></code></a> for the re-quoted plan (it is an ordinary
+<a class="reference internal" href="falaw.html#falaw.Plan" title="falaw.Plan"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.Plan</span></code></a>, so <code class="docutils literal notranslate"><span class="pre">known_cost_usd</span></code> / <code class="docutils literal notranslate"><span class="pre">unknown_call_count</span></code> /
+<code class="docutils literal notranslate"><span class="pre">has_unknown_costs</span></code> mean what they always mean), and <a class="reference internal" href="#falaw.reprice.RepricedPlan.calls" title="falaw.reprice.RepricedPlan.calls"><code class="xref py py-attr docutils literal notranslate"><span class="pre">calls</span></code></a> for
+what changed and why.</p>
+<dl class="field-list simple">
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan.calls">
+<span class="sig-name descname"><span class="pre">calls</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.reprice.CallRepricing" title="falaw.reprice.CallRepricing"><span class="pre">CallRepricing</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.RepricedPlan.calls" title="Link to this definition">#</a></dt>
+<dd><p>One entry per call of the input plan, in order.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan.changed">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">changed</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.reprice.CallRepricing" title="falaw.reprice.CallRepricing"><span class="pre">CallRepricing</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.RepricedPlan.changed" title="Link to this definition">#</a></dt>
+<dd><p>Calls whose price moved — the ones a re-quote exists to surface.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan.known_delta_usd">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">known_delta_usd</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#falaw.reprice.RepricedPlan.known_delta_usd" title="Link to this definition">#</a></dt>
+<dd><p>Sum of <a class="reference internal" href="#falaw.reprice.CallRepricing.delta_usd" title="falaw.reprice.CallRepricing.delta_usd"><code class="xref py py-attr docutils literal notranslate"><span class="pre">CallRepricing.delta_usd</span></code></a> over calls priced both times.</p>
+<p>The movement you can actually see. It says nothing about the calls in
+<a class="reference internal" href="#falaw.reprice.RepricedPlan.unpriced" title="falaw.reprice.RepricedPlan.unpriced"><code class="xref py py-attr docutils literal notranslate"><span class="pre">unpriced</span></code></a> — read that alongside it, never this alone.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan.plan">
+<span class="sig-name descname"><span class="pre">plan</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="falaw.plan.html#falaw.plan.Plan" title="falaw.plan.Plan"><span class="pre">Plan</span></a></span><a class="headerlink" href="#falaw.reprice.RepricedPlan.plan" title="Link to this definition">#</a></dt>
+<dd><p>The re-priced plan. Structurally identical to the input — same calls,
+same order, same arguments, so <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> is unmoved — with today’s
+costs.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="falaw.reprice.RepricedPlan.unpriced">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">unpriced</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#falaw.reprice.CallRepricing" title="falaw.reprice.CallRepricing"><span class="pre">CallRepricing</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#falaw.reprice.RepricedPlan.unpriced" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code> plus <code class="docutils literal notranslate"><span class="pre">&quot;no_basis&quot;</span></code>.</p>
+<p>A budget gate refuses while this is non-empty, the same way it refuses
+on <a class="reference internal" href="falaw.html#falaw.Plan.has_unknown_costs" title="falaw.Plan.has_unknown_costs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.Plan.has_unknown_costs</span></code></a> — the two are the same
+judgement, one made at re-quote time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Calls today’s rates cannot price</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.reprice.catalogue_cost_basis">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">catalogue_cost_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">quantities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#catalogue_cost_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.catalogue_cost_basis" title="Link to this definition">#</a></dt>
+<dd><p>A <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> for a call priced from <code class="docutils literal notranslate"><span class="pre">models.json</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">quantities</span></code> are <a class="reference internal" href="falaw.html#falaw.estimate_call_cost" title="falaw.estimate_call_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.estimate_call_cost()</span></code></a> keywords (<code class="docutils literal notranslate"><span class="pre">count</span></code>,
+<code class="docutils literal notranslate"><span class="pre">seconds</span></code>, <code class="docutils literal notranslate"><span class="pre">megapixels</span></code>, <code class="docutils literal notranslate"><span class="pre">tokens</span></code>); <code class="docutils literal notranslate"><span class="pre">None</span></code> values are dropped, so a
+hint that was never supplied is recorded as absent rather than as <code class="docutils literal notranslate"><span class="pre">null</span></code>
+— the same thing the estimator saw.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="falaw.plan.html#falaw.plan.CostBasis" title="falaw.plan.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">CostBasis</span></code></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">catalogue_cost_basis</span><span class="p">(</span><span class="s2">"fal-ai/flux/dev"</span><span class="p">,</span> <span class="n">seconds</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">quantities</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.reprice.llm_cost_basis">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">llm_cost_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">routed_model</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_output_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_rates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#llm_cost_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.llm_cost_basis" title="Link to this definition">#</a></dt>
+<dd><p>A <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> for a routed LLM call priced from the rate table.</p>
+<p><code class="docutils literal notranslate"><span class="pre">custom_rates=True</span></code> records that the quote came from a caller-supplied
+<code class="docutils literal notranslate"><span class="pre">rates=</span></code> table rather than the committed one: there is no file to digest,
+so the version stays empty and the table names itself
+<a class="reference internal" href="falaw.llm_rates.html#falaw.llm_rates.CUSTOM_LLM_RATES_TABLE" title="falaw.llm_rates.CUSTOM_LLM_RATES_TABLE"><code class="xref py py-data docutils literal notranslate"><span class="pre">falaw.llm_rates.CUSTOM_LLM_RATES_TABLE</span></code></a>. <a class="reference internal" href="#falaw.reprice.reprice_plan" title="falaw.reprice.reprice_plan"><code class="xref py py-func docutils literal notranslate"><span class="pre">reprice_plan()</span></code></a> then
+<strong>refuses</strong> to re-quote it with the committed table, reporting <code class="docutils literal notranslate"><span class="pre">unknown</span></code>
+— a caller’s reconciled $0.50 row re-priced at falaw’s published $0.01 is a
+50x under-quote, not a price drop. Re-quote it by passing a
+<a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pricer</span></code></a> over your table that names that same identity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="falaw.plan.html#falaw.plan.CostBasis" title="falaw.plan.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">CostBasis</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.reprice.reprice_plan">
+<span class="sig-prename descclassname"><span class="pre">falaw.reprice.</span></span><span class="sig-name descname"><span class="pre">reprice_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pricers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'llm_rates':</span> <span class="pre">Pricer(quote=&lt;function</span> <span class="pre">_quote_from_llm_rates&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'falaw/data/llm_rates.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;functools._lru_cache_wrapper</span> <span class="pre">object&gt;)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'model_catalogue'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Pricer(quote</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">&lt;function</span> <span class="pre">_quote_from_catalogue&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'falaw/data/models.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;functools._lru_cache_wrapper</span> <span class="pre">object&gt;)}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/reprice.html#reprice_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.reprice.reprice_plan" title="Link to this definition">#</a></dt>
+<dd><p>Re-quote every call in <code class="docutils literal notranslate"><span class="pre">plan</span></code> against today’s rate tables.</p>
+<p>Pure data: no network, no billing API, nothing executed. Returns a new
+<a class="reference internal" href="#falaw.reprice.RepricedPlan" title="falaw.reprice.RepricedPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">RepricedPlan</span></code></a> — the input plan is untouched.</p>
+<p>A call carrying a <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> is re-quoted through the pricer
+its basis names, with the exact quantity hints that produced the original
+figure, and comes back with a basis re-stamped to today’s table version. A
+call carrying no basis is reported as <code class="docutils literal notranslate"><span class="pre">&quot;no_basis&quot;</span></code> and its cost is
+<strong>cleared to</strong> <code class="docutils literal notranslate"><span class="pre">None</span></code>: the frozen number is a fact about a past moment,
+and silently re-presenting it as a current quote is the failure this
+function exists to prevent. That clearing lights up
+<a class="reference internal" href="falaw.html#falaw.Plan.has_unknown_costs" title="falaw.Plan.has_unknown_costs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.Plan.has_unknown_costs</span></code></a>, which is exactly right — nobody can
+say what that call costs today.</p>
+<p>A basis is only re-quoted by a pricer reading the <strong>same table</strong> it names.
+A mismatch is <code class="docutils literal notranslate"><span class="pre">&quot;unknown&quot;</span></code>, not a re-quote: two tables are two sets of
+books, and pricing a caller’s reconciled $0.50 row at falaw’s published
+$0.01 would be a 50x under-quote wearing the clothes of a price drop. Pass
+a <a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pricer</span></code></a> naming that table to re-quote against the same books.</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache_status</span></code> is carried through unchanged. Re-pricing answers “what
+would this cost?”, not “is it still cached?”; peeking the cache here would
+quietly turn a re-quote into an I/O operation and make a hit look like a
+price drop. Re-plan the calls if you want a fresh cache reading.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plan</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="falaw.plan.html#falaw.plan.Plan" title="falaw.plan.Plan"><code class="xref py py-class docutils literal notranslate"><span class="pre">Plan</span></code></a></span>) – The plan to re-quote, typically just deserialized with
+<a class="reference internal" href="falaw.html#falaw.plan_from_dict" title="falaw.plan_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan_from_dict()</span></code></a>.</p></li>
+<li><p><strong>pricers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pricer</span></code></a>]</span>) – Pricing rules by <a class="reference internal" href="falaw.html#falaw.CostBasis.pricer" title="falaw.CostBasis.pricer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">falaw.CostBasis.pricer</span></code></a> name. The seam
+for a caller who has reconciled real numbers against their own
+invoice — see <a class="reference internal" href="#falaw.reprice.Pricer" title="falaw.reprice.Pricer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pricer</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#falaw.reprice.RepricedPlan" title="falaw.reprice.RepricedPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">RepricedPlan</span></code></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw</span><span class="w"> </span><span class="kn">import</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">CallPlan</span><span class="p">,</span> <span class="n">reprice_plan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">stale</span> <span class="o">=</span> <span class="n">CallPlan</span><span class="p">(</span><span class="n">tool</span><span class="o">=</span><span class="s2">"generate_image"</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="s2">"fal-ai/flux/dev"</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="n">arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="s2">"a tiger"</span><span class="p">},</span> <span class="n">output_kind</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span>
+<span class="gp">... </span>                 <span class="n">estimated_cost_usd</span><span class="o">=</span><span class="mf">0.025</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span> <span class="o">=</span> <span class="n">reprice_plan</span><span class="p">(</span><span class="n">Plan</span><span class="p">(</span><span class="n">calls</span><span class="o">=</span><span class="p">(</span><span class="n">stale</span><span class="p">,)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">status</span>
+<span class="go">'no_basis'</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">plan</span><span class="o">.</span><span class="n">calls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">estimated_cost_usd</span> <span class="ow">is</span> <span class="kc">None</span>   <span class="c1"># unknown, not $0.025</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">.</span><span class="n">plan</span><span class="o">.</span><span class="n">has_unknown_costs</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="falaw.registry.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">falaw.registry</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="falaw.results.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">falaw.results</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CATALOGUE_PRICER"><code class="docutils literal notranslate"><span class="pre">CATALOGUE_PRICER</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing"><code class="docutils literal notranslate"><span class="pre">CallRepricing</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.basis_changed"><code class="docutils literal notranslate"><span class="pre">CallRepricing.basis_changed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.call"><code class="docutils literal notranslate"><span class="pre">CallRepricing.call</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.delta_usd"><code class="docutils literal notranslate"><span class="pre">CallRepricing.delta_usd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.index"><code class="docutils literal notranslate"><span class="pre">CallRepricing.index</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.new_cost_usd"><code class="docutils literal notranslate"><span class="pre">CallRepricing.new_cost_usd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.old_cost_usd"><code class="docutils literal notranslate"><span class="pre">CallRepricing.old_cost_usd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.reason"><code class="docutils literal notranslate"><span class="pre">CallRepricing.reason</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.CallRepricing.status"><code class="docutils literal notranslate"><span class="pre">CallRepricing.status</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.DFLT_PRICERS"><code class="docutils literal notranslate"><span class="pre">DFLT_PRICERS</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.LLM_RATES_PRICER"><code class="docutils literal notranslate"><span class="pre">LLM_RATES_PRICER</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.Pricer"><code class="docutils literal notranslate"><span class="pre">Pricer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.Pricer.quote"><code class="docutils literal notranslate"><span class="pre">Pricer.quote</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.Pricer.table"><code class="docutils literal notranslate"><span class="pre">Pricer.table</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.Pricer.version"><code class="docutils literal notranslate"><span class="pre">Pricer.version</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepriceStatus"><code class="docutils literal notranslate"><span class="pre">RepriceStatus</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan"><code class="docutils literal notranslate"><span class="pre">RepricedPlan</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan.calls"><code class="docutils literal notranslate"><span class="pre">RepricedPlan.calls</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan.changed"><code class="docutils literal notranslate"><span class="pre">RepricedPlan.changed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan.known_delta_usd"><code class="docutils literal notranslate"><span class="pre">RepricedPlan.known_delta_usd</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan.plan"><code class="docutils literal notranslate"><span class="pre">RepricedPlan.plan</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.RepricedPlan.unpriced"><code class="docutils literal notranslate"><span class="pre">RepricedPlan.unpriced</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.catalogue_cost_basis"><code class="docutils literal notranslate"><span class="pre">catalogue_cost_basis()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.llm_cost_basis"><code class="docutils literal notranslate"><span class="pre">llm_cost_basis()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.reprice.reprice_plan"><code class="docutils literal notranslate"><span class="pre">reprice_plan()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/falaw.reprice.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

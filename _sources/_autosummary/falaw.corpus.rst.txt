@@ -1,0 +1,13 @@
+falaw.corpus
+============
+
+.. automodule:: falaw.corpus
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      extract_models_from_corpus
+      refresh_models_from_corpus
+   

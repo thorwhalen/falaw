@@ -1,4 +1,0 @@
-falaw.prune
-===========
-.. automodule:: falaw.prune
-   :members:

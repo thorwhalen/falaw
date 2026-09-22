@@ -1,0 +1,21 @@
+falaw.canonical
+===============
+
+.. automodule:: falaw.canonical
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_BACKEND
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      canonical_blob
+      ensure_canonical
+      cache_key_payload
+      plan_identity_payload
+   

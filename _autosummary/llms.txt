@@ -1,0 +1,51 @@
+# falaw
+
+> Agent-friendly Python facade over fal.ai for generating and managing AI media (images, video, audio).
+
+
+## Pages in this subsection
+
+- [falaw](falaw.html.md): falaw: agent-friendly Python facade over fal.ai for AI media generation.
+- [falaw.journal](falaw.journal.html.md): Agent journal: append-only log of notes, issues and improvements.
+- [falaw.account](falaw.account.html.md): Account health probe.
+- [falaw.backends](falaw.backends.html.md): Execution backend registry — where &#96;CallPlan.backend&#96; dispatches (falaw#15).
+- [falaw.base](falaw.base.html.md): Core types: ToolSpec and ModelRecord.
+- [falaw.bridges](falaw.bridges.html.md): Bridges: derive auxiliary surfaces (skill, MCP, HTTP service) from the tool registry.
+- [falaw.bridges.mcp](falaw.bridges.mcp.html.md): MCP bridge: expose every falaw tool as an MCP tool.
+- [falaw.bridges.service](falaw.bridges.service.html.md): HTTP service bridge (planned): expose falaw tools as a &#96;qh&#96; app.
+- [falaw.bridges.skill](falaw.bridges.skill.html.md): Render a Claude SKILL.md (and references) from the falaw tool registry.
+- [falaw.cache](falaw.cache.html.md): Content-addressed cache for fal calls.
+- [falaw.canonical](falaw.canonical.html.md): One canonical byte-form for everything falaw hashes (falaw#17).
+- [falaw.content](falaw.content.html.md): Content addressing for fal-produced media — identify a file by &#42;what it is&#42;.
+- [falaw.core](falaw.core.html.md): Wrapper over &#96;fal_client.subscribe&#96; with progress events and auto-journaling.
+- [falaw.corpus](falaw.corpus.html.md): Extract model records from &#96;misc/docs/llms-full.txt&#96;.
+- [falaw.cost](falaw.cost.html.md): Cost estimation: ModelRecord.cost_estimate + Scene rollups.
+- [falaw.degrade](falaw.degrade.html.md): Where falaw sends “I carried on, but you should know” — one collection point.
+- [falaw.errors](falaw.errors.html.md): Typed exceptions for falaw operations.
+- [falaw.events](falaw.events.html.md): Structured progress events for fal calls.
+- [falaw.llm_rates](falaw.llm_rates.html.md): Per-routed-model LLM rates: the data behind a &#42;ceiling&#42; quote (falaw#50, option A).
+- [falaw.llm_rates_refresh](falaw.llm_rates_refresh.html.md): Refresh proposals for the LLM rate table, never a silent overwrite (falaw#56).
+- [falaw.local](falaw.local.html.md): Local utilities: ffmpeg + PIL glue for stitching fal outputs.
+- [falaw.operations](falaw.operations.html.md): Task-level verbs: stable, agent-friendly entry points.
+- [falaw.operations.audio](falaw.operations.audio.html.md): Audio operations: text-to-speech and friends.
+- [falaw.operations.avatar](falaw.operations.avatar.html.md): Avatar / lip-sync operations and composers.
+- [falaw.operations.images](falaw.operations.images.html.md): Image-generation and image-manipulation operations.
+- [falaw.operations.llm](falaw.operations.llm.html.md): LLM-driven tools: text completion, screenplay → Scene IR, IR editing.
+- [falaw.operations.preproduction](falaw.operations.preproduction.html.md): Pre-production: produce reusable identity anchors for a Scene.
+- [falaw.operations.render](falaw.operations.render.html.md): Beat / shot / scene rendering with caching.
+- [falaw.operations.video](falaw.operations.video.html.md): Video-generation operations: text-to-video and image-to-video.
+- [falaw.outcomes](falaw.outcomes.html.md): Per-call outcomes of running a &#96;falaw.Plan&#96; — the partial-result type.
+- [falaw.plan](falaw.plan.html.md): Plan / Execute primitives — separate planning (data) from execution (effects).
+- [falaw.pricing](falaw.pricing.html.md): Read fal’s pricing API into &#96;models.json&#96; cost estimates (falaw#18).
+- [falaw.prune](falaw.prune.html.md): Capacity management for the falaw cache: see what is on disk, and reclaim it.
+- [falaw.refresh](falaw.refresh.html.md): Refresh fal.ai docs locally with conditional GETs.
+- [falaw.registry](falaw.registry.html.md): Tool and model registries.
+- [falaw.reprice](falaw.reprice.html.md): Re-quote a persisted &#96;falaw.Plan&#96; at today’s rates (falaw#60).
+- [falaw.results](falaw.results.html.md): Result wrapper: parse fal responses into typed assets, lazy download.
+- [falaw.scene](falaw.scene.html.md): Scene IR: the editable structure that survives all the way to the pixels.
+- [falaw.session](falaw.session.html.md): Session: optional stateful controller over a sequence of falaw operations.
+- [falaw.testing](falaw.testing.html.md): Make a suite that uses falaw genuinely offline — the fake asset transport.
+
+## Optional
+
+- [Top-level llms.txt](../llms.txt): Complete documentation index.

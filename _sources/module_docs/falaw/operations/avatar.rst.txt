@@ -1,4 +1,0 @@
-falaw.operations.avatar
-=======================
-.. automodule:: falaw.operations.avatar
-   :members:

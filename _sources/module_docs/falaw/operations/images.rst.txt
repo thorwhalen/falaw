@@ -1,4 +1,0 @@
-falaw.operations.images
-=======================
-.. automodule:: falaw.operations.images
-   :members:

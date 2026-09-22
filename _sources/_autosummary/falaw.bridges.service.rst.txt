@@ -1,0 +1,12 @@
+falaw.bridges.service
+=====================
+
+.. automodule:: falaw.bridges.service
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      build_qh_app
+   

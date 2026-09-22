@@ -1,0 +1,15 @@
+falaw.local
+===========
+
+.. automodule:: falaw.local
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      concatenate_clips
+      extract_thumbnail
+      has_ffmpeg
+      overlay_audio
+   

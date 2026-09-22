@@ -1,0 +1,811 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="alternate" type="text/markdown" href="falaw.cache.html.md">
+<link rel="describedby" href="../llms.txt" type="text/markdown">
+<link rel="alternate" type="text/markdown" href="falaw.cache.html.md">
+<link rel="describedby" href="llms.txt">
+    <title>falaw.cache &#8212; falaw</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/epythet.css?v=f0eeacdc" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="../_static/documentation_options.js?v=e072a57b"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.cache';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="falaw.canonical" href="falaw.canonical.html" />
+    <link rel="prev" title="falaw.bridges.skill" href="falaw.bridges.skill.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.50" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">falaw</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/falaw" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ai-agents.html">
+    For AI agents
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/thorwhalen/falaw" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="falaw.html">falaw</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="falaw.journal.html">falaw.journal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.account.html">falaw.account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.backends.html">falaw.backends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.base.html">falaw.base</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="falaw.bridges.html">falaw.bridges</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.mcp.html">falaw.bridges.mcp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.service.html">falaw.bridges.service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.bridges.skill.html">falaw.bridges.skill</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">falaw.cache</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.canonical.html">falaw.canonical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.content.html">falaw.content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.core.html">falaw.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.corpus.html">falaw.corpus</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.cost.html">falaw.cost</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.degrade.html">falaw.degrade</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.errors.html">falaw.errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="falaw.operations.html">falaw.operations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.audio.html">falaw.operations.audio</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.avatar.html">falaw.operations.avatar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.images.html">falaw.operations.images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.llm.html">falaw.operations.llm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.preproduction.html">falaw.operations.preproduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.render.html">falaw.operations.render</a></li>
+<li class="toctree-l3"><a class="reference internal" href="falaw.operations.video.html">falaw.operations.video</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.outcomes.html">falaw.outcomes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.plan.html">falaw.plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.pricing.html">falaw.pricing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.prune.html">falaw.prune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.refresh.html">falaw.refresh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.registry.html">falaw.registry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.reprice.html">falaw.reprice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.results.html">falaw.results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.scene.html">falaw.scene</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.session.html">falaw.session</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.testing.html">falaw.testing</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="falaw.html" class="nav-link">falaw</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.cache</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-falaw.cache">
+<span id="falaw-cache"></span><h1>falaw.cache<a class="headerlink" href="#module-falaw.cache" title="Link to this heading">#</a></h1>
+<p>Content-addressed cache for fal calls.</p>
+<p>Why this exists: the directorial workflow (“a single edit, the scene
+re-renders around it”) only works if unchanged beats <em>don’t</em> re-render.
+A cache hit is the difference between a 30-second edit-and-preview
+loop and a 5-minute one.</p>
+<p>Design:</p>
+<ul class="simple">
+<li><p>Key = SHA256 of (model_id, sorted(arguments_json)). Two structurally
+identical fal calls collapse to the same key.</p></li>
+<li><p>Value = the raw fal response, plus optional locally-downloaded asset
+paths. We persist both the JSON manifest and the binary downloads.</p></li>
+<li><p>Cache root: <code class="docutils literal notranslate"><span class="pre">$FALAW_CACHE_DIR</span></code> or <code class="docutils literal notranslate"><span class="pre">$FALAW_DATA_DIR/cache</span></code> or
+<code class="docutils literal notranslate"><span class="pre">~/.config/falaw/cache</span></code>.</p></li>
+<li><p>The cache is <em>per-process</em> aware via lru_cache for hot lookups;
+on-disk for persistence across runs.</p></li>
+</ul>
+<p><strong>The key arguments are not always the wire arguments.</strong> A chained plan
+(<code class="docutils literal notranslate"><span class="pre">generate_image</span></code> → <code class="docutils literal notranslate"><span class="pre">image_to_video</span></code>) sends fal a <em>URL</em> for the upstream
+image, but a URL is minted fresh per upload — so keying on it guarantees a
+miss the moment the upstream is genuinely re-executed, and the miss re-bills
+the expensive downstream call for unchanged work. <a class="reference internal" href="#falaw.cache.cached_call_fal" title="falaw.cache.cached_call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a>
+therefore takes an optional <code class="docutils literal notranslate"><span class="pre">key_arguments</span></code>: the same call with upstream
+references resolved to <strong>content hashes</strong> (<code class="docutils literal notranslate"><span class="pre">sha256:&lt;hex&gt;</span></code>) instead of URLs.
+See <a class="reference internal" href="falaw.content.html#module-falaw.content" title="falaw.content"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.content</span></code></a> for how those hashes are produced.</p>
+<p>Usage:</p>
+<blockquote>
+<div><p>from falaw.cache import cached_call_fal
+raw = cached_call_fal(“fal-ai/flux/dev”, {“prompt”: “…”})</p>
+</div></blockquote>
+<p>The wrapped variant has the same signature as <code class="code docutils literal notranslate"><span class="pre">core.call_fal</span></code> but skips
+the network when the (model_id, arguments) tuple was seen before.</p>
+<p class="rubric">Module Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.cache.ASSETS_DIRNAME" title="falaw.cache.ASSETS_DIRNAME"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ASSETS_DIRNAME</span></code></a></p></td>
+<td><p>Sub-directory of the falaw cache holding <a class="reference internal" href="#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_asset()</span></code></a> copies.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.cache.cache_get" title="falaw.cache.cache_get"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_get</span></code></a>(application, arguments, *[, ...])</p></td>
+<td><p>Return the raw fal response if cached, else None.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.cache.cache_put" title="falaw.cache.cache_put"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_put</span></code></a>(application, arguments, raw, *[, ...])</p></td>
+<td><p>Persist a fal response.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.cache.cache_stats" title="falaw.cache.cache_stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cache_stats</span></code></a>()</p></td>
+<td><p>Quick summary of the cache: entry count, disk usage, and where it went.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.cache.cached_call_fal" title="falaw.cache.cached_call_fal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cached_call_fal</span></code></a>(application, arguments, *[, ...])</p></td>
+<td><p>Call a fal model, but reuse the cached response when present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.cache.drop_cache_entry" title="falaw.cache.drop_cache_entry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_cache_entry</span></code></a>(application, arguments, *)</p></td>
+<td><p>Delete the cache entry for <code class="docutils literal notranslate"><span class="pre">(application,</span> <span class="pre">arguments)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.cache.emit_cache_hit" title="falaw.cache.emit_cache_hit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit_cache_hit</span></code></a>(application[, on_event])</p></td>
+<td><p>Emit the synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> progress event for <code class="docutils literal notranslate"><span class="pre">application</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">materialize_asset</span></code></a>(url, *[, key_hint, store, ...])</p></td>
+<td><p>Download a remote asset to the cache and return the local path.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.cache.ASSETS_DIRNAME">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">ASSETS_DIRNAME</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'assets'</span></span><a class="headerlink" href="#falaw.cache.ASSETS_DIRNAME" title="Link to this definition">#</a></dt>
+<dd><p>Sub-directory of the falaw cache holding <a class="reference internal" href="#falaw.cache.materialize_asset" title="falaw.cache.materialize_asset"><code class="xref py py-func docutils literal notranslate"><span class="pre">materialize_asset()</span></code></a> copies.</p>
+<p>Named here rather than in <a class="reference internal" href="falaw.prune.html#module-falaw.prune" title="falaw.prune"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.prune</span></code></a> because <code class="xref py py-func docutils literal notranslate"><span class="pre">_asset_path()</span></code> is
+what decides the layout; the prune side reads this so the two cannot drift.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.cache_get">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cache_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#cache_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cache_get" title="Link to this definition">#</a></dt>
+<dd><p>Return the raw fal response if cached, else None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.cache_put">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cache_put</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wire_arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#cache_put"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cache_put" title="Link to this definition">#</a></dt>
+<dd><p>Persist a fal response. Returns the entry directory path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – fal model id.</p></li>
+<li><p><strong>arguments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – the arguments the entry is <strong>keyed</strong> on.</p></li>
+<li><p><strong>raw</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – the fal response to store.</p></li>
+<li><p><strong>note</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – free-form label recorded in the manifest.</p></li>
+<li><p><strong>wire_arguments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span>) – the arguments actually sent to fal, when they differ
+from the key arguments (chained calls send URLs but are keyed on
+content hashes). Recorded for debugging only — it never affects
+the key.</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – which execution backend produced <code class="docutils literal notranslate"><span class="pre">raw</span></code> (falaw#15). Joins
+the cache key only when non-default, same rule as
+<a class="reference internal" href="falaw.canonical.html#falaw.canonical.cache_key_payload" title="falaw.canonical.cache_key_payload"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.canonical.cache_key_payload()</span></code></a>; recorded in the
+manifest under the same condition, for debugging.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+<p>The manifest is written to a temporary file and moved into place with
+<a class="reference external" href="https://docs.python.org/3/library/os.html#os.replace" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.replace()</span></code></a>, so a reader never sees a half-written entry. That is not
+hypothetical since <code class="docutils literal notranslate"><span class="pre">execute_plan(concurrency=N)</span></code>: two calls of one Plan
+that are structurally identical land on the same key, and an interleaved
+<code class="docutils literal notranslate"><span class="pre">json.dump</span></code> would leave a permanently unparseable entry — a cache that
+poisons itself under exactly the fan-out it exists to make cheap.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.cache_stats">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cache_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#cache_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cache_stats" title="Link to this definition">#</a></dt>
+<dd><p>Quick summary of the cache: entry count, disk usage, and where it went.</p>
+<p><code class="docutils literal notranslate"><span class="pre">areas</span></code> is the part worth reading. Since falaw#14 the cache holds the
+<em>bytes</em> of every generated asset, so a total on its own cannot distinguish
+gigabytes of irreplaceable blobs from gigabytes of <code class="docutils literal notranslate"><span class="pre">assets/</span></code> copies that
+cost nothing to regenerate — and only the second is safe to reclaim without
+thinking. Each area’s economics, and the primitives that reclaim it, are in
+<a class="reference internal" href="falaw.prune.html#module-falaw.prune" title="falaw.prune"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.prune</span></code></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">size_bytes</span></code> is every byte under the cache root, unchanged in meaning from
+before the breakdown existed: the <code class="docutils literal notranslate"><span class="pre">other</span></code> area absorbs whatever the named
+areas do not claim, so the areas always sum to the whole.</p>
+<p>(<code class="docutils literal notranslate"><span class="pre">+SKIP</span></code>ed — it reads the caller’s real cache, a multi-gigabyte walk on
+the production box. <code class="xref py py-mod docutils literal notranslate"><span class="pre">tests.test_prune</span></code> pins this against a throwaway
+cache instead.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stats</span> <span class="o">=</span> <span class="n">cache_stats</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">sorted</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">"areas"</span><span class="p">])</span>
+<span class="go">['assets', 'content', 'manifests', 'other', 'scenes', 'url_index']</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.cached_call_fal">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">cached_call_fal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#cached_call_fal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.cached_call_fal" title="Link to this definition">#</a></dt>
+<dd><p>Call a fal model, but reuse the cached response when present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>application</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – fal model id.</p></li>
+<li><p><strong>arguments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – model input dict — what is sent <strong>on the wire</strong>.</p></li>
+<li><p><strong>key_arguments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Mapping" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span>) – what the cache entry is <strong>keyed</strong> on, when that differs
+from what goes on the wire. Defaults to <code class="docutils literal notranslate"><span class="pre">arguments</span></code>. The split
+exists because a chained call must send fal an expiring URL for its
+upstream input while being keyed on that input’s <em>content hash</em>, so
+a byte-identical upstream regeneration hits instead of re-billing.</p></li>
+<li><p><strong>refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if True, bypass the cache and overwrite it with a fresh result.</p></li>
+<li><p><strong>on_event</strong> – Per-call subscriber for <a class="reference internal" href="falaw.events.html#falaw.events.ProgressEvent" title="falaw.events.ProgressEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.events.ProgressEvent</span></code></a>.
+On a cache hit, a synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> event is emitted so
+UIs can show “skipped” instead of “running”.</p></li>
+<li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – which execution backend serves this call (falaw#15) —
+resolved via <a class="reference internal" href="falaw.backends.html#module-falaw.backends" title="falaw.backends"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.backends</span></code></a>. Also joins the cache key
+(non-default only), so two backends never share an entry. Despite
+the name, this function is no longer fal-specific; the name is
+kept because “fal” is still the only backend and every existing
+call site already spells it this way.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Raw response (whether from cache or network).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.drop_cache_entry">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">drop_cache_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#drop_cache_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.drop_cache_entry" title="Link to this definition">#</a></dt>
+<dd><p>Delete the cache entry for <code class="docutils literal notranslate"><span class="pre">(application,</span> <span class="pre">arguments)</span></code>. Returns whether one existed.</p>
+<p>The counterpart to <a class="reference internal" href="#falaw.cache.cache_put" title="falaw.cache.cache_put"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_put()</span></code></a>, and the mechanism that keeps a cache
+from becoming a <em>trap</em>. An entry whose response can no longer be turned
+into a usable artifact — fal deleted the URL and the bytes are not in the
+content store — must be a <strong>miss</strong>, not a permanent failure: without this,
+escaping one dead call means re-running the whole plan.
+<a class="reference internal" href="falaw.plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> calls it.</p>
+<p>The plan-level escapes are <code class="docutils literal notranslate"><span class="pre">execute_plan(plan,</span> <span class="pre">refresh=True)</span></code>, which
+re-runs every call and <strong>keeps</strong> what it pays for, and
+<code class="docutils literal notranslate"><span class="pre">execute_plan(plan,</span> <span class="pre">use_cache=False)</span></code>, which re-runs and keeps nothing —
+so the second one bills again on the next run (falaw#49). Neither is a
+substitute for this function: both re-bill <em>every</em> call in the plan, and
+this drops the one entry that actually went bad.</p>
+<p>Only the manifest is removed. Blobs in the content store are shared by
+content hash across entries and are never dropped from here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.emit_cache_hit">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">emit_cache_hit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">application</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#emit_cache_hit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.emit_cache_hit" title="Link to this definition">#</a></dt>
+<dd><p>Emit the synthetic <code class="docutils literal notranslate"><span class="pre">cache_hit</span></code> progress event for <code class="docutils literal notranslate"><span class="pre">application</span></code>.</p>
+<p>Shared by <a class="reference internal" href="#falaw.cache.cached_call_fal" title="falaw.cache.cached_call_fal"><code class="xref py py-func docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a> and <a class="reference internal" href="falaw.plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a> (which
+drives the cache directly, because it must decide whether a hit is
+<em>usable</em> before committing to it) so a UI sees one event shape either way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.cache.materialize_asset">
+<span class="sig-prename descclassname"><span class="pre">falaw.cache.</span></span><span class="sig-name descname"><span class="pre">materialize_asset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetcher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/cache.html#materialize_asset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.cache.materialize_asset" title="Link to this definition">#</a></dt>
+<dd><p>Download a remote asset to the cache and return the local path.</p>
+<p>The local filename is content-addressed by the asset’s <strong>bytes</strong>, so two
+URLs serving identical bytes resolve to one file. The extension is a
+presentational hint for ffmpeg/PIL; the SHA-256 is the address.</p>
+<p>Repeat calls are cheap, in three widening circles — this is what makes it
+safe to call from a loop over 200 shots:</p>
+<ol class="arabic simple">
+<li><p>the file is already on disk here (no store lookup, no network) —
+<strong>immutable URLs only</strong>, see below;</p></li>
+<li><p>the bytes are in the content store (no network, or one validating
+round-trip) — so it still works after fal has expired the URL;</p></li>
+<li><p>otherwise, one download.</p></li>
+</ol>
+<p>Circle 1 matters on its own: the content store is prunable, so an asset
+can survive as a materialized file after its blob is gone.</p>
+<p><strong>Circle 1 is taken only when the URL cannot change</strong> — that is,
+<a class="reference internal" href="falaw.content.html#falaw.content.is_immutable_url" title="falaw.content.is_immutable_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.is_immutable_url()</span></code></a> — because reaching it requires
+trusting the <code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">hash</span></code> index to name the <em>current</em> bytes, and for an
+arbitrary caller-supplied URL it does not (thorwhalen/falaw#23). A mutable
+URL goes to circle 2, where <a class="reference internal" href="falaw.content.html#falaw.content.content_ref_for_url" title="falaw.content.content_ref_for_url"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.content_ref_for_url()</span></code></a>
+revalidates before reusing anything; when the bytes really are unchanged
+that costs one conditional request and still no download, and when they
+have changed you get the new file instead of silently getting the old one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – the remote asset URL. <code class="docutils literal notranslate"><span class="pre">file://</span></code> is supported and is used
+deliberately by downstream packages for locally-rendered media.</p></li>
+<li><p><strong>key_hint</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – optional human-readable filename prefix.</p></li>
+<li><p><strong>store</strong> – injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
+<a class="reference internal" href="falaw.content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>.</p></li>
+<li><p><strong>fetcher</strong> – injected byte source (<code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">Iterable[bytes]</span></code>); defaults to
+the <code class="docutils literal notranslate"><span class="pre">urllib</span></code>-based one. The seam for custom transport (auth
+headers, retries) and for a hermetic test suite.</p></li>
+<li><p><strong>refresh</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – re-fetch unconditionally, skipping every circle. Rarely needed
+now: a mutable URL revalidates on its own (falaw#23), so this is for
+an origin that lies about its validators.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="falaw.errors.html#falaw.errors.FalAssetFetchError" title="falaw.errors.FalAssetFetchError"><strong>FalAssetFetchError</strong></a> – the bytes could not be retrieved.
+    Unlike a generated-media artifact (which degrades to URL-only —
+    see <a class="reference internal" href="falaw.plan.html#falaw.plan.execute" title="falaw.plan.execute"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.plan.execute()</span></code></a>), there is nothing to degrade to
+    here: the caller asked for a local file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="falaw.bridges.skill.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">falaw.bridges.skill</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="falaw.canonical.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">falaw.canonical</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.ASSETS_DIRNAME"><code class="docutils literal notranslate"><span class="pre">ASSETS_DIRNAME</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.cache_get"><code class="docutils literal notranslate"><span class="pre">cache_get()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.cache_put"><code class="docutils literal notranslate"><span class="pre">cache_put()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.cache_stats"><code class="docutils literal notranslate"><span class="pre">cache_stats()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.cached_call_fal"><code class="docutils literal notranslate"><span class="pre">cached_call_fal()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.drop_cache_entry"><code class="docutils literal notranslate"><span class="pre">drop_cache_entry()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.emit_cache_hit"><code class="docutils literal notranslate"><span class="pre">emit_cache_hit()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.cache.materialize_asset"><code class="docutils literal notranslate"><span class="pre">materialize_asset()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_autosummary/falaw.cache.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

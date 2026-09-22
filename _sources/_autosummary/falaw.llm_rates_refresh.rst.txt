@@ -1,0 +1,33 @@
+falaw.llm\_rates\_refresh
+=========================
+
+.. automodule:: falaw.llm_rates_refresh
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ANY_LLM_DOC_URL
+      OPENROUTER_MODELS_URL
+      PROPOSED_RATES_FILENAME
+      RATES_DIFF_FILENAME
+      TOKEN_RATE_PRECISION
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      build_proposed_rows
+      diff_llm_rate_tables
+      format_llm_rates_diff
+      parse_any_llm_doc
+      parse_openrouter_models
+      refresh_llm_rates
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AnyLlmDoc
+   

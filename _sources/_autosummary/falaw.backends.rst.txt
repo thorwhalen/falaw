@@ -1,0 +1,19 @@
+falaw.backends
+==============
+
+.. automodule:: falaw.backends
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      BackendExecutor
+      backends
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_backend_executor
+   

@@ -1,0 +1,26 @@
+falaw.base
+==========
+
+.. automodule:: falaw.base
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      TABLE_VERSION_CHARS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      data_table_version
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CostEstimate
+      ModelRecord
+      ToolSpec
+   

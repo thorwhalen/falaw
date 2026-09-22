@@ -1,0 +1,19 @@
+falaw.outcomes
+==============
+
+.. automodule:: falaw.outcomes
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CallStatus
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CallOutcome
+      ExecutionReport
+   

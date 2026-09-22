@@ -1,4 +1,0 @@
-falaw.testing
-=============
-.. automodule:: falaw.testing
-   :members:

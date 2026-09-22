@@ -1,0 +1,14 @@
+falaw.operations.audio
+======================
+
+.. automodule:: falaw.operations.audio
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      generate_audio
+      text_to_speech
+      voice_clone
+   

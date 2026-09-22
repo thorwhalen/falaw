@@ -1,4 +1,0 @@
-falaw.events
-============
-.. automodule:: falaw.events
-   :members:

@@ -1,0 +1,15 @@
+falaw.bridges
+=============
+
+.. automodule:: falaw.bridges
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   mcp
+   service
+   skill

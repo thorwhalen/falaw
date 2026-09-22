@@ -1,0 +1,43 @@
+falaw.plan
+==========
+
+.. automodule:: falaw.plan
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      CacheStatus
+      OutputKind
+      PLAN_DICT_SCHEMA
+      DFLT_FETCH_BYTES
+      FETCH_BYTES_ENVVAR
+      DFLT_CONCURRENCY
+      CONTENT_REF_PREFIX
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      call_plan_from_dict
+      call_plan_to_dict
+      cost_basis_from_dict
+      cost_basis_to_dict
+      execute
+      execute_isolated
+      extract_first_url
+      make_call_plan
+      plan_dependencies
+      plan_from_dict
+      plan_hash
+      plan_to_dict
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CallPlan
+      CostBasis
+      Plan
+   

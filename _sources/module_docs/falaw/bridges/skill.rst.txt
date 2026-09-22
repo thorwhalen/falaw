@@ -1,4 +1,0 @@
-falaw.bridges.skill
-===================
-.. automodule:: falaw.bridges.skill
-   :members:

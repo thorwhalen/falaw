@@ -1,4 +1,0 @@
-falaw.llm_rates_refresh
-=======================
-.. automodule:: falaw.llm_rates_refresh
-   :members:

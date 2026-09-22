@@ -1,4 +1,0 @@
-falaw.cost
-==========
-.. automodule:: falaw.cost
-   :members:

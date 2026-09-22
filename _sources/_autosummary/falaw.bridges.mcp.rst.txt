@@ -1,0 +1,23 @@
+falaw.bridges.mcp
+=================
+
+.. automodule:: falaw.bridges.mcp
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      FREE_TAG
+      COSTED_TOOLS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      build_mcp_server
+      costed_tools
+      register_tools
+      serve
+      unresolved_tool_references
+   

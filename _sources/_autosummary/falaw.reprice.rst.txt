@@ -1,0 +1,31 @@
+falaw.reprice
+=============
+
+.. automodule:: falaw.reprice
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      RepriceStatus
+      CATALOGUE_PRICER
+      LLM_RATES_PRICER
+      DFLT_PRICERS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      catalogue_cost_basis
+      llm_cost_basis
+      reprice_plan
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CallRepricing
+      Pricer
+      RepricedPlan
+   

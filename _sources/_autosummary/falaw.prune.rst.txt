@@ -1,0 +1,24 @@
+falaw.prune
+===========
+
+.. automodule:: falaw.prune
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      cache_usage
+      prune_assets
+      prune_content
+      prune_manifests
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      AreaUsage
+      CacheUsage
+      PruneCandidate
+      PruneReport
+   

@@ -1,0 +1,16 @@
+falaw.operations.render
+=======================
+
+.. automodule:: falaw.operations.render
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      iter_render_scene
+      manifest_path_for
+      render_beat
+      render_scene
+      render_shot
+   

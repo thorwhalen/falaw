@@ -1,0 +1,22 @@
+falaw.operations.llm
+====================
+
+.. automodule:: falaw.operations.llm
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      apply_note_to_beat
+      apply_note_to_scene
+      llm_complete
+      llm_complete_with_receipt
+      parse_screenplay
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      LlmReceipt
+   

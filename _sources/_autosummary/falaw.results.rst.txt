@@ -1,0 +1,19 @@
+falaw.results
+=============
+
+.. automodule:: falaw.results
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      parse_response
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Asset
+      Result
+   

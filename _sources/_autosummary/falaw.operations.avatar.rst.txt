@@ -1,0 +1,14 @@
+falaw.operations.avatar
+=======================
+
+.. automodule:: falaw.operations.avatar
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      animate_face
+      lipsync
+      talking_avatar_from_text
+   

@@ -1,4 +1,0 @@
-falaw.bridges.service
-=====================
-.. automodule:: falaw.bridges.service
-   :members:
