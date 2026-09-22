@@ -213,6 +213,16 @@ Rooted at `<falaw cache dir>/content`, so it moves with
 state. Constructed per call (the constructor only ensures directories
 exist) so a test that re-points the cache dir gets a fresh store.
 
+**Deleting a blob removes it from disk** rather than moving it to the OS
+trash. `dol.Files` — the blob backend `from_directory` lays down —
+trashes by default, including on Linux, which is a kind default for a
+user’s own files and the wrong one here: every blob is derived data, and
+the only thing in falaw that deletes one is [`falaw.prune.prune_content()`](falaw.prune.md#falaw.prune.prune_content),
+whose whole job is to give the volume its space back. A trashed blob frees
+nothing (the trash usually lives on the same volume) while the prune report
+says it did (thorwhalen/falaw#66). The deletion is still an explicit,
+`dry_run`-by-default operator act, so the trash was never the safety net.
+
 ### falaw.content.default_url_fetcher()
 
 The transport used when no `fetcher=` argument is given.

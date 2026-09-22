@@ -44,7 +44,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../_static/documentation_options.js?v=73f2ab08"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
     <link rel="prev" title="falaw.pricing" href="falaw.pricing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.51" />
+  <meta name="docsearch:version" content="0.0.52" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -727,17 +727,29 @@ read <code class="docutils literal notranslate"><span class="pre">rebillable_ent
 <li><p><strong>max_bytes</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>) – drop oldest-first until the area fits in this budget.</p></li>
 <li><p><strong>dry_run</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – report without deleting. Default, deliberately.</p></li>
 <li><p><strong>store</strong> – injected <code class="xref py py-class docutils literal notranslate"><span class="pre">lacing.ArtifactStore</span></code>; defaults to
-<a class="reference internal" href="falaw.content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>.</p></li>
+<a class="reference internal" href="falaw.content.html#falaw.content.default_content_store" title="falaw.content.default_content_store"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.content.default_content_store()</span></code></a>, whose deletes remove
+the file. An injected store keeps its own backend’s delete policy:
+a stock <code class="docutils literal notranslate"><span class="pre">ArtifactStore.from_directory</span></code> store moves each blob to
+the OS trash, which frees no space on that volume even though the
+report counts the bytes as freed.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>with <code class="docutils literal notranslate"><span class="pre">area=&quot;content&quot;</span></code>.</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><em>PruneReport</em></a></p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">PruneReport</span></code></a></span></p>
+</dl>
+<p>Blobs are listed and deleted through lacing’s contained
+<code class="docutils literal notranslate"><span class="pre">iter_blobs</span></code>/<code class="docutils literal notranslate"><span class="pre">delete_blob</span></code> (falaw#66): nothing outside the blob root is
+listed or removed, and an in-root symlink is unlinked, never its target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>with <code class="docutils literal notranslate"><span class="pre">area=&quot;content&quot;</span></code>.</p>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – neither bound was given — see <code class="xref py py-func docutils literal notranslate"><span class="pre">_require_a_bound()</span></code>.</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#falaw.prune.PruneReport" title="falaw.prune.PruneReport"><code class="xref py py-class docutils literal notranslate"><span class="pre">PruneReport</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – neither bound was given — see <code class="xref py py-func docutils literal notranslate"><span class="pre">_require_a_bound()</span></code>.</p>
 </dd>
 </dl>
 <p>Both bounds may be combined; a blob selected by either is dropped.</p>

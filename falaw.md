@@ -1,4 +1,4 @@
-> built 2026-09-22 14:35 UTC from 619bc3f (main) · falaw 0.0.51. Details: build_info.json
+> built 2026-09-22 16:14 UTC from 50b61ff (main) · falaw 0.0.52. Details: build_info.json
 
 # index.html.md
 
@@ -1378,6 +1378,16 @@ Rooted at `<falaw cache dir>/content`, so it moves with
 `$FALAW_CACHE_DIR` / `$FALAW_DATA_DIR` like every other piece of falaw
 state. Constructed per call (the constructor only ensures directories
 exist) so a test that re-points the cache dir gets a fresh store.
+
+**Deleting a blob removes it from disk** rather than moving it to the OS
+trash. `dol.Files` — the blob backend `from_directory` lays down —
+trashes by default, including on Linux, which is a kind default for a
+user’s own files and the wrong one here: every blob is derived data, and
+the only thing in falaw that deletes one is [`falaw.prune.prune_content()`](_autosummary/falaw.prune.html.md#falaw.prune.prune_content),
+whose whole job is to give the volume its space back. A trashed blob frees
+nothing (the trash usually lives on the same volume) while the prune report
+says it did (thorwhalen/falaw#66). The deletion is still an explicit,
+`dry_run`-by-default operator act, so the trash was never the safety net.
 
 ### falaw.content.default_url_fetcher()
 
@@ -3721,6 +3731,16 @@ Rooted at `<falaw cache dir>/content`, so it moves with
 state. Constructed per call (the constructor only ensures directories
 exist) so a test that re-points the cache dir gets a fresh store.
 
+**Deleting a blob removes it from disk** rather than moving it to the OS
+trash. `dol.Files` — the blob backend `from_directory` lays down —
+trashes by default, including on Linux, which is a kind default for a
+user’s own files and the wrong one here: every blob is derived data, and
+the only thing in falaw that deletes one is [`falaw.prune.prune_content()`](_autosummary/falaw.prune.html.md#falaw.prune.prune_content),
+whose whole job is to give the volume its space back. A trashed blob frees
+nothing (the trash usually lives on the same volume) while the prune report
+says it did (thorwhalen/falaw#66). The deletion is still an explicit,
+`dry_run`-by-default operator act, so the trash was never the safety net.
+
 ### falaw.default_url_fetcher()
 
 The transport used when no `fetcher=` argument is given.
@@ -4673,7 +4693,18 @@ read `rebillable_entries`.
   * **max_bytes** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`int`](https://docs.python.org/3/builtins/functions.html#int)]) – drop oldest-first until the area fits in this budget.
   * **dry_run** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – report without deleting. Default, deliberately.
   * **store** – injected `lacing.ArtifactStore`; defaults to
-    [`falaw.content.default_content_store()`](_autosummary/falaw.content.html.md#falaw.content.default_content_store).
+    [`falaw.content.default_content_store()`](_autosummary/falaw.content.html.md#falaw.content.default_content_store), whose deletes remove
+    the file. An injected store keeps its own backend’s delete policy:
+    a stock `ArtifactStore.from_directory` store moves each blob to
+    the OS trash, which frees no space on that volume even though the
+    report counts the bytes as freed.
+* **Return type:**
+  [*PruneReport*](_autosummary/falaw.prune.html.md#falaw.prune.PruneReport)
+
+Blobs are listed and deleted through lacing’s contained
+`iter_blobs`/`delete_blob` (falaw#66): nothing outside the blob root is
+listed or removed, and an in-root symlink is unlinked, never its target.
+
 * **Returns:**
   with `area="content"`.
 * **Return type:**
@@ -7516,7 +7547,18 @@ read `rebillable_entries`.
   * **max_bytes** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`int`](https://docs.python.org/3/builtins/functions.html#int)]) – drop oldest-first until the area fits in this budget.
   * **dry_run** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – report without deleting. Default, deliberately.
   * **store** – injected `lacing.ArtifactStore`; defaults to
-    [`falaw.content.default_content_store()`](_autosummary/falaw.content.html.md#falaw.content.default_content_store).
+    [`falaw.content.default_content_store()`](_autosummary/falaw.content.html.md#falaw.content.default_content_store), whose deletes remove
+    the file. An injected store keeps its own backend’s delete policy:
+    a stock `ArtifactStore.from_directory` store moves each blob to
+    the OS trash, which frees no space on that volume even though the
+    report counts the bytes as freed.
+* **Return type:**
+  [*PruneReport*](_autosummary/falaw.prune.html.md#falaw.prune.PruneReport)
+
+Blobs are listed and deleted through lacing’s contained
+`iter_blobs`/`delete_blob` (falaw#66): nothing outside the blob root is
+listed or removed, and an in-root symlink is unlinked, never its target.
+
 * **Returns:**
   with `area="content"`.
 * **Return type:**
@@ -8718,16 +8760,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-09-22 14:35 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/619bc3f8ca342cc407495a380b121566a1f3d76e"><code>619bc3f</code></a> on branch <code>main</code>, for **falaw 0.0.51** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-09-22 16:14 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/50b61ffebfb6fe76d097afbef9f4c0ef118fb69b"><code>50b61ff</code></a> on branch <code>main</code>, for **falaw 0.0.52** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.52) is behind the latest release on PyPI (0.0.53): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/619bc3f8ca342cc407495a380b121566a1f3d76e"><code>619bc3f8ca342cc407495a380b121566a1f3d76e</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/50b61ffebfb6fe76d097afbef9f4c0ef118fb69b"><code>50b61ffebfb6fe76d097afbef9f4c0ef118fb69b</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8738,9 +8782,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/35741204171">35741204171</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/35752568068">35752568068</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>619bc3f8ca342cc407495a380b121566a1f3d76e</code> (in the history of the built commit) |
+| Event commit | <code>50b61ffebfb6fe76d097afbef9f4c0ef118fb69b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8765,13 +8809,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.51/">0.0.51</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/falaw/0.0.53/">0.0.53</a>, newer than the documented version (0.0.52).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout 619bc3f8ca342cc407495a380b121566a1f3d76e
+git checkout 50b61ffebfb6fe76d097afbef9f4c0ef118fb69b
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

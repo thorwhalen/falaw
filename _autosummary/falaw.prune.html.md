@@ -257,7 +257,18 @@ read `rebillable_entries`.
   * **max_bytes** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`int`](https://docs.python.org/3/builtins/functions.html#int)]) – drop oldest-first until the area fits in this budget.
   * **dry_run** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – report without deleting. Default, deliberately.
   * **store** – injected `lacing.ArtifactStore`; defaults to
-    [`falaw.content.default_content_store()`](falaw.content.html.md#falaw.content.default_content_store).
+    [`falaw.content.default_content_store()`](falaw.content.html.md#falaw.content.default_content_store), whose deletes remove
+    the file. An injected store keeps its own backend’s delete policy:
+    a stock `ArtifactStore.from_directory` store moves each blob to
+    the OS trash, which frees no space on that volume even though the
+    report counts the bytes as freed.
+* **Return type:**
+  [*PruneReport*](#falaw.prune.PruneReport)
+
+Blobs are listed and deleted through lacing’s contained
+`iter_blobs`/`delete_blob` (falaw#66): nothing outside the blob root is
+listed or removed, and an in-root symlink is unlinked, never its target.
+
 * **Returns:**
   with `area="content"`.
 * **Return type:**

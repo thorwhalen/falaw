@@ -1585,6 +1585,16 @@ Rooted at `<falaw cache dir>/content`, so it moves with
 state. Constructed per call (the constructor only ensures directories
 exist) so a test that re-points the cache dir gets a fresh store.
 
+**Deleting a blob removes it from disk** rather than moving it to the OS
+trash. `dol.Files` — the blob backend `from_directory` lays down —
+trashes by default, including on Linux, which is a kind default for a
+user’s own files and the wrong one here: every blob is derived data, and
+the only thing in falaw that deletes one is [`falaw.prune.prune_content()`](falaw.prune.html.md#falaw.prune.prune_content),
+whose whole job is to give the volume its space back. A trashed blob frees
+nothing (the trash usually lives on the same volume) while the prune report
+says it did (thorwhalen/falaw#66). The deletion is still an explicit,
+`dry_run`-by-default operator act, so the trash was never the safety net.
+
 ### falaw.default_url_fetcher()
 
 The transport used when no `fetcher=` argument is given.
@@ -2537,7 +2547,18 @@ read `rebillable_entries`.
   * **max_bytes** ([`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`int`](https://docs.python.org/3/builtins/functions.html#int)]) – drop oldest-first until the area fits in this budget.
   * **dry_run** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – report without deleting. Default, deliberately.
   * **store** – injected `lacing.ArtifactStore`; defaults to
-    [`falaw.content.default_content_store()`](falaw.content.html.md#falaw.content.default_content_store).
+    [`falaw.content.default_content_store()`](falaw.content.html.md#falaw.content.default_content_store), whose deletes remove
+    the file. An injected store keeps its own backend’s delete policy:
+    a stock `ArtifactStore.from_directory` store moves each blob to
+    the OS trash, which frees no space on that volume even though the
+    report counts the bytes as freed.
+* **Return type:**
+  [*PruneReport*](falaw.prune.html.md#falaw.prune.PruneReport)
+
+Blobs are listed and deleted through lacing’s contained
+`iter_blobs`/`delete_blob` (falaw#66): nothing outside the blob root is
+listed or removed, and an in-root symlink is unlinked, never its target.
+
 * **Returns:**
   with `area="content"`.
 * **Return type:**

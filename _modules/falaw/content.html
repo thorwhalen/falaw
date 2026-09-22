@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=440a2162"></script>
+    <script src="../../_static/documentation_options.js?v=73f2ab08"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -410,7 +410,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.51" />
+  <meta name="docsearch:version" content="0.0.52" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1053,12 +1053,26 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ``$FALAW_CACHE_DIR`` / ``$FALAW_DATA_DIR`` like every other piece of falaw</span>
 <span class="sd">    state. Constructed per call (the constructor only ensures directories</span>
 <span class="sd">    exist) so a test that re-points the cache dir gets a fresh store.</span>
+
+<span class="sd">    **Deleting a blob removes it from disk** rather than moving it to the OS</span>
+<span class="sd">    trash. ``dol.Files`` — the blob backend ``from_directory`` lays down —</span>
+<span class="sd">    trashes by default, including on Linux, which is a kind default for a</span>
+<span class="sd">    user's own files and the wrong one here: every blob is derived data, and</span>
+<span class="sd">    the only thing in falaw that deletes one is :func:`falaw.prune.prune_content`,</span>
+<span class="sd">    whose whole job is to give the volume its space back. A trashed blob frees</span>
+<span class="sd">    nothing (the trash usually lives on the same volume) while the prune report</span>
+<span class="sd">    says it did (thorwhalen/falaw#66). The deletion is still an explicit,</span>
+<span class="sd">    ``dry_run``-by-default operator act, so the trash was never the safety net.</span>
 <span class="sd">    """</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">replace</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dol</span><span class="w"> </span><span class="kn">import</span> <span class="n">Files</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">lacing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArtifactStore</span>
 
-    <span class="k">return</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">ArtifactStore</span><span class="o">.</span><span class="n">from_directory</span><span class="p">(</span>
         <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_cache_dir</span><span class="p">(),</span> <span class="n">CONTENT_STORE_DIRNAME</span><span class="p">)</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">replace</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">blobs</span><span class="o">=</span><span class="n">Files</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">blobs</span><span class="o">.</span><span class="n">rootdir</span><span class="p">,</span> <span class="n">delete_func</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">))</span></div>
 
 
 
