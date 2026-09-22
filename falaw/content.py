@@ -323,12 +323,26 @@ def default_content_store():
     ``$FALAW_CACHE_DIR`` / ``$FALAW_DATA_DIR`` like every other piece of falaw
     state. Constructed per call (the constructor only ensures directories
     exist) so a test that re-points the cache dir gets a fresh store.
+
+    **Deleting a blob removes it from disk** rather than moving it to the OS
+    trash. ``dol.Files`` — the blob backend ``from_directory`` lays down —
+    trashes by default, including on Linux, which is a kind default for a
+    user's own files and the wrong one here: every blob is derived data, and
+    the only thing in falaw that deletes one is :func:`falaw.prune.prune_content`,
+    whose whole job is to give the volume its space back. A trashed blob frees
+    nothing (the trash usually lives on the same volume) while the prune report
+    says it did (thorwhalen/falaw#66). The deletion is still an explicit,
+    ``dry_run``-by-default operator act, so the trash was never the safety net.
     """
+    from dataclasses import replace
+
+    from dol import Files
     from lacing import ArtifactStore
 
-    return ArtifactStore.from_directory(
+    store = ArtifactStore.from_directory(
         os.path.join(_cache_dir(), CONTENT_STORE_DIRNAME)
     )
+    return replace(store, blobs=Files(store.blobs.rootdir, delete_func=os.remove))
 
 
 def is_immutable_url(url: str) -> bool:

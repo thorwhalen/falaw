@@ -611,11 +611,12 @@ def _delete(
 
 
 def _blob_candidates(store) -> list[PruneCandidate]:
-    blobs = getattr(store, "blobs", None)
-    if blobs is None:
-        return []
+    # `iter_blobs`, not `iter(store.blobs)`: on a filesystem store the raw
+    # `dol.Files` listing follows symlinked directories, so it can yield files
+    # outside the blob root (falaw#66, lacing#55). Listed up front so the
+    # later deletes do not mutate what is being iterated.
     out = []
-    for content_hash in list(blobs):
+    for content_hash in list(store.iter_blobs()):
         path = store.blob_path(content_hash)
         if path is not None:
             try:
@@ -634,9 +635,12 @@ def _blob_candidates(store) -> list[PruneCandidate]:
             # Opaque backend (in-memory, object store): size is knowable, age
             # is not. `_select` keeps unknown-age blobs unless space forces it.
             try:
-                size = len(blobs[content_hash])
+                data = store.get_blob(content_hash)
             except Exception:  # noqa: BLE001 — an unreadable blob is not prunable data
                 continue
+            if data is None:
+                continue
+            size = len(data)
             out.append(
                 PruneCandidate(
                     key=content_hash, path="", bytes=size, last_modified=None
@@ -704,7 +708,15 @@ def prune_content(
         max_bytes: drop oldest-first until the area fits in this budget.
         dry_run: report without deleting. Default, deliberately.
         store: injected :class:`lacing.ArtifactStore`; defaults to
-            :func:`falaw.content.default_content_store`.
+            :func:`falaw.content.default_content_store`, whose deletes remove
+            the file. An injected store keeps its own backend's delete policy:
+            a stock ``ArtifactStore.from_directory`` store moves each blob to
+            the OS trash, which frees no space on that volume even though the
+            report counts the bytes as freed.
+
+    Blobs are listed and deleted through lacing's contained
+    ``iter_blobs``/``delete_blob`` (falaw#66): nothing outside the blob root is
+    listed or removed, and an in-root symlink is unlinked, never its target.
 
     Returns:
         PruneReport: with ``area="content"``.
@@ -735,7 +747,7 @@ def prune_content(
     deleted: tuple[PruneCandidate, ...] = tuple(doomed)
     errors: tuple[str, ...] = ()
     if not dry_run:
-        deleted, errors = _delete(lambda c: store.blobs.__delitem__(c.key), doomed)
+        deleted, errors = _delete(lambda c: store.delete_blob(c.key), doomed)
 
     return PruneReport(
         area=CONTENT_AREA,

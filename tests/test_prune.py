@@ -620,3 +620,57 @@ def test_summary_says_would_when_it_is_a_dry_run():
 
     wet = prune.prune_content(older_than=90 * DAY, dry_run=False)
     assert "freed" in wet.summary() and "would free" not in wet.summary()
+
+
+# --- containment and real deletion (falaw#66) --------------------------------
+
+
+def test_prune_content_deletes_from_disk_not_to_the_trash(tmp_path, monkeypatch):
+    """A trashed blob frees nothing on the volume while the report says it did."""
+    import dol.trash
+
+    home = tmp_path / "home"
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("XDG_DATA_HOME", str(home / ".local" / "share"))
+
+    # dol falls back to os.remove where it finds no trash (macOS with a fake
+    # HOME, Windows without pywin32), so an empty trash alone proves nothing
+    # there. The trashing default must not even be reached.
+    def _trash_default(path):
+        raise AssertionError(f"dol's trash-by-default delete was used for {path}")
+
+    monkeypatch.setattr(dol.trash, "default_delete_func", _trash_default)
+    content_hash = _put_blob(b"old-bytes", age_s=100 * DAY)
+
+    report = prune.prune_content(older_than=90 * DAY, dry_run=False)
+
+    assert report.errors == ()
+    assert [c.key for c in report.deleted] == [content_hash]
+    trashed = [f for _, _, files in os.walk(home) for f in files]
+    assert trashed == [], f"blob went to the trash instead of off the disk: {trashed}"
+
+
+def test_prune_content_never_lists_or_deletes_outside_the_blob_root(tmp_path):
+    """A symlinked directory in the blob root must not pull outside files in."""
+    from falaw.content import default_content_store
+
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    victim = outside / "precious.bin"
+    victim.write_bytes(b"not a blob")
+    old = time.time() - 100 * DAY
+    os.utime(victim, (old, old))
+
+    store = default_content_store()
+    try:
+        os.symlink(outside, os.path.join(store.blobs.rootdir, "escape"))
+    except (OSError, NotImplementedError):  # Windows without symlink privilege
+        pytest.skip("cannot create symlinks here")
+    content_hash = _put_blob(b"old-bytes", age_s=100 * DAY)
+
+    # `max_bytes=0` selects everything listed, so an escaped file that got
+    # listed (the raw `dol.Files` listing follows the link) would be deleted.
+    report = prune.prune_content(max_bytes=0, dry_run=False, store=store)
+
+    assert [c.key for c in report.candidates] == [content_hash]
+    assert victim.read_bytes() == b"not a blob"
