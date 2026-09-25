@@ -1,0 +1,12 @@
+falaw.schema\_export
+====================
+
+.. automodule:: falaw.schema_export
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      export_schema
+   

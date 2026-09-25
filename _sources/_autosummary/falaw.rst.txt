@@ -197,5 +197,6 @@
    reprice
    results
    scene
+   schema_export
    session
    testing

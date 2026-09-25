@@ -2942,5 +2942,6 @@ Generate speech in a cloned voice.
 | [`reprice`](falaw.reprice.md#module-falaw.reprice)                     | Re-quote a persisted [`falaw.Plan`](#falaw.Plan) at today's rates (falaw#60).         |
 | [`results`](falaw.results.md#module-falaw.results)                     | Result wrapper: parse fal responses into typed assets, lazy download.                                                 |
 | [`scene`](falaw.scene.md#module-falaw.scene)                         | Scene IR: the editable structure that survives all the way to the pixels.                                             |
+| [`schema_export`](falaw.schema_export.md#module-falaw.schema_export)         | Export the Python SSOT as committed JSON for the TypeScript twin (`ts/`).                                             |
 | [`session`](falaw.session.md#module-falaw.session)                     | Session: optional stateful controller over a sequence of falaw operations.                                            |
 | [`testing`](falaw.testing.md#module-falaw.testing)                     | Make a suite that uses falaw genuinely offline — the fake asset transport.                                            |

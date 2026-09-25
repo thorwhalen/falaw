@@ -4,6 +4,12 @@ falaw.cost
 .. automodule:: falaw.cost
 
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      DFLT_MEGAPIXELS
+   
    .. rubric:: Functions
 
    .. autosummary::

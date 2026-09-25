@@ -7,11 +7,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<link rel="alternate" type="text/markdown" href="falaw.local.html.md">
+<link rel="alternate" type="text/markdown" href="falaw.schema_export.html.md">
 <link rel="describedby" href="../llms.txt" type="text/markdown">
-<link rel="alternate" type="text/markdown" href="falaw.local.html.md">
+<link rel="alternate" type="text/markdown" href="falaw.schema_export.html.md">
 <link rel="describedby" href="llms.txt">
-    <title>falaw.local &#8212; falaw</title>
+    <title>falaw.schema_export &#8212; falaw</title>
   
   
   
@@ -48,12 +48,12 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.local';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.schema_export';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="falaw.operations" href="falaw.operations.html" />
-    <link rel="prev" title="falaw.llm_rates_refresh" href="falaw.llm_rates_refresh.html" />
+    <link rel="next" title="falaw.session" href="falaw.session.html" />
+    <link rel="prev" title="falaw.scene" href="falaw.scene.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.53" />
@@ -339,7 +339,7 @@
 <li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
-<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">falaw.local</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="falaw.operations.html">falaw.operations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="falaw.operations.audio.html">falaw.operations.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="falaw.operations.avatar.html">falaw.operations.avatar</a></li>
@@ -359,7 +359,7 @@
 <li class="toctree-l2"><a class="reference internal" href="falaw.reprice.html">falaw.reprice</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.results.html">falaw.results</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.scene.html">falaw.scene</a></li>
-<li class="toctree-l2"><a class="reference internal" href="falaw.schema_export.html">falaw.schema_export</a></li>
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">falaw.schema_export</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.session.html">falaw.session</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.testing.html">falaw.testing</a></li>
 </ul>
@@ -410,7 +410,7 @@
     
     <li class="breadcrumb-item"><a href="falaw.html" class="nav-link">falaw</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.local</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.schema_export</span></li>
   </ul>
 </nav>
 </div>
@@ -427,74 +427,63 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-falaw.local">
-<span id="falaw-local"></span><h1>falaw.local<a class="headerlink" href="#module-falaw.local" title="Link to this heading">#</a></h1>
-<p>Local utilities: ffmpeg + PIL glue for stitching fal outputs.</p>
-<p>The fal calls produce URLs. This module materializes them into local
-files and assembles them into watchable scenes (concat, transitions,
-thumbnails, etc.). Anything that’s cheap to do locally lives here so
-the cloud calls stay focused on generation.</p>
-<p><code class="code docutils literal notranslate"><span class="pre">ffmpeg</span></code> is the one external dependency. The functions raise a clear
-error if it’s missing.</p>
+  <section id="module-falaw.schema_export">
+<span id="falaw-schema-export"></span><h1>falaw.schema_export<a class="headerlink" href="#module-falaw.schema_export" title="Link to this heading">#</a></h1>
+<p>Export the Python SSOT as committed JSON for the TypeScript twin (<code class="docutils literal notranslate"><span class="pre">ts/</span></code>).</p>
+<p>falaw ships twice: as this Python package and as the npm package <code class="docutils literal notranslate"><span class="pre">falaw</span></code>
+(<code class="docutils literal notranslate"><span class="pre">ts/</span></code>), which <em>plans</em> in the browser and <em>executes</em> through a server relay.
+The two must agree on the plan and result shapes, the model catalogue and its
+prices, the cost rules, the model-picking rules, the response parser, and the
+canonical byte-form every hash is taken over. None of that is re-authored on
+the TypeScript side: this module writes it out as JSON, the TS build generates
+its types from the schemas and reads the catalogue as data, and its parity tests
+replay the fixtures below and assert the same output, hash for hash.</p>
+<p>What lands in <code class="docutils literal notranslate"><span class="pre">&lt;out_dir&gt;</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">call-plan.schema.json</span></code>, <code class="docutils literal notranslate"><span class="pre">result.schema.json</span></code>, <code class="docutils literal notranslate"><span class="pre">model-record.schema.json</span></code>
+— the dataclasses as JSON Schema (via <code class="docutils literal notranslate"><span class="pre">pydantic.TypeAdapter</span></code>), the codegen
+inputs for the Zod types.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">models.json</span></code> — the catalogue, <strong>byte for byte</strong>, so the TS side can compute
+the same <code class="docutils literal notranslate"><span class="pre">models_table_version</span></code> digest a <a class="reference internal" href="falaw.html#falaw.CostBasis" title="falaw.CostBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.CostBasis</span></code></a> records.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constants.json</span></code> — the default backend, the plan dict schema tag, the
+catalogue pricer identity, the tier order, the response-kind keys, and the
+literal vocabularies (<code class="docutils literal notranslate"><span class="pre">OutputKind</span></code>, <code class="docutils literal notranslate"><span class="pre">CacheStatus</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fixtures/plans.json</span></code> — planner inputs → the <code class="docutils literal notranslate"><span class="pre">CallPlan</span></code> dict this package
+builds (cost, basis and all) and its <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code>; plus multi-call plans.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fixtures/responses.json</span></code> — raw fal responses → the <code class="docutils literal notranslate"><span class="pre">Result</span></code> this package
+parses them into.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fixtures/pick_model.json</span></code>, <code class="docutils literal notranslate"><span class="pre">fixtures/cost.json</span></code>, <code class="docutils literal notranslate"><span class="pre">fixtures/canonical.json</span></code>
+— model selection, cost estimation, and the canonical blob + SHA-256 for a set
+of payloads (the byte-form parity that makes <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> agree).</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">tests/test_schema_export.py</span></code> pins the committed directory to a fresh export,
+so a change here that forgets <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">falaw</span> <span class="pre">export-schema</span></code> fails CI on this
+side, before the TS side can drift.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">falaw.schema_export</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLAN_CASES</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PLAN_CASES</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"tool"</span><span class="p">]</span>
+<span class="go">'generate_image'</span>
+</pre></div>
+</div>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.local.concatenate_clips" title="falaw.local.concatenate_clips"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concatenate_clips</span></code></a>(clip_urls, *, output_path)</p></td>
-<td><p>Materialize each clip and concatenate into one mp4.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.local.extract_thumbnail" title="falaw.local.extract_thumbnail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_thumbnail</span></code></a>(clip_url, *, output_path)</p></td>
-<td><p>Save a single frame from a clip as a PNG.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_ffmpeg</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.local.overlay_audio" title="falaw.local.overlay_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">overlay_audio</span></code></a>(video_url, audio_url, *, ...)</p></td>
-<td><p>Mix an audio track onto a video clip.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.schema_export.export_schema" title="falaw.schema_export.export_schema"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_schema</span></code></a>([out_dir])</p></td>
+<td><p>Write the JSON contract under <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>; return the paths written.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py function">
-<dt class="sig sig-object py" id="falaw.local.concatenate_clips">
-<span class="sig-prename descclassname"><span class="pre">falaw.local.</span></span><span class="sig-name descname"><span class="pre">concatenate_clips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_urls</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transition_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/local.html#concatenate_clips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.local.concatenate_clips" title="Link to this definition">#</a></dt>
-<dd><p>Materialize each clip and concatenate into one mp4.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>clip_urls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – ordered iterable of fal-served clip URLs (or local paths).</p></li>
-<li><p><strong>output_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – where to write the concatenated mp4.</p></li>
-<li><p><strong>transition_s</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – crossfade duration in seconds (0 = hard cut).</p></li>
-<li><p><strong>audio</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – whether to include audio in the output.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The output path.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="falaw.local.extract_thumbnail">
-<span class="sig-prename descclassname"><span class="pre">falaw.local.</span></span><span class="sig-name descname"><span class="pre">extract_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_url</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">at_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/local.html#extract_thumbnail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.local.extract_thumbnail" title="Link to this definition">#</a></dt>
-<dd><p>Save a single frame from a clip as a PNG.</p>
+<dt class="sig sig-object py" id="falaw.schema_export.export_schema">
+<span class="sig-prename descclassname"><span class="pre">falaw.schema_export.</span></span><span class="sig-name descname"><span class="pre">export_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#falaw.schema_export.export_schema" title="Link to this definition">#</a></dt>
+<dd><p>Write the JSON contract under <code class="docutils literal notranslate"><span class="pre">out_dir</span></code>; return the paths written.</p>
+<p><code class="docutils literal notranslate"><span class="pre">out_dir</span></code> defaults to the <code class="docutils literal notranslate"><span class="pre">schema/</span></code> directory of <em>this checkout</em>. This is
+repository tooling: from an installed wheel (no <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> beside the
+package) it refuses rather than writing a stray <code class="docutils literal notranslate"><span class="pre">schema/</span></code> wherever the shell
+happens to be.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="falaw.local.overlay_audio">
-<span class="sig-prename descclassname"><span class="pre">falaw.local.</span></span><span class="sig-name descname"><span class="pre">overlay_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_url</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_audio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/local.html#overlay_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.local.overlay_audio" title="Link to this definition">#</a></dt>
-<dd><p>Mix an audio track onto a video clip.</p>
-<p>With <code class="docutils literal notranslate"><span class="pre">replace_audio=True</span></code> (default) the original audio is dropped.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -512,20 +501,20 @@ error if it’s missing.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="falaw.llm_rates_refresh.html"
+       href="falaw.scene.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">falaw.llm_rates_refresh</p>
+        <p class="prev-next-title">falaw.scene</p>
       </div>
     </a>
     <a class="right-next"
-       href="falaw.operations.html"
+       href="falaw.session.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">falaw.operations</p>
+        <p class="prev-next-title">falaw.session</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -548,16 +537,14 @@ error if it’s missing.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.local.concatenate_clips"><code class="docutils literal notranslate"><span class="pre">concatenate_clips()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.local.extract_thumbnail"><code class="docutils literal notranslate"><span class="pre">extract_thumbnail()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.local.overlay_audio"><code class="docutils literal notranslate"><span class="pre">overlay_audio()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.schema_export.export_schema"><code class="docutils literal notranslate"><span class="pre">export_schema()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/_autosummary/falaw.local.rst.txt">
+    <a href="../_sources/_autosummary/falaw.schema_export.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

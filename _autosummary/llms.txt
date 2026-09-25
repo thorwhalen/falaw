@@ -43,6 +43,7 @@
 - [falaw.reprice](falaw.reprice.html.md): Re-quote a persisted &#96;falaw.Plan&#96; at today’s rates (falaw#60).
 - [falaw.results](falaw.results.html.md): Result wrapper: parse fal responses into typed assets, lazy download.
 - [falaw.scene](falaw.scene.html.md): Scene IR: the editable structure that survives all the way to the pixels.
+- [falaw.schema_export](falaw.schema_export.html.md): Export the Python SSOT as committed JSON for the TypeScript twin (&#96;ts/&#96;).
 - [falaw.session](falaw.session.html.md): Session: optional stateful controller over a sequence of falaw operations.
 - [falaw.testing](falaw.testing.html.md): Make a suite that uses falaw genuinely offline — the fake asset transport.
 

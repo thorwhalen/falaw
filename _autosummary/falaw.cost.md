@@ -18,6 +18,11 @@ with model fluctuations and provider billing rules, but this is good
 enough to gate on (e.g. `--budget=1.00`) and to surface in
 `muvid status`.
 
+### Module Attributes
+
+| [`DFLT_MEGAPIXELS`](#falaw.cost.DFLT_MEGAPIXELS)   | Pixel budget assumed for a `per_megapixel` call when the caller gives none: a 16:9 canvas 1024 wide (≈0.59 MP), enough for a useful upper-bound estimate.   |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`estimate_call_cost`](#falaw.cost.estimate_call_cost)(record, \*[, count, ...])       | Cost of one fal call against `record`.                       |
@@ -48,6 +53,12 @@ Sum per `kind` for quick inspection.
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### falaw.cost.DFLT_MEGAPIXELS *= 0.6*
+
+Pixel budget assumed for a `per_megapixel` call when the caller gives none:
+a 16:9 canvas 1024 wide (≈0.59 MP), enough for a useful upper-bound estimate.
+Exported to the TypeScript twin, which must assume the same.
 
 ### falaw.cost.estimate_call_cost(record, , count=1, seconds=None, megapixels=None, tokens=None)
 

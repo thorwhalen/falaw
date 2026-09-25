@@ -1,4 +1,4 @@
-> built 2026-09-22 16:14 UTC from 50b61ff (main) · falaw 0.0.52. Details: build_info.json
+> built 2026-09-25 09:50 UTC from cdd456c (main) · falaw 0.0.53. Details: build_info.json
 
 # index.html.md
 
@@ -37,6 +37,26 @@ adds:
 pip install -e .
 export FAL_KEY="your-fal-api-key"
 ```
+
+### From the browser
+
+The planning half of this package ships to npm as **`falaw`** (the `ts/`
+directory): the catalogue with its prices, the cost rules, `CallPlan` and
+`plan_hash` are generated from and pinned to this package, and execution goes
+through a server relay because fal.ai forbids browser-held keys.
+
+```ts
+import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw';
+const plan = makePlan([planGenerateImage({ prompt: 'a tiger eye', quality: 'fast' })]);
+totalCostUsd(plan);  // before any network
+await execute(plan, { transport: queueTransport({ proxyUrl: '/api/fal/proxy', key }) });
+```
+
+See [`ts/README.md`](). After changing a dataclass, the catalogue,
+a cost rule, `parse_response` or the canonical byte-form, run
+`python -m falaw export-schema`, then `cd ts && npm run codegen`, and commit
+both — `tests/test_schema_export.py` and `ts/src/codegen.test.ts` fail until
+you do.
 
 ## Core surface
 
@@ -1700,6 +1720,11 @@ with model fluctuations and provider billing rules, but this is good
 enough to gate on (e.g. `--budget=1.00`) and to surface in
 `muvid status`.
 
+### Module Attributes
+
+| [`DFLT_MEGAPIXELS`](_autosummary/falaw.cost.html.md#falaw.cost.DFLT_MEGAPIXELS)   | Pixel budget assumed for a `per_megapixel` call when the caller gives none: a 16:9 canvas 1024 wide (≈0.59 MP), enough for a useful upper-bound estimate.   |
+|--------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
 ### Functions
 
 | [`estimate_call_cost`](_autosummary/falaw.cost.html.md#falaw.cost.estimate_call_cost)(record, \*[, count, ...])       | Cost of one fal call against `record`.                       |
@@ -1730,6 +1755,12 @@ Sum per `kind` for quick inspection.
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`float`](https://docs.python.org/3/builtins/functions.html#float)]
+
+### falaw.cost.DFLT_MEGAPIXELS *= 0.6*
+
+Pixel budget assumed for a `per_megapixel` call when the caller gives none:
+a 16:9 canvas 1024 wide (≈0.59 MP), enough for a useful upper-bound estimate.
+Exported to the TypeScript twin, which must assume the same.
 
 ### falaw.cost.estimate_call_cost(record, , count=1, seconds=None, megapixels=None, tokens=None)
 
@@ -5088,6 +5119,7 @@ Generate speech in a cloned voice.
 | [`reprice`](_autosummary/falaw.reprice.html.md#module-falaw.reprice)                     | Re-quote a persisted [`falaw.Plan`](_autosummary/falaw.html.md#falaw.Plan) at today's rates (falaw#60).         |
 | [`results`](_autosummary/falaw.results.html.md#module-falaw.results)                     | Result wrapper: parse fal responses into typed assets, lazy download.                                                 |
 | [`scene`](_autosummary/falaw.scene.html.md#module-falaw.scene)                         | Scene IR: the editable structure that survives all the way to the pixels.                                             |
+| [`schema_export`](_autosummary/falaw.schema_export.html.md#module-falaw.schema_export)         | Export the Python SSOT as committed JSON for the TypeScript twin (`ts/`).                                             |
 | [`session`](_autosummary/falaw.session.html.md#module-falaw.session)                     | Session: optional stateful controller over a sequence of falaw operations.                                            |
 | [`testing`](_autosummary/falaw.testing.html.md#module-falaw.testing)                     | Make a suite that uses falaw genuinely offline — the fake asset transport.                                            |
 
@@ -8280,6 +8312,67 @@ Inverse of asdict: reconstruct a Scene from a plain dict.
   [`Scene`](_autosummary/falaw.scene.html.md#falaw.scene.Scene)
 
 
+# _autosummary/falaw.schema_export.html.md
+
+# falaw.schema_export
+
+Export the Python SSOT as committed JSON for the TypeScript twin (`ts/`).
+
+falaw ships twice: as this Python package and as the npm package `falaw`
+(`ts/`), which *plans* in the browser and *executes* through a server relay.
+The two must agree on the plan and result shapes, the model catalogue and its
+prices, the cost rules, the model-picking rules, the response parser, and the
+canonical byte-form every hash is taken over. None of that is re-authored on
+the TypeScript side: this module writes it out as JSON, the TS build generates
+its types from the schemas and reads the catalogue as data, and its parity tests
+replay the fixtures below and assert the same output, hash for hash.
+
+What lands in `<out_dir>`:
+
+- `call-plan.schema.json`, `result.schema.json`, `model-record.schema.json`
+  — the dataclasses as JSON Schema (via `pydantic.TypeAdapter`), the codegen
+  inputs for the Zod types.
+- `models.json` — the catalogue, **byte for byte**, so the TS side can compute
+  the same `models_table_version` digest a [`falaw.CostBasis`](_autosummary/falaw.html.md#falaw.CostBasis) records.
+- `constants.json` — the default backend, the plan dict schema tag, the
+  catalogue pricer identity, the tier order, the response-kind keys, and the
+  literal vocabularies (`OutputKind`, `CacheStatus`).
+- `fixtures/plans.json` — planner inputs → the `CallPlan` dict this package
+  builds (cost, basis and all) and its `plan_hash`; plus multi-call plans.
+- `fixtures/responses.json` — raw fal responses → the `Result` this package
+  parses them into.
+- `fixtures/pick_model.json`, `fixtures/cost.json`, `fixtures/canonical.json`
+  — model selection, cost estimation, and the canonical blob + SHA-256 for a set
+  of payloads (the byte-form parity that makes `plan_hash` agree).
+
+`tests/test_schema_export.py` pins the committed directory to a fresh export,
+so a change here that forgets `python -m falaw export-schema` fails CI on this
+side, before the TS side can drift.
+
+```pycon
+>>> from falaw.schema_export import PLAN_CASES
+>>> PLAN_CASES[0]["tool"]
+'generate_image'
+```
+
+### Functions
+
+| [`export_schema`](_autosummary/falaw.schema_export.html.md#falaw.schema_export.export_schema)([out_dir])   | Write the JSON contract under `out_dir`; return the paths written.   |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------|
+
+### falaw.schema_export.export_schema(out_dir=None)
+
+Write the JSON contract under `out_dir`; return the paths written.
+
+`out_dir` defaults to the `schema/` directory of *this checkout*. This is
+repository tooling: from an installed wheel (no `pyproject.toml` beside the
+package) it refuses rather than writing a stray `schema/` wherever the shell
+happens to be.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]
+
+
 # _autosummary/falaw.session.html.md
 
 # falaw.session
@@ -8760,18 +8853,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-09-22 16:14 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/50b61ffebfb6fe76d097afbef9f4c0ef118fb69b"><code>50b61ff</code></a> on branch <code>main</code>, for **falaw 0.0.52** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-09-25 09:50 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/cdd456c604b490ebc486dc0bef06dd9c7046c676"><code>cdd456c</code></a> on branch <code>main</code>, for **falaw 0.0.53** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.52) is behind the latest release on PyPI (0.0.53): `pip install falaw` gives newer code than these docs describe.
+- The documented version (0.0.53) is behind the latest release on PyPI (0.0.54): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/50b61ffebfb6fe76d097afbef9f4c0ef118fb69b"><code>50b61ffebfb6fe76d097afbef9f4c0ef118fb69b</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/cdd456c604b490ebc486dc0bef06dd9c7046c676"><code>cdd456c604b490ebc486dc0bef06dd9c7046c676</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8782,9 +8875,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/35752568068">35752568068</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/36120478158">36120478158</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>50b61ffebfb6fe76d097afbef9f4c0ef118fb69b</code> (in the history of the built commit) |
+| Event commit | <code>cdd456c604b490ebc486dc0bef06dd9c7046c676</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8809,13 +8902,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.53/">0.0.53</a>, newer than the documented version (0.0.52).
+Latest release: <a href="https://pypi.org/project/falaw/0.0.54/">0.0.54</a>, newer than the documented version (0.0.53).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout 50b61ffebfb6fe76d097afbef9f4c0ef118fb69b
+git checkout cdd456c604b490ebc486dc0bef06dd9c7046c676
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
