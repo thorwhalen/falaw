@@ -336,7 +336,13 @@ def _schema_of(tp) -> dict:
 
     schema = TypeAdapter(tp).json_schema()
     _add_factory_defaults(schema, tp)
+    # A dataclass docstring is documentation, not contract, and whether it is
+    # emitted as ``description`` depends on the pydantic version (2.13 started
+    # to). Drop it at the object level so the committed export is identical
+    # across versions; field-level descriptions, when declared, stay.
+    schema.pop("description", None)
     for name, sub in schema.get("$defs", {}).items():
+        sub.pop("description", None)
         if name in _NESTED_DATACLASSES:
             _add_factory_defaults(sub, _NESTED_DATACLASSES[name])
     return schema

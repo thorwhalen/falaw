@@ -1,1 +1,4 @@
 *.ipynb linguist-documentation
+# JSON tables are hashed (falaw.base.data_table_version, the schema/ export): keep the
+# bytes identical on every platform, so no CRLF conversion on Windows checkouts.
+*.json text eol=lf
