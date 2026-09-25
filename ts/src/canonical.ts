@@ -8,10 +8,14 @@
  * represent faithfully throws `FalNonCanonicalArgument`, so the failure is a diagnosable
  * refusal at plan time rather than a wrong artifact at collect time.
  *
- * The one known divergence, recorded in the decision record: a number with an integral
- * value serialises as `1` here and as `1.0` in Python when Python holds a float. Every
- * planner on either side emits ints for integral quantities, and `schema/fixtures/canonical.json`
- * pins the rest.
+ * Known divergences, all in NUMBER spelling and all recorded in the decision record: an
+ * integral-valued float (`1.0` in Python, `1` here); floats below 1e-4 (`1e-05` vs `0.00001`)
+ * or in [1e16, 1e21) (`1e+16` vs `10000000000000000`), where the two languages switch to
+ * exponent form at different thresholds; and integers beyond 2^53, which JavaScript cannot
+ * hold exactly. None can come out of a prompt (a string); only `extra` or `durationS` can
+ * carry one, and the divergence is consistent across the wire — the browser hashes what it
+ * sends, and a server recomputes from the JSON it receives. `schema/fixtures/canonical.json`
+ * pins everything else: key order (by code point, at every depth), escaping, nesting.
  */
 
 import { FalNonCanonicalArgument } from './errors';
@@ -81,9 +85,8 @@ function serialize(value: Json): string {
 }
 
 function serializeNumber(n: number): string {
-  // Python's repr(float) and JS's Number#toString agree on the shortest round-trip digits;
-  // they differ only in exponent thresholds (Python switches at 1e16, JS at 1e21), which no
-  // planner argument reaches. Integral values are the documented divergence (module docstring).
+  // Shortest round-trip digits on both sides; the spelling differs only in the cases the
+  // module docstring lists (integral floats, exponent thresholds, ints beyond 2^53).
   return String(n);
 }
 

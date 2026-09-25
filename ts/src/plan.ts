@@ -8,6 +8,7 @@
  */
 
 import { canonicalBlob, ensureCanonical, planIdentityPayload, sha256Hex } from './canonical';
+import { FalError } from './errors';
 import { catalogueCostBasis, estimateCallCost, type CostBasis } from './cost';
 import { CONSTANTS } from './generated/constants';
 import type { CallPlan } from './generated/call-plan';
@@ -33,22 +34,31 @@ export interface MakeCallPlanOptions {
   readonly expectedDurationS?: readonly [number, number] | null;
   readonly metadata?: Readonly<Record<string, unknown>> | null;
   readonly costBasis?: CostBasis | null;
+  /** Identity beyond the wire arguments (nw's Transform `impl_version`): joins the cache
+   *  key and `plan_hash` only when non-empty, exactly as on the Python side. */
+  readonly keyExtra?: Readonly<Record<string, unknown>> | null;
 }
 
 /** Build a `CallPlan`, refusing non-canonical arguments while planning is still free. */
 export function makeCallPlan(opts: MakeCallPlanOptions): CallPlan {
   ensureCanonical({ ...opts.arguments }, 'arguments');
+  if (opts.keyExtra) ensureCanonical({ ...opts.keyExtra }, 'key_extra');
+  const cost = opts.estimatedCostUsd ?? null;
+  // Python's CallPlan.__post_init__ refuses these; a NaN here would read as a *known* cost.
+  if (cost !== null && !(Number.isFinite(cost) && cost >= 0)) {
+    throw new FalError(`estimated_cost_usd must be a finite number >= 0 or null, got ${String(cost)}`);
+  }
   const plan: CallPlan = {
     tool: opts.tool,
     application: opts.application,
     backend: opts.backend ?? CONSTANTS.dflt_backend,
     arguments: { ...opts.arguments },
     output_kind: opts.outputKind,
-    estimated_cost_usd: opts.estimatedCostUsd ?? null,
+    estimated_cost_usd: cost,
     cache_status: 'unknown',
     expected_duration_s: opts.expectedDurationS ? [...opts.expectedDurationS] : null,
     metadata: { ...(opts.metadata ?? {}) },
-    key_extra: {},
+    key_extra: { ...(opts.keyExtra ?? {}) },
     // Python omits the key when unset; `null` here parses identically on that side
     // (`call_plan_from_dict`) and keeps the TS type one shape. Never hashed either way.
     cost_basis: opts.costBasis ?? null,
@@ -120,10 +130,15 @@ export function makePlan(calls: readonly CallPlan[]): Plan {
   return { schema: CONSTANTS.plan_dict_schema, calls: [...calls] };
 }
 
-/** Sum of the known per-call estimates; calls with unknown cost contribute nothing —
- *  read `hasUnknownCosts` before trusting the total as a ceiling. */
+/** What a call will bill: nothing on a cache hit, its estimate otherwise, `0` when
+ *  unknown — so read `hasUnknownCosts` before trusting a total as a ceiling. */
+export function billableCostUsd(call: CallPlan): number {
+  return call.cache_status === 'hit' ? 0 : (call.estimated_cost_usd ?? 0);
+}
+
+/** Sum of `billableCostUsd` over the plan (Python's `Plan.total_cost_usd`). */
 export function totalCostUsd(plan: Plan): number {
-  return plan.calls.reduce((sum, c) => sum + (c.estimated_cost_usd ?? 0), 0);
+  return plan.calls.reduce((sum, c) => sum + billableCostUsd(c), 0);
 }
 
 export function hasUnknownCosts(plan: Plan): boolean {

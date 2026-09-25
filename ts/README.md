@@ -39,7 +39,7 @@ A `Transport` is one function `(call, ctx) => Promise<{ raw, requestId? }>`, so 
 
 `CallPlan` is `falaw.call_plan_to_dict`'s shape: `tool`, `application`, `backend`, `arguments`, `output_kind`, `estimated_cost_usd` (`null` when unknown), `cache_status` (always `"unknown"` in a browser: there is no cache to peek), `expected_duration_s`, `metadata`, `key_extra`, and `cost_basis` (which record, which quantities, which catalogue version priced it, so it can be re-quoted later). `planHash` is SHA-256 over the same canonical bytes Python uses.
 
-One known divergence: an integral-valued float (`1.0`) serialises as `1` here and `1.0` in Python, so such a plan hashes differently on the two sides. The hash is an idempotency handle; a server recomputes it from the plan it receives.
+Known divergences, all in how a *number* is spelled: an integral-valued float (`1.0` in Python, `1` here), floats below 1e-4 or in [1e16, 1e21) (different exponent thresholds), and integers beyond 2^53. A prompt cannot trigger any of them; only `extra` or `durationS` can, and a plan still hashes consistently across the wire because the browser hashes what it sends and a server recomputes from the JSON it receives.
 
 ## How it stays in step with Python
 

@@ -64,6 +64,7 @@ interface QueueSubmission {
   request_id?: string;
   status_url?: string;
   response_url?: string;
+  cancel_url?: string;
 }
 
 interface QueueStatus {
@@ -79,7 +80,7 @@ export function queueTransport(opts: QueueTransportOptions = {}): Transport {
   const timeout = opts.timeoutMs ?? DFLT_TIMEOUT_MS;
   const readKey = () => (typeof opts.key === 'function' ? opts.key() : opts.key) ?? null;
 
-  async function request(method: 'GET' | 'POST', target: string, body: unknown, signal?: AbortSignal): Promise<Json> {
+  async function request(method: 'GET' | 'POST' | 'PUT', target: string, body: unknown, signal?: AbortSignal): Promise<Json> {
     const key = readKey();
     const headers = new Headers({ Accept: 'application/json' });
     if (body !== undefined) headers.set('Content-Type', 'application/json');
@@ -96,42 +97,78 @@ export function queueTransport(opts: QueueTransportOptions = {}): Transport {
     try {
       response = await doFetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), signal });
     } catch (e) {
+      if (signal?.aborted || (e as Error).name === 'AbortError') throw abortError(signal);
       throw new FalError(`fal request failed: ${(e as Error).message ?? String(e)}`);
     }
     if (!response.ok) throw new FalError(`fal ${method} ${target}: ${await shortBody(response)}`, response.status);
-    return (await response.json()) as Json;
+    let decoded: unknown;
+    try {
+      decoded = await response.json();
+    } catch {
+      // The classic misroute: a wrong `proxyUrl` answered by an SPA's index.html with 200.
+      throw new FalError(`fal ${method} ${target}: the reply was not JSON — is \`proxyUrl\` (${opts.proxyUrl ?? 'direct'}) the relay?`, response.status);
+    }
+    if (typeof decoded !== 'object' || decoded === null || Array.isArray(decoded)) {
+      throw new FalError(`fal ${method} ${target}: unexpected reply type ${Array.isArray(decoded) ? 'array' : typeof decoded}`, response.status);
+    }
+    return decoded as Json;
+  }
+
+  /** Best-effort: tell fal to stop a job we will no longer collect, so it stops billing. */
+  async function cancel(submitted: QueueSubmission, signal?: AbortSignal): Promise<void> {
+    if (!submitted.cancel_url) return;
+    try {
+      await request('PUT', submitted.cancel_url, undefined, signal);
+    } catch {
+      // the caller is already on an error path; a failed cancel adds nothing actionable
+    }
   }
 
   return async (call, ctx) => {
     const { signal } = ctx;
-    const submitted = (await request('POST', `${base}/${call.application}`, call.arguments, signal)) as QueueSubmission;
+    const { application } = call;
+    const fail = (error: FalError): never => {
+      ctx.onEvent?.({ kind: 'error', application, message: error.message });
+      throw error;
+    };
+    let submitted: QueueSubmission;
+    try {
+      submitted = (await request('POST', `${base}/${application}`, call.arguments, signal)) as QueueSubmission;
+    } catch (e) {
+      return fail(e instanceof FalError ? e : new FalError(String(e)));
+    }
     const requestId = submitted.request_id;
     if (!submitted.status_url || !submitted.response_url) {
-      // Some endpoints answer synchronously with the result itself.
-      ctx.onEvent?.({ kind: 'done', application: call.application, requestId });
-      return { raw: submitted as Json, requestId };
+      // The queue host never answers synchronously; a 2xx JSON without the queue
+      // fields is a relay speaking for itself ({"detail": "quota exceeded"} with 200).
+      return fail(
+        new FalError(`fal queue did not accept the request: ${JSON.stringify(submitted).slice(0, 300)}`),
+      );
     }
-    ctx.onEvent?.({ kind: 'queued', application: call.application, requestId });
+    ctx.onEvent?.({ kind: 'queued', application, requestId });
     const deadline = Date.now() + timeout;
-    for (;;) {
-      const status = (await request('GET', submitted.status_url, undefined, signal)) as QueueStatus;
-      ctx.onEvent?.({
-        kind: 'progress',
-        application: call.application,
-        requestId,
-        status: status.status,
-        queuePosition: status.queue_position,
-      });
-      if (status.status === 'COMPLETED') break;
-      if (status.status && status.status !== 'IN_QUEUE' && status.status !== 'IN_PROGRESS') {
-        throw new FalError(`fal request ${requestId ?? ''} ended with status ${status.status}`);
+    try {
+      for (;;) {
+        const status = (await request('GET', submitted.status_url, undefined, signal)) as QueueStatus;
+        ctx.onEvent?.({ kind: 'progress', application, requestId, status: status.status, queuePosition: status.queue_position });
+        if (status.status === 'COMPLETED') break;
+        if (status.status && status.status !== 'IN_QUEUE' && status.status !== 'IN_PROGRESS') {
+          throw new FalError(`fal request ${requestId ?? ''} ended with status ${status.status}`);
+        }
+        if (Date.now() > deadline) {
+          await cancel(submitted);
+          throw new FalError(`fal request ${requestId ?? ''} timed out after ${timeout} ms (cancel requested)`);
+        }
+        await sleep(pollInterval, signal);
       }
-      if (Date.now() > deadline) throw new FalError(`fal request ${requestId ?? ''} timed out after ${timeout} ms`);
-      await sleep(pollInterval, signal);
+      const raw = await request('GET', submitted.response_url, undefined, signal);
+      ctx.onEvent?.({ kind: 'done', application, requestId });
+      return { raw, requestId };
+    } catch (e) {
+      const error = e instanceof FalError ? e : new FalError(String(e));
+      if (signal?.aborted) await cancel(submitted); // stop billing for a job nobody will collect
+      return fail(error);
     }
-    const raw = await request('GET', submitted.response_url, undefined, signal);
-    ctx.onEvent?.({ kind: 'done', application: call.application, requestId });
-    return { raw, requestId };
   };
 }
 
@@ -144,14 +181,16 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     }, ms);
     function onAbort() {
       clearTimeout(t);
-      reject(abortError(signal!));
+      reject(abortError(signal));
     }
     signal?.addEventListener('abort', onAbort, { once: true });
   });
 }
 
-function abortError(signal: AbortSignal): Error {
-  return signal.reason instanceof Error ? signal.reason : new FalError('fal request aborted');
+/** One error for one user action, whether the abort landed during a fetch or a sleep. */
+function abortError(signal?: AbortSignal): FalError {
+  const reason = signal?.reason;
+  return new FalError(`fal request aborted${reason instanceof Error ? `: ${reason.message}` : reason ? `: ${String(reason)}` : ''}`);
 }
 
 async function shortBody(response: Response): Promise<string> {

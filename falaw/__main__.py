@@ -59,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
     if cmd == "export-schema":
         from .schema_export import export_schema
 
-        for path in export_schema(rest[0] if rest else "schema"):
+        for path in export_schema(rest[0] if rest else None):
             print(path)
         return 0
     print(f"Unknown command: {cmd}", file=sys.stderr)

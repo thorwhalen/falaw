@@ -25,6 +25,7 @@ export {
   planImageToVideo,
   makePlan,
   totalCostUsd,
+  billableCostUsd,
   hasUnknownCosts,
   planHash,
 } from './plan';

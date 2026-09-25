@@ -38,6 +38,8 @@ Documentation = "https://thorwhalen.github.io/falaw"
 
 [project.optional-dependencies]
 dev = [
+    # falaw.schema_export (repo tooling: the TS twin's contract) and its test.
+    "pydantic>=2.12",
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.1.0",

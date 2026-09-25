@@ -114,3 +114,62 @@ describe('queueTransport', () => {
     ).rejects.not.toThrow(/SECRET/);
   });
 });
+
+describe('review-driven edges', () => {
+  it('a cache hit bills nothing, and a NaN or negative estimate is refused', async () => {
+    const { billableCostUsd, makeCallPlan, totalCostUsd } = await import('./plan');
+    const { callPlanSchema } = await import('./generated/call-plan');
+    const hit = callPlanSchema.parse({ ...planGenerateImage({ prompt: 'x' }), cache_status: 'hit' });
+    expect(billableCostUsd(hit)).toBe(0);
+    expect(totalCostUsd(makePlan([hit]))).toBe(0);
+    const base = { tool: 't', application: 'a/b', arguments: {}, outputKind: 'image' as const };
+    expect(() => makeCallPlan({ ...base, estimatedCostUsd: Number.NaN })).toThrow(FalError);
+    expect(() => makeCallPlan({ ...base, estimatedCostUsd: -1 })).toThrow(FalError);
+    expect(makeCallPlan({ ...base, keyExtra: { impl_version: '3' } }).key_extra).toEqual({ impl_version: '3' });
+  });
+
+  it('a relay answering non-JSON or a 200 without queue fields is an error, not a result', async () => {
+    const html = (async () => new Response('<!doctype html><title>app</title>', { status: 200 })) as typeof globalThis.fetch;
+    await expect(
+      execute([planGenerateImage({ prompt: 'x' })], { transport: queueTransport({ proxyUrl: '/wrong', fetch: html }) }),
+    ).rejects.toThrow(/not JSON.*proxyUrl/);
+    const quota = (async () => new Response('{"detail":"quota exceeded"}', { status: 200 })) as typeof globalThis.fetch;
+    await expect(
+      execute([planGenerateImage({ prompt: 'x' })], { transport: queueTransport({ proxyUrl: '/api/fal/proxy', fetch: quota }) }),
+    ).rejects.toThrow(/did not accept.*quota exceeded/);
+  });
+
+  it('an abort is one FalError whether it lands in a fetch or between polls, and cancels the job', async () => {
+    const calls: string[] = [];
+    const controller = new AbortController();
+    const fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const target = new Headers(init?.headers).get('x-fal-target-url') ?? String(input);
+      calls.push(`${init?.method} ${target}`);
+      if (target.endsWith('/cancel')) return new Response('{}', { status: 200 });
+      if (target.endsWith('/status')) {
+        controller.abort(); // abort lands during the following sleep
+        return new Response(JSON.stringify({ status: 'IN_QUEUE' }), { status: 200 });
+      }
+      return new Response(
+        JSON.stringify({ request_id: 'r', status_url: 'https://queue.fal.run/x/requests/r/status', response_url: 'https://queue.fal.run/x/requests/r', cancel_url: 'https://queue.fal.run/x/requests/r/cancel' }),
+        { status: 200 },
+      );
+    }) as typeof globalThis.fetch;
+    const events: string[] = [];
+    await expect(
+      execute([planGenerateImage({ prompt: 'x' })], {
+        transport: queueTransport({ key: 'k', fetch, pollIntervalMs: 50 }),
+        signal: controller.signal,
+        onEvent: (e) => events.push(e.kind),
+      }),
+    ).rejects.toThrow(/aborted/);
+    expect(calls.some((c) => c === 'PUT https://queue.fal.run/x/requests/r/cancel')).toBe(true);
+    expect(events.at(-1)).toBe('error');
+  });
+
+  it('never reaches the network by default (the vitest guard)', async () => {
+    await expect(
+      execute([planGenerateImage({ prompt: 'x' })], { transport: queueTransport({ key: 'k' }) }),
+    ).rejects.toThrow(/offline test/);
+  });
+});

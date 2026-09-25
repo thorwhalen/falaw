@@ -289,9 +289,15 @@ IDENTITY_CASES: tuple[dict, ...] = (
 )
 
 
-def export_schema(out_dir: "str | Path" = "schema") -> list[Path]:
-    """Write the JSON contract under ``out_dir``; return the paths written."""
-    out = Path(out_dir)
+def export_schema(out_dir: "str | Path | None" = None) -> list[Path]:
+    """Write the JSON contract under ``out_dir``; return the paths written.
+
+    ``out_dir`` defaults to the ``schema/`` directory of *this checkout*. This is
+    repository tooling: from an installed wheel (no ``pyproject.toml`` beside the
+    package) it refuses rather than writing a stray ``schema/`` wherever the shell
+    happens to be.
+    """
+    out = _resolve_out_dir(out_dir)
     fixtures = out / "fixtures"
     fixtures.mkdir(parents=True, exist_ok=True)
     return [
@@ -306,6 +312,19 @@ def export_schema(out_dir: "str | Path" = "schema") -> list[Path]:
         _write(fixtures / "cost.json", _cost_fixtures()),
         _write(fixtures / "canonical.json", _canonical_fixtures()),
     ]
+
+
+def _resolve_out_dir(out_dir: "str | Path | None") -> Path:
+    if out_dir is not None:
+        return Path(out_dir)
+    root = Path(__file__).resolve().parent.parent
+    if not (root / "pyproject.toml").exists():
+        raise FileNotFoundError(
+            "export-schema is repository tooling: no checkout found next to this "
+            f"package ({root}). Run it from a clone of thorwhalen/falaw, or pass "
+            "out_dir explicitly."
+        )
+    return root / "schema"
 
 
 # --- schemas --------------------------------------------------------------------
@@ -341,11 +360,29 @@ def _schema_of(tp) -> dict:
     # to). Drop it at the object level so the committed export is identical
     # across versions; field-level descriptions, when declared, stay.
     schema.pop("description", None)
+    _items_from_prefix_items(schema)
     for name, sub in schema.get("$defs", {}).items():
         sub.pop("description", None)
         if name in _NESTED_DATACLASSES:
             _add_factory_defaults(sub, _NESTED_DATACLASSES[name])
     return schema
+
+
+def _items_from_prefix_items(schema: dict) -> None:
+    """Express a uniform ``prefixItems`` (a ``tuple[float, float]``) as ``items``.
+
+    json-schema-to-zod cannot render ``prefixItems`` and types the tuple as
+    ``z.array(z.any())``; as ``items`` with the min/max bounds it emits
+    ``z.array(z.number()).min(2).max(2)``, as close to the tuple as Zod v4 codegen gets.
+    """
+    for prop in schema.get("properties", {}).values():
+        for branch in [prop, *prop.get("anyOf", [])]:
+            prefix = branch.get("prefixItems")
+            if prefix and "items" not in branch and all(p == prefix[0] for p in prefix):
+                # `items` REPLACES `prefixItems`: json-schema-to-zod prefers the
+                # latter and, unable to render it, falls back to z.any().
+                branch["items"] = dict(prefix[0])
+                del branch["prefixItems"]
 
 
 def _add_factory_defaults(schema: dict, tp) -> None:
