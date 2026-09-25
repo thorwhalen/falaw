@@ -1,0 +1,91 @@
+[
+  {
+    "cost_estimate": null,
+    "count": 1,
+    "expected": null
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.05,
+      "kind": "per_call"
+    },
+    "count": 1,
+    "expected": 0.05
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.05,
+      "kind": "per_call"
+    },
+    "count": 3,
+    "expected": 0.15000000000000002
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.04,
+      "kind": "per_image"
+    },
+    "count": 2,
+    "expected": 0.08
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.08,
+      "kind": "per_second"
+    },
+    "count": 1,
+    "expected": null
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.08,
+      "kind": "per_second"
+    },
+    "count": 1,
+    "expected": 0.48,
+    "seconds": 6
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.08,
+      "kind": "per_second"
+    },
+    "count": 2,
+    "expected": 0.88,
+    "seconds": 5.5
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.025,
+      "kind": "per_megapixel"
+    },
+    "count": 1,
+    "expected": 0.015
+  },
+  {
+    "cost_estimate": {
+      "amount": 0.025,
+      "kind": "per_megapixel"
+    },
+    "count": 1,
+    "expected": 0.037500000000000006,
+    "megapixels": 1.5
+  },
+  {
+    "cost_estimate": {
+      "amount": 2e-06,
+      "kind": "per_token"
+    },
+    "count": 1,
+    "expected": null
+  },
+  {
+    "cost_estimate": {
+      "amount": 2e-06,
+      "kind": "per_token"
+    },
+    "count": 1,
+    "expected": 0.003,
+    "tokens": 1500
+  }
+]

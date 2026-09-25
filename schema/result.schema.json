@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "Asset": {
+      "properties": {
+        "content_type": {
+          "default": "",
+          "title": "Content Type",
+          "type": "string"
+        },
+        "duration_s": {
+          "default": 0.0,
+          "title": "Duration S",
+          "type": "number"
+        },
+        "height": {
+          "default": 0,
+          "title": "Height",
+          "type": "integer"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Metadata",
+          "type": "object"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "width": {
+          "default": 0,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "url",
+        "kind"
+      ],
+      "title": "Asset",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "application": {
+      "default": "",
+      "title": "Application",
+      "type": "string"
+    },
+    "arguments": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Arguments",
+      "type": "object"
+    },
+    "assets": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Asset"
+      },
+      "title": "Assets",
+      "type": "array"
+    },
+    "raw": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Raw",
+      "type": "object"
+    }
+  },
+  "title": "Result",
+  "type": "object"
+}

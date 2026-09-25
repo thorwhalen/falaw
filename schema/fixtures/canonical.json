@@ -1,0 +1,165 @@
+{
+  "blobs": [
+    {
+      "blob": "{}",
+      "payload": {},
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "blob": "[]",
+      "payload": [],
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "blob": "{\"a\": [1, 2.5, \"\\u00e9\", true, null, {\"x\": \"y\", \"y\": \"x\"}], \"b\": 1}",
+      "payload": {
+        "a": [
+          1,
+          2.5,
+          "é",
+          true,
+          null,
+          {
+            "x": "y",
+            "y": "x"
+          }
+        ],
+        "b": 1
+      },
+      "sha256": "d9a19d1c3914f7239b1329d216c3ccd47b80d7571b5ed48a683bd8a0d68839e7"
+    },
+    {
+      "blob": "{\"app\": \"fal-ai/flux/dev\", \"args\": {\"prompt\": \"caf\\u00e9 at dusk \\u2615 \\u2014 35mm\", \"seed\": 7}}",
+      "payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "café at dusk ☕ — 35mm",
+          "seed": 7
+        }
+      },
+      "sha256": "fcc5ee8ac6e2d8ac52deabeb0aa77bc5bb5b7b5291fac7230da7f50df29d558a"
+    },
+    {
+      "blob": "{\"nested\": {\"deep\": {\"deeper\": [{\"a\": \"\\u2028 line sep\", \"z\": 0.1}]}}, \"tab\": \"a\\tb\\n\"}",
+      "payload": {
+        "nested": {
+          "deep": {
+            "deeper": [
+              {
+                "a": "  line sep",
+                "z": 0.1
+              }
+            ]
+          }
+        },
+        "tab": "a\tb\n"
+      },
+      "sha256": "7562a3bbe5d9ac052498dc1e7c2402e9d13a6f24ed040e8603fd2e28380f32ba"
+    },
+    {
+      "blob": "[\"<from 0>\", {\"image_url\": \"<from 0>\"}]",
+      "payload": [
+        "<from 0>",
+        {
+          "image_url": "<from 0>"
+        }
+      ],
+      "sha256": "face3a59697a90fb544676f7be8e112707f936758b8fb36aa179db8fd99d9cf2"
+    }
+  ],
+  "identities": [
+    {
+      "application": "fal-ai/flux/dev",
+      "arguments": {
+        "prompt": "x"
+      },
+      "cache_key_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        }
+      },
+      "plan_identity_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "tool": "generate_image"
+      },
+      "tool": "generate_image"
+    },
+    {
+      "application": "fal-ai/flux/dev",
+      "arguments": {
+        "prompt": "x"
+      },
+      "backend": "comfyui",
+      "cache_key_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "backend": "comfyui"
+      },
+      "plan_identity_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "backend": "comfyui",
+        "tool": "generate_image"
+      },
+      "tool": "generate_image"
+    },
+    {
+      "application": "fal-ai/flux/dev",
+      "arguments": {
+        "prompt": "x"
+      },
+      "cache_key_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "key_extra": {
+          "impl_version": "3"
+        }
+      },
+      "key_extra": {
+        "impl_version": "3"
+      },
+      "plan_identity_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "key_extra": {
+          "impl_version": "3"
+        },
+        "tool": "generate_image"
+      },
+      "tool": "generate_image"
+    },
+    {
+      "application": "fal-ai/flux/dev",
+      "arguments": {
+        "prompt": "x"
+      },
+      "cache_key_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        }
+      },
+      "key_extra": {},
+      "plan_identity_payload": {
+        "app": "fal-ai/flux/dev",
+        "args": {
+          "prompt": "x"
+        },
+        "tool": null
+      },
+      "tool": null
+    }
+  ]
+}

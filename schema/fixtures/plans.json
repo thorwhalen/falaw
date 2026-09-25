@@ -1,0 +1,499 @@
+{
+  "calls": [
+    {
+      "expected": {
+        "application": "fal-ai/flux/dev",
+        "arguments": {
+          "image_size": "landscape_4_3",
+          "prompt": "a tiger eye, macro, 35mm"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/flux/dev",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.015,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "image",
+        "tool": "generate_image"
+      },
+      "input": {
+        "prompt": "a tiger eye, macro, 35mm"
+      },
+      "plan_hash": "bad76b4c204b1f1dc02def9385a5be1907224210eedb76d05f374e2a39e0501c",
+      "tool": "generate_image"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/flux/schnell",
+        "arguments": {
+          "image_size": "landscape_4_3",
+          "prompt": "a tiger eye"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/flux/schnell",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.0018,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "image",
+        "tool": "generate_image"
+      },
+      "input": {
+        "prompt": "a tiger eye",
+        "quality": "fast"
+      },
+      "plan_hash": "b501f61f20d2bed8ff6d7fa836eafae67c68b9462a85c3d4c90dc8d5bf1b5fc4",
+      "tool": "generate_image"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/flux-pro/v1.1-ultra",
+        "arguments": {
+          "image_size": "square_hd",
+          "prompt": "a tiger eye"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/flux-pro/v1.1-ultra",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.06,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "image",
+        "tool": "generate_image"
+      },
+      "input": {
+        "image_size": "square_hd",
+        "prompt": "a tiger eye",
+        "quality": "ultra"
+      },
+      "plan_hash": "228992262c669e4c3f3bed152f6bc31d35c325e4dba35961c0bf8f2a076924ae",
+      "tool": "generate_image"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/flux/dev",
+        "arguments": {
+          "guidance_scale": 3.5,
+          "image_size": "landscape_4_3",
+          "nested": {
+            "a": "é",
+            "none": null,
+            "ok": true,
+            "z": 1
+          },
+          "prompt": "café at dusk ☕",
+          "seed": 7,
+          "tags": [
+            "b",
+            "a"
+          ]
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/flux/dev",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.015,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "image",
+        "tool": "generate_image"
+      },
+      "input": {
+        "extra": {
+          "guidance_scale": 3.5,
+          "nested": {
+            "a": "é",
+            "none": null,
+            "ok": true,
+            "z": 1
+          },
+          "seed": 7,
+          "tags": [
+            "b",
+            "a"
+          ]
+        },
+        "model_id": "flux-dev",
+        "prompt": "café at dusk ☕"
+      },
+      "plan_hash": "07247381f6254bfc4c199e52e222b8d59e16032c436630a8faf2f0f330b68edb",
+      "tool": "generate_image"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/flux/dev",
+        "arguments": {
+          "image_size": "landscape_4_3",
+          "prompt": "a tiger eye"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/flux/dev",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.015,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {
+          "n": 2,
+          "panel": "p3"
+        },
+        "output_kind": "image",
+        "tool": "generate_image"
+      },
+      "input": {
+        "metadata": {
+          "n": 2,
+          "panel": "p3"
+        },
+        "prompt": "a tiger eye"
+      },
+      "plan_hash": "345b0cf66a70ce9f57012aac3d297171c781fdabf32fd2c27a2588625b3a0860",
+      "tool": "generate_image"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+        "arguments": {
+          "image_url": "https://x.example/tiger.png"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+          "pricer": "model_catalogue",
+          "quantities": {},
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": null,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "video",
+        "tool": "image_to_video"
+      },
+      "input": {
+        "image_url": "https://x.example/tiger.png"
+      },
+      "plan_hash": "d996b24ca8ead40f80a10df7ef59ed76ec09467feb21bba058e76828404ee668",
+      "tool": "image_to_video"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+        "arguments": {
+          "image_url": "https://x.example/tiger.png",
+          "prompt": "slow push in"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+          "pricer": "model_catalogue",
+          "quantities": {
+            "seconds": 6
+          },
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 1.2000000000000002,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "video",
+        "tool": "image_to_video"
+      },
+      "input": {
+        "duration_s": 6,
+        "image_url": "https://x.example/tiger.png",
+        "prompt": "slow push in"
+      },
+      "plan_hash": "e69783c1b485f9ac0912084c83c2aa202e2a0054b7e2ea1bb6a824132983ea0b",
+      "tool": "image_to_video"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/kling-video/v2.1/master/image-to-video",
+        "arguments": {
+          "image_url": "https://x.example/tiger.png"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/kling-video/v2.1/master/image-to-video",
+          "pricer": "model_catalogue",
+          "quantities": {
+            "seconds": 5.5
+          },
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 1.54,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "video",
+        "tool": "image_to_video"
+      },
+      "input": {
+        "duration_s": 5.5,
+        "image_url": "https://x.example/tiger.png",
+        "quality": "ultra"
+      },
+      "plan_hash": "8db6390a46128502f1adf70f03b7ca7d7fe6e34bb3d761618d40d659f6050b39",
+      "tool": "image_to_video"
+    },
+    {
+      "expected": {
+        "application": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+        "arguments": {
+          "image_url": "<from 0>"
+        },
+        "backend": "fal",
+        "cache_status": "unknown",
+        "cost_basis": {
+          "priced": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+          "pricer": "model_catalogue",
+          "quantities": {
+            "seconds": 6
+          },
+          "table": "falaw/data/models.json",
+          "table_version": "daa1188cd0be"
+        },
+        "estimated_cost_usd": 0.48,
+        "expected_duration_s": null,
+        "key_extra": {},
+        "metadata": {},
+        "output_kind": "video",
+        "tool": "image_to_video"
+      },
+      "input": {
+        "duration_s": 6,
+        "image_url": "<from 0>",
+        "model_id": "hailuo-pro"
+      },
+      "plan_hash": "aad83965a0ccf53d11dfc521ce122afe95ee1b1dbf353d6fb033aa02b9f08900",
+      "tool": "image_to_video"
+    }
+  ],
+  "plans": [
+    {
+      "calls": [
+        0,
+        5
+      ],
+      "expected": {
+        "calls": [
+          {
+            "application": "fal-ai/flux/dev",
+            "arguments": {
+              "image_size": "landscape_4_3",
+              "prompt": "a tiger eye, macro, 35mm"
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/flux/dev",
+              "pricer": "model_catalogue",
+              "quantities": {},
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": 0.015,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "image",
+            "tool": "generate_image"
+          },
+          {
+            "application": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+            "arguments": {
+              "image_url": "https://x.example/tiger.png"
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+              "pricer": "model_catalogue",
+              "quantities": {},
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": null,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "video",
+            "tool": "image_to_video"
+          }
+        ],
+        "schema": "falaw.plan/v1"
+      },
+      "has_unknown_costs": true,
+      "plan_hash": "c0c83f604efd6666600e1783de94e3e46a1fa532c620eaa874d96d38199c1544",
+      "total_cost_usd": 0.015
+    },
+    {
+      "calls": [
+        3,
+        8
+      ],
+      "expected": {
+        "calls": [
+          {
+            "application": "fal-ai/flux/dev",
+            "arguments": {
+              "guidance_scale": 3.5,
+              "image_size": "landscape_4_3",
+              "nested": {
+                "a": "é",
+                "none": null,
+                "ok": true,
+                "z": 1
+              },
+              "prompt": "café at dusk ☕",
+              "seed": 7,
+              "tags": [
+                "b",
+                "a"
+              ]
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/flux/dev",
+              "pricer": "model_catalogue",
+              "quantities": {},
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": 0.015,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "image",
+            "tool": "generate_image"
+          },
+          {
+            "application": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+            "arguments": {
+              "image_url": "<from 0>"
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+              "pricer": "model_catalogue",
+              "quantities": {
+                "seconds": 6
+              },
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": 0.48,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "video",
+            "tool": "image_to_video"
+          }
+        ],
+        "schema": "falaw.plan/v1"
+      },
+      "has_unknown_costs": false,
+      "plan_hash": "dfad244fc17dbe4c91e34225f07806e247f8d6a27aca9527c76885c4c97f9f7a",
+      "total_cost_usd": 0.495
+    },
+    {
+      "calls": [
+        1,
+        1
+      ],
+      "expected": {
+        "calls": [
+          {
+            "application": "fal-ai/flux/schnell",
+            "arguments": {
+              "image_size": "landscape_4_3",
+              "prompt": "a tiger eye"
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/flux/schnell",
+              "pricer": "model_catalogue",
+              "quantities": {},
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": 0.0018,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "image",
+            "tool": "generate_image"
+          },
+          {
+            "application": "fal-ai/flux/schnell",
+            "arguments": {
+              "image_size": "landscape_4_3",
+              "prompt": "a tiger eye"
+            },
+            "backend": "fal",
+            "cache_status": "unknown",
+            "cost_basis": {
+              "priced": "fal-ai/flux/schnell",
+              "pricer": "model_catalogue",
+              "quantities": {},
+              "table": "falaw/data/models.json",
+              "table_version": "daa1188cd0be"
+            },
+            "estimated_cost_usd": 0.0018,
+            "expected_duration_s": null,
+            "key_extra": {},
+            "metadata": {},
+            "output_kind": "image",
+            "tool": "generate_image"
+          }
+        ],
+        "schema": "falaw.plan/v1"
+      },
+      "has_unknown_costs": false,
+      "plan_hash": "a5ac9060ff83af35fe616d393e25a4773848f9fc8e708356fb23db3582351f42",
+      "total_cost_usd": 0.0036
+    }
+  ]
+}

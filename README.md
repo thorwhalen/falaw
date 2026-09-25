@@ -32,6 +32,26 @@ pip install -e .
 export FAL_KEY="your-fal-api-key"
 ```
 
+### From the browser
+
+The planning half of this package ships to npm as **`falaw`** (the `ts/`
+directory): the catalogue with its prices, the cost rules, `CallPlan` and
+`plan_hash` are generated from and pinned to this package, and execution goes
+through a server relay because fal.ai forbids browser-held keys.
+
+```ts
+import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw';
+const plan = makePlan([planGenerateImage({ prompt: 'a tiger eye', quality: 'fast' })]);
+totalCostUsd(plan);  // before any network
+await execute(plan, { transport: queueTransport({ proxyUrl: '/api/fal/proxy', key }) });
+```
+
+See [`ts/README.md`](ts/README.md). After changing a dataclass, the catalogue,
+a cost rule, `parse_response` or the canonical byte-form, run
+`python -m falaw export-schema`, then `cd ts && npm run codegen`, and commit
+both — `tests/test_schema_export.py` and `ts/src/codegen.test.ts` fail until
+you do.
+
 ## Core surface
 
 | Function | Purpose |

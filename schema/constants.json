@@ -1,0 +1,60 @@
+{
+  "cache_statuses": [
+    "hit",
+    "miss",
+    "stale",
+    "unknown"
+  ],
+  "catalogue_pricer": "model_catalogue",
+  "content_ref_prefix": "sha256:",
+  "default_megapixels": 0.6,
+  "dflt_backend": "fal",
+  "kind_keys": [
+    [
+      "images",
+      "image"
+    ],
+    [
+      "image",
+      "image"
+    ],
+    [
+      "videos",
+      "video"
+    ],
+    [
+      "video",
+      "video"
+    ],
+    [
+      "audios",
+      "audio"
+    ],
+    [
+      "audio",
+      "audio"
+    ],
+    [
+      "audio_url",
+      "audio"
+    ]
+  ],
+  "model_catalogue_table": "falaw/data/models.json",
+  "models_table_version": "daa1188cd0be",
+  "output_kinds": [
+    "image",
+    "video",
+    "audio",
+    "json",
+    "text",
+    "binary"
+  ],
+  "placeholder_prefix": "<from ",
+  "plan_dict_schema": "falaw.plan/v1",
+  "tier_order": [
+    "fast",
+    "balanced",
+    "high",
+    "ultra"
+  ]
+}

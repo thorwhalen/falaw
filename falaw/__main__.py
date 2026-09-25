@@ -8,6 +8,8 @@ Commands:
                          (never overwrites the committed table).
   state                 Print the saved refresh state (etags, last fetch).
   regen-skill           Regenerate the Claude SKILL.md from the registry.
+  export-schema [DIR]   Write the JSON contract the TypeScript twin (ts/)
+                         is generated from (default DIR: schema).
 """
 
 from __future__ import annotations
@@ -53,6 +55,12 @@ def main(argv: list[str] | None = None) -> int:
             os.path.join(repo_root, ".claude", "skills", "falaw"),
         ):
             print("wrote", write_skill_files(d))
+        return 0
+    if cmd == "export-schema":
+        from .schema_export import export_schema
+
+        for path in export_schema(rest[0] if rest else None):
+            print(path)
         return 0
     print(f"Unknown command: {cmd}", file=sys.stderr)
     return 2

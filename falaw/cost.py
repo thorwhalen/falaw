@@ -56,6 +56,12 @@ class CostRollup:
         return out
 
 
+DFLT_MEGAPIXELS = 0.6
+"""Pixel budget assumed for a ``per_megapixel`` call when the caller gives none:
+a 16:9 canvas 1024 wide (≈0.59 MP), enough for a useful upper-bound estimate.
+Exported to the TypeScript twin, which must assume the same."""
+
+
 def estimate_call_cost(
     record: ModelRecord,
     *,
@@ -98,7 +104,7 @@ def estimate_call_cost(
     if ce.kind == "per_megapixel":
         # Default to a 16:9 1024-wide canvas if the caller didn't say
         # (≈0.59 MP); enough to give a useful upper-bound estimate.
-        mp = megapixels if megapixels is not None else 0.6
+        mp = megapixels if megapixels is not None else DFLT_MEGAPIXELS
         return ce.amount * mp * count
     if ce.kind == "per_token":
         if tokens is None:

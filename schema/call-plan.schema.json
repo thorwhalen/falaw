@@ -1,0 +1,141 @@
+{
+  "$defs": {
+    "CostBasis": {
+      "properties": {
+        "priced": {
+          "title": "Priced",
+          "type": "string"
+        },
+        "pricer": {
+          "title": "Pricer",
+          "type": "string"
+        },
+        "quantities": {
+          "additionalProperties": true,
+          "default": {},
+          "title": "Quantities",
+          "type": "object"
+        },
+        "table": {
+          "default": "",
+          "title": "Table",
+          "type": "string"
+        },
+        "table_version": {
+          "default": "",
+          "title": "Table Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "pricer",
+        "priced"
+      ],
+      "title": "CostBasis",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "application": {
+      "title": "Application",
+      "type": "string"
+    },
+    "arguments": {
+      "additionalProperties": true,
+      "title": "Arguments",
+      "type": "object"
+    },
+    "backend": {
+      "default": "fal",
+      "title": "Backend",
+      "type": "string"
+    },
+    "cache_status": {
+      "default": "unknown",
+      "enum": [
+        "hit",
+        "miss",
+        "stale",
+        "unknown"
+      ],
+      "title": "Cache Status",
+      "type": "string"
+    },
+    "cost_basis": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CostBasis"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "estimated_cost_usd": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Estimated Cost Usd"
+    },
+    "expected_duration_s": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "number"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Duration S"
+    },
+    "key_extra": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Key Extra",
+      "type": "object"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Metadata",
+      "type": "object"
+    },
+    "output_kind": {
+      "enum": [
+        "image",
+        "video",
+        "audio",
+        "json",
+        "text",
+        "binary"
+      ],
+      "title": "Output Kind",
+      "type": "string"
+    },
+    "tool": {
+      "title": "Tool",
+      "type": "string"
+    }
+  },
+  "required": [
+    "tool",
+    "application",
+    "arguments",
+    "output_kind"
+  ],
+  "title": "CallPlan",
+  "type": "object"
+}

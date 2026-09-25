@@ -1,0 +1,152 @@
+[
+  {
+    "category": "image",
+    "error": null,
+    "expected": "fal-ai/flux/schnell",
+    "quality_tier": "fast"
+  },
+  {
+    "category": "image",
+    "error": null,
+    "expected": "fal-ai/flux/dev",
+    "quality_tier": "balanced"
+  },
+  {
+    "category": "image",
+    "error": null,
+    "expected": "fal-ai/flux-pro/v1.1",
+    "quality_tier": "high"
+  },
+  {
+    "category": "image",
+    "error": null,
+    "expected": "fal-ai/flux-pro/v1.1-ultra",
+    "quality_tier": "ultra"
+  },
+  {
+    "category": "image",
+    "error": null,
+    "expected": "fal-ai/flux/dev",
+    "quality_tier": "weird"
+  },
+  {
+    "category": "image_edit",
+    "error": null,
+    "expected": "fal-ai/flux-kontext/dev",
+    "quality_tier": "fast"
+  },
+  {
+    "category": "image_edit",
+    "error": null,
+    "expected": "fal-ai/flux-kontext/dev",
+    "quality_tier": "balanced"
+  },
+  {
+    "category": "image_edit",
+    "error": null,
+    "expected": "fal-ai/bytedance/seededit/v3/edit-image",
+    "quality_tier": "high"
+  },
+  {
+    "category": "image_edit",
+    "error": null,
+    "expected": "fal-ai/flux-pro/kontext/max",
+    "quality_tier": "ultra"
+  },
+  {
+    "category": "image_edit",
+    "error": null,
+    "expected": "fal-ai/flux-kontext/dev",
+    "quality_tier": "weird"
+  },
+  {
+    "category": "image_to_video",
+    "error": null,
+    "expected": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+    "quality_tier": "fast"
+  },
+  {
+    "category": "image_to_video",
+    "error": null,
+    "expected": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+    "quality_tier": "balanced"
+  },
+  {
+    "category": "image_to_video",
+    "error": null,
+    "expected": "fal-ai/bytedance/seedance/v1/pro/image-to-video",
+    "quality_tier": "high"
+  },
+  {
+    "category": "image_to_video",
+    "error": null,
+    "expected": "fal-ai/kling-video/v2.1/master/image-to-video",
+    "quality_tier": "ultra"
+  },
+  {
+    "category": "image_to_video",
+    "error": null,
+    "expected": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+    "quality_tier": "weird"
+  },
+  {
+    "category": "text_to_video",
+    "error": null,
+    "expected": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+    "quality_tier": "fast"
+  },
+  {
+    "category": "text_to_video",
+    "error": null,
+    "expected": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+    "quality_tier": "balanced"
+  },
+  {
+    "category": "text_to_video",
+    "error": null,
+    "expected": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+    "quality_tier": "high"
+  },
+  {
+    "category": "text_to_video",
+    "error": null,
+    "expected": "fal-ai/veo3",
+    "quality_tier": "ultra"
+  },
+  {
+    "category": "text_to_video",
+    "error": null,
+    "expected": "fal-ai/bytedance/seedance/v1/pro/text-to-video",
+    "quality_tier": "weird"
+  },
+  {
+    "category": "tts",
+    "error": null,
+    "expected": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "quality_tier": "fast"
+  },
+  {
+    "category": "tts",
+    "error": null,
+    "expected": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "quality_tier": "balanced"
+  },
+  {
+    "category": "tts",
+    "error": null,
+    "expected": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "quality_tier": "high"
+  },
+  {
+    "category": "tts",
+    "error": null,
+    "expected": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "quality_tier": "ultra"
+  },
+  {
+    "category": "tts",
+    "error": null,
+    "expected": "fal-ai/elevenlabs/tts/multilingual-v2",
+    "quality_tier": "weird"
+  }
+]
