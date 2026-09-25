@@ -1,0 +1,293 @@
+[
+  {
+    "application": "fal-ai/flux/dev",
+    "arguments": {
+      "prompt": "a tiger eye"
+    },
+    "expected": {
+      "application": "fal-ai/flux/dev",
+      "arguments": {
+        "prompt": "a tiger eye"
+      },
+      "assets": [
+        {
+          "content_type": "image/png",
+          "duration_s": 0.0,
+          "height": 768,
+          "kind": "image",
+          "metadata": {},
+          "url": "https://v3.fal.media/a.png",
+          "width": 1024
+        },
+        {
+          "content_type": "image/png",
+          "duration_s": 0.0,
+          "height": 768,
+          "kind": "image",
+          "metadata": {
+            "nsfw": false
+          },
+          "url": "https://v3.fal.media/b.png",
+          "width": 1024
+        }
+      ],
+      "raw": {
+        "has_nsfw_concepts": [
+          false,
+          false
+        ],
+        "images": [
+          {
+            "content_type": "image/png",
+            "height": 768,
+            "url": "https://v3.fal.media/a.png",
+            "width": 1024
+          },
+          {
+            "content_type": "image/png",
+            "height": 768,
+            "nsfw": false,
+            "url": "https://v3.fal.media/b.png",
+            "width": 1024
+          }
+        ],
+        "prompt": "a tiger eye",
+        "seed": 42,
+        "timings": {
+          "inference": 1.2
+        }
+      }
+    },
+    "raw": {
+      "has_nsfw_concepts": [
+        false,
+        false
+      ],
+      "images": [
+        {
+          "content_type": "image/png",
+          "height": 768,
+          "url": "https://v3.fal.media/a.png",
+          "width": 1024
+        },
+        {
+          "content_type": "image/png",
+          "height": 768,
+          "nsfw": false,
+          "url": "https://v3.fal.media/b.png",
+          "width": 1024
+        }
+      ],
+      "prompt": "a tiger eye",
+      "seed": 42,
+      "timings": {
+        "inference": 1.2
+      }
+    }
+  },
+  {
+    "application": "fal-ai/some/model",
+    "arguments": {},
+    "expected": {
+      "application": "fal-ai/some/model",
+      "arguments": {},
+      "assets": [
+        {
+          "content_type": "",
+          "duration_s": 0.0,
+          "height": 512,
+          "kind": "image",
+          "metadata": {},
+          "url": "https://v3.fal.media/one.jpg",
+          "width": 512
+        }
+      ],
+      "raw": {
+        "image": {
+          "height": 512,
+          "url": "https://v3.fal.media/one.jpg",
+          "width": 512
+        }
+      }
+    },
+    "raw": {
+      "image": {
+        "height": 512,
+        "url": "https://v3.fal.media/one.jpg",
+        "width": 512
+      }
+    }
+  },
+  {
+    "application": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+    "arguments": {
+      "image_url": "https://x.example/tiger.png"
+    },
+    "expected": {
+      "application": "fal-ai/minimax/hailuo-02/pro/image-to-video",
+      "arguments": {
+        "image_url": "https://x.example/tiger.png"
+      },
+      "assets": [
+        {
+          "content_type": "video/mp4",
+          "duration_s": 6.0,
+          "height": 0,
+          "kind": "video",
+          "metadata": {
+            "fps": 25
+          },
+          "url": "https://v3.fal.media/clip.mp4",
+          "width": 0
+        }
+      ],
+      "raw": {
+        "video": {
+          "content_type": "video/mp4",
+          "duration": 6.0,
+          "fps": 25,
+          "url": "https://v3.fal.media/clip.mp4"
+        }
+      }
+    },
+    "raw": {
+      "video": {
+        "content_type": "video/mp4",
+        "duration": 6.0,
+        "fps": 25,
+        "url": "https://v3.fal.media/clip.mp4"
+      }
+    }
+  },
+  {
+    "application": "fal-ai/tts",
+    "arguments": {
+      "text": "hi"
+    },
+    "expected": {
+      "application": "fal-ai/tts",
+      "arguments": {
+        "text": "hi"
+      },
+      "assets": [
+        {
+          "content_type": "",
+          "duration_s": 0.0,
+          "height": 0,
+          "kind": "audio",
+          "metadata": {},
+          "url": "https://v3.fal.media/say.mp3",
+          "width": 0
+        }
+      ],
+      "raw": {
+        "audio_url": "https://v3.fal.media/say.mp3"
+      }
+    },
+    "raw": {
+      "audio_url": "https://v3.fal.media/say.mp3"
+    }
+  },
+  {
+    "application": "fal-ai/mixed",
+    "arguments": {},
+    "expected": {
+      "application": "fal-ai/mixed",
+      "arguments": {},
+      "assets": [
+        {
+          "content_type": "",
+          "duration_s": 0.0,
+          "height": 0,
+          "kind": "image",
+          "metadata": {},
+          "url": "https://v3.fal.media/bare.png",
+          "width": 0
+        },
+        {
+          "content_type": "",
+          "duration_s": 0.0,
+          "height": 0,
+          "kind": "video",
+          "metadata": {},
+          "url": "https://v3.fal.media/v.mp4",
+          "width": 0
+        }
+      ],
+      "raw": {
+        "extra": 1,
+        "images": [
+          "https://v3.fal.media/bare.png"
+        ],
+        "videos": [
+          {
+            "url": "https://v3.fal.media/v.mp4"
+          }
+        ]
+      }
+    },
+    "raw": {
+      "extra": 1,
+      "images": [
+        "https://v3.fal.media/bare.png"
+      ],
+      "videos": [
+        {
+          "url": "https://v3.fal.media/v.mp4"
+        }
+      ]
+    }
+  },
+  {
+    "application": "fal-ai/odd",
+    "arguments": {},
+    "expected": {
+      "application": "fal-ai/odd",
+      "arguments": {},
+      "assets": [],
+      "raw": {
+        "output": {
+          "url": "https://v3.fal.media/unknown.bin"
+        }
+      }
+    },
+    "raw": {
+      "output": {
+        "url": "https://v3.fal.media/unknown.bin"
+      }
+    }
+  },
+  {
+    "application": "fal-ai/odd",
+    "arguments": {},
+    "expected": {
+      "application": "fal-ai/odd",
+      "arguments": {},
+      "assets": [
+        {
+          "content_type": "",
+          "duration_s": 0.0,
+          "height": 0,
+          "kind": "image",
+          "metadata": {},
+          "url": "",
+          "width": 10
+        }
+      ],
+      "raw": {
+        "images": [
+          {
+            "width": 10
+          }
+        ]
+      }
+    },
+    "raw": {
+      "images": [
+        {
+          "width": 10
+        }
+      ]
+    }
+  }
+]

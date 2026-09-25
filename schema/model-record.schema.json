@@ -1,0 +1,129 @@
+{
+  "$defs": {
+    "CostEstimate": {
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "number"
+        },
+        "currency": {
+          "default": "USD",
+          "title": "Currency",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "per_call",
+            "per_image",
+            "per_second",
+            "per_token",
+            "per_megapixel"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        },
+        "source": {
+          "default": "approximate",
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "amount"
+      ],
+      "title": "CostEstimate",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "aliases": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Aliases",
+      "type": "array"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "cost_estimate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CostEstimate"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "cost_hint": {
+      "default": "",
+      "title": "Cost Hint",
+      "type": "string"
+    },
+    "default_negative_prompt": {
+      "default": "",
+      "title": "Default Negative Prompt",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "docs_url": {
+      "default": "",
+      "title": "Docs Url",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "max_clip_seconds": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Clip Seconds"
+    },
+    "quality_tier": {
+      "default": "",
+      "title": "Quality Tier",
+      "type": "string"
+    },
+    "single_character_recommended": {
+      "default": false,
+      "title": "Single Character Recommended",
+      "type": "boolean"
+    },
+    "supported_resolutions": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Supported Resolutions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "category"
+  ],
+  "title": "ModelRecord",
+  "type": "object"
+}
