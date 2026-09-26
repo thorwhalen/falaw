@@ -1,6 +1,6 @@
 """Export the Python SSOT as committed JSON for the TypeScript twin (``ts/``).
 
-falaw ships twice: as this Python package and as the npm package ``falaw``
+falaw ships twice: as this Python package and as the npm package ``falaw-client``
 (``ts/``), which *plans* in the browser and *executes* through a server relay.
 The two must agree on the plan and result shapes, the model catalogue and its
 prices, the cost rules, the model-picking rules, the response parser, and the

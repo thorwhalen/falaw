@@ -1,7 +1,7 @@
 {
-  "name": "falaw",
+  "name": "falaw-client",
   "version": "0.0.1",
-  "description": "Plan and execute fal.ai media generation from the browser: the TypeScript twin of the Python `falaw` package, with cost-honest plans, the model catalogue as data, and execution through a server relay.",
+  "description": "Plan and execute fal.ai media generation from the browser: the TypeScript twin of the Python `falaw` package (PyPI), with cost-honest plans, the model catalogue as data, and execution through a server relay.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
