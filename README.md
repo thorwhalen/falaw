@@ -34,13 +34,13 @@ export FAL_KEY="your-fal-api-key"
 
 ### From the browser
 
-The planning half of this package ships to npm as **`falaw`** (the `ts/`
+The planning half of this package ships to npm as **`falaw-client`** (the `ts/`
 directory): the catalogue with its prices, the cost rules, `CallPlan` and
 `plan_hash` are generated from and pinned to this package, and execution goes
 through a server relay because fal.ai forbids browser-held keys.
 
 ```ts
-import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw';
+import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw-client';
 const plan = makePlan([planGenerateImage({ prompt: 'a tiger eye', quality: 'fast' })]);
 totalCostUsd(plan);  // before any network
 await execute(plan, { transport: queueTransport({ proxyUrl: '/api/fal/proxy', key }) });

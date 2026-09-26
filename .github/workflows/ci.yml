@@ -25,7 +25,7 @@ name: Continuous Integration
 # TRIGGERS — the `push` filter is a PUBLISH gate, not a test gate (walkthru#23).
 #
 # This repo is a Python package (root) plus a sibling TypeScript package (`ts/`,
-# npm `falaw`) with its own workflow, `npm-ci-ts.yml`, filtered to `ts/**`.
+# npm `falaw-client`) with its own workflow, `npm-ci-ts.yml`, filtered to `ts/**`.
 # The reusable workflow's publish job auto-bumps and releases a Python version on
 # every push to the default branch (or a manual dispatch on it) — never from a
 # `pull_request` — so filtering `push` gates exactly the publish, while `pull_request` stays

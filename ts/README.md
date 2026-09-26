@@ -1,13 +1,13 @@
-# falaw (npm)
+# falaw-client (npm)
 
-Plan and execute fal.ai media generation **from the browser**. The TypeScript twin of the Python [`falaw`](https://github.com/thorwhalen/falaw) package: the same model catalogue with its prices, the same cost rules, the same `CallPlan` wire shape and the same `plan_hash`, so a plan built in a browser is one a server running Python `falaw.execute_plan` accepts unchanged.
+Plan and execute fal.ai media generation **from the browser**. The TypeScript twin of the Python [`falaw`](https://github.com/thorwhalen/falaw) package (PyPI `falaw`; the registry refused that name on npm as too similar to existing packages, hence `falaw-client`): the same model catalogue with its prices, the same cost rules, the same `CallPlan` wire shape and the same `plan_hash`, so a plan built in a browser is one a server running Python `falaw.execute_plan` accepts unchanged.
 
 ```bash
-npm install falaw
+npm install falaw-client
 ```
 
 ```ts
-import { planGenerateImage, planImageToVideo, makePlan, totalCostUsd, hasUnknownCosts, execute, queueTransport } from 'falaw';
+import { planGenerateImage, planImageToVideo, makePlan, totalCostUsd, hasUnknownCosts, execute, queueTransport } from 'falaw-client';
 
 // Plans are pure data: no network, cost-honest.
 const plan = makePlan([

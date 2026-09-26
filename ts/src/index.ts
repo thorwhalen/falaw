@@ -1,5 +1,5 @@
 /**
- * falaw — plan and execute fal.ai media generation from the browser.
+ * falaw-client — plan and execute fal.ai media generation from the browser.
  *
  * The TypeScript twin of the Python `falaw` package. The plan and result shapes,
  * the model catalogue with its prices, the cost rules and the canonical hashing
@@ -8,7 +8,7 @@
  * keys.
  *
  * ```ts
- * import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw';
+ * import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw-client';
  *
  * const plan = makePlan([planGenerateImage({ prompt: 'a tiger eye, macro', quality: 'fast' })]);
  * console.log(totalCostUsd(plan));            // cost-honest, before any network
