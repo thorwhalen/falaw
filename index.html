@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="_static/documentation_options.js?v=d78a2f11"></script>
+    <script src="_static/documentation_options.js?v=1c03bfdc"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="next" title="API reference" href="api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.53" />
+  <meta name="docsearch:version" content="0.0.54" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -367,11 +367,11 @@ adds:</p>
 </div>
 <section id="from-the-browser">
 <h3>From the browser<a class="headerlink" href="#from-the-browser" title="Link to this heading">#</a></h3>
-<p>The planning half of this package ships to npm as <strong><code class="docutils literal notranslate"><span class="pre">falaw</span></code></strong> (the <code class="docutils literal notranslate"><span class="pre">ts/</span></code>
+<p>The planning half of this package ships to npm as <strong><code class="docutils literal notranslate"><span class="pre">falaw-client</span></code></strong> (the <code class="docutils literal notranslate"><span class="pre">ts/</span></code>
 directory): the catalogue with its prices, the cost rules, <code class="docutils literal notranslate"><span class="pre">CallPlan</span></code> and
 <code class="docutils literal notranslate"><span class="pre">plan_hash</span></code> are generated from and pinned to this package, and execution goes
 through a server relay because fal.ai forbids browser-held keys.</p>
-<div class="highlight-ts notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">planGenerateImage</span><span class="p">,</span><span class="w"> </span><span class="nx">makePlan</span><span class="p">,</span><span class="w"> </span><span class="nx">totalCostUsd</span><span class="p">,</span><span class="w"> </span><span class="nx">execute</span><span class="p">,</span><span class="w"> </span><span class="nx">queueTransport</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'falaw'</span><span class="p">;</span>
+<div class="highlight-ts notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">planGenerateImage</span><span class="p">,</span><span class="w"> </span><span class="nx">makePlan</span><span class="p">,</span><span class="w"> </span><span class="nx">totalCostUsd</span><span class="p">,</span><span class="w"> </span><span class="nx">execute</span><span class="p">,</span><span class="w"> </span><span class="nx">queueTransport</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'falaw-client'</span><span class="p">;</span>
 <span class="kd">const</span><span class="w"> </span><span class="nx">plan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">makePlan</span><span class="p">([</span><span class="nx">planGenerateImage</span><span class="p">({</span><span class="w"> </span><span class="nx">prompt</span><span class="o">:</span><span class="w"> </span><span class="s1">'a tiger eye'</span><span class="p">,</span><span class="w"> </span><span class="nx">quality</span><span class="o">:</span><span class="w"> </span><span class="s1">'fast'</span><span class="w"> </span><span class="p">})]);</span>
 <span class="nx">totalCostUsd</span><span class="p">(</span><span class="nx">plan</span><span class="p">);</span><span class="w">  </span><span class="c1">// before any network</span>
 <span class="k">await</span><span class="w"> </span><span class="nx">execute</span><span class="p">(</span><span class="nx">plan</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">transport</span><span class="o">:</span><span class="w"> </span><span class="kt">queueTransport</span><span class="p">({</span><span class="w"> </span><span class="nx">proxyUrl</span><span class="o">:</span><span class="w"> </span><span class="s1">'/api/fal/proxy'</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">});</span>
@@ -678,7 +678,7 @@ refuse.</p></li>
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-09-25 09:50 UTC from <a href="https://github.com/thorwhalen/falaw/commit/cdd456c604b490ebc486dc0bef06dd9c7046c676">cdd456c</a> (main) · falaw 0.0.53 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-09-26 15:52 UTC from <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267">506c8c9</a> (main) · falaw 0.0.54 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

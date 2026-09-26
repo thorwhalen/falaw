@@ -1,4 +1,4 @@
-> built 2026-09-25 09:50 UTC from cdd456c (main) · falaw 0.0.53. Details: build_info.json
+> built 2026-09-26 15:52 UTC from 506c8c9 (main) · falaw 0.0.54. Details: build_info.json
 
 # index.html.md
 
@@ -40,13 +40,13 @@ export FAL_KEY="your-fal-api-key"
 
 ### From the browser
 
-The planning half of this package ships to npm as **`falaw`** (the `ts/`
+The planning half of this package ships to npm as **`falaw-client`** (the `ts/`
 directory): the catalogue with its prices, the cost rules, `CallPlan` and
 `plan_hash` are generated from and pinned to this package, and execution goes
 through a server relay because fal.ai forbids browser-held keys.
 
 ```ts
-import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw';
+import { planGenerateImage, makePlan, totalCostUsd, execute, queueTransport } from 'falaw-client';
 const plan = makePlan([planGenerateImage({ prompt: 'a tiger eye', quality: 'fast' })]);
 totalCostUsd(plan);  // before any network
 await execute(plan, { transport: queueTransport({ proxyUrl: '/api/fal/proxy', key }) });
@@ -8318,7 +8318,7 @@ Inverse of asdict: reconstruct a Scene from a plain dict.
 
 Export the Python SSOT as committed JSON for the TypeScript twin (`ts/`).
 
-falaw ships twice: as this Python package and as the npm package `falaw`
+falaw ships twice: as this Python package and as the npm package `falaw-client`
 (`ts/`), which *plans* in the browser and *executes* through a server relay.
 The two must agree on the plan and result shapes, the model catalogue and its
 prices, the cost rules, the model-picking rules, the response parser, and the
@@ -8853,18 +8853,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-09-25 09:50 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/cdd456c604b490ebc486dc0bef06dd9c7046c676"><code>cdd456c</code></a> on branch <code>main</code>, for **falaw 0.0.53** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-09-26 15:52 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9</code></a> on branch <code>main</code>, for **falaw 0.0.54** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.53) is behind the latest release on PyPI (0.0.54): `pip install falaw` gives newer code than these docs describe.
+- The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/cdd456c604b490ebc486dc0bef06dd9c7046c676"><code>cdd456c604b490ebc486dc0bef06dd9c7046c676</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8875,9 +8875,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/36120478158">36120478158</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/36253340579">36253340579</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>cdd456c604b490ebc486dc0bef06dd9c7046c676</code> (in the history of the built commit) |
+| Event commit | <code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8902,13 +8902,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.54/">0.0.54</a>, newer than the documented version (0.0.53).
+Latest release: <a href="https://pypi.org/project/falaw/0.0.55/">0.0.55</a>, newer than the documented version (0.0.54).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout cdd456c604b490ebc486dc0bef06dd9c7046c676
+git checkout 506c8c9f1d5bc1709d581e07e006cd9dfd127267
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
