@@ -28,9 +28,11 @@ adds:
 ## Install
 
 ```bash
-pip install -e .
+pip install 'falaw[fal]'   # to actually call fal.ai (pulls in fal-client)
 export FAL_KEY="your-fal-api-key"
 ```
+
+`pip install falaw` alone installs **no fal.ai client**. That is enough to build, price, hash, serialize and cache `Plan`s (and to read cache hits), which is all a caller needs if it never makes a paid call. The first real network call raises `falaw.FalClientNotInstalled` (an `ImportError`) naming `pip install 'falaw[fal]'`. Anything that executes plans declares `falaw[fal]` as its requirement.
 
 ### From the browser
 

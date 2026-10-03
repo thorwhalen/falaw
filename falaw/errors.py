@@ -39,6 +39,44 @@ class FalError(Exception):
     """Base for all falaw-raised exceptions."""
 
 
+class FalClientNotInstalled(FalError, ImportError):
+    """A real network call was attempted but the fal.ai client is not installed.
+
+    ``pip install falaw`` carries no fal.ai client, so that callers that only
+    build, price, hash and cache plans install none. Anything that actually
+    reaches fal.ai needs the ``fal`` extra: ``pip install 'falaw[fal]'``.
+    It is an :class:`ImportError`, so ``except ImportError`` still matches.
+    """
+
+    INSTALL_HINT = "pip install 'falaw[fal]'"
+
+    def __init__(self, what: str = "calling fal.ai", *, missing: str = "fal_client"):
+        super().__init__(
+            f"{what} needs the {missing!r} package, which falaw no longer installs "
+            f"by default. Install the extra: {self.INSTALL_HINT}"
+        )
+        self.name = missing
+
+
+def import_fal_client():
+    """Import and return ``fal_client``, or raise :class:`FalClientNotInstalled`."""
+    try:
+        import fal_client  # type: ignore[import-untyped]
+    except ImportError as e:
+        raise FalClientNotInstalled("calling a fal.ai model") from e
+    return fal_client
+
+
+def import_httpx(what: str = "fetching from fal.ai"):
+    """Import and return ``httpx`` (part of the ``fal`` extra), or raise
+    :class:`FalClientNotInstalled`."""
+    try:
+        import httpx  # type: ignore[import-untyped]
+    except ImportError as e:
+        raise FalClientNotInstalled(what, missing="httpx") from e
+    return httpx
+
+
 class FalHTTPError(FalError):
     """Wraps an HTTP error from fal.ai with the original status, body, and headers.
 

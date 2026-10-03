@@ -154,7 +154,9 @@ def _default_http_get(
 ) -> Optional[dict]:
     import time
 
-    import httpx  # type: ignore[import-untyped]
+    from .errors import import_httpx
+
+    httpx = import_httpx("refreshing fal.ai prices")
 
     with httpx.Client(timeout=15.0) as client:
         for attempt in range(MAX_429_RETRIES):

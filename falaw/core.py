@@ -20,6 +20,7 @@ import uuid
 from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Mapping, Optional
 
+from .errors import import_fal_client as _import_fal_client
 from .errors import translate as _translate_error
 from .events import EventCallback, ProgressEvent, emit
 from .journal import _default_journal
@@ -116,7 +117,9 @@ def call_fal(
     Returns:
         The raw response dict from the model.
     """
-    import fal_client  # lazy: keep import out of `from falaw import ...`
+    # Lazy: `fal_client` is the optional `falaw[fal]` extra, so importing falaw
+    # (and planning, pricing, hashing, cache hits) must not need it.
+    fal_client = _import_fal_client()
 
     # Resolve the per-call credential: explicit arg > context binding > SDK
     # default. Only when a key is resolved do we route through a dedicated
