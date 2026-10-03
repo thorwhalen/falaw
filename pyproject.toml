@@ -138,6 +138,11 @@ enabled = false
 [tool.wads.ci.quality.mypy]
 enabled = false
 
+[tool.wads.ci.install]
+# CI installs the bare package; the suite stubs or exercises fal_client, which is
+# the optional `fal` extra.
+extras = ["fal"]
+
 [tool.wads.ci.testing]
 python_versions = [
     "3.10",
