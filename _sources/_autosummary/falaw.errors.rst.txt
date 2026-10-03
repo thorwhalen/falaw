@@ -8,6 +8,8 @@ falaw.errors
 
    .. autosummary::
    
+      import_fal_client
+      import_httpx
       translate
    
    .. rubric:: Exceptions
@@ -17,6 +19,7 @@ falaw.errors
       FalAccountLocked
       FalAssetFetchError
       FalBadRequest
+      FalClientNotInstalled
       FalDurationOutOfRange
       FalError
       FalHTTPError

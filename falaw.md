@@ -1,4 +1,4 @@
-> built 2026-09-26 15:52 UTC from 506c8c9 (main) · falaw 0.0.54. Details: build_info.json
+> built 2026-10-03 08:05 UTC from 0916158 (main) · falaw 0.0.55. Details: build_info.json
 
 # index.html.md
 
@@ -34,9 +34,11 @@ adds:
 ## Install
 
 ```bash
-pip install -e .
+pip install 'falaw[fal]'   # to actually call fal.ai (pulls in fal-client)
 export FAL_KEY="your-fal-api-key"
 ```
+
+`pip install falaw` alone installs **no fal.ai client**. That is enough to build, price, hash, serialize and cache `Plan`s (and to read cache hits), which is all a caller needs if it never makes a paid call. The first real network call raises `falaw.FalClientNotInstalled` (an `ImportError`) naming `pip install 'falaw[fal]'`. Anything that executes plans declares `falaw[fal]` as its requirement.
 
 ### From the browser
 
@@ -1905,8 +1907,10 @@ True
 
 ### Functions
 
-| [`translate`](_autosummary/falaw.errors.html.md#falaw.errors.translate)(exc, \*[, application])   | Convert an underlying fal_client / network exception to a typed falaw exception.   |
-|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`import_fal_client`](_autosummary/falaw.errors.html.md#falaw.errors.import_fal_client)()               | Import and return `fal_client`, or raise [`FalClientNotInstalled`](_autosummary/falaw.errors.html.md#falaw.errors.FalClientNotInstalled).                      |
+|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [`import_httpx`](_autosummary/falaw.errors.html.md#falaw.errors.import_httpx)([what])              | Import and return `httpx` (part of the `fal` extra), or raise [`FalClientNotInstalled`](_autosummary/falaw.errors.html.md#falaw.errors.FalClientNotInstalled). |
+| [`translate`](_autosummary/falaw.errors.html.md#falaw.errors.translate)(exc, \*[, application]) | Convert an underlying fal_client / network exception to a typed falaw exception.                                                      |
 
 ### Exceptions
 
@@ -1914,6 +1918,7 @@ True
 |------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | [`FalAssetFetchError`](_autosummary/falaw.errors.html.md#falaw.errors.FalAssetFetchError)(message, \*, url[, cause])       | The bytes behind a fal-served asset URL could not be retrieved.              |
 | [`FalBadRequest`](_autosummary/falaw.errors.html.md#falaw.errors.FalBadRequest)(message, \*, status_code[, ...])      | Server rejected the request payload — typical 400 / 422.                     |
+| [`FalClientNotInstalled`](_autosummary/falaw.errors.html.md#falaw.errors.FalClientNotInstalled)([what, missing])              | A real network call was attempted but the fal.ai client is not installed.    |
 | [`FalDurationOutOfRange`](_autosummary/falaw.errors.html.md#falaw.errors.FalDurationOutOfRange)(message, \*, model_id, ...)   | The requested duration is outside what the model can produce.                |
 | [`FalError`](_autosummary/falaw.errors.html.md#falaw.errors.FalError)                                            | Base for all falaw-raised exceptions.                                        |
 | [`FalHTTPError`](_autosummary/falaw.errors.html.md#falaw.errors.FalHTTPError)(message, \*, status_code[, ...])       | Wraps an HTTP error from fal.ai with the original status, body, and headers. |
@@ -1953,6 +1958,17 @@ cache key derived from it.
 Bases: [`FalHTTPError`](_autosummary/falaw.errors.html.md#falaw.errors.FalHTTPError)
 
 Server rejected the request payload — typical 400 / 422.
+
+### *exception* falaw.errors.FalClientNotInstalled(what='calling fal.ai', , missing='fal_client')
+
+Bases: [`FalError`](_autosummary/falaw.errors.html.md#falaw.errors.FalError), [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError)
+
+A real network call was attempted but the fal.ai client is not installed.
+
+`pip install falaw` carries no fal.ai client, so that callers that only
+build, price, hash and cache plans install none. Anything that actually
+reaches fal.ai needs the `fal` extra: `pip install 'falaw[fal]'`.
+It is an [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError), so `except ImportError` still matches.
 
 ### *exception* falaw.errors.FalDurationOutOfRange(message, , model_id, requested, valid_range)
 
@@ -2036,6 +2052,15 @@ The fal call timed out before producing a result.
 Bases: [`FalHTTPError`](_autosummary/falaw.errors.html.md#falaw.errors.FalHTTPError)
 
 Missing or invalid API credentials — typical 401.
+
+### falaw.errors.import_fal_client()
+
+Import and return `fal_client`, or raise [`FalClientNotInstalled`](_autosummary/falaw.errors.html.md#falaw.errors.FalClientNotInstalled).
+
+### falaw.errors.import_httpx(what='fetching from fal.ai')
+
+Import and return `httpx` (part of the `fal` extra), or raise
+[`FalClientNotInstalled`](_autosummary/falaw.errors.html.md#falaw.errors.FalClientNotInstalled).
 
 ### falaw.errors.translate(exc, , application=None)
 
@@ -2349,6 +2374,7 @@ Leave notes for future sessions:
 | [`FalAccountLocked`](_autosummary/falaw.html.md#falaw.FalAccountLocked)(message, \*, status_code[, ...])   | fal account is locked / suspended / awaiting verification.                   |
 |------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | [`FalAssetFetchError`](_autosummary/falaw.html.md#falaw.FalAssetFetchError)(message, \*, url[, cause])       | The bytes behind a fal-served asset URL could not be retrieved.              |
+| [`FalClientNotInstalled`](_autosummary/falaw.html.md#falaw.FalClientNotInstalled)([what, missing])              | A real network call was attempted but the fal.ai client is not installed.    |
 | [`FalBadRequest`](_autosummary/falaw.html.md#falaw.FalBadRequest)(message, \*, status_code[, ...])      | Server rejected the request payload — typical 400 / 422.                     |
 | [`FalDurationOutOfRange`](_autosummary/falaw.html.md#falaw.FalDurationOutOfRange)(message, \*, model_id, ...)   | The requested duration is outside what the model can produce.                |
 | [`FalError`](_autosummary/falaw.html.md#falaw.FalError)                                            | Base for all falaw-raised exceptions.                                        |
@@ -2935,6 +2961,17 @@ cache key derived from it.
 Bases: [`FalHTTPError`](_autosummary/falaw.errors.html.md#falaw.errors.FalHTTPError)
 
 Server rejected the request payload — typical 400 / 422.
+
+### *exception* falaw.FalClientNotInstalled(what='calling fal.ai', , missing='fal_client')
+
+Bases: [`FalError`](_autosummary/falaw.errors.html.md#falaw.errors.FalError), [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError)
+
+A real network call was attempted but the fal.ai client is not installed.
+
+`pip install falaw` carries no fal.ai client, so that callers that only
+build, price, hash and cache plans install none. Anything that actually
+reaches fal.ai needs the `fal` extra: `pip install 'falaw[fal]'`.
+It is an [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError), so `except ImportError` still matches.
 
 ### *exception* falaw.FalDurationOutOfRange(message, , model_id, requested, valid_range)
 
@@ -8853,18 +8890,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-09-26 15:52 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9</code></a> on branch <code>main</code>, for **falaw 0.0.54** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-03 08:05 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030"><code>0916158</code></a> on branch <code>main</code>, for **falaw 0.0.55** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install falaw` gives newer code than these docs describe.
+- The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030"><code>0916158b35fc20aed99d57d230be1d51f4aed030</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8875,9 +8912,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/36253340579">36253340579</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37108411676">37108411676</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code> (in the history of the built commit) |
+| Event commit | <code>0916158b35fc20aed99d57d230be1d51f4aed030</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8902,13 +8939,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.55/">0.0.55</a>, newer than the documented version (0.0.54).
+Latest release: <a href="https://pypi.org/project/falaw/0.0.56/">0.0.56</a>, newer than the documented version (0.0.55).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout 506c8c9f1d5bc1709d581e07e006cd9dfd127267
+git checkout 0916158b35fc20aed99d57d230be1d51f4aed030
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

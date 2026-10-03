@@ -2,18 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-09-26 15:52 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9</code></a> on branch <code>main</code>, for **falaw 0.0.54** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-03 08:05 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030"><code>0916158</code></a> on branch <code>main</code>, for **falaw 0.0.55** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install falaw` gives newer code than these docs describe.
+- The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267"><code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030"><code>0916158b35fc20aed99d57d230be1d51f4aed030</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -24,9 +24,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/36253340579">36253340579</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37108411676">37108411676</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>506c8c9f1d5bc1709d581e07e006cd9dfd127267</code> (in the history of the built commit) |
+| Event commit | <code>0916158b35fc20aed99d57d230be1d51f4aed030</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -51,13 +51,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.55/">0.0.55</a>, newer than the documented version (0.0.54).
+Latest release: <a href="https://pypi.org/project/falaw/0.0.56/">0.0.56</a>, newer than the documented version (0.0.55).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout 506c8c9f1d5bc1709d581e07e006cd9dfd127267
+git checkout 0916158b35fc20aed99d57d230be1d51f4aed030
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

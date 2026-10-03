@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -55,7 +55,7 @@
     <link rel="next" title="API reference" href="api.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -361,10 +361,11 @@ adds:</p>
 </section>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Link to this heading">#</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'falaw[fal]'</span><span class="w">   </span><span class="c1"># to actually call fal.ai (pulls in fal-client)</span>
 <span class="nb">export</span><span class="w"> </span><span class="nv">FAL_KEY</span><span class="o">=</span><span class="s2">"your-fal-api-key"</span>
 </pre></div>
 </div>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">falaw</span></code> alone installs <strong>no fal.ai client</strong>. That is enough to build, price, hash, serialize and cache <code class="docutils literal notranslate"><span class="pre">Plan</span></code>s (and to read cache hits), which is all a caller needs if it never makes a paid call. The first real network call raises <code class="docutils literal notranslate"><span class="pre">falaw.FalClientNotInstalled</span></code> (an <code class="docutils literal notranslate"><span class="pre">ImportError</span></code>) naming <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'falaw[fal]'</span></code>. Anything that executes plans declares <code class="docutils literal notranslate"><span class="pre">falaw[fal]</span></code> as its requirement.</p>
 <section id="from-the-browser">
 <h3>From the browser<a class="headerlink" href="#from-the-browser" title="Link to this heading">#</a></h3>
 <p>The planning half of this package ships to npm as <strong><code class="docutils literal notranslate"><span class="pre">falaw-client</span></code></strong> (the <code class="docutils literal notranslate"><span class="pre">ts/</span></code>
@@ -678,7 +679,7 @@ refuse.</p></li>
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-09-26 15:52 UTC from <a href="https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267">506c8c9</a> (main) · falaw 0.0.54 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-10-03 08:05 UTC from <a href="https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030">0916158</a> (main) · falaw 0.0.55 · <a href="about-this-build.html">about this build</a></p>
 
                 </article>
               

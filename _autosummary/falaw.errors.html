@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
     <link rel="prev" title="falaw.degrade" href="falaw.degrade.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -460,6 +460,12 @@ typed subclass — <a class="reference internal" href="falaw.core.html#falaw.cor
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.import_fal_client" title="falaw.errors.import_fal_client"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_fal_client</span></code></a>()</p></td>
+<td><p>Import and return <code class="docutils literal notranslate"><span class="pre">fal_client</span></code>, or raise <a class="reference internal" href="#falaw.errors.FalClientNotInstalled" title="falaw.errors.FalClientNotInstalled"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.import_httpx" title="falaw.errors.import_httpx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">import_httpx</span></code></a>([what])</p></td>
+<td><p>Import and return <code class="docutils literal notranslate"><span class="pre">httpx</span></code> (part of the <code class="docutils literal notranslate"><span class="pre">fal</span></code> extra), or raise <a class="reference internal" href="#falaw.errors.FalClientNotInstalled" title="falaw.errors.FalClientNotInstalled"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a>.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.translate" title="falaw.errors.translate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate</span></code></a>(exc, *[, application])</p></td>
 <td><p>Convert an underlying fal_client / network exception to a typed falaw exception.</p></td>
 </tr>
@@ -478,34 +484,37 @@ typed subclass — <a class="reference internal" href="falaw.core.html#falaw.cor
 <tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalBadRequest" title="falaw.errors.FalBadRequest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>Server rejected the request payload — typical 400 / 422.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalDurationOutOfRange" title="falaw.errors.FalDurationOutOfRange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a>(message, *, model_id, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalClientNotInstalled" title="falaw.errors.FalClientNotInstalled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a>([what, missing])</p></td>
+<td><p>A real network call was attempted but the fal.ai client is not installed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalDurationOutOfRange" title="falaw.errors.FalDurationOutOfRange"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a>(message, *, model_id, ...)</p></td>
 <td><p>The requested duration is outside what the model can produce.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalError" title="falaw.errors.FalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalError</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalError" title="falaw.errors.FalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalError</span></code></a></p></td>
 <td><p>Base for all falaw-raised exceptions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalHTTPError" title="falaw.errors.FalHTTPError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a>(message, *, status_code[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalHTTPError" title="falaw.errors.FalHTTPError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>Wraps an HTTP error from fal.ai with the original status, body, and headers.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalInsufficientFunds" title="falaw.errors.FalInsufficientFunds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a>(message, *, status_code)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalInsufficientFunds" title="falaw.errors.FalInsufficientFunds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a>(message, *, status_code)</p></td>
 <td><p>Account balance is insufficient — typical 402.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalModelHung" title="falaw.errors.FalModelHung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalModelHung</span></code></a>(message, *, model_id, elapsed_s)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalModelHung" title="falaw.errors.FalModelHung"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalModelHung</span></code></a>(message, *, model_id, elapsed_s)</p></td>
 <td><p>A model was queued but never returned — distinct from a network timeout.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code></a>(message, *, path)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code></a>(message, *, path)</p></td>
 <td><p>An argument cannot be canonicalised into falaw's hashed JSON form.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a>(message, *[, retry_after_s])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a>(message, *[, retry_after_s])</p></td>
 <td><p>fal is throttling requests — typical 429.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalServerError" title="falaw.errors.FalServerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalServerError</span></code></a>(message, *, status_code[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalServerError" title="falaw.errors.FalServerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalServerError</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>fal-side server error — typical 5xx.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalTimeout" title="falaw.errors.FalTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalTimeout</span></code></a>(message, *, elapsed_s[, application])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalTimeout" title="falaw.errors.FalTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalTimeout</span></code></a>(message, *, elapsed_s[, application])</p></td>
 <td><p>The fal call timed out before producing a result.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalUnauthorized" title="falaw.errors.FalUnauthorized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a>(message, *, status_code[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalUnauthorized" title="falaw.errors.FalUnauthorized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>Missing or invalid API credentials — typical 401.</p></td>
 </tr>
 </tbody>
@@ -543,6 +552,19 @@ cache key derived from it.</p>
 <span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalBadRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detail</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cause</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#FalBadRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalBadRequest" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#falaw.errors.FalHTTPError" title="falaw.errors.FalHTTPError"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></p>
 <p>Server rejected the request payload — typical 400 / 422.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalClientNotInstalled">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalClientNotInstalled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'calling</span> <span class="pre">fal.ai'</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fal_client'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#FalClientNotInstalled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalClientNotInstalled" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#falaw.errors.FalError" title="falaw.errors.FalError"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalError</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportError</span></code></a></p>
+<p>A real network call was attempted but the fal.ai client is not installed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">falaw</span></code> carries no fal.ai client, so that callers that only
+build, price, hash and cache plans install none. Anything that actually
+reaches fal.ai needs the <code class="docutils literal notranslate"><span class="pre">fal</span></code> extra: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'falaw[fal]'</span></code>.
+It is an <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ImportError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportError</span></code></a>, so <code class="docutils literal notranslate"><span class="pre">except</span> <span class="pre">ImportError</span></code> still matches.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
@@ -653,6 +675,21 @@ else <code class="docutils literal notranslate"><span class="pre">None</span></c
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="falaw.errors.import_fal_client">
+<span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">import_fal_client</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#import_fal_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.import_fal_client" title="Link to this definition">#</a></dt>
+<dd><p>Import and return <code class="docutils literal notranslate"><span class="pre">fal_client</span></code>, or raise <a class="reference internal" href="#falaw.errors.FalClientNotInstalled" title="falaw.errors.FalClientNotInstalled"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.errors.import_httpx">
+<span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">import_httpx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fetching</span> <span class="pre">from</span> <span class="pre">fal.ai'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#import_httpx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.import_httpx" title="Link to this definition">#</a></dt>
+<dd><p>Import and return <code class="docutils literal notranslate"><span class="pre">httpx</span></code> (part of the <code class="docutils literal notranslate"><span class="pre">fal</span></code> extra), or raise
+<a class="reference internal" href="#falaw.errors.FalClientNotInstalled" title="falaw.errors.FalClientNotInstalled"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="falaw.errors.translate">
 <span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">translate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">application</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#translate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.translate" title="Link to this definition">#</a></dt>
 <dd><p>Convert an underlying fal_client / network exception to a typed falaw exception.</p>
@@ -728,6 +765,7 @@ else <code class="docutils literal notranslate"><span class="pre">None</span></c
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalAccountLocked"><code class="docutils literal notranslate"><span class="pre">FalAccountLocked</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalAssetFetchError"><code class="docutils literal notranslate"><span class="pre">FalAssetFetchError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalBadRequest"><code class="docutils literal notranslate"><span class="pre">FalBadRequest</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalClientNotInstalled"><code class="docutils literal notranslate"><span class="pre">FalClientNotInstalled</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalDurationOutOfRange"><code class="docutils literal notranslate"><span class="pre">FalDurationOutOfRange</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalError"><code class="docutils literal notranslate"><span class="pre">FalError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalHTTPError"><code class="docutils literal notranslate"><span class="pre">FalHTTPError</span></code></a></li>
@@ -738,6 +776,8 @@ else <code class="docutils literal notranslate"><span class="pre">None</span></c
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalUnauthorized"><code class="docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.import_fal_client"><code class="docutils literal notranslate"><span class="pre">import_fal_client()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.import_httpx"><code class="docutils literal notranslate"><span class="pre">import_httpx()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.translate"><code class="docutils literal notranslate"><span class="pre">translate()</span></code></a></li>
 </ul>
   </nav></div>

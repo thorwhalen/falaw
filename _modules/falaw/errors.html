@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../_static/documentation_options.js?v=1c03bfdc"></script>
+    <script src="../../_static/documentation_options.js?v=b87b3bc5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -409,7 +409,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.54" />
+  <meta name="docsearch:version" content="0.0.55" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -751,6 +751,53 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../_autosummary/falaw.errors.html#falaw.FalError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">FalError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Base for all falaw-raised exceptions."""</span></div>
+
+
+
+<div class="viewcode-block" id="FalClientNotInstalled">
+<a class="viewcode-back" href="../../_autosummary/falaw.errors.html#falaw.FalClientNotInstalled">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FalClientNotInstalled</span><span class="p">(</span><span class="n">FalError</span><span class="p">,</span> <span class="ne">ImportError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A real network call was attempted but the fal.ai client is not installed.</span>
+
+<span class="sd">    ``pip install falaw`` carries no fal.ai client, so that callers that only</span>
+<span class="sd">    build, price, hash and cache plans install none. Anything that actually</span>
+<span class="sd">    reaches fal.ai needs the ``fal`` extra: ``pip install 'falaw[fal]'``.</span>
+<span class="sd">    It is an :class:`ImportError`, so ``except ImportError`` still matches.</span>
+<span class="sd">    """</span>
+
+    <span class="n">INSTALL_HINT</span> <span class="o">=</span> <span class="s2">"pip install 'falaw[fal]'"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">what</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"calling fal.ai"</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">missing</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"fal_client"</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">what</span><span class="si">}</span><span class="s2"> needs the </span><span class="si">{</span><span class="n">missing</span><span class="si">!r}</span><span class="s2"> package, which falaw no longer installs "</span>
+            <span class="sa">f</span><span class="s2">"by default. Install the extra: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">INSTALL_HINT</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">missing</span></div>
+
+
+
+<div class="viewcode-block" id="import_fal_client">
+<a class="viewcode-back" href="../../_autosummary/falaw.errors.html#falaw.import_fal_client">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">import_fal_client</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">"""Import and return ``fal_client``, or raise :class:`FalClientNotInstalled`."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">fal_client</span>  <span class="c1"># type: ignore[import-untyped]</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FalClientNotInstalled</span><span class="p">(</span><span class="s2">"calling a fal.ai model"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">return</span> <span class="n">fal_client</span></div>
+
+
+
+<div class="viewcode-block" id="import_httpx">
+<a class="viewcode-back" href="../../_autosummary/falaw.errors.html#falaw.import_httpx">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">import_httpx</span><span class="p">(</span><span class="n">what</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"fetching from fal.ai"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Import and return ``httpx`` (part of the ``fal`` extra), or raise</span>
+<span class="sd">    :class:`FalClientNotInstalled`."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>  <span class="c1"># type: ignore[import-untyped]</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">FalClientNotInstalled</span><span class="p">(</span><span class="n">what</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s2">"httpx"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">return</span> <span class="n">httpx</span></div>
 
 
 

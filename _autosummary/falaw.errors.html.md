@@ -34,8 +34,10 @@ True
 
 ### Functions
 
-| [`translate`](#falaw.errors.translate)(exc, \*[, application])   | Convert an underlying fal_client / network exception to a typed falaw exception.   |
-|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------|
+| [`import_fal_client`](#falaw.errors.import_fal_client)()               | Import and return `fal_client`, or raise [`FalClientNotInstalled`](#falaw.errors.FalClientNotInstalled).                      |
+|------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| [`import_httpx`](#falaw.errors.import_httpx)([what])              | Import and return `httpx` (part of the `fal` extra), or raise [`FalClientNotInstalled`](#falaw.errors.FalClientNotInstalled). |
+| [`translate`](#falaw.errors.translate)(exc, \*[, application]) | Convert an underlying fal_client / network exception to a typed falaw exception.                                                      |
 
 ### Exceptions
 
@@ -43,6 +45,7 @@ True
 |------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | [`FalAssetFetchError`](#falaw.errors.FalAssetFetchError)(message, \*, url[, cause])       | The bytes behind a fal-served asset URL could not be retrieved.              |
 | [`FalBadRequest`](#falaw.errors.FalBadRequest)(message, \*, status_code[, ...])      | Server rejected the request payload — typical 400 / 422.                     |
+| [`FalClientNotInstalled`](#falaw.errors.FalClientNotInstalled)([what, missing])              | A real network call was attempted but the fal.ai client is not installed.    |
 | [`FalDurationOutOfRange`](#falaw.errors.FalDurationOutOfRange)(message, \*, model_id, ...)   | The requested duration is outside what the model can produce.                |
 | [`FalError`](#falaw.errors.FalError)                                            | Base for all falaw-raised exceptions.                                        |
 | [`FalHTTPError`](#falaw.errors.FalHTTPError)(message, \*, status_code[, ...])       | Wraps an HTTP error from fal.ai with the original status, body, and headers. |
@@ -82,6 +85,17 @@ cache key derived from it.
 Bases: [`FalHTTPError`](#falaw.errors.FalHTTPError)
 
 Server rejected the request payload — typical 400 / 422.
+
+### *exception* falaw.errors.FalClientNotInstalled(what='calling fal.ai', , missing='fal_client')
+
+Bases: [`FalError`](#falaw.errors.FalError), [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError)
+
+A real network call was attempted but the fal.ai client is not installed.
+
+`pip install falaw` carries no fal.ai client, so that callers that only
+build, price, hash and cache plans install none. Anything that actually
+reaches fal.ai needs the `fal` extra: `pip install 'falaw[fal]'`.
+It is an [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError), so `except ImportError` still matches.
 
 ### *exception* falaw.errors.FalDurationOutOfRange(message, , model_id, requested, valid_range)
 
@@ -165,6 +179,15 @@ The fal call timed out before producing a result.
 Bases: [`FalHTTPError`](#falaw.errors.FalHTTPError)
 
 Missing or invalid API credentials — typical 401.
+
+### falaw.errors.import_fal_client()
+
+Import and return `fal_client`, or raise [`FalClientNotInstalled`](#falaw.errors.FalClientNotInstalled).
+
+### falaw.errors.import_httpx(what='fetching from fal.ai')
+
+Import and return `httpx` (part of the `fal` extra), or raise
+[`FalClientNotInstalled`](#falaw.errors.FalClientNotInstalled).
 
 ### falaw.errors.translate(exc, , application=None)
 

@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-09-26T15:52:23Z",
+  "built_at": "2026-10-03T08:05:17Z",
   "package": {
     "name": "falaw",
-    "version": "0.0.54",
+    "version": "0.0.55",
     "display_name": "falaw",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "506c8c9f1d5bc1709d581e07e006cd9dfd127267",
-    "short_commit": "506c8c9",
+    "commit": "0916158b35fc20aed99d57d230be1d51f4aed030",
+    "short_commit": "0916158",
     "branch": "main",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/thorwhalen/falaw",
-    "commit_url": "https://github.com/thorwhalen/falaw/commit/506c8c9f1d5bc1709d581e07e006cd9dfd127267",
+    "commit_url": "https://github.com/thorwhalen/falaw/commit/0916158b35fc20aed99d57d230be1d51f4aed030",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "thorwhalen/falaw",
-    "sha": "506c8c9f1d5bc1709d581e07e006cd9dfd127267",
+    "sha": "0916158b35fc20aed99d57d230be1d51f4aed030",
     "sha_in_history": true,
     "ref": "refs/heads/main",
     "ref_name": "main",
-    "run_id": "36253340579",
-    "run_url": "https://github.com/thorwhalen/falaw/actions/runs/36253340579",
+    "run_id": "37108411676",
+    "run_url": "https://github.com/thorwhalen/falaw/actions/runs/37108411676",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -56,20 +56,20 @@
   },
   "site": {
     "modules_documented": 41,
-    "objects_documented": 567
+    "objects_documented": 571
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.55",
+    "latest": "0.0.56",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/thorwhalen/falaw && cd falaw\ngit checkout 506c8c9f1d5bc1709d581e07e006cd9dfd127267\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/thorwhalen/falaw && cd falaw\ngit checkout 0916158b35fc20aed99d57d230be1d51f4aed030\npip install \"epythet==0.2.12\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install falaw` gives newer code than these docs describe."
+      "The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install falaw` gives newer code than these docs describe."
     ]
   }
 }

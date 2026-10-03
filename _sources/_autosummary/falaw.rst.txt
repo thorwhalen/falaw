@@ -152,6 +152,7 @@
    
       FalAccountLocked
       FalAssetFetchError
+      FalClientNotInstalled
       FalBadRequest
       FalDurationOutOfRange
       FalError

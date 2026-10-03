@@ -172,6 +172,7 @@ Leave notes for future sessions:
 | [`FalAccountLocked`](#falaw.FalAccountLocked)(message, \*, status_code[, ...])   | fal account is locked / suspended / awaiting verification.                   |
 |------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | [`FalAssetFetchError`](#falaw.FalAssetFetchError)(message, \*, url[, cause])       | The bytes behind a fal-served asset URL could not be retrieved.              |
+| [`FalClientNotInstalled`](#falaw.FalClientNotInstalled)([what, missing])              | A real network call was attempted but the fal.ai client is not installed.    |
 | [`FalBadRequest`](#falaw.FalBadRequest)(message, \*, status_code[, ...])      | Server rejected the request payload — typical 400 / 422.                     |
 | [`FalDurationOutOfRange`](#falaw.FalDurationOutOfRange)(message, \*, model_id, ...)   | The requested duration is outside what the model can produce.                |
 | [`FalError`](#falaw.FalError)                                            | Base for all falaw-raised exceptions.                                        |
@@ -758,6 +759,17 @@ cache key derived from it.
 Bases: [`FalHTTPError`](falaw.errors.md#falaw.errors.FalHTTPError)
 
 Server rejected the request payload — typical 400 / 422.
+
+### *exception* falaw.FalClientNotInstalled(what='calling fal.ai', , missing='fal_client')
+
+Bases: [`FalError`](falaw.errors.md#falaw.errors.FalError), [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError)
+
+A real network call was attempted but the fal.ai client is not installed.
+
+`pip install falaw` carries no fal.ai client, so that callers that only
+build, price, hash and cache plans install none. Anything that actually
+reaches fal.ai needs the `fal` extra: `pip install 'falaw[fal]'`.
+It is an [`ImportError`](https://docs.python.org/3/builtins/exceptions.html#ImportError), so `except ImportError` still matches.
 
 ### *exception* falaw.FalDurationOutOfRange(message, , model_id, requested, valid_range)
 
