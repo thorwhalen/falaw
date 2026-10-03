@@ -15,7 +15,6 @@ authors = [
     { name = "Thor Whalen" },
 ]
 dependencies = [
-    "fal-client>=0.5",
     # >=0.0.31 for the widened ProvenanceRef union (lacing#14/D5): the
     # executor stamps upstream artifact asset_ids into was_derived_from,
     # which the pre-D5 list[UUID] type refuses.
@@ -42,7 +41,15 @@ Repository = "https://github.com/thorwhalen/falaw"
 Documentation = "https://thorwhalen.github.io/falaw"
 
 [project.optional-dependencies]
+# The fal.ai network client. Building, pricing, hashing and caching plans needs
+# none of it; the first real call (`call_fal`, the refresh/pricing fetchers)
+# raises FalClientNotInstalled naming this extra. httpx rides in with it.
+fal = [
+    "fal-client>=0.5",
+]
 dev = [
+    # the suite exercises execution against a stubbed or real fal_client.
+    "falaw[fal]",
     # falaw.schema_export (repo tooling: the TS twin's contract) and its test.
     "pydantic>=2.12",
     "pytest>=7.0",

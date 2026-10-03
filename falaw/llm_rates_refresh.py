@@ -332,7 +332,9 @@ HttpGetJson = Callable[[str], dict]
 
 
 def _default_http_get_text(url: str) -> str:
-    import httpx  # type: ignore[import-untyped]
+    from .errors import import_httpx
+
+    httpx = import_httpx("refreshing LLM rates")
 
     with httpx.Client(timeout=15.0) as client:
         response = client.get(url)
@@ -341,7 +343,9 @@ def _default_http_get_text(url: str) -> str:
 
 
 def _default_http_get_json(url: str) -> dict:
-    import httpx  # type: ignore[import-untyped]
+    from .errors import import_httpx
+
+    httpx = import_httpx("refreshing LLM rates")
 
     with httpx.Client(timeout=15.0) as client:
         response = client.get(url)
