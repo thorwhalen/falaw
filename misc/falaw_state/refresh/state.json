@@ -1476,10 +1476,10 @@
     "fetched_at": 1778490551.2373748
   },
   "llms": {
-    "etag": "\"04899724a98c8700a9b36e6fa891b4d6\"",
-    "fetched_at": 1787562453.1396677,
-    "last_modified": "Mon, 24 Aug 2026 06:32:04 GMT",
-    "size": 7890
+    "etag": "\"4cb66c0b2ea10606f30228ac1c3a2be9\"",
+    "fetched_at": 1791191574.1363876,
+    "last_modified": "Mon, 05 Oct 2026 09:12:54 GMT",
+    "size": 10264
   },
   "llms-full": {
     "etag": "\"385a1f5c21faf648b47fe5edc6676fca\"",
