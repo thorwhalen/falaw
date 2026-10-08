@@ -19,6 +19,7 @@ falaw.registry
       list_models
       list_tools
       model_constraints
+      model_params
       models_table_version
       pick_model
       register_tool

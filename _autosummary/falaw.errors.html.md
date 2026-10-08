@@ -52,6 +52,7 @@ True
 | [`FalInsufficientFunds`](#falaw.errors.FalInsufficientFunds)(message, \*, status_code)      | Account balance is insufficient — typical 402.                               |
 | [`FalModelHung`](#falaw.errors.FalModelHung)(message, \*, model_id, elapsed_s)      | A model was queued but never returned — distinct from a network timeout.     |
 | [`FalNonCanonicalArgument`](#falaw.errors.FalNonCanonicalArgument)(message, \*, path)          | An argument cannot be canonicalised into falaw's hashed JSON form.           |
+| [`FalPromptTooLong`](#falaw.errors.FalPromptTooLong)(message, \*, model, limit, ...)    | The prompt exceeds the model's hard length cap (falaw#76).                   |
 | [`FalRateLimited`](#falaw.errors.FalRateLimited)(message, \*[, retry_after_s])        | fal is throttling requests — typical 429.                                    |
 | [`FalServerError`](#falaw.errors.FalServerError)(message, \*, status_code[, ...])     | fal-side server error — typical 5xx.                                         |
 | [`FalTimeout`](#falaw.errors.FalTimeout)(message, \*, elapsed_s[, application])   | The fal call timed out before producing a result.                            |
@@ -152,6 +153,16 @@ different calls into one cache key, handing back the *wrong artifact* as
 a supposed saving (falaw#17).
 
 `path` names the offending node, e.g. `arguments.extra.ref`.
+
+### *exception* falaw.errors.FalPromptTooLong(message, , model, limit, length)
+
+Bases: [`FalError`](#falaw.errors.FalError), [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+The prompt exceeds the model’s hard length cap (falaw#76).
+
+Raised before any call is queued: fal answers an over-long prompt with an
+HTTP 422 only after the request round-trips. `limit`/`length` are in
+characters.
 
 ### *exception* falaw.errors.FalRateLimited(message, , retry_after_s=None, \*\*kwargs)
 

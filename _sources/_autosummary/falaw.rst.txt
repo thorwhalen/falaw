@@ -74,6 +74,7 @@
       parse_screenplay
       pick_model
       model_constraints
+      model_params
       video_model_constraints
       plan_animate_face
       plan_composite_character_in_environment
@@ -89,6 +90,8 @@
       refresh_llms
       refresh_models_from_corpus
       refresh_model_prices
+      check_model_liveness
+      dead_models
       fetch_model_prices
       refresh_llm_rates
       refresh_state
@@ -160,6 +163,7 @@
       FalInsufficientFunds
       FalModelHung
       FalNonCanonicalArgument
+      FalPromptTooLong
       FalRateLimited
       FalServerError
       FalTimeout
@@ -185,6 +189,7 @@
    degrade
    errors
    events
+   liveness
    llm_rates
    llm_rates_refresh
    local

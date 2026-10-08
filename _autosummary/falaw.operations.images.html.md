@@ -40,6 +40,13 @@ Edit an image with a natural-language instruction.
 
 Generate an image from a text prompt.
 
+`image_size` is a fal preset (`landscape_16_9` …); models that size by
+`aspect_ratio` (`nano-banana-pro`) get the equivalent ratio, with
+`extra={"resolution": "2K"}` for the pixel tier. A prompt over the
+model’s cap raises [`falaw.FalPromptTooLong`](falaw.html.md#falaw.FalPromptTooLong) before any call. Check
+[`falaw.model_params()`](falaw.html.md#falaw.model_params) for enums whose default may not be what you
+want (Recraft `style` defaults to photoreal).
+
 * **Return type:**
   [`Result`](falaw.results.html.md#falaw.results.Result)
 

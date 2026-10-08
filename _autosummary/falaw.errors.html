@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
     <link rel="prev" title="falaw.degrade" href="falaw.degrade.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.56" />
+  <meta name="docsearch:version" content="0.0.57" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -337,6 +337,7 @@
 <li class="toctree-l2"><a class="reference internal" href="falaw.degrade.html">falaw.degrade</a></li>
 <li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">falaw.errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.liveness.html">falaw.liveness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
@@ -505,16 +506,19 @@ typed subclass — <a class="reference internal" href="falaw.core.html#falaw.cor
 <tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalNonCanonicalArgument" title="falaw.errors.FalNonCanonicalArgument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code></a>(message, *, path)</p></td>
 <td><p>An argument cannot be canonicalised into falaw's hashed JSON form.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a>(message, *[, retry_after_s])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalPromptTooLong" title="falaw.errors.FalPromptTooLong"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalPromptTooLong</span></code></a>(message, *, model, limit, ...)</p></td>
+<td><p>The prompt exceeds the model's hard length cap (falaw#76).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalRateLimited" title="falaw.errors.FalRateLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a>(message, *[, retry_after_s])</p></td>
 <td><p>fal is throttling requests — typical 429.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalServerError" title="falaw.errors.FalServerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalServerError</span></code></a>(message, *, status_code[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalServerError" title="falaw.errors.FalServerError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalServerError</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>fal-side server error — typical 5xx.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalTimeout" title="falaw.errors.FalTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalTimeout</span></code></a>(message, *, elapsed_s[, application])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalTimeout" title="falaw.errors.FalTimeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalTimeout</span></code></a>(message, *, elapsed_s[, application])</p></td>
 <td><p>The fal call timed out before producing a result.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.errors.FalUnauthorized" title="falaw.errors.FalUnauthorized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a>(message, *, status_code[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.errors.FalUnauthorized" title="falaw.errors.FalUnauthorized"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FalUnauthorized</span></code></a>(message, *, status_code[, ...])</p></td>
 <td><p>Missing or invalid API credentials — typical 401.</p></td>
 </tr>
 </tbody>
@@ -632,6 +636,18 @@ or a non-string mapping key. Deliberately <strong>loud</strong>: the old behavio
 different calls into one cache key, handing back the <em>wrong artifact</em> as
 a supposed saving (falaw#17).</p>
 <p><code class="docutils literal notranslate"><span class="pre">path</span></code> names the offending node, e.g. <code class="docutils literal notranslate"><span class="pre">arguments.extra.ref</span></code>.</p>
+<dl class="field-list simple">
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="falaw.errors.FalPromptTooLong">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">falaw.errors.</span></span><span class="sig-name descname"><span class="pre">FalPromptTooLong</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/errors.html#FalPromptTooLong"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.errors.FalPromptTooLong" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#falaw.errors.FalError" title="falaw.errors.FalError"><code class="xref py py-class docutils literal notranslate"><span class="pre">FalError</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></p>
+<p>The prompt exceeds the model’s hard length cap (falaw#76).</p>
+<p>Raised before any call is queued: fal answers an over-long prompt with an
+HTTP 422 only after the request round-trips. <code class="docutils literal notranslate"><span class="pre">limit</span></code>/<code class="docutils literal notranslate"><span class="pre">length</span></code> are in
+characters.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
@@ -772,6 +788,7 @@ else <code class="docutils literal notranslate"><span class="pre">None</span></c
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalInsufficientFunds"><code class="docutils literal notranslate"><span class="pre">FalInsufficientFunds</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalModelHung"><code class="docutils literal notranslate"><span class="pre">FalModelHung</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalNonCanonicalArgument"><code class="docutils literal notranslate"><span class="pre">FalNonCanonicalArgument</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalPromptTooLong"><code class="docutils literal notranslate"><span class="pre">FalPromptTooLong</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalRateLimited"><code class="docutils literal notranslate"><span class="pre">FalRateLimited</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalServerError"><code class="docutils literal notranslate"><span class="pre">FalServerError</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.errors.FalTimeout"><code class="docutils literal notranslate"><span class="pre">FalTimeout</span></code></a></li>

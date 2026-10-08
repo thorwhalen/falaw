@@ -7,11 +7,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<link rel="alternate" type="text/markdown" href="falaw.degrade.html.md">
+<link rel="alternate" type="text/markdown" href="falaw.liveness.html.md">
 <link rel="describedby" href="../llms.txt" type="text/markdown">
-<link rel="alternate" type="text/markdown" href="falaw.degrade.html.md">
+<link rel="alternate" type="text/markdown" href="falaw.liveness.html.md">
 <link rel="describedby" href="llms.txt">
-    <title>falaw.degrade &#8212; falaw</title>
+    <title>falaw.liveness &#8212; falaw</title>
   
   
   
@@ -48,12 +48,12 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.degrade';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/falaw.liveness';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="falaw.errors" href="falaw.errors.html" />
-    <link rel="prev" title="falaw.cost" href="falaw.cost.html" />
+    <link rel="next" title="falaw.llm_rates" href="falaw.llm_rates.html" />
+    <link rel="prev" title="falaw.events" href="falaw.events.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.57" />
@@ -334,10 +334,10 @@
 <li class="toctree-l2"><a class="reference internal" href="falaw.core.html">falaw.core</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.corpus.html">falaw.corpus</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.cost.html">falaw.cost</a></li>
-<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">falaw.degrade</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.degrade.html">falaw.degrade</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.errors.html">falaw.errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
-<li class="toctree-l2"><a class="reference internal" href="falaw.liveness.html">falaw.liveness</a></li>
+<li class="toctree-l2 current active"><a aria-current="page" class="current reference internal" href="#">falaw.liveness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
@@ -411,7 +411,7 @@
     
     <li class="breadcrumb-item"><a href="falaw.html" class="nav-link">falaw</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.degrade</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">falaw.liveness</span></li>
   </ul>
 </nav>
 </div>
@@ -428,65 +428,71 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-falaw.degrade">
-<span id="falaw-degrade"></span><h1>falaw.degrade<a class="headerlink" href="#module-falaw.degrade" title="Link to this heading">#</a></h1>
-<p>Where falaw sends “I carried on, but you should know” — one collection point.</p>
-<p>falaw deliberately degrades rather than failing in several places: a failed
-asset fetch becomes a URL-only artifact instead of discarding a render fal has
-already billed, and an unreadable origin falls back to bytes already in the
-store instead of losing the artifact. Every one of those is a decision the
-caller would want to hear about, and none of them should stop the run.</p>
-<p><code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code> alone is the wrong channel for two reasons, both learned:</p>
-<ul class="simple">
-<li><p><strong>It deduplicates.</strong> Python’s default filter shows a given message once per
-location per process, so on a long-lived server the second and every
-subsequent stale serve of the same URL is <em>silent</em>.</p></li>
-<li><p><strong>It cannot be collected.</strong> Under <code class="docutils literal notranslate"><span class="pre">execute_plan(concurrency=N)</span></code> a
-speculative probe’s complaint interleaves with real ones, and
-<code class="docutils literal notranslate"><span class="pre">warnings.catch_warnings</span></code> is documented as not thread-safe — it mutates
-process-global filter state, so one call suppressing its own noise would
-suppress another call’s genuine warning at random.</p></li>
-</ul>
-<p>Hence a <a class="reference external" href="https://docs.python.org/3/library/contextvars.html#contextvars.ContextVar" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextVar</span></code></a> sink. Set inside a unit of work it is
-visible only to that unit (each pool task runs in its own context copy), and
-when nothing has set one the message falls through to <code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code>.</p>
-<p>This lives in its own module, below both <a class="reference internal" href="falaw.plan.html#module-falaw.plan" title="falaw.plan"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.plan</span></code></a> and
-<a class="reference internal" href="falaw.content.html#module-falaw.content" title="falaw.content"><code class="xref py py-mod docutils literal notranslate"><span class="pre">falaw.content</span></code></a>, because <strong>both</strong> produce degradations and neither may
-import the other at module scope.</p>
-<p class="rubric">Functions</p>
+  <section id="module-falaw.liveness">
+<span id="falaw-liveness"></span><h1>falaw.liveness<a class="headerlink" href="#module-falaw.liveness" title="Link to this heading">#</a></h1>
+<p>Is a catalogued endpoint still deployed? (falaw#76)</p>
+<p>fal retires endpoints without notice (<code class="docutils literal notranslate"><span class="pre">fal-ai/imagen4/preview/ultra</span></code> answers
+<code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Application</span> <span class="pre">&quot;imagen4&quot;</span> <span class="pre">not</span> <span class="pre">found</span></code>), and <code class="docutils literal notranslate"><span class="pre">pick_model</span></code> would keep
+picking them. fal’s OpenAPI endpoint answers 404 for a dead id and 200 for a
+live one without a billed call or an API key, so one GET per id is a free
+liveness probe.</p>
+<p class="rubric">Module Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.degrade.deferred_degrade_warnings" title="falaw.degrade.deferred_degrade_warnings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deferred_degrade_warnings</span></code></a>()</p></td>
-<td><p>Collect degradation messages into a list instead of warning.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.liveness.OPENAPI_URL" title="falaw.liveness.OPENAPI_URL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OPENAPI_URL</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">?endpoint_id=&lt;id&gt;</span></code> selects the endpoint.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#falaw.degrade.emit_degradation" title="falaw.degrade.emit_degradation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">emit_degradation</span></code></a>(message, *[, stacklevel])</p></td>
-<td><p>Report that falaw degraded rather than failed.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.liveness.StatusGetter" title="falaw.liveness.StatusGetter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StatusGetter</span></code></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">HTTP</span> <span class="pre">status</span></code>; injectable so tests never touch the network.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#falaw.liveness.check_model_liveness" title="falaw.liveness.check_model_liveness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_model_liveness</span></code></a>([ids, status_of])</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{endpoint_id:</span> <span class="pre">is_live}</span></code> for <code class="docutils literal notranslate"><span class="pre">ids</span></code> (default: every catalogued model).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.liveness.dead_models" title="falaw.liveness.dead_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dead_models</span></code></a>([ids, status_of])</p></td>
+<td><p>The ids from <a class="reference internal" href="#falaw.liveness.check_model_liveness" title="falaw.liveness.check_model_liveness"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_model_liveness()</span></code></a> that are no longer deployed.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.liveness.OPENAPI_URL">
+<span class="sig-prename descclassname"><span class="pre">falaw.liveness.</span></span><span class="sig-name descname"><span class="pre">OPENAPI_URL</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://fal.ai/api/openapi/queue/openapi.json'</span></span><a class="headerlink" href="#falaw.liveness.OPENAPI_URL" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">?endpoint_id=&lt;id&gt;</span></code> selects the endpoint.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="falaw.liveness.StatusGetter">
+<span class="sig-prename descclassname"><span class="pre">falaw.liveness.</span></span><span class="sig-name descname"><span class="pre">StatusGetter</span></span><a class="headerlink" href="#falaw.liveness.StatusGetter" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">url</span> <span class="pre">-&gt;</span> <span class="pre">HTTP</span> <span class="pre">status</span></code>; injectable so tests never touch the network.</p>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code>[[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd></dl>
+
 <dl class="py function">
-<dt class="sig sig-object py" id="falaw.degrade.deferred_degrade_warnings">
-<span class="sig-prename descclassname"><span class="pre">falaw.degrade.</span></span><span class="sig-name descname"><span class="pre">deferred_degrade_warnings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/degrade.html#deferred_degrade_warnings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.degrade.deferred_degrade_warnings" title="Link to this definition">#</a></dt>
-<dd><p>Collect degradation messages into a list instead of warning.</p>
+<dt class="sig sig-object py" id="falaw.liveness.check_model_liveness">
+<span class="sig-prename descclassname"><span class="pre">falaw.liveness.</span></span><span class="sig-name descname"><span class="pre">check_model_liveness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/liveness.html#check_model_liveness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.liveness.check_model_liveness" title="Link to this definition">#</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">{endpoint_id:</span> <span class="pre">is_live}</span></code> for <code class="docutils literal notranslate"><span class="pre">ids</span></code> (default: every catalogued model).</p>
+<p>Only a 404 means dead; any other non-200 answer (rate limit, fal outage)
+raises rather than report a live model as dead, which would get it deleted.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterator" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>]</span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="falaw.degrade.emit_degradation">
-<span class="sig-prename descclassname"><span class="pre">falaw.degrade.</span></span><span class="sig-name descname"><span class="pre">emit_degradation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacklevel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/degrade.html#emit_degradation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.degrade.emit_degradation" title="Link to this definition">#</a></dt>
-<dd><p>Report that falaw degraded rather than failed.</p>
-<p>Into the active sink if there is one, else straight to <code class="docutils literal notranslate"><span class="pre">warnings.warn</span></code>.
-Every degradation in falaw goes through here so that none of them can be
-the one that escapes collection — the more severe the degradation, the
-worse it is for it to be the escapee.</p>
+<dt class="sig sig-object py" id="falaw.liveness.dead_models">
+<span class="sig-prename descclassname"><span class="pre">falaw.liveness.</span></span><span class="sig-name descname"><span class="pre">dead_models</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">status_of</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/liveness.html#dead_models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.liveness.dead_models" title="Link to this definition">#</a></dt>
+<dd><p>The ids from <a class="reference internal" href="#falaw.liveness.check_model_liveness" title="falaw.liveness.check_model_liveness"><code class="xref py py-func docutils literal notranslate"><span class="pre">check_model_liveness()</span></code></a> that are no longer deployed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -504,20 +510,20 @@ worse it is for it to be the escapee.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="falaw.cost.html"
+       href="falaw.events.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">falaw.cost</p>
+        <p class="prev-next-title">falaw.events</p>
       </div>
     </a>
     <a class="right-next"
-       href="falaw.errors.html"
+       href="falaw.llm_rates.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">falaw.errors</p>
+        <p class="prev-next-title">falaw.llm_rates</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -540,15 +546,17 @@ worse it is for it to be the escapee.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.degrade.deferred_degrade_warnings"><code class="docutils literal notranslate"><span class="pre">deferred_degrade_warnings()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.degrade.emit_degradation"><code class="docutils literal notranslate"><span class="pre">emit_degradation()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.liveness.OPENAPI_URL"><code class="docutils literal notranslate"><span class="pre">OPENAPI_URL</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.liveness.StatusGetter"><code class="docutils literal notranslate"><span class="pre">StatusGetter</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.liveness.check_model_liveness"><code class="docutils literal notranslate"><span class="pre">check_model_liveness()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.liveness.dead_models"><code class="docutils literal notranslate"><span class="pre">dead_models()</span></code></a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/_autosummary/falaw.degrade.rst.txt">
+    <a href="../_sources/_autosummary/falaw.liveness.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>

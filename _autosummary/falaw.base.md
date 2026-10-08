@@ -57,7 +57,7 @@ How the estimate was obtained — `"docs"`,
 `"empirical"`, `"approximate"`. Lets us flag stale or
 unverified entries in audits.
 
-### *class* falaw.base.ModelRecord(, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='')
+### *class* falaw.base.ModelRecord(\*, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='', max_prompt_chars=None, size_param='image_size', param_specs=<factory>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -73,11 +73,31 @@ plastic-skin look). Empty when none.
 Practical max length of a single generated clip, in seconds (e.g. ~10
 for Seedance). Drives the “this shot is too long, split it” warning.
 
+#### max_prompt_chars *: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Hard cap on `prompt` length, from the model’s OpenAPI schema. Calls
+over it fail at fal with an HTTP 422 after queueing; falaw raises first.
+
+#### param_specs *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]*
+
+Discoverable per-model parameters that matter for choosing well, as
+`{name: {"enum": [...], "default": ...}}` — e.g. Recraft’s `style`,
+whose photoreal default silently overrides a woodcut prompt. See
+[`falaw.model_params()`](falaw.md#falaw.model_params).
+
 #### single_character_recommended *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
 True when the model handles a single character per shot far better than
 multiple interacting ones — drives the “two characters, consider
 shot/reverse-shot” warning.
+
+#### size_param *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+`"image_size"` (fal’s named
+presets, the default) or `"aspect_ratio"` (+ `resolution`).
+
+* **Type:**
+  Which argument carries the output size
 
 #### supported_resolutions *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]*
 

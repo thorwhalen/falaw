@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -409,7 +409,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.56" />
+  <meta name="docsearch:version" content="0.0.57" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -824,6 +824,21 @@ window.runMermaid = runMermaid;</script>
         <span class="s2">"default_negative_prompt"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">default_negative_prompt</span><span class="p">,</span>
         <span class="s2">"docs_url"</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">docs_url</span><span class="p">,</span>
     <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="model_params">
+<a class="viewcode-back" href="../../_autosummary/falaw.registry.html#falaw.model_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_params</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Per-model parameters worth knowing before a call, ``{name: spec}``.</span>
+
+<span class="sd">    Each spec is ``{"enum": [...], "default": ...}``; resolves aliases. For</span>
+<span class="sd">    ``fal-ai/recraft/v3/text-to-image`` this shows ``style`` defaults to</span>
+<span class="sd">    ``realistic_image`` — a photograph, whatever the prompt describes — and</span>
+<span class="sd">    lists the styles that actually give a woodcut or a linocut. Empty when the</span>
+<span class="sd">    catalogue records none (fal's OpenAPI schema is the full source).</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">get_model</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">param_specs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
 
 
 

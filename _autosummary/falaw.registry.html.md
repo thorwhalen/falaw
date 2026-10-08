@@ -23,6 +23,7 @@ Bridges (skill / MCP / HTTP) read the tool registry. Operations call
 | `list_models`(\*[, category, quality_tier])                                               |                                                                                                                                               |
 | `list_tools`(\*[, tag])                                                                   |                                                                                                                                               |
 | [`model_constraints`](#falaw.registry.model_constraints)(id)                    | The capability/limit fields for a model — the "static reminder of limitations" a shot-list builder surfaces.                                  |
+| [`model_params`](#falaw.registry.model_params)(id)                         | Per-model parameters worth knowing before a call, `{name: spec}`.                                                                             |
 | [`models_table_version`](#falaw.registry.models_table_version)()                   | The catalogue's version — see [`falaw.base.data_table_version()`](falaw.base.html.md#falaw.base.data_table_version). |
 | [`pick_model`](#falaw.registry.pick_model)(\*, category[, quality_tier]) | Pick a sensible fal model for a (category, quality) request.                                                                                  |
 | [`register_tool`](#falaw.registry.register_tool)(\*\*spec_kwargs)           | Decorator: register the wrapped function as a falaw tool.                                                                                     |
@@ -39,6 +40,19 @@ limitations” a shot-list builder surfaces. Resolves aliases.
 
 Returns a JSON-able dict; `max_clip_seconds` etc. are `None` / empty
 when unknown for that model.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### falaw.registry.model_params(id)
+
+Per-model parameters worth knowing before a call, `{name: spec}`.
+
+Each spec is `{"enum": [...], "default": ...}`; resolves aliases. For
+`fal-ai/recraft/v3/text-to-image` this shows `style` defaults to
+`realistic_image` — a photograph, whatever the prompt describes — and
+lists the styles that actually give a woodcut or a linocut. Empty when the
+catalogue records none (fal’s OpenAPI schema is the full source).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)

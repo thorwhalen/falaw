@@ -1,4 +1,4 @@
-> built 2026-10-05 14:17 UTC from e3a41b6 (main) · falaw 0.0.56. Details: build_info.json
+> built 2026-10-08 06:47 UTC from a9e75be (main) · falaw 0.0.57. Details: build_info.json
 
 # index.html.md
 
@@ -542,7 +542,7 @@ How the estimate was obtained — `"docs"`,
 `"empirical"`, `"approximate"`. Lets us flag stale or
 unverified entries in audits.
 
-### *class* falaw.base.ModelRecord(, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='')
+### *class* falaw.base.ModelRecord(\*, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='', max_prompt_chars=None, size_param='image_size', param_specs=<factory>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -558,11 +558,31 @@ plastic-skin look). Empty when none.
 Practical max length of a single generated clip, in seconds (e.g. ~10
 for Seedance). Drives the “this shot is too long, split it” warning.
 
+#### max_prompt_chars *: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Hard cap on `prompt` length, from the model’s OpenAPI schema. Calls
+over it fail at fal with an HTTP 422 after queueing; falaw raises first.
+
+#### param_specs *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]*
+
+Discoverable per-model parameters that matter for choosing well, as
+`{name: {"enum": [...], "default": ...}}` — e.g. Recraft’s `style`,
+whose photoreal default silently overrides a woodcut prompt. See
+[`falaw.model_params()`](_autosummary/falaw.html.md#falaw.model_params).
+
 #### single_character_recommended *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
 True when the model handles a single character per shot far better than
 multiple interacting ones — drives the “two characters, consider
 shot/reverse-shot” warning.
+
+#### size_param *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+`"image_size"` (fal’s named
+presets, the default) or `"aspect_ratio"` (+ `resolution`).
+
+* **Type:**
+  Which argument carries the output size
 
 #### supported_resolutions *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]*
 
@@ -1925,6 +1945,7 @@ True
 | [`FalInsufficientFunds`](_autosummary/falaw.errors.html.md#falaw.errors.FalInsufficientFunds)(message, \*, status_code)      | Account balance is insufficient — typical 402.                               |
 | [`FalModelHung`](_autosummary/falaw.errors.html.md#falaw.errors.FalModelHung)(message, \*, model_id, elapsed_s)      | A model was queued but never returned — distinct from a network timeout.     |
 | [`FalNonCanonicalArgument`](_autosummary/falaw.errors.html.md#falaw.errors.FalNonCanonicalArgument)(message, \*, path)          | An argument cannot be canonicalised into falaw's hashed JSON form.           |
+| [`FalPromptTooLong`](_autosummary/falaw.errors.html.md#falaw.errors.FalPromptTooLong)(message, \*, model, limit, ...)    | The prompt exceeds the model's hard length cap (falaw#76).                   |
 | [`FalRateLimited`](_autosummary/falaw.errors.html.md#falaw.errors.FalRateLimited)(message, \*[, retry_after_s])        | fal is throttling requests — typical 429.                                    |
 | [`FalServerError`](_autosummary/falaw.errors.html.md#falaw.errors.FalServerError)(message, \*, status_code[, ...])     | fal-side server error — typical 5xx.                                         |
 | [`FalTimeout`](_autosummary/falaw.errors.html.md#falaw.errors.FalTimeout)(message, \*, elapsed_s[, application])   | The fal call timed out before producing a result.                            |
@@ -2025,6 +2046,16 @@ different calls into one cache key, handing back the *wrong artifact* as
 a supposed saving (falaw#17).
 
 `path` names the offending node, e.g. `arguments.extra.ref`.
+
+### *exception* falaw.errors.FalPromptTooLong(message, , model, limit, length)
+
+Bases: [`FalError`](_autosummary/falaw.errors.html.md#falaw.errors.FalError), [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+The prompt exceeds the model’s hard length cap (falaw#76).
+
+Raised before any call is queued: fal answers an over-long prompt with an
+HTTP 422 only after the request round-trips. `limit`/`length` are in
+characters.
 
 ### *exception* falaw.errors.FalRateLimited(message, , retry_after_s=None, \*\*kwargs)
 
@@ -2298,6 +2329,7 @@ Leave notes for future sessions:
 | [`parse_screenplay`](_autosummary/falaw.html.md#falaw.parse_screenplay)(text, \*[, title, style, model])  | Convert prose screenplay text into a Scene IR via an LLM call.                                                                                          |
 | [`pick_model`](_autosummary/falaw.html.md#falaw.pick_model)(\*, category[, quality_tier])           | Pick a sensible fal model for a (category, quality) request.                                                                                            |
 | [`model_constraints`](_autosummary/falaw.html.md#falaw.model_constraints)(id)                              | The capability/limit fields for a model — the "static reminder of limitations" a shot-list builder surfaces.                                            |
+| [`model_params`](_autosummary/falaw.html.md#falaw.model_params)(id)                                   | Per-model parameters worth knowing before a call, `{name: spec}`.                                                                                       |
 | [`video_model_constraints`](_autosummary/falaw.html.md#falaw.video_model_constraints)()                          | `model_constraints` for every video model in the catalog — the data a shot-list builder shows as its model-limits reference.                            |
 | [`plan_animate_face`](_autosummary/falaw.html.md#falaw.plan_animate_face)(image_url, audio_url, \*[, ...]) | Plan a [`falaw.animate_face()`](_autosummary/falaw.html.md#falaw.animate_face) call (image + audio → talking video).                                      |
 | [`plan_composite_character_in_environment`](_autosummary/falaw.html.md#falaw.plan_composite_character_in_environment)(...)       | Plan a [`falaw.composite_character_in_environment()`](_autosummary/falaw.html.md#falaw.composite_character_in_environment) call.                                                |
@@ -2313,6 +2345,8 @@ Leave notes for future sessions:
 | [`refresh_llms`](_autosummary/falaw.html.md#falaw.refresh_llms)(\*[, docs_dir, journal])              | Refresh `llms.txt` and `llms-full.txt`; return a summary dict.                                                                                          |
 | [`refresh_models_from_corpus`](_autosummary/falaw.html.md#falaw.refresh_models_from_corpus)(\*[, path, write])      | Merge corpus-discovered models into models.json (additive).                                                                                             |
 | [`refresh_model_prices`](_autosummary/falaw.html.md#falaw.refresh_model_prices)(\*[, write, api_key, ...])    | Refresh `models.json` cost estimates from fal's pricing API.                                                                                            |
+| [`check_model_liveness`](_autosummary/falaw.html.md#falaw.check_model_liveness)([ids, status_of])             | `{endpoint_id: is_live}` for `ids` (default: every catalogued model).                                                                                   |
+| [`dead_models`](_autosummary/falaw.html.md#falaw.dead_models)([ids, status_of])                      | The ids from [`check_model_liveness()`](_autosummary/falaw.html.md#falaw.check_model_liveness) that are no longer deployed.                                       |
 | [`fetch_model_prices`](_autosummary/falaw.html.md#falaw.fetch_model_prices)(endpoint_ids, \*[, ...])        | `{endpoint_id: {"unit_price", "unit", "currency"}}` from fal's API.                                                                                     |
 | [`refresh_llm_rates`](_autosummary/falaw.html.md#falaw.refresh_llm_rates)(\*[, write, ...])                | Fetch both sources, propose a fresh table, diff it — never overwrite.                                                                                   |
 | [`refresh_state`](_autosummary/falaw.html.md#falaw.refresh_state)()                                    | Return the saved per-source refresh state (etags, last fetch times).                                                                                    |
@@ -2382,6 +2416,7 @@ Leave notes for future sessions:
 | [`FalInsufficientFunds`](_autosummary/falaw.html.md#falaw.FalInsufficientFunds)(message, \*, status_code)      | Account balance is insufficient — typical 402.                               |
 | [`FalModelHung`](_autosummary/falaw.html.md#falaw.FalModelHung)(message, \*, model_id, elapsed_s)      | A model was queued but never returned — distinct from a network timeout.     |
 | [`FalNonCanonicalArgument`](_autosummary/falaw.html.md#falaw.FalNonCanonicalArgument)(message, \*, path)          | An argument cannot be canonicalised into falaw's hashed JSON form.           |
+| [`FalPromptTooLong`](_autosummary/falaw.html.md#falaw.FalPromptTooLong)(message, \*, model, limit, ...)    | The prompt exceeds the model's hard length cap (falaw#76).                   |
 | [`FalRateLimited`](_autosummary/falaw.html.md#falaw.FalRateLimited)(message, \*[, retry_after_s])        | fal is throttling requests — typical 429.                                    |
 | [`FalServerError`](_autosummary/falaw.html.md#falaw.FalServerError)(message, \*, status_code[, ...])     | fal-side server error — typical 5xx.                                         |
 | [`FalTimeout`](_autosummary/falaw.html.md#falaw.FalTimeout)(message, \*, elapsed_s[, application])   | The fal call timed out before producing a result.                            |
@@ -3029,6 +3064,16 @@ a supposed saving (falaw#17).
 
 `path` names the offending node, e.g. `arguments.extra.ref`.
 
+### *exception* falaw.FalPromptTooLong(message, , model, limit, length)
+
+Bases: [`FalError`](_autosummary/falaw.errors.html.md#falaw.errors.FalError), [`ValueError`](https://docs.python.org/3/builtins/exceptions.html#ValueError)
+
+The prompt exceeds the model’s hard length cap (falaw#76).
+
+Raised before any call is queued: fal answers an over-long prompt with an
+HTTP 422 only after the request round-trips. `limit`/`length` are in
+characters.
+
 ### *exception* falaw.FalRateLimited(message, , retry_after_s=None, \*\*kwargs)
 
 Bases: [`FalHTTPError`](_autosummary/falaw.errors.html.md#falaw.errors.FalHTTPError)
@@ -3138,7 +3183,7 @@ Field semantics, honest by construction:
   `"rate_table:per_call"`, `"registry:<kind>"` (the fallback for a
   model the table does not price), or `"unknown"`.
 
-### *class* falaw.ModelRecord(, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='')
+### *class* falaw.ModelRecord(\*, id, category, description='', aliases=(), quality_tier='', cost_hint='', cost_estimate=None, docs_url='', max_clip_seconds=None, single_character_recommended=False, supported_resolutions=(), default_negative_prompt='', max_prompt_chars=None, size_param='image_size', param_specs=<factory>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
 
@@ -3154,11 +3199,31 @@ plastic-skin look). Empty when none.
 Practical max length of a single generated clip, in seconds (e.g. ~10
 for Seedance). Drives the “this shot is too long, split it” warning.
 
+#### max_prompt_chars *: [int](https://docs.python.org/3/builtins/functions.html#int) | [None](https://docs.python.org/3/builtins/constants.html#None)*
+
+Hard cap on `prompt` length, from the model’s OpenAPI schema. Calls
+over it fail at fal with an HTTP 422 after queueing; falaw raises first.
+
+#### param_specs *: [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Mapping](https://docs.python.org/3/library/typing.html#typing.Mapping)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), [Any](https://docs.python.org/3/library/typing.html#typing.Any)]]*
+
+Discoverable per-model parameters that matter for choosing well, as
+`{name: {"enum": [...], "default": ...}}` — e.g. Recraft’s `style`,
+whose photoreal default silently overrides a woodcut prompt. See
+[`falaw.model_params()`](_autosummary/falaw.html.md#falaw.model_params).
+
 #### single_character_recommended *: [bool](https://docs.python.org/3/builtins/functions.html#bool)*
 
 True when the model handles a single character per shot far better than
 multiple interacting ones — drives the “two characters, consider
 shot/reverse-shot” warning.
+
+#### size_param *: [str](https://docs.python.org/3/builtins/stdtypes.html#str)*
+
+`"image_size"` (fal’s named
+presets, the default) or `"aspect_ratio"` (+ `resolution`).
+
+* **Type:**
+  Which argument carries the output size
 
 #### supported_resolutions *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]*
 
@@ -3691,6 +3756,16 @@ hint that was never supplied is recorded as absent rather than as `null`
 {}
 ```
 
+### falaw.check_model_liveness(ids=None, , status_of=None)
+
+`{endpoint_id: is_live}` for `ids` (default: every catalogued model).
+
+Only a 404 means dead; any other non-200 answer (rate limit, fal outage)
+raises rather than report a live model as dead, which would get it deleted.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
 ### falaw.clear_subscribers()
 
 Drop all registered subscribers. Mostly for tests.
@@ -3789,6 +3864,13 @@ the fal SDK’s own `FAL_KEY` env-var lookup.
 
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### falaw.dead_models(ids=None, , status_of=None)
+
+The ids from [`check_model_liveness()`](_autosummary/falaw.html.md#falaw.check_model_liveness) that are no longer deployed.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 ### falaw.default_content_store()
 
@@ -4127,6 +4209,13 @@ with identical inputs collapse to the same cache entry.
 
 Generate an image from a text prompt.
 
+`image_size` is a fal preset (`landscape_16_9` …); models that size by
+`aspect_ratio` (`nano-banana-pro`) get the equivalent ratio, with
+`extra={"resolution": "2K"}` for the pixel tier. A prompt over the
+model’s cap raises [`falaw.FalPromptTooLong`](_autosummary/falaw.html.md#falaw.FalPromptTooLong) before any call. Check
+[`falaw.model_params()`](_autosummary/falaw.html.md#falaw.model_params) for enums whose default may not be what you
+want (Recraft `style` defaults to photoreal).
+
 * **Return type:**
   [`Result`](_autosummary/falaw.results.html.md#falaw.results.Result)
 
@@ -4410,6 +4499,19 @@ limitations” a shot-list builder surfaces. Resolves aliases.
 
 Returns a JSON-able dict; `max_clip_seconds` etc. are `None` / empty
 when unknown for that model.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### falaw.model_params(id)
+
+Per-model parameters worth knowing before a call, `{name: spec}`.
+
+Each spec is `{"enum": [...], "default": ...}`; resolves aliases. For
+`fal-ai/recraft/v3/text-to-image` this shows `style` defaults to
+`realistic_image` — a photograph, whatever the prompt describes — and
+lists the styles that actually give a woodcut or a linocut. Empty when the
+catalogue records none (fal’s OpenAPI schema is the full source).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
@@ -5143,6 +5245,7 @@ Generate speech in a cloned voice.
 | [`degrade`](_autosummary/falaw.degrade.html.md#module-falaw.degrade)                     | Where falaw sends "I carried on, but you should know" — one collection point.                                         |
 | [`errors`](_autosummary/falaw.errors.html.md#module-falaw.errors)                       | Typed exceptions for falaw operations.                                                                                |
 | [`events`](_autosummary/falaw.events.html.md#module-falaw.events)                       | Structured progress events for fal calls.                                                                             |
+| [`liveness`](_autosummary/falaw.liveness.html.md#module-falaw.liveness)                   | Is a catalogued endpoint still deployed? (falaw#76)                                                                   |
 | [`llm_rates`](_autosummary/falaw.llm_rates.html.md#module-falaw.llm_rates)                 | Per-routed-model LLM rates: the data behind a *ceiling* quote (falaw#50, option A).                                   |
 | [`llm_rates_refresh`](_autosummary/falaw.llm_rates_refresh.html.md#module-falaw.llm_rates_refresh) | Refresh proposals for the LLM rate table, never a silent overwrite (falaw#56).                                        |
 | [`local`](_autosummary/falaw.local.html.md#module-falaw.local)                         | Local utilities: ffmpeg + PIL glue for stitching fal outputs.                                                         |
@@ -5219,6 +5322,58 @@ a process-wide sequence number breaking same-tick ties, so
 ### *class* falaw.journal.JournalEntry(\*, id, timestamp, kind, text, tags=(), suggestion='', context=<factory>)
 
 Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+
+# _autosummary/falaw.liveness.html.md
+
+# falaw.liveness
+
+Is a catalogued endpoint still deployed? (falaw#76)
+
+fal retires endpoints without notice (`fal-ai/imagen4/preview/ultra` answers
+`404 Application "imagen4" not found`), and `pick_model` would keep
+picking them. fal’s OpenAPI endpoint answers 404 for a dead id and 200 for a
+live one without a billed call or an API key, so one GET per id is a free
+liveness probe.
+
+### Module Attributes
+
+| [`OPENAPI_URL`](_autosummary/falaw.liveness.html.md#falaw.liveness.OPENAPI_URL)   | `?endpoint_id=<id>` selects the endpoint.                          |
+|----------------------------------------------------------------|--------------------------------------------------------------------|
+| [`StatusGetter`](_autosummary/falaw.liveness.html.md#falaw.liveness.StatusGetter)  | `url -> HTTP status`; injectable so tests never touch the network. |
+
+### Functions
+
+| [`check_model_liveness`](_autosummary/falaw.liveness.html.md#falaw.liveness.check_model_liveness)([ids, status_of])   | `{endpoint_id: is_live}` for `ids` (default: every catalogued model).                                             |
+|-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| [`dead_models`](_autosummary/falaw.liveness.html.md#falaw.liveness.dead_models)([ids, status_of])            | The ids from [`check_model_liveness()`](_autosummary/falaw.liveness.html.md#falaw.liveness.check_model_liveness) that are no longer deployed. |
+
+### falaw.liveness.OPENAPI_URL *= 'https://fal.ai/api/openapi/queue/openapi.json'*
+
+`?endpoint_id=<id>` selects the endpoint.
+
+### falaw.liveness.StatusGetter
+
+`url -> HTTP status`; injectable so tests never touch the network.
+
+alias of `Callable`[[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)], [`int`](https://docs.python.org/3/builtins/functions.html#int)]
+
+### falaw.liveness.check_model_liveness(ids=None, , status_of=None)
+
+`{endpoint_id: is_live}` for `ids` (default: every catalogued model).
+
+Only a 404 means dead; any other non-200 answer (rate limit, fal outage)
+raises rather than report a live model as dead, which would get it deleted.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`bool`](https://docs.python.org/3/builtins/functions.html#bool)]
+
+### falaw.liveness.dead_models(ids=None, , status_of=None)
+
+The ids from [`check_model_liveness()`](_autosummary/falaw.liveness.html.md#falaw.liveness.check_model_liveness) that are no longer deployed.
+
+* **Return type:**
+  [`list`](https://docs.python.org/3/builtins/stdtypes.html#list)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
 
 
 # _autosummary/falaw.llm_rates.html.md
@@ -5941,6 +6096,13 @@ Edit an image with a natural-language instruction.
 ### falaw.operations.images.generate_image(prompt, , quality='balanced', image_size='landscape_4_3', model_id=None, extra=None)
 
 Generate an image from a text prompt.
+
+`image_size` is a fal preset (`landscape_16_9` …); models that size by
+`aspect_ratio` (`nano-banana-pro`) get the equivalent ratio, with
+`extra={"resolution": "2K"}` for the pixel tier. A prompt over the
+model’s cap raises [`falaw.FalPromptTooLong`](_autosummary/falaw.html.md#falaw.FalPromptTooLong) before any call. Check
+[`falaw.model_params()`](_autosummary/falaw.html.md#falaw.model_params) for enums whose default may not be what you
+want (Recraft `style` defaults to photoreal).
 
 * **Return type:**
   [`Result`](_autosummary/falaw.results.html.md#falaw.results.Result)
@@ -7790,6 +7952,7 @@ Bridges (skill / MCP / HTTP) read the tool registry. Operations call
 | `list_models`(\*[, category, quality_tier])                                               |                                                                                                                                               |
 | `list_tools`(\*[, tag])                                                                   |                                                                                                                                               |
 | [`model_constraints`](_autosummary/falaw.registry.html.md#falaw.registry.model_constraints)(id)                    | The capability/limit fields for a model — the "static reminder of limitations" a shot-list builder surfaces.                                  |
+| [`model_params`](_autosummary/falaw.registry.html.md#falaw.registry.model_params)(id)                         | Per-model parameters worth knowing before a call, `{name: spec}`.                                                                             |
 | [`models_table_version`](_autosummary/falaw.registry.html.md#falaw.registry.models_table_version)()                   | The catalogue's version — see [`falaw.base.data_table_version()`](_autosummary/falaw.base.html.md#falaw.base.data_table_version). |
 | [`pick_model`](_autosummary/falaw.registry.html.md#falaw.registry.pick_model)(\*, category[, quality_tier]) | Pick a sensible fal model for a (category, quality) request.                                                                                  |
 | [`register_tool`](_autosummary/falaw.registry.html.md#falaw.registry.register_tool)(\*\*spec_kwargs)           | Decorator: register the wrapped function as a falaw tool.                                                                                     |
@@ -7806,6 +7969,19 @@ limitations” a shot-list builder surfaces. Resolves aliases.
 
 Returns a JSON-able dict; `max_clip_seconds` etc. are `None` / empty
 when unknown for that model.
+
+* **Return type:**
+  [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
+
+### falaw.registry.model_params(id)
+
+Per-model parameters worth knowing before a call, `{name: spec}`.
+
+Each spec is `{"enum": [...], "default": ...}`; resolves aliases. For
+`fal-ai/recraft/v3/text-to-image` this shows `style` defaults to
+`realistic_image` — a photograph, whatever the prompt describes — and
+lists the styles that actually give a woodcut or a linocut. Empty when the
+catalogue records none (fal’s OpenAPI schema is the full source).
 
 * **Return type:**
   [`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict)
@@ -8890,16 +9066,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-10-05 14:17 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/e3a41b658d4a3242d916838c2bed704f968f4880"><code>e3a41b6</code></a> on branch <code>main</code>, for **falaw 0.0.56** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-08 06:47 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/a9e75be2054d24a8cbb165d0905496a3f0abcbc1"><code>a9e75be</code></a> on branch <code>main</code>, for **falaw 0.0.57** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/e3a41b658d4a3242d916838c2bed704f968f4880"><code>e3a41b658d4a3242d916838c2bed704f968f4880</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/a9e75be2054d24a8cbb165d0905496a3f0abcbc1"><code>a9e75be2054d24a8cbb165d0905496a3f0abcbc1</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -8910,9 +9088,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37323296895">37323296895</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37739370600">37739370600</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>e3a41b658d4a3242d916838c2bed704f968f4880</code> (in the history of the built commit) |
+| Event commit | <code>a9e75be2054d24a8cbb165d0905496a3f0abcbc1</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8937,13 +9115,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.56/">0.0.56</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/falaw/0.0.58/">0.0.58</a>, newer than the documented version (0.0.57).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout e3a41b658d4a3242d916838c2bed704f968f4880
+git checkout a9e75be2054d24a8cbb165d0905496a3f0abcbc1
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

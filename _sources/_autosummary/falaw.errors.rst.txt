@@ -26,6 +26,7 @@ falaw.errors
       FalInsufficientFunds
       FalModelHung
       FalNonCanonicalArgument
+      FalPromptTooLong
       FalRateLimited
       FalServerError
       FalTimeout

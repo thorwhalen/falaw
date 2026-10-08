@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -409,7 +409,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.56" />
+  <meta name="docsearch:version" content="0.0.57" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -830,7 +830,22 @@ window.runMermaid = runMermaid;</script>
 <span class="w">    </span><span class="sd">"""Resolutions the model offers, cheap→expensive (e.g. ("720p", "1080p"))."""</span>
     <span class="n">default_negative_prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">""</span>
 <span class="w">    </span><span class="sd">"""Quality/realism negatives worth appending by default (e.g. to avoid the</span>
-<span class="sd">    plastic-skin look). Empty when none."""</span></div>
+<span class="sd">    plastic-skin look). Empty when none."""</span>
+
+    <span class="c1"># --- request-shape metadata (image models; falaw#76) ---</span>
+    <span class="n">max_prompt_chars</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">"""Hard cap on ``prompt`` length, from the model's OpenAPI schema. Calls</span>
+<span class="sd">    over it fail at fal with an HTTP 422 after queueing; falaw raises first."""</span>
+    <span class="n">size_param</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"image_size"</span>
+<span class="w">    </span><span class="sd">"""Which argument carries the output size: ``"image_size"`` (fal's named</span>
+<span class="sd">    presets, the default) or ``"aspect_ratio"`` (+ ``resolution``)."""</span>
+    <span class="n">param_specs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">hash</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">"""Discoverable per-model parameters that matter for choosing well, as</span>
+<span class="sd">    ``{name: {"enum": [...], "default": ...}}`` — e.g. Recraft's ``style``,</span>
+<span class="sd">    whose photoreal default silently overrides a woodcut prompt. See</span>
+<span class="sd">    :func:`falaw.model_params`."""</span></div>
 
 </pre></div>
 

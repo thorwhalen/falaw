@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../../../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -409,7 +409,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.56" />
+  <meta name="docsearch:version" content="0.0.57" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -719,6 +719,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..core</span><span class="w"> </span><span class="kn">import</span> <span class="n">call_fal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_model</span><span class="p">,</span> <span class="n">register_tool</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..results</span><span class="w"> </span><span class="kn">import</span> <span class="n">Result</span><span class="p">,</span> <span class="n">parse_response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._image_args</span><span class="w"> </span><span class="kn">import</span> <span class="n">image_arguments</span><span class="p">,</span> <span class="n">known_record</span>
 
 
 <div class="viewcode-block" id="generate_image">
@@ -761,9 +762,17 @@ window.runMermaid = runMermaid;</script>
     <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">extra</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Result</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Generate an image from a text prompt."""</span>
+<span class="w">    </span><span class="sd">"""Generate an image from a text prompt.</span>
+
+<span class="sd">    ``image_size`` is a fal preset (``landscape_16_9`` …); models that size by</span>
+<span class="sd">    ``aspect_ratio`` (``nano-banana-pro``) get the equivalent ratio, with</span>
+<span class="sd">    ``extra={"resolution": "2K"}`` for the pixel tier. A prompt over the</span>
+<span class="sd">    model's cap raises :class:`falaw.FalPromptTooLong` before any call. Check</span>
+<span class="sd">    :func:`falaw.model_params` for enums whose default may not be what you</span>
+<span class="sd">    want (Recraft ``style`` defaults to photoreal).</span>
+<span class="sd">    """</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">model_id</span> <span class="ow">or</span> <span class="n">pick_model</span><span class="p">(</span><span class="n">category</span><span class="o">=</span><span class="s2">"image"</span><span class="p">,</span> <span class="n">quality_tier</span><span class="o">=</span><span class="n">quality</span><span class="p">)</span><span class="o">.</span><span class="n">id</span>
-    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"prompt"</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">"image_size"</span><span class="p">:</span> <span class="n">image_size</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">extra</span> <span class="ow">or</span> <span class="p">{})}</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="n">image_arguments</span><span class="p">(</span><span class="n">known_record</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
     <span class="n">raw</span> <span class="o">=</span> <span class="n">call_fal</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">parse_response</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">application</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">arguments</span><span class="o">=</span><span class="n">arguments</span><span class="p">)</span></div>
 

@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=8f83b1af"></script>
+    <script src="../_static/documentation_options.js?v=2bfb35b6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
     <link rel="prev" title="falaw.operations.avatar" href="falaw.operations.avatar.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.56" />
+  <meta name="docsearch:version" content="0.0.57" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -337,6 +337,7 @@
 <li class="toctree-l2"><a class="reference internal" href="falaw.degrade.html">falaw.degrade</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.errors.html">falaw.errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.events.html">falaw.events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="falaw.liveness.html">falaw.liveness</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates.html">falaw.llm_rates</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.llm_rates_refresh.html">falaw.llm_rates_refresh</a></li>
 <li class="toctree-l2"><a class="reference internal" href="falaw.local.html">falaw.local</a></li>
@@ -491,6 +492,12 @@ balanced/high tier). Pass <code class="docutils literal notranslate"><span class
 <dt class="sig sig-object py" id="falaw.operations.images.generate_image">
 <span class="sig-prename descclassname"><span class="pre">falaw.operations.images.</span></span><span class="sig-name descname"><span class="pre">generate_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'balanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'landscape_4_3'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/operations/images.html#generate_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.operations.images.generate_image" title="Link to this definition">#</a></dt>
 <dd><p>Generate an image from a text prompt.</p>
+<p><code class="docutils literal notranslate"><span class="pre">image_size</span></code> is a fal preset (<code class="docutils literal notranslate"><span class="pre">landscape_16_9</span></code> …); models that size by
+<code class="docutils literal notranslate"><span class="pre">aspect_ratio</span></code> (<code class="docutils literal notranslate"><span class="pre">nano-banana-pro</span></code>) get the equivalent ratio, with
+<code class="docutils literal notranslate"><span class="pre">extra={&quot;resolution&quot;:</span> <span class="pre">&quot;2K&quot;}</span></code> for the pixel tier. A prompt over the
+model’s cap raises <a class="reference internal" href="falaw.html#falaw.FalPromptTooLong" title="falaw.FalPromptTooLong"><code class="xref py py-class docutils literal notranslate"><span class="pre">falaw.FalPromptTooLong</span></code></a> before any call. Check
+<a class="reference internal" href="falaw.html#falaw.model_params" title="falaw.model_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">falaw.model_params()</span></code></a> for enums whose default may not be what you
+want (Recraft <code class="docutils literal notranslate"><span class="pre">style</span></code> defaults to photoreal).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="falaw.results.html#falaw.results.Result" title="falaw.results.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a></span></p>
