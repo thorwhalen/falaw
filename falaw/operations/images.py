@@ -7,6 +7,7 @@ from typing import Optional
 from ..core import call_fal
 from ..registry import pick_model, register_tool
 from ..results import Result, parse_response
+from ._image_args import image_arguments, known_record
 
 
 @register_tool(
@@ -47,9 +48,17 @@ def generate_image(
     model_id: Optional[str] = None,
     extra: Optional[dict] = None,
 ) -> Result:
-    """Generate an image from a text prompt."""
+    """Generate an image from a text prompt.
+
+    ``image_size`` is a fal preset (``landscape_16_9`` …); models that size by
+    ``aspect_ratio`` (``nano-banana-pro``) get the equivalent ratio, with
+    ``extra={"resolution": "2K"}`` for the pixel tier. A prompt over the
+    model's cap raises :class:`falaw.FalPromptTooLong` before any call. Check
+    :func:`falaw.model_params` for enums whose default may not be what you
+    want (Recraft ``style`` defaults to photoreal).
+    """
     model = model_id or pick_model(category="image", quality_tier=quality).id
-    arguments = {"prompt": prompt, "image_size": image_size, **(extra or {})}
+    arguments = image_arguments(known_record(model), prompt, image_size, extra)
     raw = call_fal(model, arguments)
     return parse_response(raw, application=model, arguments=arguments)
 

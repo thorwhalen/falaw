@@ -25,6 +25,7 @@ import os
 from typing import Optional
 
 from ..cache import _cache_dir, cache_get, cache_put, cached_call_fal
+from ._image_args import image_arguments, known_record
 from ..registry import pick_model, register_tool
 from ..results import parse_response
 from ..scene import (
@@ -254,7 +255,7 @@ def render_shot(
     img_model = image_model_id or pick_model(category="image", quality_tier=quality).id
     img_raw = cached_call_fal(
         img_model,
-        {"prompt": prompt, "image_size": "landscape_16_9"},
+        image_arguments(known_record(img_model), prompt, "landscape_16_9", None),
         refresh=force,
     )
     img_result = parse_response(

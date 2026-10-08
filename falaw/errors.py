@@ -231,6 +231,21 @@ class FalNonCanonicalArgument(FalError):
         self.path = path
 
 
+class FalPromptTooLong(FalError, ValueError):
+    """The prompt exceeds the model's hard length cap (falaw#76).
+
+    Raised before any call is queued: fal answers an over-long prompt with an
+    HTTP 422 only after the request round-trips. ``limit``/``length`` are in
+    characters.
+    """
+
+    def __init__(self, message: str, *, model: str, limit: int, length: int):
+        super().__init__(message)
+        self.model = model
+        self.limit = limit
+        self.length = length
+
+
 # --- Translation from fal_client errors --------------------------------------
 
 

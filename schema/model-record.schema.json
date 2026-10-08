@@ -101,6 +101,27 @@
       "default": null,
       "title": "Max Clip Seconds"
     },
+    "max_prompt_chars": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Prompt Chars"
+    },
+    "param_specs": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "default": {},
+      "title": "Param Specs",
+      "type": "object"
+    },
     "quality_tier": {
       "default": "",
       "title": "Quality Tier",
@@ -110,6 +131,11 @@
       "default": false,
       "title": "Single Character Recommended",
       "type": "boolean"
+    },
+    "size_param": {
+      "default": "image_size",
+      "title": "Size Param",
+      "type": "string"
     },
     "supported_resolutions": {
       "default": [],
