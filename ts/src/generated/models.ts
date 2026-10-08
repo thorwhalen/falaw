@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { type ModelRecord, modelRecordSchema } from './model-record';
 
 /** Digest of the committed catalogue bytes — what a CostBasis records as `table_version`. */
-export const MODELS_TABLE_VERSION = "ef84deba655d";
+export const MODELS_TABLE_VERSION = "70b26c6bfd7b";
 
 /** The fal model catalogue, in catalogue order (curated entries first). Parsed through the
  *  schema at import so every record carries its defaults, as the Python dataclass does. */
@@ -337,24 +337,6 @@ export const MODELS: readonly ModelRecord[] = z.array(modelRecordSchema).parse([
     }
   },
   {
-    "id": "fal-ai/flux-2-pro",
-    "category": "image",
-    "description": "FLUX.2 [pro]: high-quality text-to-image, zero-config.",
-    "aliases": [
-      "flux-2-pro"
-    ],
-    "quality_tier": "high",
-    "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/flux-2-pro",
-    "cost_estimate": {
-      "kind": "per_megapixel",
-      "amount": 0.03,
-      "currency": "USD",
-      "notes": "fal pricing API, fetched 2026-10-08",
-      "source": "api"
-    }
-  },
-  {
     "id": "fal-ai/nano-banana-pro",
     "category": "image",
     "description": "Nano Banana Pro (Gemini 3 Pro Image): top-tier text rendering and instruction following. Sizes via aspect_ratio + resolution.",
@@ -368,7 +350,7 @@ export const MODELS: readonly ModelRecord[] = z.array(modelRecordSchema).parse([
       "kind": "per_image",
       "amount": 0.15,
       "currency": "USD",
-      "notes": "fal pricing API, fetched 2026-10-08",
+      "notes": "fal pricing API, fetched 2026-10-08; 1K/2K price, a 4K render may cost more",
       "source": "api"
     },
     "max_prompt_chars": 50000,

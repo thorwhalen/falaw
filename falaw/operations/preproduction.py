@@ -14,6 +14,7 @@ from dataclasses import replace
 from typing import Optional
 
 from ..cache import cached_call_fal
+from ._image_args import image_arguments, known_record
 from ..registry import pick_model, register_tool
 from ..results import Result, parse_response
 from ..scene import Character, Environment, Shot, Voice
@@ -85,7 +86,9 @@ def cast_character(
         if style:
             prompt = f"{description} | style: {style}"
         model = pick_model(category="image", quality_tier=quality).id
-        raw = cached_call_fal(model, {"prompt": prompt, "image_size": "portrait_4_3"})
+        raw = cached_call_fal(
+            model, image_arguments(known_record(model), prompt, "portrait_4_3", None)
+        )
         result = parse_response(raw, application=model, arguments={"prompt": prompt})
         if not result.first:
             raise RuntimeError(
@@ -203,7 +206,9 @@ def establish_environment(
             prompt_parts.append(f"lighting: {lighting}")
         prompt = " | ".join(prompt_parts)
         model = pick_model(category="image", quality_tier=quality).id
-        raw = cached_call_fal(model, {"prompt": prompt, "image_size": "landscape_16_9"})
+        raw = cached_call_fal(
+            model, image_arguments(known_record(model), prompt, "landscape_16_9", None)
+        )
         result = parse_response(raw, application=model, arguments={"prompt": prompt})
         if not result.first:
             raise RuntimeError(
@@ -278,5 +283,7 @@ def storyboard_shot(
     prompt = " | ".join(parts)
 
     model = pick_model(category="image", quality_tier=quality).id
-    raw = cached_call_fal(model, {"prompt": prompt, "image_size": "landscape_16_9"})
+    raw = cached_call_fal(
+        model, image_arguments(known_record(model), prompt, "landscape_16_9", None)
+    )
     return parse_response(raw, application=model, arguments={"prompt": prompt})

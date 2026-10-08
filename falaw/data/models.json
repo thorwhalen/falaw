@@ -326,24 +326,6 @@
     }
   },
   {
-    "id": "fal-ai/flux-2-pro",
-    "category": "image",
-    "description": "FLUX.2 [pro]: high-quality text-to-image, zero-config.",
-    "aliases": [
-      "flux-2-pro"
-    ],
-    "quality_tier": "high",
-    "cost_hint": "",
-    "docs_url": "https://fal.ai/models/fal-ai/flux-2-pro",
-    "cost_estimate": {
-      "kind": "per_megapixel",
-      "amount": 0.03,
-      "currency": "USD",
-      "notes": "fal pricing API, fetched 2026-10-08",
-      "source": "api"
-    }
-  },
-  {
     "id": "fal-ai/nano-banana-pro",
     "category": "image",
     "description": "Nano Banana Pro (Gemini 3 Pro Image): top-tier text rendering and instruction following. Sizes via aspect_ratio + resolution.",
@@ -357,7 +339,7 @@
       "kind": "per_image",
       "amount": 0.15,
       "currency": "USD",
-      "notes": "fal pricing API, fetched 2026-10-08",
+      "notes": "fal pricing API, fetched 2026-10-08; 1K/2K price, a 4K render may cost more",
       "source": "api"
     },
     "max_prompt_chars": 50000,

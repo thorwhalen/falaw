@@ -149,11 +149,37 @@ def test_nano_banana_pro_does_not_win_default_ultra_pick():
     )
 
 
-def test_flux_2_pro_uses_image_size_and_is_priced(monkeypatch):
+def test_flux_2_pro_unlisted_keeps_image_size(monkeypatch):
+    # Not catalogued (it would sort ahead of flux-pro/v1.1 on the next price
+    # refresh and silently become the default 'high' pick), but it works by id.
     seen = _capture(monkeypatch)
-    falaw.generate_image("a fox", model_id="flux-2-pro", image_size="square_hd")
+    falaw.generate_image("a fox", model_id="fal-ai/flux-2-pro", image_size="square_hd")
     assert seen["arguments"] == {"prompt": "a fox", "image_size": "square_hd"}
-    assert falaw.get_model("flux-2-pro").cost_estimate.amount == 0.03
+
+
+def test_model_record_stays_hashable():
+    hash(falaw.get_model("fal-ai/recraft/v3/text-to-image"))
+
+
+def test_default_picks_are_stable_under_the_refresh_sort():
+    # refresh_model_prices / refresh_models_from_corpus rewrite models.json
+    # sorted by (category, tier, id); the default pick must not move.
+    ms = sorted(
+        falaw.list_models(category="image"), key=lambda m: (m.quality_tier, m.id)
+    )
+    for tier in ("fast", "balanced", "high", "ultra"):
+        first = next(m for m in ms if m.quality_tier == tier)
+        assert first.id == falaw.pick_model(category="image", quality_tier=tier).id
+
+
+def test_render_shot_still_sizes_by_aspect_ratio(monkeypatch):
+    from falaw.operations._image_args import image_arguments
+
+    rec = falaw.get_model("nano-banana-pro")
+    assert image_arguments(rec, "p", "landscape_16_9", None) == {
+        "prompt": "p",
+        "aspect_ratio": "16:9",
+    }
 
 
 def test_unlisted_model_keeps_legacy_arguments(monkeypatch):

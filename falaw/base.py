@@ -116,7 +116,9 @@ class ModelRecord:
     size_param: str = "image_size"
     """Which argument carries the output size: ``"image_size"`` (fal's named
     presets, the default) or ``"aspect_ratio"`` (+ ``resolution``)."""
-    param_specs: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    param_specs: Mapping[str, Mapping[str, Any]] = field(
+        default_factory=dict, hash=False
+    )
     """Discoverable per-model parameters that matter for choosing well, as
     ``{name: {"enum": [...], "default": ...}}`` — e.g. Recraft's ``style``,
     whose photoreal default silently overrides a woodcut prompt. See
