@@ -4,8 +4,43 @@ from __future__ import annotations
 
 import mimetypes
 import os
+import warnings
 from dataclasses import dataclass, field
 from typing import Any, Optional
+
+
+def _fetch(url: str) -> bytes:
+    """Asset bytes through falaw's one transport (``falaw.content``)."""
+    from falaw.content import default_url_fetcher
+
+    return b"".join(default_url_fetcher()(url))
+
+
+_MAGIC = (
+    (b"\x89PNG\r\n\x1a\n", ".png"),
+    (b"\xff\xd8\xff", ".jpg"),
+    (b"GIF8", ".gif"),
+)
+
+
+def sniff_extension(data: bytes) -> str:
+    """Extension implied by the leading bytes ('' if unrecognised)."""
+    head = data[:2048]
+    for magic, ext in _MAGIC:
+        if head.startswith(magic):
+            return ext
+    if head[:4] == b"RIFF" and head[8:12] == b"WEBP":
+        return ".webp"
+    text = head.lstrip(b"\xef\xbb\xbf \t\r\n").lower()
+    if text.startswith((b"<svg", b"<?xml")) and b"<svg" in head.lower():
+        return ".svg"
+    return ""
+
+
+def _same_format(suffix: str, sniffed: str) -> bool:
+    norm = {".jpeg": ".jpg"}
+    suffix = suffix.lower()
+    return norm.get(suffix, suffix) == sniffed
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,19 +58,40 @@ class Asset:
     duration_s: float = 0.0
     metadata: dict = field(default_factory=dict)
 
-    def download(self, *, to: Optional[str] = None) -> str:
-        """Download the asset to a file. Returns the local path."""
-        import urllib.request
+    def download(self, *, to: Optional[str] = None, fix_suffix: bool = False) -> str:
+        """Download the asset to a file. Returns the local path.
 
+        The bytes are sniffed: some models return a different format than the
+        usual one (Recraft's ``vector_illustration/*`` styles return SVG, not
+        PNG). If the suffix of ``to`` contradicts the content, a
+        ``UserWarning`` is issued; with ``fix_suffix=True`` the suffix is
+        corrected instead (so the returned path may differ from ``to``).
+        """
+        data = _fetch(self.url)
+        sniffed = sniff_extension(data)
         if to is None:
             to = os.path.join(
                 os.getcwd(),
-                f"falaw_asset_{abs(hash(self.url)) % 10**8}{self._infer_extension()}",
+                f"falaw_asset_{abs(hash(self.url)) % 10**8}"
+                f"{sniffed or self._infer_extension()}",
             )
+        elif sniffed and not _same_format(os.path.splitext(to)[1], sniffed):
+            if fix_suffix:
+                to = os.path.splitext(to)[0] + sniffed
+            else:
+                warnings.warn(
+                    f"{to!r}: content is {sniffed!r} but the suffix says "
+                    f"{os.path.splitext(to)[1]!r}; some models return a different "
+                    "format than usual (e.g. Recraft vector_illustration/* "
+                    "styles return SVG). Pass fix_suffix=True to correct it.",
+                    UserWarning,
+                    stacklevel=2,
+                )
         parent = os.path.dirname(os.path.abspath(to))
         if parent:
             os.makedirs(parent, exist_ok=True)
-        urllib.request.urlretrieve(self.url, to)
+        with open(to, "wb") as f:
+            f.write(data)
         return to
 
     def _infer_extension(self) -> str:
@@ -72,7 +128,7 @@ class Result:
         stem_base = self.application.replace("/", "_") or "asset"
         for i, a in enumerate(self.assets):
             path = os.path.join(to_dir, f"{stem_base}_{i}{a._infer_extension()}")
-            paths.append(a.download(to=path))
+            paths.append(a.download(to=path, fix_suffix=True))
         return paths
 
 
