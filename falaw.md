@@ -1,4 +1,4 @@
-> built 2026-10-08 06:47 UTC from a9e75be (main) · falaw 0.0.57. Details: build_info.json
+> built 2026-10-08 06:58 UTC from 5c2ae08 (main) · falaw 0.0.58. Details: build_info.json
 
 # index.html.md
 
@@ -2489,9 +2489,15 @@ A single piece of generated media.
 
 Holds the URL plus minimal typed metadata. `download` materializes it.
 
-#### download(, to=None)
+#### download(, to=None, fix_suffix=False)
 
 Download the asset to a file. Returns the local path.
+
+The bytes are sniffed: some models return a different format than the
+usual one (Recraft’s `vector_illustration/*` styles return SVG, not
+PNG). If the suffix of `to` contradicts the content, a
+`UserWarning` is issued; with `fix_suffix=True` the suffix is
+corrected instead (so the returned path may differ from `to`).
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -8347,8 +8353,9 @@ Result wrapper: parse fal responses into typed assets, lazy download.
 
 ### Functions
 
-| [`parse_response`](_autosummary/falaw.results.html.md#falaw.results.parse_response)(raw, \*, application, arguments)   | Best-effort parser over the common fal response shapes.   |
-|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| [`parse_response`](_autosummary/falaw.results.html.md#falaw.results.parse_response)(raw, \*, application, arguments)   | Best-effort parser over the common fal response shapes.      |
+|----------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| [`sniff_extension`](_autosummary/falaw.results.html.md#falaw.results.sniff_extension)(data)                             | Extension implied by the leading bytes ('' if unrecognised). |
 
 ### Classes
 
@@ -8364,9 +8371,15 @@ A single piece of generated media.
 
 Holds the URL plus minimal typed metadata. `download` materializes it.
 
-#### download(, to=None)
+#### download(, to=None, fix_suffix=False)
 
 Download the asset to a file. Returns the local path.
+
+The bytes are sniffed: some models return a different format than the
+usual one (Recraft’s `vector_illustration/*` styles return SVG, not
+PNG). If the suffix of `to` contradicts the content, a
+`UserWarning` is issued; with `fix_suffix=True` the suffix is
+corrected instead (so the returned path may differ from `to`).
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
@@ -8390,6 +8403,13 @@ as `raw` only — callers can read `result.raw` for anything we miss.
 
 * **Return type:**
   [`Result`](_autosummary/falaw.results.html.md#falaw.results.Result)
+
+### falaw.results.sniff_extension(data)
+
+Extension implied by the leading bytes (’’ if unrecognised).
+
+* **Return type:**
+  [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)
 
 
 # _autosummary/falaw.scene.html.md
@@ -9066,18 +9086,18 @@ False
 
 # About this build
 
-This documentation was built on **2026-10-08 06:47 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/a9e75be2054d24a8cbb165d0905496a3f0abcbc1"><code>a9e75be</code></a> on branch <code>main</code>, for **falaw 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-10-08 06:58 UTC** from commit <a href="https://github.com/thorwhalen/falaw/commit/5c2ae08f7f8238dab8ba5366e5fc52ef170157c2"><code>5c2ae08</code></a> on branch <code>main</code>, for **falaw 0.0.58** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install falaw` gives newer code than these docs describe.
+- The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install falaw` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                         |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/a9e75be2054d24a8cbb165d0905496a3f0abcbc1"><code>a9e75be2054d24a8cbb165d0905496a3f0abcbc1</code></a> |
+| Commit              | <a href="https://github.com/thorwhalen/falaw/commit/5c2ae08f7f8238dab8ba5366e5fc52ef170157c2"><code>5c2ae08f7f8238dab8ba5366e5fc52ef170157c2</code></a> |
 | Branch              | <code>main</code>                                                                                                                                       |
 | Tags at this commit | none                                                                                                                                                    |
 | Working tree        | clean                                                                                                                                                   |
@@ -9088,9 +9108,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>thorwhalen/falaw</code>                                                              |
-| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37739370600">37739370600</a>     |
+| Run          | <a href="https://github.com/thorwhalen/falaw/actions/runs/37740407987">37740407987</a>     |
 | Ref          | <code>refs/heads/main</code>                                                               |
-| Event commit | <code>a9e75be2054d24a8cbb165d0905496a3f0abcbc1</code> (in the history of the built commit) |
+| Event commit | <code>5c2ae08f7f8238dab8ba5366e5fc52ef170157c2</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -9099,7 +9119,7 @@ The documentation and the package may be misaligned:
 | epythet  | 0.2.12  |
 | Sphinx   | 9.1.0   |
 | docutils | 0.22.4  |
-| Python   | 3.12.14 |
+| Python   | 3.12.15 |
 
 ## Configuration as resolved
 
@@ -9115,13 +9135,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/falaw/0.0.58/">0.0.58</a>, newer than the documented version (0.0.57).
+Latest release: <a href="https://pypi.org/project/falaw/0.0.59/">0.0.59</a>, newer than the documented version (0.0.58).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/thorwhalen/falaw && cd falaw
-git checkout a9e75be2054d24a8cbb165d0905496a3f0abcbc1
+git checkout 5c2ae08f7f8238dab8ba5366e5fc52ef170157c2
 pip install "epythet==0.2.12"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

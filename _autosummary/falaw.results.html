@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=2bfb35b6"></script>
+    <script src="../_static/documentation_options.js?v=c3e19674"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,7 +56,7 @@
     <link rel="prev" title="falaw.reprice" href="falaw.reprice.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.57" />
+  <meta name="docsearch:version" content="0.0.58" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -437,6 +437,9 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#falaw.results.parse_response" title="falaw.results.parse_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_response</span></code></a>(raw, *, application, arguments)</p></td>
 <td><p>Best-effort parser over the common fal response shapes.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#falaw.results.sniff_extension" title="falaw.results.sniff_extension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sniff_extension</span></code></a>(data)</p></td>
+<td><p>Extension implied by the leading bytes ('' if unrecognised).</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -462,8 +465,13 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="falaw.results.Asset.download">
-<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/results.html#Asset.download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.results.Asset.download" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fix_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/results.html#Asset.download"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.results.Asset.download" title="Link to this definition">#</a></dt>
 <dd><p>Download the asset to a file. Returns the local path.</p>
+<p>The bytes are sniffed: some models return a different format than the
+usual one (Recraft’s <code class="docutils literal notranslate"><span class="pre">vector_illustration/*</span></code> styles return SVG, not
+PNG). If the suffix of <code class="docutils literal notranslate"><span class="pre">to</span></code> contradicts the content, a
+<code class="docutils literal notranslate"><span class="pre">UserWarning</span></code> is issued; with <code class="docutils literal notranslate"><span class="pre">fix_suffix=True</span></code> the suffix is
+corrected instead (so the returned path may differ from <code class="docutils literal notranslate"><span class="pre">to</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
@@ -494,6 +502,17 @@ as <code class="code docutils literal notranslate"><span class="pre">raw</span><
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#falaw.results.Result" title="falaw.results.Result"><code class="xref py py-class docutils literal notranslate"><span class="pre">Result</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="falaw.results.sniff_extension">
+<span class="sig-prename descclassname"><span class="pre">falaw.results.</span></span><span class="sig-name descname"><span class="pre">sniff_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/falaw/results.html#sniff_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#falaw.results.sniff_extension" title="Link to this definition">#</a></dt>
+<dd><p>Extension implied by the leading bytes (’’ if unrecognised).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -553,6 +572,7 @@ as <code class="code docutils literal notranslate"><span class="pre">raw</span><
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.results.Result"><code class="docutils literal notranslate"><span class="pre">Result</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.results.parse_response"><code class="docutils literal notranslate"><span class="pre">parse_response()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#falaw.results.sniff_extension"><code class="docutils literal notranslate"><span class="pre">sniff_extension()</span></code></a></li>
 </ul>
   </nav></div>
 

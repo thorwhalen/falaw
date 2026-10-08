@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../_static/documentation_options.js?v=2bfb35b6"></script>
+    <script src="../../_static/documentation_options.js?v=c3e19674"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -409,7 +409,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.0.57" />
+  <meta name="docsearch:version" content="0.0.58" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -716,8 +716,46 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_fetch</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Asset bytes through falaw's one transport (``falaw.content``)."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">falaw.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_url_fetcher</span>
+
+    <span class="k">return</span> <span class="sa">b</span><span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">default_url_fetcher</span><span class="p">()(</span><span class="n">url</span><span class="p">))</span>
+
+
+<span class="n">_MAGIC</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\x89</span><span class="s2">PNG</span><span class="se">\r\n\x1a\n</span><span class="s2">"</span><span class="p">,</span> <span class="s2">".png"</span><span class="p">),</span>
+    <span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\xff\xd8\xff</span><span class="s2">"</span><span class="p">,</span> <span class="s2">".jpg"</span><span class="p">),</span>
+    <span class="p">(</span><span class="sa">b</span><span class="s2">"GIF8"</span><span class="p">,</span> <span class="s2">".gif"</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="sniff_extension">
+<a class="viewcode-back" href="../../_autosummary/falaw.results.html#falaw.sniff_extension">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sniff_extension</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Extension implied by the leading bytes ('' if unrecognised)."""</span>
+    <span class="n">head</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">2048</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">magic</span><span class="p">,</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">_MAGIC</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">head</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">magic</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ext</span>
+    <span class="k">if</span> <span class="n">head</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"RIFF"</span> <span class="ow">and</span> <span class="n">head</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"WEBP"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">".webp"</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">head</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="sa">b</span><span class="s2">"</span><span class="se">\xef\xbb\xbf</span><span class="s2"> </span><span class="se">\t\r\n</span><span class="s2">"</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="sa">b</span><span class="s2">"&lt;svg"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"&lt;?xml"</span><span class="p">))</span> <span class="ow">and</span> <span class="sa">b</span><span class="s2">"&lt;svg"</span> <span class="ow">in</span> <span class="n">head</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">".svg"</span>
+    <span class="k">return</span> <span class="s2">""</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_same_format</span><span class="p">(</span><span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sniffed</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="p">{</span><span class="s2">".jpeg"</span><span class="p">:</span> <span class="s2">".jpg"</span><span class="p">}</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">norm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">suffix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span> <span class="o">==</span> <span class="n">sniffed</span>
 
 
 <div class="viewcode-block" id="Asset">
@@ -739,19 +777,40 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="Asset.download">
 <a class="viewcode-back" href="../../_autosummary/falaw.results.html#falaw.Asset.download">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""Download the asset to a file. Returns the local path."""</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">fix_suffix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Download the asset to a file. Returns the local path.</span>
 
+<span class="sd">        The bytes are sniffed: some models return a different format than the</span>
+<span class="sd">        usual one (Recraft's ``vector_illustration/*`` styles return SVG, not</span>
+<span class="sd">        PNG). If the suffix of ``to`` contradicts the content, a</span>
+<span class="sd">        ``UserWarning`` is issued; with ``fix_suffix=True`` the suffix is</span>
+<span class="sd">        corrected instead (so the returned path may differ from ``to``).</span>
+<span class="sd">        """</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_fetch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">sniffed</span> <span class="o">=</span> <span class="n">sniff_extension</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">to</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
-                <span class="sa">f</span><span class="s2">"falaw_asset_</span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">))</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">_infer_extension</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"falaw_asset_</span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">))</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="si">}</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">sniffed</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_infer_extension</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">sniffed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_same_format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">to</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sniffed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">fix_suffix</span><span class="p">:</span>
+                <span class="n">to</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">to</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sniffed</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">to</span><span class="si">!r}</span><span class="s2">: content is </span><span class="si">{</span><span class="n">sniffed</span><span class="si">!r}</span><span class="s2"> but the suffix says "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">to</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="si">!r}</span><span class="s2">; some models return a different "</span>
+                    <span class="s2">"format than usual (e.g. Recraft vector_illustration/* "</span>
+                    <span class="s2">"styles return SVG). Pass fix_suffix=True to correct it."</span><span class="p">,</span>
+                    <span class="ne">UserWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
         <span class="n">parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">to</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">parent</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">to</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">to</span></div>
 
 
@@ -792,7 +851,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">stem_base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">"asset"</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assets</span><span class="p">):</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stem_base</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}{</span><span class="n">a</span><span class="o">.</span><span class="n">_infer_extension</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="n">path</span><span class="p">))</span>
+            <span class="n">paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">to</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">fix_suffix</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">paths</span></div>
 
 

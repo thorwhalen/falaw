@@ -256,9 +256,15 @@ A single piece of generated media.
 
 Holds the URL plus minimal typed metadata. `download` materializes it.
 
-#### download(, to=None)
+#### download(, to=None, fix_suffix=False)
 
 Download the asset to a file. Returns the local path.
+
+The bytes are sniffed: some models return a different format than the
+usual one (Recraft’s `vector_illustration/*` styles return SVG, not
+PNG). If the suffix of `to` contradicts the content, a
+`UserWarning` is issued; with `fix_suffix=True` the suffix is
+corrected instead (so the returned path may differ from `to`).
 
 * **Return type:**
   [`str`](https://docs.python.org/3/builtins/stdtypes.html#str)

@@ -9,6 +9,7 @@ falaw.results
    .. autosummary::
    
       parse_response
+      sniff_extension
    
    .. rubric:: Classes
 
