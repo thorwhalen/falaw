@@ -106,6 +106,18 @@ def model_constraints(id: str) -> dict:
     }
 
 
+def model_params(id: str) -> dict:
+    """Per-model parameters worth knowing before a call, ``{name: spec}``.
+
+    Each spec is ``{"enum": [...], "default": ...}``; resolves aliases. For
+    ``fal-ai/recraft/v3/text-to-image`` this shows ``style`` defaults to
+    ``realistic_image`` — a photograph, whatever the prompt describes — and
+    lists the styles that actually give a woodcut or a linocut. Empty when the
+    catalogue records none (fal's OpenAPI schema is the full source).
+    """
+    return {k: dict(v) for k, v in get_model(id).param_specs.items()}
+
+
 def video_model_constraints() -> list[dict]:
     """``model_constraints`` for every video model in the catalog — the data a
     shot-list builder shows as its model-limits reference."""

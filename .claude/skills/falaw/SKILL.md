@@ -568,8 +568,9 @@ The model registry lives at `falaw/data/models.json`. Refresh it from
   image                fast       fal-ai/hidream-i1-fast
   image                fast       fal-ai/sana/sprint
   image                high       fal-ai/flux-pro/v1.1
+  image                high       fal-ai/flux-2-pro
   image                ultra      fal-ai/flux-pro/v1.1-ultra
-  image                ultra      fal-ai/imagen4/preview/ultra
+  image                ultra      fal-ai/nano-banana-pro
   image_edit           balanced   fal-ai/flux-kontext/dev
   image_edit           balanced   fal-ai/omnigen-v2
   image_edit           high       fal-ai/bytedance/seededit/v3/edit-image

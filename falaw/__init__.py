@@ -64,6 +64,7 @@ from .errors import (
     FalInsufficientFunds,
     FalModelHung,
     FalNonCanonicalArgument,
+    FalPromptTooLong,
     FalRateLimited,
     FalServerError,
     FalTimeout,
@@ -156,6 +157,7 @@ from .reprice import (
     reprice_plan,
 )
 from .refresh import refresh_full_docs, refresh_llms, refresh_state
+from .liveness import check_model_liveness, dead_models
 from .pricing import fetch_model_prices, refresh_model_prices
 from .llm_rates_refresh import refresh_llm_rates
 from .registry import (
@@ -164,6 +166,7 @@ from .registry import (
     list_models,
     list_tools,
     model_constraints,
+    model_params,
     pick_model,
     register_tool,
     video_model_constraints,
@@ -207,6 +210,7 @@ __all__ = [
     "FalInsufficientFunds",
     "FalModelHung",
     "FalNonCanonicalArgument",
+    "FalPromptTooLong",
     "FalRateLimited",
     "FalServerError",
     "FalTimeout",
@@ -302,6 +306,7 @@ __all__ = [
     "parse_screenplay",
     "pick_model",
     "model_constraints",
+    "model_params",
     "video_model_constraints",
     "plan_animate_face",
     "plan_composite_character_in_environment",
@@ -317,6 +322,8 @@ __all__ = [
     "refresh_llms",
     "refresh_models_from_corpus",
     "refresh_model_prices",
+    "check_model_liveness",
+    "dead_models",
     "fetch_model_prices",
     "refresh_llm_rates",
     "refresh_state",

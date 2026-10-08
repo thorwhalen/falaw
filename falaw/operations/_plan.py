@@ -25,6 +25,7 @@ from ..cost import estimate_call_cost
 from ..llm_rates import LlmRateTable, llm_ceiling_usd
 from ..plan import CallPlan, CostBasis, make_call_plan
 from ..registry import get_model, pick_model
+from ._image_args import image_arguments
 from ..reprice import catalogue_cost_basis, llm_cost_basis
 
 
@@ -100,7 +101,7 @@ def plan_generate_image(
     application, record = _resolve_model_id_and_record(
         model_id=model_id, category="image", quality_tier=quality
     )
-    arguments = {"prompt": prompt, "image_size": image_size, **(extra or {})}
+    arguments = image_arguments(record, prompt, image_size, extra)
     cost, basis = _catalogue_price(record)
     return make_call_plan(
         tool="generate_image",

@@ -108,3 +108,16 @@ class ModelRecord:
     default_negative_prompt: str = ""
     """Quality/realism negatives worth appending by default (e.g. to avoid the
     plastic-skin look). Empty when none."""
+
+    # --- request-shape metadata (image models; falaw#76) ---
+    max_prompt_chars: Optional[int] = None
+    """Hard cap on ``prompt`` length, from the model's OpenAPI schema. Calls
+    over it fail at fal with an HTTP 422 after queueing; falaw raises first."""
+    size_param: str = "image_size"
+    """Which argument carries the output size: ``"image_size"`` (fal's named
+    presets, the default) or ``"aspect_ratio"`` (+ ``resolution``)."""
+    param_specs: Mapping[str, Mapping[str, Any]] = field(default_factory=dict)
+    """Discoverable per-model parameters that matter for choosing well, as
+    ``{name: {"enum": [...], "default": ...}}`` — e.g. Recraft's ``style``,
+    whose photoreal default silently overrides a woodcut prompt. See
+    :func:`falaw.model_params`."""
